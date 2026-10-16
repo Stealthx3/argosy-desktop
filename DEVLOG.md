@@ -80,7 +80,12 @@ Project rules (set by the project owner, 2026-10-16):
 **Reasoning:** Releases are upstream's tested states, so diffing and re-basing the port against releases avoids chasing half-finished work between them. Fast-forward-only keeps the reference branch's history trustworthy.
 **Finding:** `origin/upstream` was created at `6e64baa`, which is v2.23.0 (`9940f11`) plus 3 post-release commits; `main` is based on the same commit. The workflow leaves that as is until v2.24.0; resetting `upstream` exactly to v2.23.0 needs a force-push, which is the owner's call. Scheduled workflows on a fork run only once Actions are enabled for the fork.
 
-**Still open:** commit and push `main`; ask about Phase 1.
+**Action:** Owner approved resetting `upstream` to exactly v2.23.0 (`9940f11`), dropping the 3 post-release commits from the reference branch, by force-push with a lease on `6e64baa`.
+**Reasoning:** Makes the reference branch match the release-only rule from the start; the sync workflow then fast-forwards it at v2.24.0. `main` keeps its base at `6e64baa`.
+
+**Note:** Pushing from this session failed: HTTPS has no credential helper ("Password authentication is not supported"), and the SSH agent refused to sign with `~/.ssh/id_ed25519`. The owner runs the pushes.
+
+**Still open:** owner pushes `main` and resets `upstream`; ask about Phase 1.
 
 ### Next (for the Claude Code session)
 
