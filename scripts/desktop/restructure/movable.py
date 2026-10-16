@@ -14,9 +14,11 @@ does not depend on; commonMain files may not depend on them.
 Usage: movable.py --check           audits files already in shared against the same rules.
        movable.py --why <file>      prints the chain of dependencies that keeps <file> in app.
        movable.py --android <file>  prints what placing <file> in androidMain also needs.
-       movable.py [path-prefix ...]   prints the qualifying files under those prefixes, together
+       movable.py [--exclude glob ...] [path-prefix ...]   (an excluded file and everything that
+                                    depends on it stays in app)   prints the qualifying files under those prefixes, together
 with the qualifying files they depend on, so the printed set compiles on its own.
 """
+import fnmatch
 import re
 import sys
 from collections import defaultdict
@@ -143,6 +145,11 @@ def analyse(u, index, packages):
 
 def main():
     args = sys.argv[1:]
+    excluded = []
+    while "--exclude" in args:
+        i = args.index("--exclude")
+        excluded.append(args[i + 1])
+        del args[i:i + 2]
     app, common_shared, android_shared = load(APP), load(SHARED), load(SHARED_ANDROID)
     index = defaultdict(set)
     packages = set()
@@ -172,7 +179,10 @@ def main():
         print(f"{bad} problems")
         sys.exit(1 if bad else 0)
 
-    movable = {u for u in app if not common_reasons[u]}
+    def held_back(u):
+        return any(fnmatch.fnmatchcase(u.rel, glob.replace("**", "*")) for glob in excluded)
+
+    movable = {u for u in app if not common_reasons[u] and not held_back(u)}
     changed = True
     while changed:
         changed = False
