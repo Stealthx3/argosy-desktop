@@ -94,7 +94,7 @@ Project rules (set by the project owner, 2026-10-16):
 
 ## Phase 1 · Kotlin Multiplatform restructure
 
-**Status:** plan approved by the owner (2026-10-16); step 1 done, step 2 (module skeleton) next.
+**Status:** plan approved by the owner (2026-10-16); steps 1 and 2 done, step 3 (Room into `shared`) next.
 
 ### 2026-10-16 — Session 3 (Claude Code on the owner's computer)
 
@@ -187,3 +187,18 @@ Declarations, KDoc and annotations move byte for byte; each file keeps only the 
 **Verification:** `./gradlew :app:assembleDebug :app:testDebugUnitTest` on JDK 21 → BUILD SUCCESSFUL in 2 m 34 s (warm); `compileDebugKotlin`, `compileDebugUnitTestKotlin` and `testDebugUnitTest` all executed: 4,359 tests, 0 failures, 1 skipped (upstream's own). `scripts/ci/stability_checks.py` and `service_stability_checks.py` pass. Not checked on a device or emulator: the step moves declarations without changing any of them, so there is no behaviour to compare; the emulator is set up before step 3.
 **Finding:** First attempt failed to compile (the constant above was `private` and used by both files); fixed in the script, not by hand.
 **Finding:** upstream's `agentic-smells.py` flags 8 moved lines (KDoc wording, two `//` lines, a `glowColorMode` field) because a partial move looks like added text in a diff. They are upstream's own lines, left verbatim; if this step is ever offered upstream, the PR needs a `Takt-ack:` saying the lines are moved, not written.
+
+**Action:** Owner said proceed. Installed the Android emulator and an API 35 `google_apis` x86_64 image in `~/Android/Sdk`, and created AVD `argosy_handheld` (1920×1080 landscape, 320 dpi, hardware keyboard), the common handheld resolution Argosy targets. KVM is available; it boots headless in about 22 s (`-no-window -gpu swiftshader_indirect`).
+**Reasoning:** Owner's choice for the "looks unchanged" check.
+
+**Action:** Step 2 done: module skeleton. Added `:shared` (Kotlin Multiplatform library: `androidTarget()` + `jvm("desktop")`, namespace `com.nendo.argosy.shared`, min SDK 26, JVM 17) and `:desktopApp` (Compose desktop, `com.nendo.argosy.desktop.MainKt`, an empty window for now); `:app` depends on `:shared`. `shared` uses the app's `compose_stability_config.conf` and the same three Compose feature flags as `app`, so code compiles the same in both modules. Detekt now also scans `shared/src` and `desktopApp/src`. Moved one real file, `domain/model/UnifiedStateEntry.kt` (self-contained, uses `java.time`), to `shared/src/commonMain` as a pure rename (100% similarity, its own commit).
+**Reasoning:** One real file proves the whole chain (JDK APIs in `commonMain`, `app` compiling against `shared`, desktop compile) without adding placeholder code.
+**Decision (technical):** Compose Multiplatform **1.7.3**. Its Android variants require androidx Compose `ui`/`foundation`/`runtime` **1.7.6** and `material3` **1.3.1**, exactly what BOM 2024.12.01 already resolves. Checked by diffing `:app:dependencies --configuration debugRuntimeClasspath` before and after: no existing artifact changed version; five were added (`org.jetbrains.compose.runtime`, `annotation-internal`, `collection-internal` 1.7.3, `atomicfu`/`atomicfu-jvm` 0.23.2). CMP plugin 1.7.3 works with Kotlin 2.3.20 (only the existing `IntrinsicRemember` deprecation warning).
+**Finding:** with only JVM-family targets, Kotlin skips `compileCommonMainKotlinMetadata`; `commonMain` is compiled once per target. "No Android imports in `commonMain`" is therefore enforced by `:shared:compileKotlinDesktop` (no `android.jar` on that classpath), which is part of every step's gate from now on.
+**Deferred:** KSP per target (`kspAndroid` / `kspDesktop`) moves to step 3, the first step with an annotation processor; an empty processor setup would prove nothing.
+**Verification:**
+- `./gradlew :shared:assemble :desktopApp:assemble :app:assembleDebug :app:testDebugUnitTest` on JDK 21 → BUILD SUCCESSFUL (6 m 35 s); `app` compile and 4,359 unit tests executed, 0 failures, 1 skipped (upstream's).
+- `./gradlew :desktopApp:run`: window process starts on the owner's desktop, no exceptions (closed by timeout after ~2 min).
+- Emulator, before/after: built the pre-Phase-1 commit `3ad8281f6` in a temporary worktree as the baseline APK, installed it, captured the first-run welcome screen and (after the gamepad A key) the RomM login screen; then installed the current build over it and repeated. Both screens are **pixel-identical** at 1920×1080 (empty difference box); no `FATAL EXCEPTION` in logcat. No app data was cleared (the first-run step is not persisted, so both builds start on the same screen).
+- Not covered: screens past first run (home, library, settings) need a RomM server; `testbed/romm` (Docker) will provide one for the database and UI steps.
+**Note:** baseline APK and its screenshots kept in `build/desktop-baseline/` (git-ignored) for later before/after checks.
