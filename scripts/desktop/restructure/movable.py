@@ -8,7 +8,12 @@ rewrite_imports.py, within the members its stand-in offers), its code (comments 
 too. Iterates to a fixpoint. Same-package matching is by word, so it over-reports dependencies,
 never under-reports them. The compiler remains the final check.
 
-Usage: movable.py --why <file>      prints the chain of dependencies that keeps <file> in app.
+Files placed in shared androidMain may use Android APIs but not R, BuildConfig or modules shared
+does not depend on; commonMain files may not depend on them.
+
+Usage: movable.py --check           audits files already in shared against the same rules.
+       movable.py --why <file>      prints the chain of dependencies that keeps <file> in app.
+       movable.py --android <file>  prints what placing <file> in androidMain also needs.
        movable.py [path-prefix ...]   prints the qualifying files under those prefixes, together
 with the qualifying files they depend on, so the printed set compiles on its own.
 """
@@ -20,6 +25,7 @@ from pathlib import Path
 PKG_ROOT = "com/nendo/argosy"
 APP = Path("app/src/main/kotlin")
 SHARED = Path("shared/src/commonMain/kotlin")
+SHARED_ANDROID = Path("shared/src/androidMain/kotlin")
 ALLOWED = (
     "kotlin.", "kotlinx.coroutines.", "java.", "javax.",
     "androidx.room.", "androidx.sqlite.", "androidx.compose.runtime.",
@@ -36,13 +42,17 @@ GUARDED_REWRITES = {
         r"\bDisplayAffinityHelper\b(?!\.isKnownDualScreenDevice\(\))"
     ),
 }
+STRINGS = re.compile(r'"(?:[^"\\\n]|\\.)*"')
 COMMENTS = re.compile(r"/\*.*?\*/|^\s*//[^\n]*", re.S | re.M)
-ANDROID_FQ = re.compile(r"\bandroidx?\.[a-z]\w*(?:\.\w+)+")
+ANDROID_FQ = re.compile(r"(?<![\w.])(?:android|androidx|com|org|io|net|dagger|coil|in|okhttp3|retrofit2)\.[a-z]\w*(?:\.\w+)+")
+ANDROID_MAIN_ALLOWED = ALLOWED + (
+    "android.", "androidx.annotation.", "androidx.datastore.", "dagger.hilt.android.qualifiers.",
+)
 FORBIDDEN_WORDS = re.compile(r"\b(R\.(string|plurals|drawable|raw|color|dimen|font|xml|array|mipmap|id)\b|BuildConfig\b)")
 DECL = re.compile(
     r"^(?:@\S+\s+)*(?:(?:private|internal|public|data|enum|sealed|abstract|open|inline|value|const|"
     r"annotation|suspend|operator|infix|tailrec|external|fun|expect|actual)\s+)*"
-    r"(?:class|interface|object|fun|val|var|typealias)\s+(?:<[^>]*>\s*)?(?:[\w.<>?, ]+\.)?(\w+)"
+    r"(?:class|interface|object|fun|val|var|typealias)\s+(?:<[^>]*>\s*)?(?:([\w.<>?, ]+)\.)?(\w+)"
 )
 IMPORT = re.compile(r"^import\s+([\w.]+)(?:\s+as\s+\w+)?", re.M)
 FQ = re.compile(r"\bcom\.nendo\.argosy(?:\.\w+)+")
@@ -56,7 +66,14 @@ class Unit:
         self.text = path.read_text()
         m = re.search(r"^package\s+([\w.]+)", self.text, re.M)
         self.pkg = m.group(1) if m else ""
-        self.names = {m.group(1) for line in self.text.splitlines() if (m := DECL.match(line))}
+        self.names, self.receivers = set(), {}
+        for line in self.text.splitlines():
+            m = DECL.match(line)
+            if not m or re.search(r"\bactual\b", line.split("(")[0]):
+                continue
+            self.names.add(m.group(2))
+            if m.group(1):
+                self.receivers[m.group(2)] = re.sub(r"<.*|\?", "", m.group(1)).split(".")[-1]
         self.imports = IMPORT.findall(self.text)
         self.body = COMMENTS.sub("", IMPORT.sub("", self.text))
 
@@ -65,17 +82,7 @@ def load(root):
     return [Unit(p, root) for p in sorted((root / PKG_ROOT).rglob("*.kt"))]
 
 
-def main():
-    prefixes = sys.argv[1:]
-    app, shared = load(APP), load(SHARED)
-    index = defaultdict(set)
-    packages = set()
-    for u in app + shared:
-        packages.add(u.pkg)
-        for n in u.names:
-            index[(u.pkg, n)].add(u)
-    shared_set = set(shared)
-
+def analyse(u, index, packages):
     def resolve(fqn):
         parts = fqn.split(".")
         for i in range(len(parts) - 1, 0, -1):
@@ -84,74 +91,131 @@ def main():
                 return index.get((pkg, parts[i]))
         return None
 
-    deps, blocked = {}, {}
-    for u in app:
-        reasons, d = [], set()
-        for imp in u.imports:
-            if imp in GUARDED_REWRITES:
-                if GUARDED_REWRITES[imp].search(u.body):
-                    reasons.append(f"uses {imp} beyond its portable stand-in")
-                continue
-            if imp.startswith("com.nendo.argosy."):
-                if imp.endswith(".*"):
-                    pkg = imp[:-2]
-                    words = set(WORD.findall(u.body))
-                    for w in words:
-                        d |= index.get((pkg, w), set())
-                    continue
-                target = resolve(imp)
-                if target is None:
-                    reasons.append(f"unresolved {imp}")
-                else:
-                    d |= target
-            elif imp in REWRITTEN:
-                continue
-            elif not imp.startswith(ALLOWED) or imp.startswith(NOT_ALLOWED):
-                reasons.append(f"import {imp}")
-        for fq in FQ.findall(u.body):
-            target = resolve(fq)
-            if target:
-                d |= target
-        for fq in ANDROID_FQ.findall(u.body):
-            if fq.startswith(REWRITTEN):
-                continue
-            if not fq.startswith(ALLOWED) or fq.startswith(NOT_ALLOWED):
-                reasons.append(f"reference {fq}")
-        if FORBIDDEN_WORDS.search(u.body):
-            reasons.append("R or BuildConfig")
-        for w in set(WORD.findall(u.body)):
-            d |= index.get((u.pkg, w), set())
-        d.discard(u)
-        deps[u] = d
-        if reasons:
-            blocked[u] = reasons
+    common, android, deps = [], [], set()
 
-    movable = {u for u in app if u not in blocked}
+    def external(name, kind):
+        if not name.startswith(ALLOWED) or name.startswith(NOT_ALLOWED):
+            common.append(f"{kind} {name}")
+        if not name.startswith(ANDROID_MAIN_ALLOWED):
+            android.append(f"{kind} {name}")
+
+    for imp in u.imports:
+        if imp in GUARDED_REWRITES:
+            if GUARDED_REWRITES[imp].search(u.body):
+                common.append(f"uses {imp} beyond its portable stand-in")
+            target = resolve(imp)
+            if target:
+                deps |= target
+            continue
+        if imp in REWRITTEN:
+            continue
+        if imp.startswith("com.nendo.argosy."):
+            if imp.endswith(".*"):
+                for w in set(WORD.findall(u.body)):
+                    deps |= index.get((imp[:-2], w), set())
+                continue
+            target = resolve(imp)
+            if target is None:
+                common.append(f"unresolved {imp}")
+                android.append(f"unresolved {imp}")
+            else:
+                deps |= target
+        else:
+            external(imp, "import")
+    for fq in FQ.findall(u.body):
+        deps |= resolve(fq) or set()
+    for fq in ANDROID_FQ.findall(STRINGS.sub('""', u.body)):
+        if not fq.startswith(REWRITTEN) and not fq.startswith("com.nendo.argosy."):
+            external(fq, "reference")
+    if FORBIDDEN_WORDS.search(u.body):
+        common.append("R or BuildConfig")
+        android.append("R or BuildConfig")
+    words = set(WORD.findall(u.body))
+    for w in words:
+        deps |= {t for t in index.get((u.pkg, w), set()) if t.receivers.get(w, w) == w or t.receivers[w] in words}
+    deps.discard(u)
+    return deps, common, android
+
+
+def main():
+    args = sys.argv[1:]
+    app, common_shared, android_shared = load(APP), load(SHARED), load(SHARED_ANDROID)
+    index = defaultdict(set)
+    packages = set()
+    for u in app + common_shared + android_shared:
+        packages.add(u.pkg)
+        for n in u.names:
+            index[(u.pkg, n)].add(u)
+    in_common = set(common_shared)
+    in_shared = in_common | set(android_shared)
+
+    deps, common_reasons, android_reasons = {}, {}, {}
+    for u in app + common_shared + android_shared:
+        deps[u], common_reasons[u], android_reasons[u] = analyse(u, index, packages)
+
+    if args[:1] == ["--check"]:
+        bad = 0
+        for u in common_shared:
+            outside = sorted(d.rel for d in deps[u] if d not in in_common)
+            for problem in common_reasons[u] + [f"depends on {r} outside commonMain" for r in outside]:
+                print(f"commonMain {u.rel}: {problem}")
+                bad += 1
+        for u in android_shared:
+            outside = sorted(d.rel for d in deps[u] if d not in in_shared)
+            for problem in android_reasons[u] + [f"depends on {r} in app" for r in outside]:
+                print(f"androidMain {u.rel}: {problem}")
+                bad += 1
+        print(f"{bad} problems")
+        sys.exit(1 if bad else 0)
+
+    movable = {u for u in app if not common_reasons[u]}
     changed = True
     while changed:
         changed = False
         for u in list(movable):
-            if any(dep not in movable and dep not in shared_set for dep in deps[u]):
+            if any(dep not in movable and dep not in in_common for dep in deps[u]):
                 movable.discard(u)
                 changed = True
 
-    if prefixes[:1] == ["--why"]:
-        by_rel = {u.rel: u for u in app}
-        seen, current = set(), by_rel[prefixes[1]]
+    by_rel = {u.rel: u for u in app}
+    if args[:1] == ["--why"]:
+        if args[1] not in by_rel:
+            sys.exit(f"{args[1]} is not in app")
+        seen, current = set(), by_rel[args[1]]
         while current is not None and current not in seen:
             seen.add(current)
             if current in movable:
                 print(f"{current.rel}: movable")
                 return
-            if current in blocked:
-                print(f"{current.rel}: {'; '.join(blocked[current])}")
+            if common_reasons[current]:
+                print(f"{current.rel}: {'; '.join(common_reasons[current])}")
                 return
-            stuck = sorted((d for d in deps[current] if d not in movable and d not in shared_set), key=lambda x: x.rel)
+            stuck = sorted((d for d in deps[current] if d not in movable and d not in in_common), key=lambda x: x.rel)
             print(f"{current.rel} -> {', '.join(d.rel for d in stuck[:6])}")
             current = stuck[0] if stuck else None
         return
 
-    chosen = {u for u in movable if not prefixes or u.rel.startswith(tuple(prefixes))}
+    if args[:1] == ["--android"]:
+        place = {by_rel[a] for a in args[1:]}
+        pending, problems = list(place), []
+        while pending:
+            u = pending.pop()
+            if android_reasons[u]:
+                problems.append(f"{u.rel}: {'; '.join(android_reasons[u])}")
+            for dep in deps[u]:
+                if dep in in_shared or dep in place or dep in movable:
+                    continue
+                place.add(dep)
+                pending.append(dep)
+        for u in sorted(place, key=lambda x: x.rel):
+            print(f"androidMain {u.rel}")
+        for u in sorted({d for p in place for d in deps[p] if d in movable}, key=lambda x: x.rel):
+            print(f"commonMain {u.rel}")
+        for line in problems:
+            print(f"blocked {line}")
+        return
+
+    chosen = {u for u in movable if not args or u.rel.startswith(tuple(args))}
     pending = list(chosen)
     while pending:
         for dep in deps[pending.pop()]:

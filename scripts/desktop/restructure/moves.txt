@@ -136,6 +136,8 @@
 + data/preferences/AccountPreferenceStoreRegistry.kt
 + data/preferences/AccountScopedDataStore.kt
 + util/DisplayAffinityHelper.kt
++ util/ScreenCatalog.kt
++ util/DesktopMode.kt
 
 # Step 6: preference repositories and their closure (movable.py data/preferences/).
 [commonMain]

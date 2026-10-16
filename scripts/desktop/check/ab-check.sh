@@ -3,7 +3,7 @@
 # Runs on AVD argosy_handheld_check (emulator-5556), which must already be signed in to the RomM
 # testbed (scripts/desktop/testbed/seed-emulator.sh emulator-5556). Each build is installed over
 # the same app data, launched, and walked through the same gamepad sequence; screenshots and a
-# database summary are compared with both clocks masked. Never clears app data.
+# database and DataStore summary are compared with both clocks masked. Never clears app data.
 #
 # usage: scripts/desktop/check/ab-check.sh [candidate.apk] [out-dir]
 set -euo pipefail
@@ -46,6 +46,11 @@ run() {
         $ADB exec-out run-as "$PKG" cat "databases/$f" > "$OUT/$tag-db/$f"
     done
     python3 -I "$ROOT/scripts/desktop/check/db_summary.py" "$OUT/$tag-db/alauncher.db" > "$OUT/$tag-db.json"
+    mkdir -p "$OUT/$tag-datastore"
+    for f in $($ADB shell run-as "$PKG" ls files/datastore | tr -d '\r'); do
+        $ADB exec-out run-as "$PKG" cat "files/datastore/$f" > "$OUT/$tag-datastore/$f"
+    done
+    python3 -I "$ROOT/scripts/desktop/check/datastore_summary.py" "$OUT/$tag-datastore" > "$OUT/$tag-datastore.json"
 }
 
 $ADB logcat -c
