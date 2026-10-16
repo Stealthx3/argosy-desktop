@@ -1,0 +1,353 @@
+package com.nendo.argosy.data.preferences
+
+import com.nendo.argosy.data.cache.GradientPreset
+import com.nendo.argosy.core.input.SoundConfig
+import com.nendo.argosy.ui.theme.generated.ComponentDefaults
+import com.nendo.argosy.core.input.SoundType
+import com.nendo.argosy.domain.model.ScreenLayouts
+import com.nendo.argosy.util.LogLevel
+import java.time.Instant
+data class BuiltinEmulatorSettings(
+    val shader: String = "None",
+    val shaderChainJson: String = "",
+    val filter: String = "Auto",
+    val aspectRatio: String = "Core Provided",
+    val portraitPosition: String = "Auto",
+    val skipDuplicateFrames: Boolean = false,
+    val lowLatencyAudio: Boolean = true,
+    val audioVolume: Int = 100,
+    val forceSoftwareTiming: Boolean = false,
+    val rumbleEnabled: Boolean = true,
+    val blackFrameInsertion: Boolean = false,
+    val framesEnabled: Boolean = false,
+    val frame: String? = null,
+    val limitHotkeysToPlayer1: Boolean = true,
+    val analogAsDpad: Boolean = false,
+    val dpadAsAnalog: Boolean = false,
+    val fastForwardEnabled: Boolean = true,
+    val fastForwardSpeed: Int = 4,
+    val fastForwardMode: com.nendo.argosy.data.local.entity.FastForwardMode = com.nendo.argosy.data.local.entity.FastForwardMode.HOLD,
+    val fastForwardPreservePitch: Boolean = false,
+    val rotation: Int = -1,
+    val overscanCrop: Int = 0,
+    val rewindEnabled: Boolean = true,
+    val rewindSpeed: Int = 1,
+    val rewindBufferDuration: Int = 15,
+    val autoSaveState: Boolean = true,
+    val autoRestoreState: Boolean = true,
+    val autoRestoreStateMode: String = "restore",
+    val preferNewerServerSave: Boolean = true,
+    val hwCoreSaveStatesEnabled: Boolean = false,
+    val defaultToHardcore: String = "ask",
+    val customSavePath: String? = null,
+    val customStatePath: String? = null,
+    val architectureOverride: String? = null,
+    val gpuDriver: String = com.nendo.argosy.data.emulator.GpuDriverToken.SYSTEM,
+    val showTouchControlsWhenNoGamepad: Boolean = true,
+    val touchControlsOpacityLandscape: Float = 0.45f,
+    val touchControlsOpacityPortrait: Float = 1.0f,
+    val touchControlsSizeScale: Float = 1.0f,
+    val touchControlsHaptic: Boolean = true,
+    val touchControlsFadeOnIdle: Boolean = false,
+    val touchControlsSwapHanded: Boolean = false,
+    val touchControlsLockOrientation: Boolean = false,
+    val touchControlsMirror180: Boolean = false,
+    val touchControlsAllowLongPressEdit: Boolean = false,
+    val touchControlsColouredFaceButtons: Boolean = false,
+    val touchControlsGenesis6Button: Boolean = false,
+    val speedrunStartOnReset: Boolean = true,
+    val speedrunPanelSide: String = "Right",
+    val speedrunPanelWidthPercent: Int = 30,
+    val ingameMenuTwoColumn: Boolean = false,
+    val hudEnabled: Boolean = false,
+    val hudCorner: String = "Top Left",
+    val hudShowBattery: Boolean = true,
+    val hudShowClock: Boolean = true,
+    val hudShowPlaytime: Boolean = false,
+    val hudShowFps: Boolean = false,
+    val hudShowLastSave: Boolean = false
+) {
+    val shaderConfig: com.swordfish.libretrodroid.ShaderConfig
+        get() = when (shader) {
+            "CRT" -> com.swordfish.libretrodroid.ShaderConfig.CRT
+            "LCD" -> com.swordfish.libretrodroid.ShaderConfig.LCD
+            "Sharp" -> com.swordfish.libretrodroid.ShaderConfig.Sharp
+            "CUT" -> com.swordfish.libretrodroid.ShaderConfig.CUT()
+            "CUT2" -> com.swordfish.libretrodroid.ShaderConfig.CUT2()
+            "CUT3" -> com.swordfish.libretrodroid.ShaderConfig.CUT3()
+            "Custom" -> com.swordfish.libretrodroid.ShaderConfig.Default
+            else -> com.swordfish.libretrodroid.ShaderConfig.Default
+        }
+
+    val shaderChainConfig: com.nendo.argosy.libretro.shader.ShaderChainConfig
+        get() = com.nendo.argosy.libretro.shader.ShaderChainConfig.fromJson(shaderChainJson)
+
+    val filterMode: Int
+        get() = when (filter) {
+            "Nearest" -> 0
+            "Bilinear" -> 1
+            else -> -1
+        }
+
+    val isIntegerScaling: Boolean
+        get() = aspectRatio == "Integer"
+
+    val audioVolumeGain: Float
+        get() = audioVolume / 100f
+
+    val audioVolumeDisplay: String
+        get() = "${audioVolume}%"
+
+    val fastForwardSpeedDisplay: String
+        get() = "${fastForwardSpeed}x"
+
+    val rewindSpeedDisplay: String
+        get() = "${rewindSpeed}x"
+
+    val rewindBufferDurationDisplay: String
+        get() = "${rewindBufferDuration}s"
+
+    val rotationDisplay: String
+        get() = when (rotation) {
+            -1 -> "Auto"
+            0 -> "0°"
+            90 -> "90°"
+            180 -> "180°"
+            270 -> "270°"
+            else -> "Auto"
+        }
+
+    val overscanCropDisplay: String
+        get() = when (overscanCrop) {
+            0 -> "Off"
+            else -> "${overscanCrop}px"
+        }
+}
+
+data class UserPreferences(
+    val firstRunComplete: Boolean = false,
+    val rommBaseUrl: String? = null,
+    val rommUsername: String? = null,
+    val rommUserId: Long? = null,
+    val rommAvatarPath: String? = null,
+    val rommToken: String? = null,
+    val rommDeviceId: String? = null,
+    val rommDeviceClientVersion: String? = null,
+    val raUsername: String? = null,
+    val raToken: String? = null,
+    val raWebApiKey: String? = null,
+    val raProxyEnabled: Boolean = false,
+    val raProxyAddress: String = "",
+    val romStoragePath: String? = null,
+    val showStatusClock: Boolean = true,
+    val showStatusBattery: Boolean = true,
+    val showStatusNetwork: Boolean = false,
+    val themeMode: ThemeMode = ThemeMode.SYSTEM,
+    val primaryColor: Int? = null,
+    val secondaryColor: Int? = null,
+    val tertiaryColor: Int? = null,
+    val surfaceTintBleed: Int = 0,
+    val backdropEnabled: Boolean = false,
+    val backdropPreset: BackdropPreset = BackdropPreset.PLATFORMS,
+    val backdropCellSize: Int = ComponentDefaults.SurfaceBackdrop.cellSizeDefaultDp,
+    val backdropScatter: Int = 200,
+    val backdropScaleJitter: Int = 100,
+    val backdropStrength: Int = 20,
+    val backdropEdgeStyle: BackdropEdgeStyle = BackdropEdgeStyle.CONNECTIONS,
+    val backdropVertexIcons: BackdropVertexIcon = BackdropVertexIcon.NONE,
+    val backdropSeed: Long = 0L,
+    val backdropMotion: BackdropMotion = BackdropMotion.SWAY,
+    val backdropMotionSpeed: Int = 75,
+    val backdropDriftAngle: Float = 45f,
+    val displayFontPath: String? = null,
+    val displayFontName: String? = null,
+    val bodyFontPath: String? = null,
+    val bodyFontName: String? = null,
+    val displayFontScale: Int = 100,
+    val bodyFontScale: Int = 100,
+    val hapticEnabled: Boolean = true,
+    val hapticStrength: Float = ControlsPreferences.DEFAULT_HAPTIC_STRENGTH,
+    val soundEnabled: Boolean = false,
+    val soundVolume: Int = 40,
+    val swapAB: Boolean = false,
+    val swapXY: Boolean = false,
+    val controllerLayout: String = "auto",
+    val swapStartSelect: Boolean = false,
+    val selectLCombo: String = "quick_menu",
+    val selectRCombo: String = "quick_settings",
+    val menuWrapMode: MenuWrapMode = MenuWrapMode.HARD_STOP,
+    val selectSwapMode: SelectSwapMode = SelectSwapMode.HOLD,
+    val openNavigationKey: Int = ControlsPreferences.DEFAULT_OPEN_NAVIGATION_KEY,
+    val openQuickPanelKey: Int = ControlsPreferences.DEFAULT_OPEN_QUICK_PANEL_KEY,
+    val navRingRoutes: List<String>? = null,
+    val quickNavigation: Boolean = true,
+    val navBarAutoHide: Boolean = true,
+    val lastRommSync: Instant? = null,
+    val lastFavoritesSync: Instant? = null,
+    val lastFavoritesCheck: Instant? = null,
+    val syncFilters: SyncFilterPreferences = SyncFilterPreferences(),
+    val regionPriority: List<String> = SyncFilterPreferences.ALL_KNOWN_REGIONS,
+    val syncScreenshotsEnabled: Boolean = false,
+    val uploadScreenshotsEnabled: Boolean = true,
+    val boxArtCacheEnabled: Boolean = true,
+    val hiddenApps: Set<String> = emptySet(),
+    val secondaryHomeApps: List<String> = emptyList(),
+    val visibleSystemApps: Set<String> = emptySet(),
+    val appOrder: List<String> = emptyList(),
+    val maxConcurrentDownloads: Int = 1,
+    val allowRemoteInstalls: Boolean = true,
+    val autoStartDownloads: Boolean = true,
+    val instantDownloadThresholdMb: Int = 50,
+    val stageDownloadsInternally: Boolean = true,
+    val folderNameFromRom: Boolean = false,
+    val gridDensity: GridDensity = GridDensity.NORMAL,
+    val libraryLayout: LibraryLayout = LibraryLayout.GRID,
+    val libraryBoxArt3d: Boolean = false,
+    val libraryDefaultSort: String = "TITLE",
+    val libraryDefaultSortDescending: Boolean? = null,
+    val sortInstalledFirst: Boolean = false,
+    val sortFavoritesFirst: Boolean = false,
+    val libraryDefaultSource: String = "ALL",
+    val libraryDefaultPlatformId: Long? = null,
+    val libraryDefaultRegions: Set<String> = emptySet(),
+    val libraryDefaultPlayers: com.nendo.argosy.domain.model.PlayerCountBucket? = null,
+    val soundConfigs: Map<SoundType, SoundConfig> = emptyMap(),
+    val betaUpdatesEnabled: Boolean = false,
+    val closeEmulatorOnSessionEnd: Boolean = true,
+    val appLanguage: AppLanguage = AppLanguage.SYSTEM,
+    val preLaunchRecapsEnabled: Boolean = true,
+    val monthlyRecapEnabled: Boolean = true,
+    val lastMonthlyRecapShown: java.time.YearMonth? = null,
+    val preLaunchRecapBaseline: java.time.Instant? = null,
+    val saveSyncEnabled: Boolean = false,
+    val secureSaves: Boolean = true,
+    val stateCacheEnabled: Boolean = true,
+    val saveCacheLimit: Int = 10,
+    val backgroundBlur: Int = 0,
+    val backgroundSaturation: Int = 100,
+    val backgroundOpacity: Int = 100,
+    val useGameBackground: Boolean = true,
+    val customBackgroundPath: String? = null,
+    val homeBackgroundMode: HomeBackgroundMode = HomeBackgroundMode.GAME_ART,
+    val homeLayout: com.nendo.argosy.domain.model.HomeLayoutSettings =
+        com.nendo.argosy.domain.model.HomeLayoutSettings(),
+    val presentationStyle: com.nendo.argosy.domain.model.PresentationStyle =
+        com.nendo.argosy.domain.model.PresentationStyle(),
+    val presentationBackgroundBlur: Int = 0,
+    val useAccentColorFooter: Boolean = false,
+    val compactFooter: Boolean = false,
+    val hideSystemNavigationBar: Boolean = true,
+    val hideSystemStatusBar: Boolean = true,
+    val lockScreenArt: Boolean = true,
+    val homeAppAvailable: Boolean = true,
+    val iconPack: String? = null,
+    val fileLoggingEnabled: Boolean = false,
+    val fileLoggingPath: String? = null,
+    val fileLogLevel: LogLevel = LogLevel.INFO,
+    val saveDebugLoggingEnabled: Boolean = false,
+    val saveWatcherEnabled: Boolean = false,
+    val boxArtShape: BoxArtShape = BoxArtShape.STANDARD,
+    val boxArtCornerRadius: BoxArtCornerRadius = BoxArtCornerRadius.MEDIUM,
+    val boxArtBorderThickness: BoxArtBorderThickness = BoxArtBorderThickness.MEDIUM,
+    val boxArtBorderStyle: BoxArtBorderStyle = BoxArtBorderStyle.GLASS,
+    val glassBorderTint: GlassBorderTint = GlassBorderTint.TINT_20,
+    val boxArtGlowStrength: BoxArtGlowStrength = BoxArtGlowStrength.MEDIUM,
+    val boxArtOuterEffect: BoxArtOuterEffect = BoxArtOuterEffect.GLOW,
+    val boxArtOuterEffectThickness: BoxArtOuterEffectThickness = BoxArtOuterEffectThickness.THIN,
+    val glowColorMode: GlowColorMode = GlowColorMode.AUTO,
+    val boxArtInnerEffect: BoxArtInnerEffect = BoxArtInnerEffect.GLASS,
+    val boxArtInnerEffectThickness: BoxArtInnerEffectThickness = BoxArtInnerEffectThickness.THICK,
+    val gradientPreset: GradientPreset = GradientPreset.BALANCED,
+    val gradientAdvancedMode: Boolean = false,
+    val systemIconPosition: SystemIconPosition = SystemIconPosition.TOP_LEFT,
+    val systemIconPadding: SystemIconPadding = SystemIconPadding.MEDIUM,
+    val platformIndicatorStyle: PlatformIndicatorStyle = PlatformIndicatorStyle.TAB,
+    val platformIndicatorContent: PlatformIndicatorContent = PlatformIndicatorContent.NAME,
+    val defaultView: DefaultView = DefaultView.HOME,
+    val recommendedGameIds: List<Long> = emptyList(),
+    val lastRecommendationGeneration: Instant? = null,
+    val recommendationPenalties: Map<Long, Float> = emptyMap(),
+    val lastPenaltyDecayWeek: String? = null,
+    val lastSeenVersion: String? = null,
+    val libraryRecentSearches: List<String> = emptyList(),
+    val ambientAudioEnabled: Boolean = false,
+    val ambientAudioVolume: Int = 50,
+    val ambientAudioUri: String? = null,
+    val ambientAudioShuffle: Boolean = false,
+    val ambientAudioPlayInBackground: Boolean = false,
+    val gameDetailThemeEnabled: Boolean = false,
+    val imageCachePath: String? = null,
+    val screenDimmerEnabled: Boolean = true,
+    val screenDimmerTimeoutMinutes: Int = 2,
+    val screenDimmerLevel: Int = 50,
+    val customBiosPath: String? = null,
+    val videoWallpaperEnabled: Boolean = false,
+    val videoWallpaperDelaySeconds: Int = 3,
+    val videoWallpaperMuted: Boolean = false,
+    val uiScale: Int = 100,
+    val gripReserveMode: GripReserveMode = GripReserveMode.OFF,
+    val gripReservePercent: Int = 35,
+    val gripAutoControllers: com.nendo.argosy.domain.model.GripAutoControllers =
+        com.nendo.argosy.domain.model.GripAutoControllers(),
+    val ambientLedEnabled: Boolean = false,
+    val ambientLedBrightness: Int = 100,
+    val ambientLedAudioBrightness: Boolean = true,
+    val ambientLedAudioColors: Boolean = false,
+    val ambientLedColorMode: AmbientLedColorMode = AmbientLedColorMode.DOMINANT_3,
+    val ambientLedCoverArtEnabled: Boolean = true,
+    val ambientLedCustomColor: Boolean = false,
+    val ambientLedCustomColorHue: Int = 200,
+    val ambientLedScreenEnabled: Boolean = false,
+    val ambientLedTransitionMs: Int = 250,
+    val ambientLedAchievementFlash: Boolean = true,
+    val builtinLibretroEnabled: Boolean = true,
+    val appDisplayTargets: Map<String, String> = emptyMap(),
+    val dualScreenEnabled: Boolean = false,
+    val displayRoleOverride: DisplayRoleOverride = DisplayRoleOverride.AUTO,
+    val gamesDisplayTarget: EmulatorDisplayTarget = EmulatorDisplayTarget.PRESENTATION,
+    val appsDisplayTarget: EmulatorDisplayTarget = EmulatorDisplayTarget.DEFAULT,
+    val dualScreenInputFocus: DualScreenInputFocus = DualScreenInputFocus.AUTO,
+    val screenLayouts: ScreenLayouts = ScreenLayouts(),
+    val installedOnlyHome: Boolean = false,
+    val socialSessionToken: String? = null,
+    val socialUserId: String? = null,
+    val socialUsername: String? = null,
+    val socialDisplayName: String? = null,
+    val socialAvatarColor: String? = null,
+    val socialAvatarDoodle: String? = null,
+    val socialAvatarUseDoodle: Boolean = false,
+    val socialOnlineStatusEnabled: Boolean = true,
+    val socialShowNowPlaying: Boolean = true,
+    val socialNotifyFriendOnline: Boolean = true,
+    val socialNotifyFriendPlaying: Boolean = true,
+    val socialSuppressNotificationsInGame: Boolean = false,
+    val discordRichPresenceEnabled: Boolean = true,
+    val lastPlaySessionSync: Instant? = null,
+    val lastStateValidation: Instant? = null,
+    val weeklyIntegrityCheckEnabled: Boolean = true,
+    val lastIntegrityCheckTime: Long? = null,
+    val steamInstallVolume: String? = null,
+    val quayPassEnabled: Boolean = false,
+    val quayPassAvatarSyncPending: Boolean = false,
+    val quayPassMessageSyncPending: Boolean = false,
+    val quayPassGreeting: String? = null,
+    val quayPassTicketBalance: Int = 0,
+    val mediaStoragePath: String? = null,
+    val jellyfinServerUrl: String? = null,
+    val jellyfinDeviceId: String? = null,
+    val jellyfinAccessToken: String? = null,
+    val jellyfinUserId: String? = null,
+    val jellyfinUserName: String? = null,
+    val mediaDownloadQuality: MediaDownloadQuality = MediaDownloadQuality.ORIGINAL,
+    val mediaStreamingQuality: MediaStreamingQuality = MediaStreamingQuality.AUTO,
+    val mediaAudioLanguage: MediaAudioLanguage = MediaAudioLanguage.ENGLISH,
+    val mediaSubtitleMode: MediaSubtitleMode = MediaSubtitleMode.PREFERRED,
+    val mediaSubtitleLanguage: MediaSubtitleLanguage = MediaSubtitleLanguage.ENGLISH,
+    val mediaBurnInImageSubtitles: Boolean = false,
+    val mediaConfirmPlayerExit: Boolean = false,
+    val shareMediaPresence: Boolean = true
+) {
+    val isSocialLinked: Boolean get() = socialSessionToken != null
+
+    val isJellyfinSignedIn: Boolean get() = !jellyfinAccessToken.isNullOrBlank()
+}

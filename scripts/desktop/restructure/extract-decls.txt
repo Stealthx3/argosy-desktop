@@ -1,0 +1,10 @@
+# Step 1 of the Phase 1 restructure: state types declared inside view-model and repository files
+# move to their own file in the same package. Format:
+#   <source file> -> <new file name>: <top-level declarations, in any order>
+# ^NAME marks a private declaration the source file still uses; it moves as internal.
+# Paths are relative to app/src/main/kotlin/com/nendo/argosy. Run extract_decls.py from the repo root.
+data/preferences/UserPreferencesRepository.kt -> UserPreferences.kt: BuiltinEmulatorSettings UserPreferences
+data/preferences/UserPreferencesRepository.kt -> PreferenceEnums.kt: GripReserveMode ThemeMode GridDensity LibraryLayout BoxArtCornerRadius BoxArtBorderThickness BoxArtBorderStyle GlassBorderTint BoxArtGlowStrength SystemIconPosition PlatformIndicatorStyle PlatformIndicatorContent SystemIconPadding DefaultView BoxArtInnerEffect BoxArtInnerEffectThickness BoxArtOuterEffect BoxArtOuterEffectThickness GlowColorMode BoxArtShape AmbientLedColorMode DisplayRoleOverride DualScreenInputFocus EmulatorDisplayTarget
+ui/screens/library/LibraryViewModel.kt -> LibraryUiState.kt: FilterCategory ActiveFilterEntry PlatformRef ActiveFilters FilterOptions LibraryFilter FocusMove LibraryView LibraryGridItem FocusCellBounds LibraryGameUi LibraryUiState ^MIN_SECTION_RAIL_LABELS
+ui/theme/ThemeViewModel.kt -> ThemeState.kt: ThemeState
+ui/screens/common/GameLaunchDelegate.kt -> LaunchStates.kt: HardcoreConflictChoice LocalModifiedChoice LaunchResultCallbacks SyncOverlayState DiscPickerState VariantPickerState MemcardPickerState

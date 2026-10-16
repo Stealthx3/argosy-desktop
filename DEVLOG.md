@@ -94,7 +94,7 @@ Project rules (set by the project owner, 2026-10-16):
 
 ## Phase 1 · Kotlin Multiplatform restructure
 
-**Status:** plan approved by the owner (2026-10-16); step 1 in progress.
+**Status:** plan approved by the owner (2026-10-16); step 1 done, step 2 (module skeleton) next.
 
 ### 2026-10-16 — Session 3 (Claude Code on the owner's computer)
 
@@ -171,3 +171,19 @@ The plan works whether or not rommapp adopts the KMP split:
 **Action:** Showed the plan to the owner. Decisions: plan approved as written (no `jvmShared` set, Android module stays `app/`); DI = plain Dagger on the desktop with Hilt kept on Android; Android stays on its current Compose 1.7 (CMP release matched to the BOM) during Phase 1; "looks unchanged" is checked on an Android emulator installed in `~/Android/Sdk`, before and after the data, resource and UI steps. Upstream-or-fork stays open (the owner holds the proposal); the plan works either way.
 **Reasoning:** These were the choices where two defensible readings lead to materially different work. Recorded the module and DI decisions in `PORT_PLAN.md`.
 **Divergence from upstream rules:** none yet. Step 8 (resources) will change upstream's "`@StringRes Int` carriers" law to `StringResource` carriers in shared code; that will be recorded here when it lands.
+
+**Action:** Step 1 done: moved state types out of view-model and repository files into their own files, same package, inside `app`. Done by `scripts/desktop/restructure/extract_decls.py` from the manifest `extract-decls.txt`, so it re-runs on an upstream release (it skips what is already extracted). 47 declarations, 5 new files:
+
+| From | To | Declarations |
+| --- | --- | --- |
+| `data/preferences/UserPreferencesRepository.kt` (1,297 → 682 lines) | `UserPreferences.kt` | `UserPreferences`, `BuiltinEmulatorSettings` |
+| same | `PreferenceEnums.kt` | 24 preference enums (`ThemeMode`, `BoxArtShape`, `EmulatorDisplayTarget`, ...) |
+| `ui/screens/library/LibraryViewModel.kt` | `LibraryUiState.kt` | `LibraryUiState`, `LibraryGameUi`, `LibraryGridItem`, filter types, `MIN_SECTION_RAIL_LABELS` |
+| `ui/theme/ThemeViewModel.kt` | `ThemeState.kt` | `ThemeState` |
+| `ui/screens/common/GameLaunchDelegate.kt` | `LaunchStates.kt` | picker and overlay states, `LaunchResultCallbacks`, the two choice enums |
+
+Declarations, KDoc and annotations move byte for byte; each file keeps only the imports its text still names. One content change: `MIN_SECTION_RAIL_LABELS` is read by both `LibraryUiState` and `LibraryViewModel`, so it moves as `internal` instead of `private` (manifest marker `^`).
+**Reasoning:** This is the set the Library spike had to copy out one declaration at a time, so it is what blocks moving these types to `commonMain` later; it is also the upstream-friendly first step in the proposal. Packages are unchanged, so no caller, test or stability glob changes.
+**Verification:** `./gradlew :app:assembleDebug :app:testDebugUnitTest` on JDK 21 → BUILD SUCCESSFUL in 2 m 34 s (warm); `compileDebugKotlin`, `compileDebugUnitTestKotlin` and `testDebugUnitTest` all executed: 4,359 tests, 0 failures, 1 skipped (upstream's own). `scripts/ci/stability_checks.py` and `service_stability_checks.py` pass. Not checked on a device or emulator: the step moves declarations without changing any of them, so there is no behaviour to compare; the emulator is set up before step 3.
+**Finding:** First attempt failed to compile (the constant above was `private` and used by both files); fixed in the script, not by hand.
+**Finding:** upstream's `agentic-smells.py` flags 8 moved lines (KDoc wording, two `//` lines, a `glowColorMode` field) because a partial move looks like added text in a diff. They are upstream's own lines, left verbatim; if this step is ever offered upstream, the PR needs a `Takt-ack:` saying the lines are moved, not written.
