@@ -307,6 +307,7 @@ dependencies {
 
     // argosy-sigil — title id / serial extraction (replaces in-tree :libchdr +
     // Iso9660Utils + AesXts + ZArchiveReader + GameCubeHeaderParser.parseRomHeader)
+    implementation(project(":shared"))
     implementation(project(":sigil"))
     // Libretro (built-in emulation) - local module for customization
     implementation(project(":libretrodroid"))
