@@ -94,7 +94,7 @@ Project rules (set by the project owner, 2026-10-16):
 
 ## Phase 1 · Kotlin Multiplatform restructure
 
-**Status:** plan approved by the owner (2026-10-16); steps 1–3 done, step 4 (Android-free models, domain and utilities) next.
+**Status:** plan approved by the owner (2026-10-16); steps 1–4 done, step 5 (network and JVM libraries) next.
 
 ### 2026-10-16 — Session 3 (Claude Code on the owner's computer)
 
@@ -215,3 +215,14 @@ Declarations, KDoc and annotations move byte for byte; each file keeps only the 
 - `:shared:compileKotlinDesktop` compiles all 155 files without `android.jar`: no Android imports in `commonMain`.
 - Emulator upgrade check: the pre-Phase-1 baseline APK had created its database on first launch (v214, 77 tables, one seeded platform row). Snapshotted it (pulled `alauncher.db` with WAL, summarised `user_version`, `room_master_table` identity hash, every table's row count and a content checksum), installed this step's build over it and launched it. The app opened the database 1.6 s after process start (`-shm` touched), the summary is **identical** before and after, the first-run screen is **pixel-identical** to the baseline, and logcat has no `FATAL EXCEPTION` or Room error. No app data was cleared.
 - Not covered: the device database holds almost no rows, because nothing past first run is reachable without a RomM server. A populated check (library sync, then upgrade) needs the `testbed/romm` Docker setup; Docker 29.7 is installed on this machine.
+
+**Action:** Owner said proceed with step 4. Wrote `scripts/desktop/restructure/movable.py`: it indexes every top-level declaration in `app` and `shared`, resolves each file's in-repo dependencies (imports, wildcard imports, fully qualified names, same-package references by word), rejects files with imports outside an allow-list (`kotlin`, `kotlinx.coroutines`, `java`, `javax.inject`, `javax.crypto`, `androidx.room`, `androidx.compose.runtime`; not `androidx.sqlite.db`) or with `R`/`BuildConfig`, and iterates to the largest closed set. Given path prefixes, it prints the qualifying files there plus the qualifying files they depend on, so the output compiles on its own.
+**Reasoning:** Hand-picking files would miss same-package references; a fixpoint over a conservative dependency graph cannot select a file whose dependency stays behind. The compiler stays the final check.
+**Finding:** today 250 `app` files form a closed Android-free set. For step 4's scope (`domain/`, `data/model/`, `util/`, 157 files) 60 qualify. About 50 are blocked directly (`Context` 16, `android.util.Log` 14, `Intent` 7, `Build` 5, `org.json` 6, Hilt qualifiers 4, …) and the rest because they depend on repositories, which move in steps 5–7. `Log` and `org.json` are cheap to unblock later (a logging interface; the `org.json` artifact on desktop).
+**Action:** Moved the 60 files as pure renames (all R100): 27 `domain/model`, 15 `domain/usecase`, 9 `data/model`, 6 `util`, plus one file each from `data/music`, `core/notification` and `core/media` that they depend on. `shared` gets `javax.inject:javax.inject:1` (plain JVM; the same artifact Hilt uses) for their `@Inject` constructors. The list is in `moves.txt`.
+**Finding:** Dagger generates the factory for an `@Inject` class compiled in another module without the processor: `app`'s Hilt build now emits `GetLauncherQueueUseCase_Factory` and the others under `app/build/generated/hilt/component_sources`. No Dagger setup in `shared` is needed for Android.
+**Note:** the parallel testbed session (started by the owner) runs AVD `argosy_handheld` on `emulator-5554`. To avoid disturbing it, before/after checks now use a second, identical AVD `argosy_handheld_check` on `emulator-5556`, started fresh each time.
+**Verification:**
+- `./gradlew :shared:compileKotlinDesktop :shared:desktopTest :desktopApp:assemble :app:assembleDebug :app:testDebugUnitTest` on JDK 21 → BUILD SUCCESSFUL (6 m 35 s). App: 4,359 tests, 0 failures, 1 skipped (upstream's). Desktop: 2 tests, 0 failures. `shared` (215 files) compiles for the desktop without `android.jar`.
+- Emulator (`argosy_handheld_check`, fresh): baseline APK first launch, then this step's build installed over it. Welcome and RomM login screens **pixel-identical** to the saved baseline screenshots; database summary identical before and after the upgrade; no `FATAL EXCEPTION`.
+- Not covered: screens past first run (waiting on the RomM testbed).
