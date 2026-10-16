@@ -9,7 +9,7 @@ checked.
 
 import re
 
-PATHS = ["app/src/main/**/ui/**/*.kt"]
+PATHS = ["app/src/main/**/ui/**/*.kt", "shared/src/**/ui/**/*.kt"]
 
 RULES = {
     "stability-var-in-data-class": (

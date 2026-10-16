@@ -17,7 +17,7 @@ import subprocess
 import sys
 
 TEST_RESULTS = "app/build/test-results/testDebugUnitTest"
-SOURCE_ROOTS = ("app/src/main", "app/src/test")
+SOURCE_ROOTS = ("app/src/main", "app/src/test", "shared/src")
 
 
 def load_ci_module(root, name):

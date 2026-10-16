@@ -7,7 +7,7 @@ caller cannot see; a KDoc whose declaration falls on one skips the declaration c
 
 import re
 
-PATHS = ["app/src/main/**/*.kt"]
+PATHS = ["app/src/main/**/*.kt", "shared/src/**/*.kt"]
 
 UNKNOWN = object()
 

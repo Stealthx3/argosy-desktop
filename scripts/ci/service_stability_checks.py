@@ -12,7 +12,7 @@ import re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 CONF = os.path.join(ROOT, "app", "compose_stability_config.conf")
-SOURCE_ROOT = "app/src/main/kotlin"
+SOURCE_ROOTS = ("app/src/main/kotlin", "shared/src/commonMain/kotlin", "shared/src/androidMain/kotlin")
 
 ENTRY_RE = re.compile(r"^(com\.nendo\.argosy(?:\.\w+)+)\s*$")
 
@@ -26,18 +26,23 @@ def _listed_paths():
     paths = []
     for entry in entries:
         package, _, name = entry.rpartition(".")
-        package_dir = "{}/{}".format(SOURCE_ROOT, package.replace(".", "/"))
         declaration = re.compile(r"\bclass\s+{}\b".format(re.escape(name)))
-        try:
-            files = sorted(f for f in os.listdir(os.path.join(ROOT, package_dir)) if f.endswith(".kt"))
-        except OSError:
-            continue
-        for file in files:
-            path = "{}/{}".format(package_dir, file)
-            with open(os.path.join(ROOT, path), errors="replace") as f:
-                if declaration.search(f.read()):
-                    paths.append(path)
-                    break
+        for source_root in SOURCE_ROOTS:
+            package_dir = "{}/{}".format(source_root, package.replace(".", "/"))
+            try:
+                files = sorted(f for f in os.listdir(os.path.join(ROOT, package_dir)) if f.endswith(".kt"))
+            except OSError:
+                continue
+            found = None
+            for file in files:
+                path = "{}/{}".format(package_dir, file)
+                with open(os.path.join(ROOT, path), errors="replace") as f:
+                    if declaration.search(f.read()):
+                        found = path
+                        break
+            if found:
+                paths.append(found)
+                break
     return paths
 
 

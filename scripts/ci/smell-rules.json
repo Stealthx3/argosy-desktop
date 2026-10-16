@@ -5,7 +5,8 @@
       "summary": "Inline // comment added in a Kotlin source body",
       "message": "House rule: zero inline // comments inside function bodies. State the WHAT in a concise KDoc if the contract is non-obvious; rationale belongs in the PR description. See CONTRIBUTING.md (AS-1).",
       "path_include": [
-        "app/src/main/**/*.kt"
+        "app/src/main/**/*.kt",
+        "shared/src/**/*.kt"
       ],
       "path_exclude": [],
       "added_regex": "(?:^\\s*|\\S\\s+)//(?!/)",
@@ -16,7 +17,8 @@
       "summary": "Single-line block comment (/* */ or /** */)",
       "message": "A one-line /* */ or /** */ is an inline comment with different delimiters; the same house rule applies. A KDoc that is genuinely needed uses the multi-line block form above the declaration. See CONTRIBUTING.md (AS-1).",
       "path_include": [
-        "app/src/main/**/*.kt"
+        "app/src/main/**/*.kt",
+        "shared/src/**/*.kt"
       ],
       "path_exclude": [],
       "added_regex": "^\\s*/\\*.*\\*/\\s*$"
@@ -26,10 +28,12 @@
       "summary": "Plain clickable or combinedClickable used instead of clickableNoFocus",
       "message": "Interactive UI must use clickableNoFocus (ui/util/Modifiers.kt; the onLongClick overloads replace combinedClickable) so touch input does not steal gamepad focus. See CONTRIBUTING.md (dual-modality).",
       "path_include": [
-        "app/src/main/**/*.kt"
+        "app/src/main/**/*.kt",
+        "shared/src/**/*.kt"
       ],
       "path_exclude": [
-        "app/src/main/**/ui/util/Modifiers.kt"
+        "app/src/main/**/ui/util/Modifiers.kt",
+        "shared/src/**/ui/util/Modifiers.kt"
       ],
       "added_regex": "\\b(?:clickable|combinedClickable)\\s*[({]"
     },
@@ -38,11 +42,14 @@
       "summary": "Hardcoded dp literal added in UI code",
       "message": "Dimensions route through Dimens / tokens.json, not literals (0.dp excepted). See CONTRIBUTING.md (design tokens).",
       "path_include": [
-        "app/src/main/**/ui/**/*.kt"
+        "app/src/main/**/ui/**/*.kt",
+        "shared/src/**/ui/**/*.kt"
       ],
       "path_exclude": [
         "app/src/main/**/ui/theme/**",
-        "app/src/main/**/Dimens*.kt"
+        "app/src/main/**/Dimens*.kt",
+        "shared/src/**/ui/theme/**",
+        "shared/src/**/Dimens*.kt"
       ],
       "added_regex": "\\b(?!0\\.dp)\\d+(?:\\.\\d+)?\\.dp\\b"
     },
@@ -51,13 +58,18 @@
       "summary": "Save-channel primitive called outside domain/usecase/savechannel",
       "message": "A save channel and its states move together. These primitives each move one half, so calling one directly leaves the other half behind - the states of a renamed channel keep the old name, the states of a deleted channel come back on the next sync. Route through domain/usecase/savechannel (ActivateSaveChannelUseCase and siblings), which owns both halves. States remain an independent peer elsewhere: their own sync paths, gates and UI do not go through here. See .claude/skills/investigate/coupling-map.md (SAVE-SYNC axis).",
       "path_include": [
-        "app/src/main/**/*.kt"
+        "app/src/main/**/*.kt",
+        "shared/src/**/*.kt"
       ],
       "path_exclude": [
         "app/src/main/**/domain/usecase/savechannel/**",
         "app/src/main/**/data/repository/ActiveSaveRepository.kt",
         "app/src/main/**/data/repository/SaveCacheManager.kt",
-        "app/src/main/**/data/repository/StateCacheManager.kt"
+        "app/src/main/**/data/repository/StateCacheManager.kt",
+        "shared/src/**/domain/usecase/savechannel/**",
+        "shared/src/**/data/repository/ActiveSaveRepository.kt",
+        "shared/src/**/data/repository/SaveCacheManager.kt",
+        "shared/src/**/data/repository/StateCacheManager.kt"
       ],
       "added_regex": "\\.(activateChannel|createChannel|renameChannel|copyToChannel|deleteStatesForChannel|deleteStatesForChannelAndCore|moveStatesToChannel|duplicateStatesForChannel)\\s*\\("
     },
@@ -66,12 +78,16 @@
       "summary": "Save config resolved without a platform",
       "message": "getConfig and getConfigByPackage answer for an emulator, not for a platform, so a multi-platform emulator resolves to whichever layout is listed first. That is how the Wii row came to display GameCube's path and how both platforms came to share one override row (#380). Ask SavePathAuthority instead: it takes the platform slug as a required argument and returns the layout, the override key, the evaluated path and a validation verdict together. The registry itself and the authority are excluded; everything else goes through the authority.",
       "path_include": [
-        "app/src/main/**/*.kt"
+        "app/src/main/**/*.kt",
+        "shared/src/**/*.kt"
       ],
       "path_exclude": [
         "app/src/main/**/data/emulator/savepath/**",
         "app/src/main/**/data/emulator/SavePathRegistry.kt",
-        "app/src/main/**/data/emulator/StatePathRegistry.kt"
+        "app/src/main/**/data/emulator/StatePathRegistry.kt",
+        "shared/src/**/data/emulator/savepath/**",
+        "shared/src/**/data/emulator/SavePathRegistry.kt",
+        "shared/src/**/data/emulator/StatePathRegistry.kt"
       ],
       "added_regex": "SavePathRegistry\\.(getConfig|getConfigByPackage|canonicalConfigId)\\s*\\("
     },
@@ -80,7 +96,8 @@
       "summary": "Compose imported into domain/",
       "message": "domain/ is Compose-free, and unlike the Android-framework debt this one has no exceptions. A use case that needs to describe state returns a plain type; the UI layer decides how to hold it. See AGENTS.md (Architecture).",
       "path_include": [
-        "app/src/main/**/domain/**/*.kt"
+        "app/src/main/**/domain/**/*.kt",
+        "shared/src/**/domain/**/*.kt"
       ],
       "path_exclude": [],
       "added_regex": "^import\\s+androidx\\.compose\\."
@@ -90,7 +107,8 @@
       "summary": "ui/ importing a game, platform or collection DAO",
       "message": "ui/ reaches game, platform and collection data through repositories, never the DAO. The existing violators are a known list that is not being extended. See AGENTS.md (Architecture) and the code-quality skill.",
       "path_include": [
-        "app/src/main/**/ui/**/*.kt"
+        "app/src/main/**/ui/**/*.kt",
+        "shared/src/**/ui/**/*.kt"
       ],
       "path_exclude": [],
       "added_regex": "^\\s*import\\s+com\\.nendo\\.argosy\\.data\\.local\\.dao\\.(?:\\*|(?:GameDao|PlatformDao|CollectionDao)\\b)"
@@ -100,10 +118,12 @@
       "summary": "System-bar hiding written outside util/ImmersiveMode.kt",
       "message": "Hiding the system bars has one owner: util/ImmersiveMode.kt (installImmersiveMode + Window.hideSystemBars). Four activities each carried their own copy and drifted into four different states; one of them silently broke the IME by returning the wrong insets. Call the shared functions instead. See util/ImmersiveMode.kt.",
       "path_include": [
-        "app/src/main/**/*.kt"
+        "app/src/main/**/*.kt",
+        "shared/src/**/*.kt"
       ],
       "path_exclude": [
-        "app/src/main/**/util/ImmersiveMode.kt"
+        "app/src/main/**/util/ImmersiveMode.kt",
+        "shared/src/**/util/ImmersiveMode.kt"
       ],
       "added_regex": "WindowInsetsControllerCompat|setDecorFitsSystemWindows"
     },
@@ -112,11 +132,14 @@
       "summary": "Box-art focus treatment written outside BoxArtFrame.kt",
       "message": "How cover art reacts to focus has one owner: ui/components/BoxArtFrame.kt (Modifier.boxArtFrame). GameCard kept a byte-identical copy of the glow-mode block that nothing read, which is the shape that drifts the moment either side is edited. Pass artworkGradient to boxArtFrame instead. See AGENTS.md (Architecture).",
       "path_include": [
-        "app/src/main/**/ui/**/*.kt"
+        "app/src/main/**/ui/**/*.kt",
+        "shared/src/**/ui/**/*.kt"
       ],
       "path_exclude": [
         "app/src/main/**/ui/components/BoxArtFrame.kt",
-        "app/src/main/**/ui/common/GlowColorModeUi.kt"
+        "app/src/main/**/ui/common/GlowColorModeUi.kt",
+        "shared/src/**/ui/components/BoxArtFrame.kt",
+        "shared/src/**/ui/common/GlowColorModeUi.kt"
       ],
       "added_regex": "\\bGlowColorMode\\.(AUTO|ACCENT_GRADIENT|COVER)\\b"
     },
@@ -127,7 +150,10 @@
       "path_include": [
         "app/src/main/**/data/**/*.kt",
         "app/src/main/**/domain/**/*.kt",
-        "app/src/main/**/util/**/*.kt"
+        "app/src/main/**/util/**/*.kt",
+        "shared/src/**/data/**/*.kt",
+        "shared/src/**/domain/**/*.kt",
+        "shared/src/**/util/**/*.kt"
       ],
       "path_exclude": [],
       "added_regex": "\"[^\"]*%[-#+ 0,(]*\\d*(?:\\.\\d+)?[dfeEgG][^\"]*\"\\s*\\.format\\(\\s*(?!Locale)"
@@ -139,7 +165,10 @@
       "path_include": [
         "app/src/main/**/data/**/*.kt",
         "app/src/main/**/domain/**/*.kt",
-        "app/src/main/**/util/**/*.kt"
+        "app/src/main/**/util/**/*.kt",
+        "shared/src/**/data/**/*.kt",
+        "shared/src/**/domain/**/*.kt",
+        "shared/src/**/util/**/*.kt"
       ],
       "path_exclude": [],
       "added_regex": "String\\.format\\(\\s*\"[^\"]*%[-#+ 0,(]*\\d*(?:\\.\\d+)?[dfeEgG]"
@@ -152,11 +181,17 @@
         "app/src/main/**/ui/**/*.kt",
         "app/src/main/**/libretro/ui/**/*.kt",
         "app/src/main/**/libretro/touch/**/*.kt",
-        "app/src/main/**/libretro/HotkeyDispatcher.kt"
+        "app/src/main/**/libretro/HotkeyDispatcher.kt",
+        "shared/src/**/ui/**/*.kt",
+        "shared/src/**/libretro/ui/**/*.kt",
+        "shared/src/**/libretro/touch/**/*.kt",
+        "shared/src/**/libretro/HotkeyDispatcher.kt"
       ],
       "path_exclude": [
         "app/src/main/**/libretro/coreoptions/**",
-        "app/src/main/**/*Registry*.kt"
+        "app/src/main/**/*Registry*.kt",
+        "shared/src/**/libretro/coreoptions/**",
+        "shared/src/**/*Registry*.kt"
       ],
       "added_regex": "(?:\\b(?:text|title|subtitle|label|message|contentDescription|placeholder|confirmLabel|declineLabel)\\s*=\\s*|\\bInputButton\\.[A-Z_]+\\s+to\\s+|\\bFooterHintItem\\s*\\(\\s*InputButton\\.[A-Z_]+\\s*,\\s*|\\bToast\\.makeText\\s*\\([^,]*,\\s*|\\bshowSnackbar\\s*\\(\\s*(?:message\\s*=\\s*)?|\\bshowToast\\s*\\(\\s*)\"[A-Z][A-Za-z]*(?:[ '.,!?:][^\"]*)?\""
     },
@@ -166,11 +201,15 @@
       "message": "Colors and text sizes route through the design tokens, not literals. Use ColorTokens (ui/theme/generated) or MaterialTheme.colorScheme for color, and MaterialTheme.typography or TypographyTokens for text size. A value the tokens lack goes into design-system-docs/tokens.json and is regenerated with node scripts/gen-tokens.mjs. See CONTRIBUTING.md (design tokens).",
       "path_include": [
         "app/src/main/**/ui/**/*.kt",
-        "app/src/main/**/libretro/ui/**/*.kt"
+        "app/src/main/**/libretro/ui/**/*.kt",
+        "shared/src/**/ui/**/*.kt",
+        "shared/src/**/libretro/ui/**/*.kt"
       ],
       "path_exclude": [
         "app/src/main/**/ui/theme/**",
-        "app/src/main/**/generated/**"
+        "app/src/main/**/generated/**",
+        "shared/src/**/ui/theme/**",
+        "shared/src/**/generated/**"
       ],
       "added_regex": "\\bColor\\s*\\(\\s*0[xX]|\\b\\d+(?:\\.\\d+)?\\.sp\\b"
     },
@@ -179,7 +218,8 @@
       "summary": "Focus index wrapped with % instead of .mod()",
       "message": "`(index - 1) % size` goes negative when the index is 0, so the wrap lands on -1 instead of the last item. Wrap with `(index - 1).mod(size)`. See AGENTS.md (Input) and the code-quality skill.",
       "path_include": [
-        "app/src/main/**/*.kt"
+        "app/src/main/**/*.kt",
+        "shared/src/**/*.kt"
       ],
       "path_exclude": [],
       "added_regex": "\\([^()]*\\w\\s*-\\s*\\w+\\s*\\)\\s*%\\s*[\\w.]+"
@@ -189,13 +229,18 @@
       "summary": "Compose focus added for navigation or selection",
       "message": "Gamepad navigation is index-driven through InputHandler with a focus index the ViewModel owns. Compose focus decides nothing about selection. The only focusable() calls are root key sinks, one per rendered surface: ArgosyApp for the control surface, the presentation branch of ArgosyActivity and SecondaryHomeActivity, and AppScreenActivity. A surface with no sink leaves its window unfocusable and Android ANRs the activity with 'does not have a focused window'. See AGENTS.md (Input) and CONTRIBUTING.md (dual-modality).",
       "path_include": [
-        "app/src/main/**/*.kt"
+        "app/src/main/**/*.kt",
+        "shared/src/**/*.kt"
       ],
       "path_exclude": [
         "app/src/main/**/ArgosyApp.kt",
         "app/src/main/**/ArgosyActivity.kt",
         "app/src/main/**/SecondaryHomeActivity.kt",
-        "app/src/main/**/AppScreenActivity.kt"
+        "app/src/main/**/AppScreenActivity.kt",
+        "shared/src/**/ArgosyApp.kt",
+        "shared/src/**/ArgosyActivity.kt",
+        "shared/src/**/SecondaryHomeActivity.kt",
+        "shared/src/**/AppScreenActivity.kt"
       ],
       "added_regex": "\\.focusable\\s*\\("
     },
@@ -204,7 +249,8 @@
       "summary": "StateFlow written as value = value.copy(...)",
       "message": "Reading and writing `.value` in two steps drops any update that lands between them. Use `_state.update { it.copy(...) }`. See the code-quality skill (atomic StateFlow writes).",
       "path_include": [
-        "app/src/main/**/*.kt"
+        "app/src/main/**/*.kt",
+        "shared/src/**/*.kt"
       ],
       "path_exclude": [],
       "added_regex": "\\b(\\w+)\\.value\\s*=\\s*\\1\\.value\\.copy\\s*\\("

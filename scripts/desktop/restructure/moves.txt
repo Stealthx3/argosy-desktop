@@ -129,3 +129,44 @@
 + data/steam/SteamInstallTarget.kt
 + data/titledb/TitleLookupResult.kt
 + util/Logger.kt
+
+# Android-only code shared with app: moved unchanged; a desktop counterpart lives in desktopMain.
+[androidMain]
++ data/preferences/DataStoreFactory.kt
++ data/preferences/AccountPreferenceStoreRegistry.kt
++ data/preferences/AccountScopedDataStore.kt
++ util/DisplayAffinityHelper.kt
+
+# Step 6: preference repositories and their closure (movable.py data/preferences/).
+[commonMain]
++ core/input/SoundConfig.kt
++ data/cache/GradientModels.kt
++ data/emulator/GpuDriverSelection.kt
++ data/emulator/LaunchOrigin.kt
++ data/preferences/AccountScopedPreferenceKeys.kt
++ data/preferences/AppLanguage.kt
++ data/preferences/AppPreferencesRepository.kt
++ data/preferences/BuiltinEmulatorPreferencesRepository.kt
++ data/preferences/ControlsPreferencesRepository.kt
++ data/preferences/DisplayPreferencesRepository.kt
++ data/preferences/DownloadDefaults.kt
++ data/preferences/FontSlot.kt
++ data/preferences/JellyfinPreferencesRepository.kt
++ data/preferences/MenuWrapMode.kt
++ data/preferences/PreferenceEnums.kt
++ data/preferences/QuickNavigationSource.kt
++ data/preferences/RegionPriority.kt
++ data/preferences/SelectSwapMode.kt
++ data/preferences/SessionPreferencesRepository.kt
++ data/preferences/SettingsBackupKeys.kt
++ data/preferences/SurfaceBackdrop.kt
++ data/preferences/SyncFilterPreferences.kt
++ data/preferences/SyncPreferencesRepository.kt
++ data/preferences/UserPreferences.kt
++ domain/model/GripAutoController.kt
++ domain/model/HomeLayout.kt
++ domain/model/PresentationStyle.kt
++ domain/model/ScreenLayout.kt
++ libretro/shader/ShaderChainConfig.kt
++ ui/theme/generated/ComponentDefaults.kt
++ util/SafeCoroutineScope.kt

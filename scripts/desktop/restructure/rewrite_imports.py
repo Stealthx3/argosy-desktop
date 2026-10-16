@@ -14,6 +14,11 @@ RULES = [
     (re.compile(r"^import android\.util\.Log$", re.M), "import com.nendo.argosy.util.PlatformLog as Log"),
     (re.compile(r"^import android\.util\.Log as (\w+)$", re.M), r"import com.nendo.argosy.util.PlatformLog as \1"),
     (re.compile(r"\bandroid\.util\.Log\."), "com.nendo.argosy.util.PlatformLog."),
+    (re.compile(r"^import android\.view\.KeyEvent$", re.M), "import com.nendo.argosy.core.input.AndroidKeyCodes as KeyEvent"),
+    (
+        re.compile(r"^import com\.nendo\.argosy\.util\.DisplayAffinityHelper$", re.M),
+        "import com.nendo.argosy.util.DualScreenDeviceInfo as DisplayAffinityHelper",
+    ),
 ]
 
 

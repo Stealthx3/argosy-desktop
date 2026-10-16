@@ -34,6 +34,10 @@ kotlin {
             implementation(libs.bundles.steam)
             implementation(libs.bouncycastle)
             implementation(libs.upokecenter.cbor)
+            implementation(libs.datastore.preferences)
+        }
+        androidMain.dependencies {
+            implementation(libs.hilt.android)
         }
         getByName("desktopMain").dependencies {
             implementation(libs.sqlite.bundled)
