@@ -1,6 +1,6 @@
 package com.nendo.argosy.util
 
-import android.util.Log as AndroidLog
+import com.nendo.argosy.util.PlatformLog as AndroidLog
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -50,7 +50,7 @@ object LogSanitizer {
 
 object Logger {
     private val loggerExceptionHandler = CoroutineExceptionHandler { _, throwable ->
-        android.util.Log.e("Logger", "Uncaught exception in Logger scope", throwable)
+        com.nendo.argosy.util.PlatformLog.e("Logger", "Uncaught exception in Logger scope", throwable)
     }
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO + loggerExceptionHandler)
     private val logChannel = Channel<LogEntry>(Channel.BUFFERED)

@@ -1,6 +1,6 @@
 package com.nendo.argosy.data.remote.playstore
 
-import android.util.Log
+import com.nendo.argosy.util.PlatformLog as Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
