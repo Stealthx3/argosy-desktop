@@ -1,6 +1,6 @@
 package com.nendo.argosy.data.remote.ra
 
-import com.nendo.argosy.BuildConfig
+import com.nendo.argosy.config.AppBuildConfig as BuildConfig
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.CancellationException
 import okhttp3.OkHttpClient

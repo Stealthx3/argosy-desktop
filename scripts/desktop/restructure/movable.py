@@ -36,6 +36,7 @@ ALLOWED = (
 )
 NOT_ALLOWED = ("androidx.sqlite.db.",)
 REWRITTEN = ("android.util.Log", "com.nendo.argosy.BuildConfig", "dagger.hilt.android.lifecycle.HiltViewModel")
+GENERATED = ("com.nendo.argosy.config.AppBuildConfig",)
 GUARDED_REWRITES = {
     "android.view.KeyEvent": re.compile(r"\bKeyEvent\b(?!\.KEYCODE_\w)"),
     "com.nendo.argosy.util.DisplayAffinityHelper": re.compile(
@@ -107,7 +108,7 @@ def analyse(u, index, packages):
             if target:
                 deps |= target
             continue
-        if imp in REWRITTEN:
+        if imp in REWRITTEN or imp in GENERATED:
             continue
         if imp.startswith("com.nendo.argosy."):
             if imp.endswith(".*"):

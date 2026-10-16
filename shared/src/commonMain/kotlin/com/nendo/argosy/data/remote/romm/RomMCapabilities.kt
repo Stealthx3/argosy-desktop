@@ -87,7 +87,7 @@ data class RomMCapabilities(
          * server exercises every gate, while release builds keep treating it as unversioned.
          */
         fun comparableVersion(version: String): String =
-            if (com.nendo.argosy.BuildConfig.DEBUG && version == DEVELOPMENT_VERSION) {
+            if (com.nendo.argosy.config.AppBuildConfig.DEBUG && version == DEVELOPMENT_VERSION) {
                 DEVELOPMENT_COMPARABLE_VERSION
             } else {
                 version
