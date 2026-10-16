@@ -35,7 +35,7 @@ ALLOWED = (
     "androidx.datastore.core.", "androidx.datastore.preferences.core.",
 )
 NOT_ALLOWED = ("androidx.sqlite.db.",)
-REWRITTEN = ("android.util.Log",)
+REWRITTEN = ("android.util.Log", "com.nendo.argosy.BuildConfig", "dagger.hilt.android.lifecycle.HiltViewModel")
 GUARDED_REWRITES = {
     "android.view.KeyEvent": re.compile(r"\bKeyEvent\b(?!\.KEYCODE_\w)"),
     "com.nendo.argosy.util.DisplayAffinityHelper": re.compile(
@@ -48,7 +48,7 @@ ANDROID_FQ = re.compile(r"(?<![\w.])(?:android|androidx|com|org|io|net|dagger|co
 ANDROID_MAIN_ALLOWED = ALLOWED + (
     "android.", "androidx.annotation.", "androidx.datastore.", "dagger.hilt.android.qualifiers.",
 )
-FORBIDDEN_WORDS = re.compile(r"\b(R\.(string|plurals|drawable|raw|color|dimen|font|xml|array|mipmap|id)\b|BuildConfig\b)")
+FORBIDDEN_WORDS = re.compile(r"\bR\.(string|plurals|drawable|raw|color|dimen|font|xml|array|mipmap|id)\b")
 DECL = re.compile(
     r"^(?:@\S+\s+)*(?:(?:private|internal|public|data|enum|sealed|abstract|open|inline|value|const|"
     r"annotation|suspend|operator|infix|tailrec|external|fun|expect|actual)\s+)*"
@@ -128,8 +128,11 @@ def analyse(u, index, packages):
         if not fq.startswith(REWRITTEN) and not fq.startswith("com.nendo.argosy."):
             external(fq, "reference")
     if FORBIDDEN_WORDS.search(u.body):
-        common.append("R or BuildConfig")
-        android.append("R or BuildConfig")
+        common.append("R")
+        android.append("R")
+    if u.pkg == "com.nendo.argosy" and re.search(r"\bBuildConfig\b", u.body):
+        common.append("BuildConfig without an import")
+        android.append("BuildConfig without an import")
     words = set(WORD.findall(u.body))
     for w in words:
         deps |= {t for t in index.get((u.pkg, w), set()) if t.receivers.get(w, w) == w or t.receivers[w] in words}

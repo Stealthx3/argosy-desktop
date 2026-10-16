@@ -172,3 +172,7 @@
 + libretro/shader/ShaderChainConfig.kt
 + ui/theme/generated/ComponentDefaults.kt
 + util/SafeCoroutineScope.kt
+
+# Step 7: files the BuildConfig stand-in unblocks.
++ data/remote/ra/RAWebClient.kt
++ data/remote/romm/RomMCapabilities.kt

@@ -65,6 +65,8 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 # Hilt
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
+dagger = { group = "com.google.dagger", name = "dagger", version.ref = "hilt" }
+dagger-compiler = { group = "com.google.dagger", name = "dagger-compiler", version.ref = "hilt" }
 hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltNavigation" }
 
 # Dependency injection annotations (plain JVM)
