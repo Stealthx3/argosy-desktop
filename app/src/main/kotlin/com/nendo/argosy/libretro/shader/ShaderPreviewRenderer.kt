@@ -151,6 +151,10 @@ class ShaderPreviewRenderer {
 
                 if (compiled.positionHandle != -1) GLES20.glDisableVertexAttribArray(compiled.positionHandle)
                 if (compiled.coordHandle != -1) GLES20.glDisableVertexAttribArray(compiled.coordHandle)
+                if (compiled.previousPassHandle != -1 || compiled.origTextureHandle != -1) {
+                    GLES20.glActiveTexture(GLES20.GL_TEXTURE1)
+                    GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0)
+                }
                 GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
                 GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0)
                 GLES20.glUseProgram(0)
