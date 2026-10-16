@@ -1,0 +1,25 @@
+# Phase 0 spike: can a sandboxed Flatpak start an emulator Flatpak on the host
+# with a ROM from the shared library folder? Mirrors the finish-args planned
+# for Argosy Desktop (see PORT_PLAN.md > Flatpak design).
+app-id: io.github.stealthx3.ArgosyLaunchSpike
+runtime: org.freedesktop.Platform
+runtime-version: '24.08'
+sdk: org.freedesktop.Sdk
+command: launch-spike
+finish-args:
+  - --share=network
+  - --share=ipc
+  - --socket=wayland
+  - --socket=x11
+  - --device=dri
+  - --socket=pulseaudio
+  - --filesystem=~/Games/Argosy:create
+  - --talk-name=org.freedesktop.Flatpak
+modules:
+  - name: launch-spike
+    buildsystem: simple
+    build-commands:
+      - install -Dm755 launch-spike.sh /app/bin/launch-spike
+    sources:
+      - type: file
+        path: launch-spike.sh
