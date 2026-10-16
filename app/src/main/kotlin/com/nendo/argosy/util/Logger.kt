@@ -1,6 +1,5 @@
 package com.nendo.argosy.util
 
-import android.content.Intent
 import android.util.Log as AndroidLog
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -46,34 +45,6 @@ object LogSanitizer {
     fun sanitizePath(path: String): String {
         val file = File(path)
         return file.name
-    }
-
-    fun describeIntent(intent: Intent?): String {
-        if (intent == null) return "null"
-        return buildString {
-            append("Intent(")
-            append("action=${intent.action}")
-            intent.`package`?.let { append(", pkg=$it") }
-            intent.component?.let { append(", component=${it.shortClassName}") }
-            intent.data?.let { uri ->
-                val scheme = uri.scheme
-                val path = uri.path
-                if (scheme != null && path != null) {
-                    append(", data=$scheme://.../${File(path).name}")
-                } else if (scheme != null) {
-                    append(", data=$scheme://...")
-                } else if (path != null) {
-                    append(", data=path:${File(path).name}")
-                }
-            }
-            val extras = intent.extras
-            if (extras != null && !extras.isEmpty) {
-                val keys = extras.keySet().take(5)
-                append(", extras=[${keys.joinToString()}]")
-                if (extras.keySet().size > 5) append("+${extras.keySet().size - 5} more")
-            }
-            append(")")
-        }
     }
 }
 
