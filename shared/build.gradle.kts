@@ -27,6 +27,7 @@ kotlin {
             implementation(compose.runtime)
             implementation(libs.room.runtime)
             implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.javax.inject)
         }
         getByName("desktopMain").dependencies {
             implementation(libs.sqlite.bundled)
