@@ -206,7 +206,6 @@
 + data/iconpack/AppFilter.kt
 + data/media/MediaAvailability.kt
 + data/music/AudioLoudnessRepository.kt
-+ data/netplay/NetplayDriver.kt
 + data/netplay/NetplayPacket.kt
 + data/netplay/NetplaySecurityBounds.kt
 + data/netplay/ReplayWindow.kt

@@ -2,7 +2,8 @@
 """
 Lists app files that can move to shared commonMain as they are.
 
-A file qualifies when its imports come only from ALLOWED (or are rewritten by
+A sealed type moves only with every subtype declared in another file (Kotlin forbids extending a
+sealed type from another module). A file qualifies when its imports come only from ALLOWED (or are rewritten by
 rewrite_imports.py, within the members its stand-in offers), its code (comments ignored) names no Android class by full name, and every in-repo declaration it names
 (by import, fully qualified name, or same-package reference) is already in shared or qualifies
 too. Iterates to a fixpoint. Same-package matching is by word, so it over-reports dependencies,
@@ -79,6 +80,7 @@ class Unit:
                 self.receivers[m.group(2)] = re.sub(r"<.*|\?", "", m.group(1)).split(".")[-1]
         self.imports = IMPORT.findall(self.text)
         self.body = COMMENTS.sub("", IMPORT.sub("", self.text))
+        self.sealed = set(re.findall(r"^\s*(?:\w+\s+)*sealed\s+(?:class|interface)\s+(\w+)", self.text, re.M))
 
 
 def load(root):
@@ -161,8 +163,20 @@ def main():
     in_shared = in_common | set(android_shared)
 
     deps, common_reasons, android_reasons = {}, {}, {}
-    for u in app + common_shared + android_shared:
+    everything = app + common_shared + android_shared
+    for u in everything:
         deps[u], common_reasons[u], android_reasons[u] = analyse(u, index, packages)
+    for sealed_unit in everything:
+        for name in sealed_unit.sealed:
+            header = re.compile(
+                r"\b(?:(?:class|interface)\s+\w+(?:<[^>]*>)?|object(?:\s+\w+)?)"
+                r"(?:\s*(?:private|internal|public|protected)?\s*(?:constructor)?\s*"
+                r"\((?:[^()]|\((?:[^()]|\([^()]*\))*\))*\))?"
+                r"\s*:\s*(?:[\w.<>?]+(?:\([^)]*\))?\s*,\s*)*(?:\w+\.)*" + re.escape(name) + r"\b"
+            )
+            for u in everything:
+                if u is not sealed_unit and u.pkg == sealed_unit.pkg and header.search(u.body):
+                    deps[sealed_unit].add(u)
 
     if args[:1] == ["--check"]:
         bad = 0
