@@ -28,9 +28,17 @@ kotlin {
             implementation(libs.room.runtime)
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.javax.inject)
+            implementation(libs.bundles.network)
+            implementation(libs.commons.compress)
+            implementation(libs.xz)
+            implementation(libs.bundles.steam)
+            implementation(libs.bouncycastle)
+            implementation(libs.upokecenter.cbor)
         }
         getByName("desktopMain").dependencies {
             implementation(libs.sqlite.bundled)
+            implementation(libs.zstd.jni)
+            implementation(libs.org.json)
         }
         getByName("desktopTest").dependencies {
             implementation(libs.kotlin.test)
@@ -57,8 +65,22 @@ room {
 }
 
 dependencies {
+    addProvider<MinimalExternalModuleDependency, ExternalModuleDependency>(
+        "commonMainImplementation",
+        libs.socketio.client
+    ) {
+        exclude(group = "org.json", module = "json")
+    }
+    addProvider<MinimalExternalModuleDependency, ExternalModuleDependency>(
+        "androidMainImplementation",
+        libs.zstd.jni
+    ) {
+        artifact { type = "aar" }
+    }
     add("kspAndroid", libs.room.compiler)
     add("kspDesktop", libs.room.compiler)
+    add("kspAndroid", libs.moshi.kotlin)
+    add("kspDesktop", libs.moshi.kotlin)
 }
 
 composeCompiler {

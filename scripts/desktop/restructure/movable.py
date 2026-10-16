@@ -2,7 +2,8 @@
 """
 Lists app files that can move to shared commonMain as they are.
 
-A file qualifies when its imports come only from ALLOWED and every in-repo declaration it names
+A file qualifies when its imports come only from ALLOWED (or are rewritten by
+rewrite_imports.py), its body names no Android class by full name, and every in-repo declaration it names
 (by import, fully qualified name, or same-package reference) is already in shared or qualifies
 too. Iterates to a fixpoint. Same-package matching is by word, so it over-reports dependencies,
 never under-reports them. The compiler remains the final check.
@@ -19,10 +20,15 @@ PKG_ROOT = "com/nendo/argosy"
 APP = Path("app/src/main/kotlin")
 SHARED = Path("shared/src/commonMain/kotlin")
 ALLOWED = (
-    "kotlin.", "kotlinx.coroutines.", "java.", "javax.inject.", "javax.crypto.",
+    "kotlin.", "kotlinx.coroutines.", "java.", "javax.",
     "androidx.room.", "androidx.sqlite.", "androidx.compose.runtime.",
+    "retrofit2.", "okhttp3.", "okio.", "com.squareup.moshi.", "io.socket.", "org.json.",
+    "org.apache.commons.compress.", "org.tukaani.xz.", "com.github.luben.zstd.",
+    "`in`.dragonbra.", "org.bouncycastle.", "com.upokecenter.cbor.", "com.google.protobuf.",
 )
 NOT_ALLOWED = ("androidx.sqlite.db.",)
+REWRITTEN = ("android.util.Log",)
+ANDROID_FQ = re.compile(r"\bandroidx?\.[a-z]\w*(?:\.\w+)+")
 FORBIDDEN_WORDS = re.compile(r"\b(R\.(string|plurals|drawable|raw|color|dimen|font|xml|array|mipmap|id)\b|BuildConfig\b)")
 DECL = re.compile(
     r"^(?:@\S+\s+)*(?:(?:private|internal|public|data|enum|sealed|abstract|open|inline|value|const|"
@@ -85,12 +91,19 @@ def main():
                     reasons.append(f"unresolved {imp}")
                 else:
                     d |= target
+            elif imp in REWRITTEN:
+                continue
             elif not imp.startswith(ALLOWED) or imp.startswith(NOT_ALLOWED):
                 reasons.append(f"import {imp}")
         for fq in FQ.findall(u.body):
             target = resolve(fq)
             if target:
                 d |= target
+        for fq in ANDROID_FQ.findall(u.body):
+            if fq.startswith(REWRITTEN):
+                continue
+            if not fq.startswith(ALLOWED) or fq.startswith(NOT_ALLOWED):
+                reasons.append(f"reference {fq}")
         if FORBIDDEN_WORDS.search(u.body):
             reasons.append("R or BuildConfig")
         for w in set(WORD.findall(u.body)):
