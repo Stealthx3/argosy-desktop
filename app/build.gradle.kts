@@ -42,10 +42,6 @@ android {
             useSupportLibrary = true
         }
 
-        ksp {
-            arg("room.schemaLocation", "$projectDir/schemas")
-        }
-
         buildConfigField("String", "TITLEDB_API_SECRET", "\"${envString("TITLEDB_API_SECRET")}\"")
         buildConfigField("String", "TITLEDB_API_URL", "\"${envString("TITLEDB_API_URL", "https://api.argosy.dev")}\"")
         buildConfigField("String", "CHEATSDB_API_SECRET", "\"${envString("CHEATSDB_API_SECRET")}\"")
@@ -156,9 +152,17 @@ android {
     }
 }
 
+val sharedFriendJars = listOf("debug", "release").map { variant ->
+    rootProject.file(
+        "shared/build/intermediates/compile_library_classes_jar/$variant/" +
+            "bundleLibCompileToJar${variant.replaceFirstChar { it.uppercase() }}/classes.jar"
+    ).path
+}
+
 kotlin {
     compilerOptions {
         jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        freeCompilerArgs.add("-Xfriend-paths=${sharedFriendJars.joinToString(",")}")
     }
 }
 
@@ -259,7 +263,6 @@ dependencies {
 
     // Room
     implementation(libs.bundles.room)
-    ksp(libs.room.compiler)
 
     // DataStore
     implementation(libs.datastore.preferences)

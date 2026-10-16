@@ -131,7 +131,8 @@ constructor/body properties crept into covered state classes:
 ```bash
 grep -rEn --include="*.kt" "^ {4}var [a-zA-Z]+:" \
   app/src/main/kotlin/com/nendo/argosy/data/model \
-  app/src/main/kotlin/com/nendo/argosy/data/local/entity \
+  shared/src/commonMain/kotlin/com/nendo/argosy/data/model \
+  shared/src/commonMain/kotlin/com/nendo/argosy/data/local/entity \
   app/src/main/kotlin/com/nendo/argosy/ui/screens \
   app/src/main/kotlin/com/nendo/argosy/ui/components \
   app/src/main/kotlin/com/nendo/argosy/ui/dualscreen

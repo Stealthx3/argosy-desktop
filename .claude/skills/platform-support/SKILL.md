@@ -181,7 +181,7 @@ A package matching a family's `packagePatterns` does not get its own registry en
 That id shape is load-bearing outside EmulatorRegistry. Both save-path registries carry explicit recovery for it - `familyBaseIdFor` / `familyFallbackConfig` in `SavePathRegistry.kt` and `familyFallbackConfig` in `StatePathRegistry.kt` - which strip the `<baseId>_` prefix (longest matching baseId wins) so a fork resolves the base emulator's save and state paths. Add a fork package under a family and it inherits those paths automatically; give it a hand-written id that does NOT start with `<baseId>_` and it silently falls through to no config, which is how saves land in the wrong directory.
 
 ### PlatformDefinitions.kt
-Location: `app/src/main/kotlin/com/nendo/argosy/data/platform/PlatformDefinitions.kt`
+Location: `shared/src/commonMain/kotlin/com/nendo/argosy/data/platform/PlatformDefinitions.kt`
 
 Contains:
 - `PlatformDef` entries with extensions

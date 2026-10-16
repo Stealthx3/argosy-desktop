@@ -1,0 +1,15 @@
+# Which files leave app/src/main/kotlin for a :shared source set. Paths are relative to
+# com/nendo/argosy. A "[sourceSet]" line opens a section; "+ glob" selects files, "- glob" removes
+# them again, in order. "**" matches across directories. Run apply_moves.py from the repo root.
+
+[commonMain]
++ domain/model/UnifiedStateEntry.kt
++ data/local/**
+- data/local/migrations/**
+- data/local/DatabaseFactory.kt
++ data/model/ArtSlot.kt
++ data/model/FileOrigin.kt
++ data/model/GameSource.kt
++ data/model/ResolvedGameArt.kt
++ data/platform/PlatformDefinitions.kt
++ util/SearchNormalizer.kt

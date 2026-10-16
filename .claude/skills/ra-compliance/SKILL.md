@@ -252,7 +252,7 @@ slot name:
   does not get hardcore credit from a tampered save.
 
 ```bash
-grep -n "SLOT_HARDCORE\|isHardcore" app/src/main/kotlin/com/nendo/argosy/data/local/entity/SaveCacheEntity.kt
+grep -n "SLOT_HARDCORE\|isHardcore" shared/src/commonMain/kotlin/com/nendo/argosy/data/local/entity/SaveCacheEntity.kt
 grep -n "appendHardcoreTrailer\|readHardcoreTrailer\|hasHardcoreTrailer" app/src/main/kotlin/com/nendo/argosy/data/sync/SaveArchiver.kt
 grep -n "appendHardcoreTrailer\|isValidHardcoreSave\|getLatestHardcoreSave" app/src/main/kotlin/com/nendo/argosy/data/repository/SaveCacheManager.kt
 ```
@@ -341,7 +341,7 @@ grep -rn "hardcore" app/src/main/kotlin/com/nendo/argosy/libretro/speedrun/
 
 ```bash
 grep -n "claimsHardcore\|armedFromCache\|getCachedPatchData" app/src/main/kotlin/com/nendo/argosy/libretro/RetroAchievementsSessionManager.kt
-grep -n "syncType != 'ACHIEVEMENT'" app/src/main/kotlin/com/nendo/argosy/data/local/dao/PendingSyncQueueDao.kt
+grep -n "syncType != 'ACHIEVEMENT'" shared/src/commonMain/kotlin/com/nendo/argosy/data/local/dao/PendingSyncQueueDao.kt
 grep -n "SyncType.ACHIEVEMENT" app/src/main/kotlin/com/nendo/argosy/data/sync/SyncCoordinator.kt
 ```
 
