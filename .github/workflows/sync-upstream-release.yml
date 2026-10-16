@@ -1,0 +1,58 @@
+# Argosy Desktop: keep the `upstream` branch at rommapp/argosy-launcher's newest stable release.
+#
+# `upstream` is a read-only reference of upstream code; `main` is the Argosy Desktop workspace.
+# The branch moves only when rommapp publishes a new stable release tag (vX.Y.Z, no beta/alpha/rc),
+# and only to that tag's commit: no commits between releases. The move is a fast-forward; if the
+# release is not a descendant of the current `upstream` the job fails instead of rewriting history.
+name: Sync upstream branch to latest release
+
+on:
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-upstream-release
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    if: github.repository == 'Stealthx3/argosy-desktop'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the upstream branch
+        uses: actions/checkout@v4
+        with:
+          ref: upstream
+          fetch-depth: 0
+
+      - name: Fast-forward to the newest stable release
+        env:
+          UPSTREAM_URL: https://github.com/rommapp/argosy-launcher.git
+        run: |
+          set -eu
+          tag=$(git ls-remote --tags --refs --sort=-v:refname "$UPSTREAM_URL" 'v*' \
+            | cut -f2 | sed 's#refs/tags/##' \
+            | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -1)
+          if [ -z "$tag" ]; then echo "No stable release tag found"; exit 1; fi
+          git fetch --no-tags "$UPSTREAM_URL" "+refs/tags/${tag}:refs/tags/${tag}"
+          release=$(git rev-parse "${tag}^{commit}")
+          current=$(git rev-parse HEAD)
+          echo "Latest stable release: ${tag} (${release}); upstream branch: ${current}"
+          if [ "$release" = "$current" ]; then
+            echo "upstream already at ${tag}"
+            exit 0
+          fi
+          if git merge-base --is-ancestor "$release" "$current"; then
+            echo "upstream already contains ${tag}; leaving it until the next release"
+            exit 0
+          fi
+          if ! git merge-base --is-ancestor "$current" "$release"; then
+            echo "::error::${tag} is not a fast-forward of upstream; resolve by hand"
+            exit 1
+          fi
+          git push origin "${release}:refs/heads/upstream"
+          echo "upstream fast-forwarded to ${tag}" >> "$GITHUB_STEP_SUMMARY"

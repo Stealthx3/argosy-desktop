@@ -13,6 +13,7 @@ Read these first, in order:
 
 - **This project is separate** from any other RomM/Argosy project (e.g. FreightCar, IceRom). Do not mix them.
 - **Git workspace:** this folder. **Remote:** `https://github.com/Stealthx3/argosy-desktop` (fork of `rommapp/argosy-launcher`, default branch `main`).
+- **Branches:** `main` is the Argosy Desktop workspace; all work lands there. `upstream` is a read-only reference copy of `rommapp/argosy-launcher` at its newest stable release. Never commit to `upstream`; `.github/workflows/sync-upstream-release.yml` fast-forwards it to each new stable release tag and does nothing between releases.
 - **Push only after a phase is complete.** Commit locally as you go; push to `origin` once, at the end of each phase.
 - **Between phases, stop and ask** the owner whether to proceed to the next phase or schedule the continuation for later. Never roll into the next phase on your own.
 - **`README.md` must contain a copy of the port plan.** At each phase end, rebuild `README.md` as: a short Argosy Desktop intro and status, then the full contents of `PORT_PLAN.md`, then a link to upstream's original README (keep it as `README.upstream.md`). The same README is pushed to GitHub, so both the local and remote repositories carry the plan.

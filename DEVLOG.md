@@ -66,7 +66,21 @@ Project rules (set by the project owner, 2026-10-16):
 **Action:** Spike `spikes/flatpak-launch/` → **pass.** Sandboxed spike Flatpak sees `~/Games/Argosy`, `flatpak-spawn --host flatpak run org.libretro.RetroArch` loads the ROM with gambatte ("Got internal game name: ARGOSY SPIKE"), exit status returns (0 normal, 1 for a bad core). Test ROM is self-made (`make-test-rom.py`), no download. Changes: builder fallback with `--disable-rofiles-fuse` (FUSE cannot mount inside the Builder sandbox); RetroArch access is checked, not overridden (owner already has `filesystems=host`). Cleaned up the auto-save state RetroArch wrote for the test ROM.
 **Finding / proposed plan change:** `org.freedesktop.Platform 24.08` is end-of-life. Move the manifest to 25.08 from Phase 1.
 
-**Gate:** all three spikes pass. **Still open:** owner's decision on posting `docs/desktop/upstream-proposal.md`; rebuild `README.md`; push `main`; ask about Phase 1.
+**Gate:** all three spikes pass.
+
+**Action:** Rebuilt `README.md` (intro and status, full `PORT_PLAN.md`, link to upstream) and saved upstream's README as `README.upstream.md`. Added a Phase 0 results note to `PORT_PLAN.md`.
+**Reasoning:** Phase-end rule from the owner.
+
+**Note:** Once the session moved into this folder, upstream's `.claude/settings.json` hooks (`coupling-guard`, `verification-guard`, `takt-guard`, `smell-guard`) began running. They resolve scripts through `$CLAUDE_PROJECT_DIR`, which in this session still pointed at the previous scratch folder, so every Bash call was refused. Hooks were left untouched (upstream config); a session started in this folder resolves them correctly.
+
+**Action:** Owner decision on the upstream proposal: add the spike results to the draft and hold it; the owner posts it. Added a section on the three proofs of concept and the "move state types into their own files" first step.
+**Reasoning:** The proposal is stronger with evidence; posting stays with the owner.
+
+**Action:** Owner set a new branch model: `main` is the workspace, `upstream` (created by the owner on `origin`) is a reference copy of upstream code that should move only on upstream releases. No sync mechanism existed in the repo. Added `.github/workflows/sync-upstream-release.yml` (daily and manual): finds rommapp's newest stable tag (`vX.Y.Z`, no pre-releases) and fast-forwards `upstream` to that tag's commit; it never force-pushes and fails loudly if a release is not a fast-forward. Recorded the rule in `CLAUDE.md`.
+**Reasoning:** Releases are upstream's tested states, so diffing and re-basing the port against releases avoids chasing half-finished work between them. Fast-forward-only keeps the reference branch's history trustworthy.
+**Finding:** `origin/upstream` was created at `6e64baa`, which is v2.23.0 (`9940f11`) plus 3 post-release commits; `main` is based on the same commit. The workflow leaves that as is until v2.24.0; resetting `upstream` exactly to v2.23.0 needs a force-push, which is the owner's call. Scheduled workflows on a fork run only once Actions are enabled for the fork.
+
+**Still open:** commit and push `main`; ask about Phase 1.
 
 ### Next (for the Claude Code session)
 

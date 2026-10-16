@@ -14,6 +14,14 @@ I surveyed the current `main` (v2.23.0) to size this:
 - 474 files (28%) call real Android APIs; they cluster in launching, package management, WorkManager, media, device controls and libretrodroid.
 - The input layer is already platform-neutral above the key-code mapping, and the Room DAOs are Room-KMP-ready apart from the `SupportSQLiteDatabase` migrations.
 
+I then ran three small proofs of concept against that same `main`, without changing any upstream file:
+
+- **Database:** the entities, all DAOs and `ALauncherDatabase` compile for the desktop JVM under Room KMP with the bundled SQLite driver. The exported schema is identical to `app/schemas/.../214.json` (same identity hash), and every DAO function is already `suspend` or `Flow`.
+- **UI:** `LibraryGameList` inside `ALauncherTheme` renders in a Compose Multiplatform desktop window, with 71 Argosy files (theme, tokens, list rows, footers, badges, titles) compiled unchanged. The Android pieces it touched were thin: `R`/`stringResource`, `LocalContext`, Coil's `AsyncImage`, `hiltViewModel`, a few `android.graphics` helpers, and one `BlurMaskFilter` glow.
+- **Sandbox:** a test Flatpak starts the RetroArch Flatpak on the host with a ROM from a shared folder and gets the exit status back, which is what play sessions need.
+
+A cheap first step that helps either way: a few state types (`LibraryUiState`, `ThemeState`, the preference enums in `UserPreferencesRepository`) are declared inside view-model or repository files. Moving them into their own files is a small, behaviour-free change.
+
 What I'd like to ask:
 
 1. Would you be open to the app being restructured into Kotlin Multiplatform modules (`shared` + `androidApp` + `desktopApp`) upstream, done in small reviewable PRs that keep the Android app unchanged for users? That avoids a long-lived fork drifting behind.

@@ -1,184 +1,254 @@
-# Argosy Launcher
+# Argosy Desktop
 
-[![Build](https://github.com/nendotools/argosy-launcher/actions/workflows/build.yml/badge.svg)](https://github.com/nendotools/argosy-launcher/actions/workflows/build.yml)
-[![Latest Release](https://img.shields.io/github/v/release/nendotools/argosy-launcher)](https://github.com/nendotools/argosy-launcher/releases/latest)
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Android](https://img.shields.io/badge/Android-8.0+-green.svg)](https://developer.android.com/about/versions/oreo)
+A faithful Linux desktop port of the [Argosy launcher](https://github.com/rommapp/argosy-launcher), shipped as a Flatpak. The goal: someone using Argosy Desktop cannot tell it apart from the Android app. It runs Argosy's own Compose UI on the desktop through Compose Multiplatform instead of rebuilding it.
 
-**A gamepad-first Android launcher for retro gaming handhelds with native RomM integration.**
+This repository is a fork of `rommapp/argosy-launcher`. It is GPL-3.0, like upstream.
 
-Sync your entire game library from your self-hosted [RomM](https://github.com/rommapp/romm) server, download games and BIOS files on demand, track your achievements, and play across devices with automatic save sync—all from a controller-native interface designed for Anbernic, Retroid Pocket, Odin, and similar devices.
+## Status
 
-**[Read the Wiki](https://github.com/rommapp/argosy-launcher/wiki)** for setup guides, emulator configuration, and troubleshooting.
+**Phase 0 (discovery and spikes): complete, gate passed (2026-10-16).**
 
-<img width="400" alt="Home Screen" src="https://github.com/user-attachments/assets/931e1f4a-e0a1-46a9-a7ce-e712c0d558cc" />
+- The Android app builds unchanged (`./gradlew :app:assembleDebug`).
+- [`spikes/room-kmp-jvm`](spikes/room-kmp-jvm): upstream's Room database (schema v214) opens on the JVM under Room KMP, with no source edits and an identical schema hash.
+- [`spikes/compose-desktop-library`](spikes/compose-desktop-library): upstream's Library list and theme render in a Compose desktop window, with 71 upstream files compiled unchanged.
+- [`spikes/flatpak-launch`](spikes/flatpak-launch): a sandboxed Flatpak starts the RetroArch Flatpak on a ROM in `~/Games/Argosy` and gets its exit status back.
 
-## Feature Highlights
+Next: Phase 1, the Kotlin Multiplatform restructure. The development log is in [`DEVLOG.md`](DEVLOG.md).
 
-### Native RomM Client
-First-class integration with [RomM](https://github.com/rommapp/romm). Sync your entire library with rich metadata from IGDB—cover art, descriptions, genres, franchises, player counts, and more. Your collection, your server, your handheld.
+![Upstream's Library list rendered by Compose Multiplatform on the desktop](spikes/compose-desktop-library/library.png)
 
-### Automatic Downloads
-Download ROMs and BIOS files directly from your RomM server. Games are automatically sorted by platform. Queue multiple downloads and let Argosy handle the rest.
+---
 
-### Save Sync
-Continue playing across devices. Bidirectional save sync with your RomM server keeps your progress in sync automatically. Conflict detection ensures you never lose data.
+# Argosy Desktop — Linux Flatpak Port Plan
 
-### RetroAchievements
-View your earned achievements and track your progress. Argosy displays achievement data synced from your RomM server, showing what you've unlocked and what's left to earn.
+As of 2026-10-16 · Micaiah Fonken · Source of truth: the "Argosy Desktop — Linux Flatpak Port Plan" doc. This file is a copy kept in the repository.
 
-### Collections
-Organize your library your way. Create custom collections, or use smart collections like "Top Unplayed", "Recently Added", and "Most Played". Pin your favorites to the home screen for quick access.
+> **Phase 0 corrections** (from the codebase survey, see `docs/desktop/phase-0-survey.md`): upstream is now **v2.23.0** (not v2.10), and **TV Compose is no longer used anywhere**, so the TV Compose swap below is already done upstream.
 
-### Gamepad-First Design
-Built for controllers from the ground up. Navigate your entire library, manage downloads, and launch games without ever touching the screen. Full D-pad, analog stick, and button support.
+> **Phase 0 results** (2026-10-16, details in `DEVLOG.md` and each spike's folder): gate **passed**. The Android app builds unchanged. Upstream's Room database (v214) runs on the JVM under Room KMP with no source edits and an identical schema hash. Upstream's Library list and theme render in a Compose desktop window with 71 files compiled unchanged; 15 Android APIs needed shims, and resources (6,254 strings) are the largest Phase 2 item. A sandboxed Flatpak starts the RetroArch Flatpak on a ROM in `~/Games/Argosy` and receives its exit status. Proposed change: `org.freedesktop.Platform` 24.08 is end-of-life, so build on 25.08 from Phase 1.
 
-## Customize Your Experience
+## Summary
 
-### Video Wallpaper
-Set YouTube video previews as dynamic backgrounds on the home screen. Watch trailers and gameplay footage while browsing your collection.
+Ship Argosy Desktop for Linux as a Flathub Flatpak that a user cannot tell apart from the Android app, by running Argosy's own Jetpack Compose UI on the desktop through Compose Multiplatform. Alpha from a self-hosted Flatpak repo at about week 19; 1.0 on Flathub at about week 32.
 
-### Ambient Audio
-Add background music to your browsing experience. Select any audio file to play while navigating your library.
+The guiding rule is **reuse, don't rebuild**. Compose Multiplatform uses the same `androidx.compose` APIs as Jetpack Compose, so Argosy's screens, view models and data layer move into shared modules almost unchanged. Only what touches Android itself (intents, package manager, ExoPlayer, WorkManager, device controls, the libretro wrapper) gets a desktop implementation behind an interface.
 
-### Display Customization
-Fine-tune the visual experience:
-- **Themes**: Light, dark, or system-matched
-- **Backgrounds**: Blur, saturation, and opacity controls for game art backgrounds
-- **Box Art Styles**: Adjust grid density, aspect ratio, and visual effects
-- **Sound Effects**: Add audio feedback to navigation with built-in presets or custom sounds
+The strongest version of this plan is one codebase for both apps: the Android app and Argosy Desktop build from the same shared modules, so every upstream feature and visual change lands on Linux automatically. That needs upstream buy-in, which is the first open decision.
 
-## Smart Emulator Management
+Timeline assumes one developer at about 20 hours a week with AI-assisted coding; it scales roughly linearly with hours.
 
-### Auto-Detection
-Argosy automatically detects installed emulators and assigns them to the appropriate platforms. No manual configuration required for most setups.
+## Starting point: upstream Argosy
 
-### RetroArch Core Selection
-When using RetroArch, select specific cores per platform. Argosy manages core selection so you launch with the right emulator every time.
+Upstream is a single-module Android app, but nearly all of it is Kotlin and Compose that can run on the desktop JVM. Facts below are from the [rommapp/argosy-launcher repo](https://github.com/rommapp/argosy-launcher) and its [version catalog](https://github.com/rommapp/argosy-launcher/blob/main/gradle/libs.versions.toml).
 
-### Multi-Disc Games
-PlayStation and other multi-disc games are handled automatically. When you launch a multi-disc game, Argosy presents a disc picker so you can choose where to start.
+| Area | Upstream today | Desktop path |
+| --- | --- | --- |
+| Language / build | Kotlin 2.3.20, Gradle, AGP 8.7.3, one `app` module | Kotlin Multiplatform: `shared` + `androidApp` + `desktopApp` |
+| UI | Jetpack Compose, Material 3 | Compose Multiplatform; same APIs, code moves almost as is |
+| TV Compose | No longer used (Phase 0 finding) | Nothing to do |
+| Navigation, ViewModel | Navigation Compose 2.8, Lifecycle 2.8 | JetBrains multiplatform builds of the same libraries |
+| DI | Hilt 2.57 | Koin, or plain Dagger 2 components (Hilt is Android-only; `javax.inject` annotations are plain JVM) |
+| Database | Room 2.7.1 | Room KMP with the bundled SQLite driver; same schema |
+| Settings | DataStore Preferences 1.1.1 | DataStore KMP |
+| Network | Retrofit 2.9, OkHttp 4.12, Moshi, Socket.IO | Unchanged: both targets are JVM, so these stay in a shared JVM source set |
+| Images | Coil 2.7 | Coil 3 (multiplatform) |
+| Media | Media3/ExoPlayer (Jellyfin, video wallpaper) | libmpv rendered into a Compose surface |
+| Colour extraction | Palette | Multiplatform port of Palette |
+| Background work | WorkManager 2.10 | Interface; WorkManager on Android, persistent coroutine queue on desktop |
+| Archives | commons-compress, xz, zstd-jni | Unchanged (plain JVM) |
+| Steam | JavaSteam fork + DepotDownloader | Unchanged libraries; Linux Steam library integration |
+| Built-in emulation | `libretrodroid` module | Desktop libretro frontend loading Linux cores |
+| Resources | Android `R.*` strings and drawables | Compose Multiplatform resources |
+| Device | CameraX (QR scanner only), BLE (QuayPass only), haptics | Webcam, BlueZ, SDL rumble behind interfaces |
+
+License is GPL-3.0, so the port must also be GPL-3.0 and ship source. `testbed/romm` holds Docker Compose setups for RomM 4.9, 5.0 and 5.1 for integration tests.
+
+## Architecture
+
+Argosy Desktop is a single JVM app whose screens, view models and data layer are Argosy's own code in shared modules; a thin desktop platform layer replaces each Android service.
 
-### Supported Emulators
-RetroArch, PPSSPP, DuckStation, AetherSX2, Dolphin, DraStic, melonDS, Mupen64Plus FZ, Pizza Boy, Lime3DS, Azahar, Flycast, Redream, and more. Missing your emulator? [Open an issue](https://github.com/nendotools/argosy-launcher/issues).
+```
+┌──────────────── Shared Argosy code (Kotlin Multiplatform, commonMain) ────────────────┐
+│  Compose UI                   ViewModels and domain          Data layer               │
+│  every screen and layout      navigation, focus, actions     RomM client, Room,       │
+│  themes, sounds, animations   collections, search            DataStore, downloads,    │
+│  identical on both apps       launch and sync rules          archives, Steam libs     │
+└───────────┬───────────────────────────────────────────────────────┬───────────────────┘
+            ▼                                                       ▼
+┌──────────────────────┐          ┌ ─ ─ ─ ─ ─ ─ Flatpak sandbox ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐
+│ Android app          │            Argosy Desktop platform layer (desktopMain)
+│ androidMain          │          │ SDL3 gamepad input, fullscreen window              │
+│ Intents, ExoPlayer   │            flatpak-spawn launcher, emulator registry
+│ WorkManager          │          │ libmpv media, libretro frontend                    │
+│ libretrodroid        │            brightness, volume, rumble via the host
+└──────────────────────┘          │ Secret portal, XDG paths                           │
+                                   ─ ─ ─ ─ ─ ┬ ─ ─ ─ ─ ─ ─ ┬ ─ ─ ─ ─ ─ ─ ┬ ─ ─ ─ ─ ─ ─ ─
+                                             ▼             ▼             ▼
+                                        RomM server    ROM library   Host emulators
+                                        (network)      ~/Games/Argosy and desktop apps
+```
 
-## Quick Menu (L3)
+Look-alike is guaranteed by construction: the pixels come from the same composables, themes, fonts and animations as on Android, so the work is in the platform layer, not the UI.
 
-Press **L3** (left stick click) anywhere to open the Quick Menu—a fast overlay for discovering games:
+**Module layout.** Restructure upstream into Kotlin Multiplatform modules with three source sets: `commonMain` (UI, view models, domain), `jvmShared` (Retrofit, Moshi, OkHttp, archive and Steam libraries that run on both Android and desktop JVMs) and per-target `androidMain` / `desktopMain`. The Android app becomes a thin `androidApp` module over `shared`.
 
-- **Search**: Find games across your entire library with fuzzy search
-- **Random**: Can't decide what to play? Let Argosy pick for you
-- **Most Played**: Jump back into your favorites
-- **Top Unplayed**: Highly-rated games you haven't touched yet
-- **Recent**: Continue where you left off
-- **Favorites**: Quick access to your starred games
+**Platform interfaces.** Every Android call site gets an interface in `commonMain` with two implementations: `GameLauncher`, `AppSource`, `MediaPlayer`, `BackgroundJobs`, `DeviceControls` (brightness, volume, haptics, performance), `SecretStore`, `FilePaths`, `Updater`.
 
-## Quick Settings (R3)
+**Input.** Compose desktop has no gamepad support, so `desktopMain` reads controllers through SDL3 (via JNA or Java's foreign function API) and feeds the same button actions Argosy's input handling expects: D-pad, A/B/X/Y, shoulders, L3/R3, Start/Select. Keyboard maps to the same actions. Phase 0 finding: upstream already maps Android key codes to a platform-free `GamepadEvent` / `InputHandler` layer (`ui/input/GamepadInputHandler.kt`), so SDL3 only has to emit the same key codes.
 
-Press **R3** (right stick click) anywhere to open Quick Settings—a right-side panel for instant adjustments:
+**Window.** Undecorated fullscreen by default (the Android app is always fullscreen), with a windowed mode for desktop use. Handheld targets such as Steam Deck Game Mode get the same layout as an Android handheld of that resolution.
 
-- **Theme**: Switch between light, dark, or system theme
-- **Haptics**: Toggle haptic feedback and adjust intensity
-- **UI Sounds**: Enable or disable navigation sounds
-- **BGM**: Toggle background music on or off
-
-On supported devices (Odin, AYN, Retroid), Quick Settings also includes **Performance Mode** and **Fan Control**.
-
-## More Features
-
-| Feature | Description |
-|---------|-------------|
-| **Library Filtering** | Browse by genre, player count, franchise, or region |
-| **Game Stats** | Track play status, ratings, and community scores |
-| **User Ratings** | Rate your games and sync ratings to RomM |
-| **Offline Mode** | Full access to downloaded games and cached metadata |
-| **Image Caching** | Cache all cover art locally for fast, offline browsing |
-| **Steam Games** | Index and launch Steam games installed via GameHub or GameNative |
-| **App Launcher** | Quick access to emulators and other apps |
-| **In-App Updates** | Update Argosy directly from the app |
-| **First-Run Wizard** | Guided setup for new users |
-| **Favorites** | Mark games for quick access |
-| **Hide Games** | Remove games from view without deleting them |
-
-## Getting Started
-
-1. **Download** the latest APK from [GitHub Releases](https://github.com/nendotools/argosy-launcher/releases/latest)
-2. **Install** the APK on your device
-3. **Run** Argosy and follow the setup wizard
-4. **Connect** to your RomM server (or skip for local-only use)
-5. **Sync** your library and start playing
-
-> **New to RomM?** Set up your self-hosted game library at [github.com/rommapp/romm](https://github.com/rommapp/romm)
-
-Updates are handled in-app after initial install.
-
-## Requirements
-
-- Android 8.0 (Oreo) or higher
-- Emulators installed for your desired platforms
-- A [RomM](https://github.com/rommapp/romm) server (optional, for sync features)
-
-### Target Devices
-
-Argosy is designed for retro gaming handhelds:
-- Anbernic (RG35XX, RG556, RG406, etc.)
-- Retroid Pocket (RP2+, RP3, RP4, RP5)
-- Odin / Odin 2
-- AYN handhelds
-- Android TV boxes
-
-Works on any Android device, but the gamepad-first interface is optimized for handheld gaming.
-
-## Screenshots
-
-<details>
-<summary>View all screenshots</summary>
-
-### Home Screen
-
-<img width="400" alt="Home Screen" src="https://github.com/user-attachments/assets/931e1f4a-e0a1-46a9-a7ce-e712c0d558cc" />
-
-### Library
-
-<img width="400" alt="Library" src="https://github.com/user-attachments/assets/b71a0297-c908-45a2-800c-a05bcc264201" />
-
-### Library Filtering
-
-<img width="400" alt="Library Filtering" src="https://github.com/user-attachments/assets/e9417ee8-a1b9-4f7d-99f0-37587bcfc9b9" />
-
-### Game Details
-
-<img width="400" alt="Game Details" src="https://github.com/user-attachments/assets/7e317d1d-ed5c-4459-a2b9-ac1f2f006789" />
-
-### Download Queue
-
-<img width="400" alt="Download Queue" src="https://github.com/user-attachments/assets/4235e9d6-ed7c-4be7-b20c-dcd5cbef5d3c" />
-
-### Settings
-
-<img width="400" alt="Settings" src="https://github.com/user-attachments/assets/fa925ef9-533a-48ba-ba71-5631297f43d4" />
-
-### Emulator Autoconfig
-
-<img width="400" alt="Emulator Autoconfig" src="https://github.com/user-attachments/assets/188a4296-7cf2-44c0-8501-913dc218bdfe" />
-
-### Built-in Updater
-
-<img width="400" alt="Built-in Updater" src="https://github.com/user-attachments/assets/be190b8a-f090-4387-939c-48ab4eb1369c" />
-
-</details>
-
-## Beta Releases
-
-Subscribe to beta releases for early access to new features. Beta versions may be unstable and introduce breaking changes. Check the [Releases](https://github.com/nendotools/argosy-launcher/releases) page for available beta builds.
-
-## Contributing
-
-Argosy is open source! Contributions, bug reports, and feature requests are welcome.
-
-- [Report a bug](https://github.com/nendotools/argosy-launcher/issues/new)
-- [Request a feature](https://github.com/nendotools/argosy-launcher/issues/new)
-
-## License
-
-This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
+**Media.** Jellyfin playback, trailers and video wallpaper use libmpv rendered into a Compose surface, with Argosy's existing player controls on top.
+
+**Built-in emulator.** A desktop counterpart to `libretrodroid`: a small native libretro frontend (C via JNI) that loads Linux cores, renders through OpenGL into the Compose window and reuses Argosy's in-game menu, so the built-in experience matches Android.
+
+## Feature parity matrix
+
+Nothing is dropped: Port means the shared code runs as is, Adapt means the same screen and behaviour sit on a Linux implementation, and the two Defer items need a sandbox permission or a fact-finding step first.
+
+| Feature | Decision | Phase | Linux notes |
+| --- | --- | --- | --- |
+| RomM connection, library sync, IGDB metadata | Port | 1 | Token stored through the Secret portal |
+| ROM and BIOS downloads, sort by platform | Port | 1 | Writes to the shared ROM folder |
+| Archive extraction | Port | 1 | Same JVM libraries |
+| Collections, smart collections, favorites, hide | Port | 1 | Shared data layer |
+| Ratings and play status synced to RomM | Port | 1 | Shared data layer |
+| Home layouts, Library, Details, Downloads, Settings screens | Port | 2 | Same composables; resource swaps only |
+| Sidebar, guide bar, Quick Menu (L3) | Port | 2 | Same composables; SDL3 supplies the buttons |
+| Themes, backgrounds, 3D box art, UI sounds, BGM | Port | 2 | Same assets and composables |
+| RetroAchievements | Port | 2 | Shared code, including offline support |
+| Restart from Settings > About | Port | 2 | Relaunches the Flatpak |
+| Save sync and save channels | Port | 3 | Argosy points emulator save folders into the shared folder, as it configures RetroArch on Android |
+| Now-playing to RomM, Argosy Social | Port | 3 | Fired on launch and process exit |
+| First-run wizard | Adapt | 3 | Same screens plus an emulator folder-access step |
+| Quick Settings (R3) | Adapt | 3 | Brightness and volume via the host; performance and fan on supported Linux handhelds |
+| Haptics | Adapt | 3 | SDL controller rumble |
+| Emulator detection, assignment, autoconfig, RetroArch cores, multi-disc | Adapt | 3 | Linux registry: Flatpak, native and AppImage emulators |
+| Apps tab | Adapt | 3 | Host .desktop apps, launched on the host |
+| Jellyfin media with offline downloads | Adapt | 4 | libmpv player behind Argosy's own controls |
+| Video wallpaper | Adapt | 4 | Same libmpv surface |
+| Built-in emulation and netplay | Adapt | 4 | Desktop libretro frontend, Linux cores |
+| Steam integration | Adapt | 4 | Reads the host Steam library; launches via `steam://rungameid/` |
+| Dual-screen | Adapt | 4 | Second window on a second display |
+| In-app updater | Adapt | 5 | Same About screen; Flatpak performs the update |
+| QuayPass (BLE) | Defer | 1.1 | Needs Bluetooth access through BlueZ; decide after 1.0 |
+| Camera features (QR scanner) | Defer | 1.1 | Webcam QR scanning; manual code entry covers 1.0 |
+
+## Flatpak design
+
+The package is one Flatpak holding a trimmed Java runtime, Argosy Desktop and its native helpers (SDL3, libmpv, the libretro frontend); it launches external emulators on the host through `flatpak-spawn --host`, the only supported way for one Flatpak to start another.
+
+### Manifest basics
+
+| Item | Choice |
+| --- | --- |
+| App ID | `io.github.<your-account>.ArgosyDesktop` (must match a GitHub account or domain you control) |
+| Runtime | `org.freedesktop.Platform` + `org.freedesktop.Sdk`, current branch |
+| SDK extensions | `openjdk` for the build and the bundled runtime |
+| Java runtime | `jlink`-trimmed JRE in `/app/jre`; JetBrains Runtime later for native Wayland |
+| Bundled modules | SDL3 and libmpv if the runtime lacks them; the libretro frontend built from source |
+| Libretro cores | Downloaded at runtime into the app's data folder, as Android downloads cores |
+| Architectures | x86_64 and aarch64 |
+| Updates | Flatpak updates the app; About screen keeps its look |
+
+### Permissions (finish-args)
+
+| Permission | Why |
+| --- | --- |
+| `--share=network` | RomM, Jellyfin, artwork |
+| `--share=ipc`, `--socket=wayland`, `--socket=x11` | Display; Java's desktop toolkit runs on X11 or XWayland until native Wayland lands |
+| `--device=dri` | GPU acceleration |
+| `--device=all` | Gamepads in `/dev/input`; switch to `--device=input` once Flathub builders and target distros all run Flatpak 1.16+ |
+| `--socket=pulseaudio` | UI sounds, BGM, video |
+| `--filesystem=~/Games/Argosy:create` | Shared ROM and BIOS library at a host path both Argosy and emulators can see |
+| `--talk-name=org.freedesktop.Flatpak` | `flatpak-spawn --host` to start emulators and list installed Flatpaks |
+
+No `--filesystem=home`. Secrets use libsecret, which falls back to the Secret portal inside the sandbox. Database, settings and cache live under `~/.var/app/<app-id>/`.
+
+### Launching emulators from the sandbox
+
+- **Host-visible paths only.** Every ROM path passed to an emulator must exist on the host, so ROMs never live under `~/.var` or a document-portal path. That is why the library uses a static filesystem grant instead of the file chooser.
+- **Three launch strategies** behind one `LaunchStrategy` interface: Flatpak emulator (`flatpak-spawn --host flatpak run <id> <args>`), native binary on the host PATH, and AppImage.
+- **Emulator Flatpaks need the ROM folder too.** The first-run wizard detects each installed emulator Flatpak and, with consent, runs `flatpak override --user --filesystem=~/Games/Argosy <emulator-id>` on the host.
+- **Supervision.** `flatpak-spawn` stays attached until the host process exits, which gives play-session start and end for now-playing reports and save sync.
+- **Discovery** runs `flatpak list --app` on the host, checks PATH, `~/Applications` AppImages, and RetroDECK/EmuDeck install folders against a Linux emulator registry (ID, launch template, supported platforms, save path).
+
+### Offline build (Flathub requirement)
+
+Flathub builds without network, so every dependency is pre-declared as a source:
+
+- Gradle: generate `gradle-sources.json` with [jwharm/flatpak-gradle-generator](https://github.com/jwharm/flatpak-gradle-generator) or the [meshtastic gradle-flatpak-sources](https://plugins.gradle.org/plugin/org.meshtastic.flatpak.sources) plugin, then build with `--offline` against the local Maven folder.
+- Native modules (SDL3, libmpv, the libretro frontend): pinned source archives or git commits with checksums in the manifest.
+- Regenerate the Gradle sources in CI on every dependency change; a stale sources file is the most common Flathub build failure.
+
+### Store listing
+
+AppStream metainfo with controller-first screenshots, OARS rating, release notes per version and a `launchable`; a .desktop file with the `Game` category; icons at 128, 256 and scalable SVG. Validate with `flatpak-builder-lint` before every submission.
+
+Sources: [Flathub forum on launching Flatpaks from Flatpaks](https://discourse.flathub.org/t/launching-flatpak-inside-flatpak/5708), [Flathub forum on device=input](https://discourse.flathub.org/t/support-for-device-input/6645).
+
+## Roadmap
+
+Six phases over about 32 weeks; restructure first, then get every screen on the desktop, then replace Android services one by one, so a playable alpha exists at week 19.
+
+| Phase | Weeks | Scope | Gate after |
+| --- | --- | --- | --- |
+| 0 · Discovery and spikes | 1–2 | Library screen in a desktop window, sandbox launch, Room KMP; upstream conversation started | All three spikes pass |
+| 1 · Kotlin Multiplatform restructure | 3–8 | Shared modules, DI, Room and DataStore KMP, shared resources; Android app unchanged for users | — |
+| 2 · Desktop UI | 9–13 | Every screen runs on the desktop; SDL3 gamepad input; identical focus feel | — |
+| 3 · Linux services and alpha Flatpak | 14–19 | Emulator registry, host launch, save paths, Apps tab, Quick Settings; Flatpak from your own repo | Alpha: sync, download, play, save sync |
+| 4 · Remaining parity | 20–28 | libmpv media and video wallpaper, Steam, dual-screen, desktop libretro frontend and netplay | — |
+| 5 · Beta and Flathub | 29–32 | Side-by-side checks against Android; GNOME, KDE and SteamOS testing; Flathub submission | 1.0 live on Flathub |
+
+Exit criteria per phase:
+
+1. **Phase 0:** upstream's Library screen renders in a desktop window; a sandboxed test Flatpak starts the RetroArch Flatpak on a ROM; upstream's schema opens under Room KMP on the JVM.
+2. **Phase 1:** `shared` builds for Android and desktop with no Android imports in `commonMain`; the Android app passes its existing tests and looks unchanged.
+3. **Phase 2:** every screen opens on the desktop and is fully navigable by gamepad; screenshots match an Android handheld at the same resolution.
+4. **Phase 3:** emulators detected on a clean Fedora and a SteamOS install; a game launches, exits and returns to Argosy; saves sync to RomM; alpha installs from your own Flatpak repo.
+5. **Phase 4:** every Port and Adapt row of the parity matrix works; built-in emulation runs at least the cores Android ships, or is moved to 1.1 by decision.
+6. **Phase 5:** testers using both apps cannot name a behavioural difference; `flatpak-builder-lint` clean; offline build green in CI for x86_64 and aarch64; Flathub PR merged.
+
+## Risks and mitigations
+
+The two risks that decide the project are upstream drift and the sandbox; both are tested in Phase 0 before any large refactor.
+
+| Risk | Impact | Mitigation |
+| --- | --- | --- |
+| Upstream moves fast (3,300+ commits) and the KMP restructure is a big diff | A private fork drifts; the desktop app looks older than Android within months | Pitch the KMP split to rommapp first; if declined, script the restructure (file moves, package swaps) so it re-applies to each upstream release |
+| Flathub questions `org.freedesktop.Flatpak` access | Blocks the Flathub listing | Justify it (a launcher must start emulators); ship from a self-hosted repo first; AppImage as fallback |
+| Emulator Flatpaks cannot read ROMs or write saves in the shared folder | Games fail; save sync breaks | Wizard applies per-emulator overrides with consent; launch preflight explains any fix needed |
+| Android-only calls scattered through screens (Context, toasts, R.*) | UI phase slips | Phase 0 counted them (see survey); compatibility shims in `desktopMain` for the common ones |
+| Focus feel differs on desktop | App feels different on a gamepad | Side-by-side video tests of every screen against an Android handheld before alpha |
+| Gamepad edge cases (hotplug, Steam Input remapping, handheld built-in pads) | Wrong buttons or none | SDL3 controller database; test on Steam Deck, an Xbox pad and a DualSense |
+| Desktop libretro frontend effort (video, audio sync, input, save states) | Built-in emulation slips | Scheduled last in Phase 4; may ship in 1.1 while external emulators cover 1.0 |
+| Java toolkit on XWayland (fractional scaling, frame pacing) | Blurry or stuttery UI on Wayland desktops | Test GNOME and KDE at 125% and 150%; move to JetBrains Runtime's native Wayland toolkit if needed |
+| `--device=all` flagged potentially unsafe | Lower trust on the store page | Move to `--device=input` once Flatpak 1.16+ is universal |
+| Naming, icon and GPL-3.0 obligations | Confusion with upstream; legal exposure | Agree name and icon with rommapp; whole port GPL-3.0 with a source link in About |
+
+## Open decisions and next steps
+
+Four decisions shape everything after Phase 0; settle them in the first two weeks.
+
+- **Upstream or fork.** Contribute the KMP restructure to rommapp so both apps share one codebase (recommended), or keep a fork with a re-apply script.
+- **Name and app ID.** "Argosy Desktop" with upstream's blessing, under rommapp or your own GitHub account.
+- **Java runtime.** Stock OpenJDK on XWayland for 1.0, or JetBrains Runtime with native Wayland from the start.
+- **Built-in emulation timing.** In 1.0, or 1.1 with external emulators only at launch.
+
+Phase 0 tasks:
+
+- [x] Fork rommapp/argosy-launcher (done: Stealthx3/argosy-desktop)
+- [x] Build the Android app unchanged, as the baseline
+- [x] Count Android-only imports in `app/` by package and by screen to size the restructure
+- [x] Record how upstream turns gamepad key events into actions, so SDL3 can feed the same path
+- [x] Spike: one real Argosy screen (Library) rendering in a Compose desktop window with fake data
+- [x] Spike: a sandboxed test Flatpak starts the RetroArch Flatpak on a ROM in `~/Games/Argosy`
+- [x] Spike: Room KMP + bundled SQLite opening upstream's schema on the JVM
+- [x] Check what CameraX and BLE are used for, and whether `testbed/romm` gives a disposable RomM for tests
+- [ ] Open an issue or Discord thread with rommapp maintainers proposing the shared KMP codebase (draft in `docs/desktop/upstream-proposal.md`; posting is the owner's call)
+
+---
+
+## Upstream Argosy
+
+Argosy Desktop is built on Argosy, the gamepad-first Android launcher for retro handhelds with native RomM integration. Upstream's original README is kept as [`README.upstream.md`](README.upstream.md); the upstream project is at [rommapp/argosy-launcher](https://github.com/rommapp/argosy-launcher).
