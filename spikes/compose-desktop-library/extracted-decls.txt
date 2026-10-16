@@ -1,0 +1,19 @@
+# <upstream file>: <top-level declarations copied verbatim>. These live in files that are too
+# entangled (Hilt view models, DataStore repositories, whole screens) to compile whole.
+com/nendo/argosy/data/preferences/UserPreferencesRepository.kt: ThemeMode GripReserveMode SystemIconPosition GlowColorMode BoxArtOuterEffect BoxArtInnerEffect BoxArtGlowStrength BoxArtBorderStyle PlatformIndicatorStyle PlatformIndicatorContent BoxArtBorderThickness BoxArtCornerRadius BoxArtInnerEffectThickness BoxArtOuterEffectThickness BoxArtShape DefaultView DisplayRoleOverride DualScreenInputFocus GlassBorderTint GridDensity LibraryLayout SystemIconPadding
+com/nendo/argosy/ui/screens/library/LibraryViewModel.kt: LibraryUiState LibraryGridItem ActiveFilters FilterCategory FilterOptions FocusMove LibraryFilter LibraryGameUi LibraryView MIN_SECTION_RAIL_LABELS ActiveFilterEntry PlatformRef
+com/nendo/argosy/ui/screens/home/HomeModels.kt: GameDownloadIndicator HomePlatformUi
+com/nendo/argosy/ui/screens/gamedetail/GameDetailModels.kt: CollectionItemUi
+com/nendo/argosy/ui/screens/common/GameLaunchDelegate.kt: DiscPickerState SyncOverlayState MemcardPickerState VariantPickerState
+com/nendo/argosy/ui/screens/library/LibraryScreen.kt: SectionDivider
+com/nendo/argosy/ui/theme/ThemeViewModel.kt: ThemeState
+com/nendo/argosy/ui/input/InputDispatcher.kt: LocalABIconsSwapped LocalSwapStartSelect LocalXYIconsSwapped
+com/nendo/argosy/ui/screens/doodle/DoodleModels.kt: DecodedDoodle DoodleColor CanvasSize ZoomLevel
+com/nendo/argosy/data/social/SocialModels.kt: FriendActivity
+com/nendo/argosy/ui/theme/backdrop/SurfaceBackdrop.kt: LocalSurfaceBackdrop
+com/nendo/argosy/ui/theme/CustomFonts.kt: CustomFontFamilies withSlot argosyTypography
+com/nendo/argosy/data/emulator/GameLauncher.kt: DiscOption
+com/nendo/argosy/util/SystemSettings.kt: formatClockTime
+com/nendo/argosy/ui/util/FocusModifiers.kt: focusBorder focusBackground
+com/nendo/argosy/data/emulator/VariantResolver.kt: VariantOption
+com/nendo/argosy/data/sync/platform/PlatformSaveHandler.kt: MemcardInfo
