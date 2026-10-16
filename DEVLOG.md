@@ -14,7 +14,7 @@ Project rules (set by the project owner, 2026-10-16):
 
 ## Phase 0 · Discovery and spikes
 
-**Status:** in progress. Survey done; spikes not yet built. Gate (all three spikes pass) still open.
+**Status:** gate passed (all three spikes pass). Phase close (README, push) pending.
 
 ### 2026-10-16 — Session 1 (claude.ai cloud session)
 
@@ -47,6 +47,26 @@ Project rules (set by the project owner, 2026-10-16):
 
 **Action:** Wrote the handoff for Claude Code: `CLAUDE.md` (project instructions and next steps), this log, the plan copy, the survey and an upstream proposal draft, all copied into the local workspace.
 **Reasoning:** The owner asked to continue in Claude Code. These files let a new session pick up without this conversation. Nothing was committed or pushed, because Phase 0 is not complete.
+
+### 2026-10-16 — Session 2 (Claude Code on the owner's computer)
+
+**Action:** Checked the fork out in place (`main` at `6e64baa`, submodules), committed the handoff files, `*.pdf` excluded via `.git/info/exclude`.
+**Reasoning:** One-time setup from `CLAUDE.md`.
+
+**Action:** Installed the missing toolchain with the owner's approval: Android SDK in `~/Android/Sdk` (platform 35, build-tools 35; AGP auto-installed NDK 27.0.12077973 and build-tools 34), Temurin JDK 21 in `~/.jdks`, and `org.flatpak.Builder` + `org.freedesktop.Platform//24.08` from Flathub (user).
+**Reasoning:** The system JDK 17 is a JRE without `jlink` (AGP fails in `JdkImageTransform`), and Gradle 8.9 cannot run on the system JDK 25. A user-level JDK 21 avoids sudo.
+
+**Action:** Android baseline: `./gradlew :app:assembleDebug` unchanged, on JDK 21 → **pass**, 6 m 01 s (partly warm after a failed first attempt), 69 MB `app-debug.apk`.
+
+**Action:** Spike `spikes/room-kmp-jvm/` → **pass.** 154 files copied unchanged (entities, DAOs, Converters, `ALauncherDatabase`, plus 6 plain-Kotlin model files they import). Only `migrations/` and `DatabaseFactory.kt` (Android `Context`) were excluded; no source line edited. Exported schema is byte-identical to `app/schemas/.../214.json` (identityHash `6a58e378d72d74d60c8b6d1bf8a20cb8`); BundledSQLiteDriver open, DAO insert and `Flow` queries pass in tests. Every DAO function is already `suspend` or `Flow`.
+
+**Action:** Spike `spikes/compose-desktop-library/` → **pass.** `LibraryGameList` in `ALauncherTheme` renders headless (`library.png`) and in a window (`./gradlew run`, checked on the owner's desktop). 71 upstream files (9,112 lines) compile unchanged; 61 declarations extracted verbatim from 17 entangled files; 15 Android/AndroidX/Coil/Hilt APIs shimmed (350 lines); fakes for `LibraryViewModel`, `ThemeViewModel`, `ImageCacheManager`, `BackdropStamps`; desktop actuals for `focusGlow` (Skia blur) and `CustomFontLoader`. Full stub inventory and Phase 2 findings in the spike README.
+**Reasoning:** Shimming at the Android API's own package keeps upstream files unedited and makes the shim list the Phase 2 work list. Biggest items: resources (6,254 strings, 225 plurals → Compose MP resources) and state types declared inside view-model files.
+
+**Action:** Spike `spikes/flatpak-launch/` → **pass.** Sandboxed spike Flatpak sees `~/Games/Argosy`, `flatpak-spawn --host flatpak run org.libretro.RetroArch` loads the ROM with gambatte ("Got internal game name: ARGOSY SPIKE"), exit status returns (0 normal, 1 for a bad core). Test ROM is self-made (`make-test-rom.py`), no download. Changes: builder fallback with `--disable-rofiles-fuse` (FUSE cannot mount inside the Builder sandbox); RetroArch access is checked, not overridden (owner already has `filesystems=host`). Cleaned up the auto-save state RetroArch wrote for the test ROM.
+**Finding / proposed plan change:** `org.freedesktop.Platform 24.08` is end-of-life. Move the manifest to 25.08 from Phase 1.
+
+**Gate:** all three spikes pass. **Still open:** owner's decision on posting `docs/desktop/upstream-proposal.md`; rebuild `README.md`; push `main`; ask about Phase 1.
 
 ### Next (for the Claude Code session)
 

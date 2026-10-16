@@ -215,11 +215,11 @@ Four decisions shape everything after Phase 0; settle them in the first two week
 Phase 0 tasks:
 
 - [x] Fork rommapp/argosy-launcher (done: Stealthx3/argosy-desktop)
-- [ ] Build the Android app unchanged, as the baseline
+- [x] Build the Android app unchanged, as the baseline
 - [x] Count Android-only imports in `app/` by package and by screen to size the restructure
 - [x] Record how upstream turns gamepad key events into actions, so SDL3 can feed the same path
-- [ ] Spike: one real Argosy screen (Library) rendering in a Compose desktop window with fake data
-- [ ] Spike: a sandboxed test Flatpak starts the RetroArch Flatpak on a ROM in `~/Games/Argosy`
-- [ ] Spike: Room KMP + bundled SQLite opening upstream's schema on the JVM
+- [x] Spike: one real Argosy screen (Library) rendering in a Compose desktop window with fake data
+- [x] Spike: a sandboxed test Flatpak starts the RetroArch Flatpak on a ROM in `~/Games/Argosy`
+- [x] Spike: Room KMP + bundled SQLite opening upstream's schema on the JVM
 - [x] Check what CameraX and BLE are used for, and whether `testbed/romm` gives a disposable RomM for tests
 - [ ] Open an issue or Discord thread with rommapp maintainers proposing the shared KMP codebase (draft in `docs/desktop/upstream-proposal.md`; posting is the owner's call)
