@@ -1,6 +1,6 @@
 package com.nendo.argosy.data.download.nsz
 
-import android.util.Log
+import com.nendo.argosy.util.PlatformLog as Log
 import java.io.BufferedInputStream
 import java.io.BufferedOutputStream
 import java.io.File
