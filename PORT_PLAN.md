@@ -23,10 +23,10 @@ Upstream is a single-module Android app, but nearly all of it is Kotlin and Comp
 | Area | Upstream today | Desktop path |
 | --- | --- | --- |
 | Language / build | Kotlin 2.3.20, Gradle, AGP 8.7.3, one `app` module | Kotlin Multiplatform: `shared` + `androidApp` + `desktopApp` |
-| UI | Jetpack Compose, Material 3 | Compose Multiplatform; same APIs, code moves almost as is |
+| UI | Jetpack Compose, Material 3 | Compose Multiplatform; same APIs, code moves almost as is. CMP release matched to Android's Compose BOM so Android does not change |
 | TV Compose | No longer used (Phase 0 finding) | Nothing to do |
 | Navigation, ViewModel | Navigation Compose 2.8, Lifecycle 2.8 | JetBrains multiplatform builds of the same libraries |
-| DI | Hilt 2.57 | Koin, or plain Dagger 2 components (Hilt is Android-only; `javax.inject` annotations are plain JVM) |
+| DI | Hilt 2.57 | Decided in Phase 1: plain Dagger 2 component on the desktop, Hilt kept on Android; `javax.inject` and `@InstallIn` (`hilt-core`) are plain JVM |
 | Database | Room 2.7.1 | Room KMP with the bundled SQLite driver; same schema |
 | Settings | DataStore Preferences 1.1.1 | DataStore KMP |
 | Network | Retrofit 2.9, OkHttp 4.12, Moshi, Socket.IO | Unchanged: both targets are JVM, so these stay in a shared JVM source set |
@@ -70,6 +70,8 @@ Argosy Desktop is a single JVM app whose screens, view models and data layer are
 Look-alike is guaranteed by construction: the pixels come from the same composables, themes, fonts and animations as on Android, so the work is in the platform layer, not the UI.
 
 **Module layout.** Restructure upstream into Kotlin Multiplatform modules with three source sets: `commonMain` (UI, view models, domain), `jvmShared` (Retrofit, Moshi, OkHttp, archive and Steam libraries that run on both Android and desktop JVMs) and per-target `androidMain` / `desktopMain`. The Android app becomes a thin `androidApp` module over `shared`.
+
+> **Phase 1 decision** (owner, 2026-10-16): no separate `jvmShared` set. Both targets are JVMs, so `commonMain` can use JDK APIs and the plain-Java libraries directly. The Android app keeps its upstream module name `app/` (it plays the `androidApp` role), which avoids renaming about 1,000 Android-only files on every upstream merge. Modules: `:shared` (KMP: `commonMain`, `androidMain`, `desktopMain`), `:app`, `:desktopApp`. Package names never change. Plan and order of moves: `DEVLOG.md`, Phase 1.
 
 **Platform interfaces.** Every Android call site gets an interface in `commonMain` with two implementations: `GameLauncher`, `AppSource`, `MediaPlayer`, `BackgroundJobs`, `DeviceControls` (brightness, volume, haptics, performance), `SecretStore`, `FilePaths`, `Updater`.
 

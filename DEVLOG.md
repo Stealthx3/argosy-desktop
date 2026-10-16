@@ -14,7 +14,7 @@ Project rules (set by the project owner, 2026-10-16):
 
 ## Phase 0 · Discovery and spikes
 
-**Status:** gate passed (all three spikes pass). Phase close (README, push) pending.
+**Status:** closed. Gate passed (all three spikes pass); README rebuilt and `main` pushed.
 
 ### 2026-10-16 — Session 1 (claude.ai cloud session)
 
@@ -90,6 +90,84 @@ Project rules (set by the project owner, 2026-10-16):
 
 **Phase 0 closed.** Next: owner decides whether to start Phase 1 now or schedule it.
 
-### Next (for the Claude Code session)
+---
 
-See `CLAUDE.md` → "Phase 0: remaining work".
+## Phase 1 · Kotlin Multiplatform restructure
+
+**Status:** plan approved by the owner (2026-10-16); step 1 in progress.
+
+### 2026-10-16 — Session 3 (Claude Code on the owner's computer)
+
+**Action:** Read the project rules, the plan, the Phase 0 log and survey, upstream's `AGENTS.md` / `.claude/CLAUDE.md`, and the spike READMEs; surveyed the build (`app/build.gradle.kts`, version catalog), the state types embedded in view-model and repository files, the Compose stability config, DataStore creation and the scripts that hard-code `app/src/main`.
+**Reasoning:** The phase plan has to fit what is in the tree, especially the things that make a restructure expensive: the stability contract (package globs), CI scripts and hooks with fixed paths (15 files), resource qualifiers, and user data locations on Android.
+
+### Phase 1 plan (proposed)
+
+**Goal and exit criteria** (from `PORT_PLAN.md`): `shared` builds for Android and desktop with no Android imports in `commonMain`; the Android app passes `testDebugUnitTest` and looks unchanged.
+
+**Scope boundary.** Phase 1 moves everything that is already platform-free (data, domain, Android-free UI) into `commonMain`, and gives Android-bound code a home in `androidMain` behind interfaces where a caller in `commonMain` needs it. It does not write the desktop implementations of those interfaces (Phase 2 and 3) and does not have to make every screen run on the desktop. A file that cannot move yet stays where it is and is listed, so the leftover list sizes Phase 2.
+
+#### Principles
+
+1. **Packages never change.** Every file keeps `com.nendo.argosy.*`. Moves change only the directory, so imports, the Compose stability globs (`ui.**`, `data.model.**`, ...), Room's generated code, test packages and upstream's tooling keep working, and git sees pure renames.
+2. **A move commit only moves.** File moves (`git mv`) and content edits never share a commit, so git's rename detection matches 100% and upstream changes to a moved file merge onto its new path.
+3. **Mechanical edits are scripted, not hand-made.** Anything applied to many files (moves, the resource rewrite, import swaps) is done by a script under `scripts/desktop/` driven by a manifest, so it can be re-run on the next upstream release instead of merged by hand.
+4. **Hand edits are small and prefer new files.** `expect`/`actual` declarations and interfaces go in new files; edits inside upstream files are kept to what a move forces.
+5. **Every step ends green:** `:app:assembleDebug`, `:app:testDebugUnitTest`, and (once it exists) `:shared:compileKotlinDesktop`. One step, one or a few commits.
+
+#### Module layout
+
+| Module | Directory | Holds |
+| --- | --- | --- |
+| `:shared` | `shared/` | KMP library: `androidTarget()` + `jvm("desktop")`. Source sets `commonMain`, `androidMain`, `desktopMain`, `commonTest`. Room, DataStore, network, domain, view models, Android-free UI, resources. |
+| `:app` | `app/` (unchanged) | The Android application: activities, services, workers, receivers, manifest, `libretrodroid`/`sigil` wiring, Hilt application component, migrations, Android-bound code not moved yet. Depends on `:shared`. |
+| `:desktopApp` | `desktopApp/` | Compose desktop entry point, Dagger component, desktop actuals as they arrive. Phase 1 content: a window that opens the shared theme, proving the wiring. |
+
+Two changes from `PORT_PLAN.md`, for the owner to confirm:
+
+- **No separate `jvmShared` source set.** Both targets are JVMs, so Kotlin lets a source set shared by Android and JVM use JDK APIs and plain-Java libraries (Retrofit, OkHttp, Moshi, commons-compress, JavaSteam). `commonMain` *is* the shared JVM set; a third layer adds configuration with no consumer. If a non-JVM target ever appears, `jvmShared` can be split out then.
+- **Keep the Android module as `app/`, not `androidApp/`.** Renaming it renames every Android-only file (about 1,000) for no functional gain and turns each upstream merge into a rename-heavy one. The module plays the `androidApp` role under its upstream name.
+
+#### Order of moves
+
+Each step is independently shippable on Android; the list runs from no-risk to the large scripted rewrites.
+
+1. **Extract state types from view-model and repository files, same package, inside `app`.** Exactly the declarations the Library spike had to copy out one by one (`spikes/compose-desktop-library/extracted-decls.txt`): the 22 display enums plus `UserPreferences` / `BuiltinEmulatorSettings` from the 1,297-line `UserPreferencesRepository.kt`; `LibraryUiState` and its filter/grid types from `LibraryViewModel.kt`; `ThemeState` from `ThemeViewModel.kt`; the picker states from `GameLaunchDelegate.kt`. No module change, no behaviour change. This is also the "first step" in the upstream proposal, so it is the most likely part to be adopted upstream.
+2. **Module skeleton.** Add `:shared` and `:desktopApp`, `app` depends on `shared`, nothing moved yet. Settles the toolchain questions on an empty module: Compose Multiplatform version (see risks), KSP per target (`kspAndroid`, `kspDesktop`), the Compose stability config applied to `shared` too, JDK APIs in `commonMain`.
+3. **Room into `shared`.** Entities, DAOs, `Converters`, `ALauncherDatabase` → `commonMain` (proved unchanged by the Room spike). `migrations/` and the Android `DatabaseFactory` stay in `app`; a desktop factory uses `BundledSQLiteDriver`. Schema export keeps writing to `app/schemas` and the v214 `identityHash` is checked. Android keeps its file name and SupportSQLite path, so existing installs open their database unchanged.
+4. **Android-free models, domain and utilities.** A script computes the movable set to a fixpoint (a file moves only when everything it references has moved), using the compiler as the final check. Domain's 12 known Android-debt files stay in `app` until an interface replaces the call.
+5. **Network and JVM libraries.** RomM client (Retrofit/Moshi/OkHttp), Socket.IO, archives, Steam libraries → `commonMain`; Moshi codegen runs per target.
+6. **DataStore KMP.** Preference repositories → `commonMain`; file creation behind an `expect`/`actual` path provider. Android keeps the exact `datastore/*.preferences_pb` file names, so no user loses settings (user-data rule from `.claude/CLAUDE.md`).
+7. **DI.** Dagger stays the engine (see decision below). `@Module`/`@Provides` and `@Inject` constructors move with their classes; `@InstallIn` comes from `hilt-core`, which is plain JVM. View models get a small `expect` annotation that is `@HiltViewModel` on Android; the desktop builds a Dagger `@Component` over the same modules plus a view-model map. Hilt keeps owning activities, services and workers in `app`.
+8. **Resources → Compose Multiplatform resources.** `res/values*/strings*.xml` (6,254 strings, 225 plurals, 8 languages) and the drawables shared UI uses move to `shared/src/commonMain/composeResources/`; a script rewrites `R.string.x` → `Res.string.x`, `stringResource`/`pluralStringResource` imports, and `@StringRes Int` carriers → `StringResource`. Android-only code (notifications, widgets, manifest labels) keeps the Android resources it needs. `scripts/ci/check-translations.py` and the lint translation checks are pointed at the new location. To verify: Compose resources' handling of the `values-b+zh+Hans` / `b+zh+Hant` folder qualifiers.
+9. **Android-free UI.** Theme, tokens (`scripts/gen-tokens.mjs` output path), components and screens that compile without Android → `commonMain`. Composables that need Android get the spike's shim list as `expect`/`actual` (blur mask, shader matrix, bitmap decode, font fallback, `LocalContext` uses). The rest stays in `app` and is listed for Phase 2.
+10. **Tooling paths.** Each step that first moves files under a script's scope updates that script in the same step: `stability_checks.py`, `service_stability_checks.py`, `comment_checks.py`, `smell-rules.json`, `check-translations.py`, `gen-tokens.mjs`, the `.claude` hooks, detekt sources, CI. Tests stay in `app/src/test` (they see `shared` through the dependency) unless a test needs to move with an `internal` declaration.
+
+#### DI: Dagger or Koin
+
+Recommendation: **plain Dagger 2 on the desktop, Hilt kept on Android.** `javax.inject` (`@Inject` in 504 files, `@Singleton` in 340) is plain JVM and stays untouched; Hilt's `@InstallIn` is in the JVM `hilt-core` artifact; only the 33 `@HiltViewModel` view models and the `hiltViewModel()` call sites need a shared alias. Koin would mean rewriting the wiring of every injected class into Koin modules or Koin annotations: a large, permanent diff against upstream that has to be redone on every release, for no user-visible gain.
+
+#### How the restructure survives upstream releases
+
+The plan works whether or not rommapp adopts the KMP split:
+
+- `main` merges each upstream release (the `upstream` branch) with git rename detection. Because moves are pure renames with unchanged packages, upstream edits to a moved file land on its new path.
+- `scripts/desktop/restructure/` holds the manifest (which file or package lives in which source set) and the scripted transforms. After a merge it is re-run: it relocates new upstream files that landed under `app/` but belong in `shared`, re-applies the resource rewrite to new or changed call sites, and fails if the layout drifts from the manifest. Every transform is idempotent.
+- Conflicts can then come only from hand edits, which are few and mostly in new files.
+- Rehearsal: before the phase closes, run the sync once on a real upstream delta (v2.24.0 if released by then; otherwise replay the restructure from `9940f11` onto `6e64baa`) and record the effort.
+- If rommapp adopts the restructure, the same script produces the upstream PR series, step by step in this order.
+
+#### Risks found while planning
+
+- **Compose version drift on Android.** Android uses Compose BOM 2024.12.01 (Compose 1.7.x, Material3 1.3.1). `commonMain` compiles against Compose Multiplatform, and on Android CMP resolves to the androidx artifacts it was built against, so CMP 1.12 (used in the spike) would silently upgrade Android Compose by several releases and risk "looks unchanged". Recommendation: use the CMP release that maps to Android's current Compose (1.7.x) during Phase 1, and move both together when upstream bumps its BOM. Step 2 proves this works with Kotlin 2.3.20.
+- **Compile time.** KMP compiles `shared` once per target; a cold build may grow beyond the ~12 min of today. Mitigation: build only the target needed, keep the stability config on `shared`, and split `shared` into `shared-data` / `shared-ui` if a cold build passes ~20 min.
+- **User data on Android.** Database and DataStore file names and locations must not change; steps 3 and 6 check this against an installed build before they are committed.
+- **Visual check.** "Looks unchanged" needs a before/after on a device or emulator, not just a green build. No Android device or emulator was used in Phase 0.
+
+#### Verification per step
+
+`./gradlew :app:assembleDebug :app:testDebugUnitTest` (plus `:shared:compileKotlinDesktop` from step 2) on JDK 21. Steps that touch the database, DataStore, resources or UI also get an on-device or emulator check before and after. Every report says which of these ran.
+
+**Action:** Showed the plan to the owner. Decisions: plan approved as written (no `jvmShared` set, Android module stays `app/`); DI = plain Dagger on the desktop with Hilt kept on Android; Android stays on its current Compose 1.7 (CMP release matched to the BOM) during Phase 1; "looks unchanged" is checked on an Android emulator installed in `~/Android/Sdk`, before and after the data, resource and UI steps. Upstream-or-fork stays open (the owner holds the proposal); the plan works either way.
+**Reasoning:** These were the choices where two defensible readings lead to materially different work. Recorded the module and DI decisions in `PORT_PLAN.md`.
+**Divergence from upstream rules:** none yet. Step 8 (resources) will change upstream's "`@StringRes Int` carriers" law to `StringResource` carriers in shared code; that will be recorded here when it lands.
