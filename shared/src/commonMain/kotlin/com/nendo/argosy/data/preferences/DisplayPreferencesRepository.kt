@@ -13,7 +13,7 @@ import com.nendo.argosy.data.cache.GradientPreset
 import com.nendo.argosy.domain.model.GripAutoControllers
 import com.nendo.argosy.domain.model.ScreenLayouts
 import com.nendo.argosy.ui.theme.generated.ComponentDefaults
-import com.nendo.argosy.util.DisplayAffinityHelper
+import com.nendo.argosy.util.DualScreenDeviceInfo as DisplayAffinityHelper
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first

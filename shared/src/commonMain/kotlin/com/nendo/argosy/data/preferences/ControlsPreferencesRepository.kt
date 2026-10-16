@@ -1,6 +1,6 @@
 package com.nendo.argosy.data.preferences
 
-import android.view.KeyEvent
+import com.nendo.argosy.core.input.AndroidKeyCodes as KeyEvent
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
