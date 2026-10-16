@@ -6,6 +6,8 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.compose.multiplatform)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.room)
 }
 
 kotlin {
@@ -23,6 +25,14 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(compose.runtime)
+            implementation(libs.room.runtime)
+            implementation(libs.kotlinx.coroutines.core)
+        }
+        getByName("desktopMain").dependencies {
+            implementation(libs.sqlite.bundled)
+        }
+        getByName("desktopTest").dependencies {
+            implementation(libs.kotlin.test)
         }
     }
 }
@@ -39,6 +49,15 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+}
+
+room {
+    schemaDirectory(rootProject.layout.projectDirectory.dir("app/schemas").asFile.path)
+}
+
+dependencies {
+    add("kspAndroid", libs.room.compiler)
+    add("kspDesktop", libs.room.compiler)
 }
 
 composeCompiler {
