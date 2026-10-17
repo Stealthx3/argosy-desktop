@@ -1,6 +1,26 @@
 package com.nendo.argosy.ui.screens.quaypass
 
-import android.content.Context
+import com.nendo.argosy.platform.PlatformContext as Context
+import com.nendo.argosy.platform.startActivity
+import com.nendo.argosy.platform.getApplicationInfo
+import com.nendo.argosy.platform.getApplicationLabel
+import com.nendo.argosy.platform.applicationContext
+import com.nendo.argosy.platform.packageName
+import com.nendo.argosy.platform.getSystemService
+import com.nendo.argosy.platform.getExternalFilesDir
+import com.nendo.argosy.platform.packageManager
+import com.nendo.argosy.platform.getPackageInfo
+import com.nendo.argosy.platform.versionName
+import com.nendo.argosy.platform.assets
+import com.nendo.argosy.platform.contentResolver
+import com.nendo.argosy.platform.getSharedPreferences
+import com.nendo.argosy.platform.list
+import com.nendo.argosy.platform.open
+import com.nendo.argosy.platform.cacheDir
+import com.nendo.argosy.platform.filesDir
+import com.nendo.argosy.platform.getQuantityString
+import com.nendo.argosy.platform.getString
+import com.nendo.argosy.platform.resources
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.snap
 import androidx.compose.foundation.Image
@@ -42,17 +62,25 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
+import com.nendo.argosy.platform.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.res.stringResource
+import com.nendo.argosy.platform.LocalPlatformContext as LocalContext
+import com.nendo.argosy.platform.cacheDir
+import com.nendo.argosy.platform.filesDir
+import com.nendo.argosy.platform.getQuantityString
+import com.nendo.argosy.platform.getString
+import com.nendo.argosy.platform.resources
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.nendo.argosy.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.hilt.navigation.compose.hiltViewModel
+import com.nendo.argosy.di.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import coil.compose.AsyncImage
-import com.nendo.argosy.shared.R
+import com.nendo.argosy.platform.image.AsyncImage
+import com.nendo.argosy.platform.image.bitmap
+import com.nendo.argosy.platform.image.intrinsicHeight
+import com.nendo.argosy.platform.image.intrinsicWidth
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.data.quaypass.QuayPassService
 import com.nendo.argosy.ui.components.FocusedScroll
 import com.nendo.argosy.ui.components.FooterBar
@@ -444,8 +472,8 @@ private fun TicketAwardChip(amount: Int, modifier: Modifier = Modifier) {
 
 private fun decodePngAvatar(base64: String?): ImageBitmap? = base64?.let {
     runCatching {
-        val bytes = android.util.Base64.decode(it, android.util.Base64.NO_WRAP)
-        android.graphics.BitmapFactory.decodeByteArray(bytes, 0, bytes.size)?.asImageBitmap()
+        val bytes = com.nendo.argosy.platform.PlatformBase64.decode(it, com.nendo.argosy.platform.PlatformBase64.NO_WRAP)
+        com.nendo.argosy.platform.PlatformBitmapFactory.decodeByteArray(bytes, 0, bytes.size)?.asImageBitmap()
     }.getOrNull()
 }
 

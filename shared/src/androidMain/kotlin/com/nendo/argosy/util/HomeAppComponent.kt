@@ -5,11 +5,11 @@ import android.content.Context
 import android.content.pm.PackageManager
 import com.nendo.argosy.ArgosyActivity
 
-object HomeAppComponent {
+actual object HomeAppComponent {
 
-    const val ALIAS_CLASS = "com.nendo.argosy.MainActivity"
+    actual const val ALIAS_CLASS = "com.nendo.argosy.MainActivity"
 
-    fun setEnabled(context: Context, enabled: Boolean) {
+    actual fun setEnabled(context: Context, enabled: Boolean) {
         val state = if (enabled) {
             PackageManager.COMPONENT_ENABLED_STATE_ENABLED
         } else {
@@ -22,13 +22,13 @@ object HomeAppComponent {
         )
     }
 
-    fun isLauncherActivity(className: String?): Boolean =
+    actual fun isLauncherActivity(className: String?): Boolean =
         className == ArgosyActivity::class.java.name || className == ALIAS_CLASS
 
-    fun componentEnabled(available: Boolean, isDefaultHome: Boolean): Boolean =
+    actual fun componentEnabled(available: Boolean, isDefaultHome: Boolean): Boolean =
         available || isDefaultHome
 
-    fun startupAvailability(
+    actual fun startupAvailability(
         stored: Boolean,
         defaultApplied: Boolean,
         desktopModeSupported: Boolean,
@@ -41,5 +41,3 @@ object HomeAppComponent {
         )
     }
 }
-
-data class HomeAppStartup(val available: Boolean, val persistDefault: Boolean)

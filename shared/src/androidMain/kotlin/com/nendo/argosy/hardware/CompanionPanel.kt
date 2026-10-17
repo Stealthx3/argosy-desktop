@@ -47,7 +47,7 @@ internal fun CompanionInGameState.withLiveQuickActionState(
     quickActionsAvailable: Boolean
 ): CompanionInGameState = copy(quickActionsAvailable = quickActionsAvailable)
 
-class CompanionSessionTimer {
+actual class CompanionSessionTimer {
     private var screenOnDuration: Duration = Duration.ZERO
     private var lastScreenOnTime: Instant? = null
     private var isScreenOn = true
@@ -61,7 +61,7 @@ class CompanionSessionTimer {
         }
     }
 
-    fun start(context: Context) {
+    actual fun start(context: Context) {
         screenOnDuration = Duration.ZERO
         lastScreenOnTime = Instant.now()
         isScreenOn = true
@@ -72,13 +72,13 @@ class CompanionSessionTimer {
         context.registerReceiver(receiver, filter)
     }
 
-    fun stop(context: Context) {
+    actual fun stop(context: Context) {
         try {
             context.unregisterReceiver(receiver)
         } catch (_: Exception) { }
     }
 
-    fun getActiveMillis(): Long {
+    actual fun getActiveMillis(): Long {
         var total = screenOnDuration
         if (isScreenOn && lastScreenOnTime != null) {
             total = total.plus(Duration.between(lastScreenOnTime, Instant.now()))

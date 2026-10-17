@@ -14,14 +14,14 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class ScreenCaptureManager @Inject constructor(
+actual class ScreenCaptureManager @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
     private val _isCapturing = MutableStateFlow(false)
-    val isCapturing: StateFlow<Boolean> = _isCapturing.asStateFlow()
+    actual val isCapturing: StateFlow<Boolean> = _isCapturing.asStateFlow()
 
     private val _hasPermission = MutableStateFlow(false)
-    val hasPermission: StateFlow<Boolean> = _hasPermission.asStateFlow()
+    actual val hasPermission: StateFlow<Boolean> = _hasPermission.asStateFlow()
 
     private var pendingResultCode: Int? = null
     private var pendingData: Intent? = null
@@ -31,7 +31,7 @@ class ScreenCaptureManager @Inject constructor(
         launcher.launch(projectionManager.createScreenCaptureIntent())
     }
 
-    fun onPermissionResult(resultCode: Int, data: Intent?) {
+    actual fun onPermissionResult(resultCode: Int, data: Intent?) {
         if (resultCode == Activity.RESULT_OK && data != null) {
             pendingResultCode = resultCode
             pendingData = data
@@ -43,7 +43,7 @@ class ScreenCaptureManager @Inject constructor(
         }
     }
 
-    fun startCapture() {
+    actual fun startCapture() {
         val resultCode = pendingResultCode
         val data = pendingData
 
@@ -56,7 +56,7 @@ class ScreenCaptureManager @Inject constructor(
         }
     }
 
-    fun stopCapture() {
+    actual fun stopCapture() {
         if (_isCapturing.value) {
             ScreenCaptureService.stop(context)
             _isCapturing.value = false
@@ -64,13 +64,13 @@ class ScreenCaptureManager @Inject constructor(
         }
     }
 
-    fun clearPermission() {
+    actual fun clearPermission() {
         pendingResultCode = null
         pendingData = null
         _hasPermission.value = false
     }
 
-    companion object {
+    actual companion object {
         private const val TAG = "ScreenCaptureManager"
     }
 }

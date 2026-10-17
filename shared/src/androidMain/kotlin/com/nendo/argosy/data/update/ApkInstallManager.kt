@@ -29,21 +29,8 @@ import javax.inject.Singleton
 
 private const val TAG = "ApkInstallManager"
 
-data class PendingApkInstall(
-    val gameId: Long,
-    val apkPath: String,
-    val expectedPackageName: String?
-)
-
-sealed class ApkInstallState {
-    data object Idle : ApkInstallState()
-    data class WaitingForInstall(val gameId: Long, val apkPath: String) : ApkInstallState()
-    data class InstallComplete(val gameId: Long, val packageName: String) : ApkInstallState()
-    data class InstallFailed(val gameId: Long, val reason: String) : ApkInstallState()
-}
-
 @Singleton
-class ApkInstallManager @Inject constructor(
+actual class ApkInstallManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val downloadManager: DownloadManager,
     private val gameDao: GameDao,
@@ -54,7 +41,7 @@ class ApkInstallManager @Inject constructor(
     private val scope = SafeCoroutineScope(Dispatchers.Main, "ApkInstallManager")
 
     private val _state = MutableStateFlow<ApkInstallState>(ApkInstallState.Idle)
-    val state: StateFlow<ApkInstallState> = _state.asStateFlow()
+    actual val state: StateFlow<ApkInstallState> = _state.asStateFlow()
 
     private val pendingInstalls = mutableMapOf<String, PendingApkInstall>()
 
@@ -217,19 +204,19 @@ class ApkInstallManager @Inject constructor(
         }
     }
 
-    fun canInstallPackages(): Boolean {
+    actual fun canInstallPackages(): Boolean {
         return appInstaller.canInstallPackages(context)
     }
 
-    fun openInstallPermissionSettings() {
+    actual fun openInstallPermissionSettings() {
         appInstaller.openInstallPermissionSettings(context)
     }
 
-    fun resetState() {
+    actual fun resetState() {
         _state.value = ApkInstallState.Idle
     }
 
-    suspend fun installApkForGame(gameId: Long): Boolean {
+    actual suspend fun installApkForGame(gameId: Long): Boolean {
         val game = gameDao.getById(gameId) ?: return false
         val localPath = game.localPath ?: return false
 

@@ -20,15 +20,14 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class ShaderChainManager(
+actual class ShaderChainManager actual constructor(
     private val shaderRegistry: ShaderRegistry,
     private val shaderDownloader: ShaderDownloader,
     private val previewRenderer: ShaderPreviewRenderer,
     private val scope: CoroutineScope,
     private val previewInputProvider: suspend () -> Bitmap?,
-    private val onChainChanged: ((ShaderChainConfig) -> Unit)? = null
-) {
-    companion object {
+    private val onChainChanged: ((ShaderChainConfig) -> Unit)?) {
+    actual companion object {
         private const val TAG = "ShaderChainManager"
         private const val PREVIEW_SIM_HEIGHT = 224
         private const val PREVIEW_UPSCALE = 3
@@ -42,9 +41,9 @@ class ShaderChainManager(
 
     private var previewJob: Job? = null
 
-    fun getShaderRegistry(): ShaderRegistry = shaderRegistry
+    actual fun getShaderRegistry(): ShaderRegistry = shaderRegistry
 
-    fun loadChain(chainJson: String) {
+    actual fun loadChain(chainJson: String) {
         shaderRegistry.ensureDirectoriesExist()
         val chain = ShaderChainConfig.fromJson(chainJson)
         val entries = chain.entries.map { entry ->
@@ -70,7 +69,7 @@ class ShaderChainManager(
         renderPreview()
     }
 
-    fun getChainConfig(): ShaderChainConfig = ShaderChainConfig(
+    actual fun getChainConfig(): ShaderChainConfig = ShaderChainConfig(
         entries = shaderStack.entries.map { entry ->
             ShaderChainConfig.Entry(
                 shaderId = entry.shaderId,
@@ -79,7 +78,7 @@ class ShaderChainManager(
         }
     )
 
-    fun addShaderToStack(shaderId: String, displayName: String) {
+    actual fun addShaderToStack(shaderId: String, displayName: String) {
         val newEntries = shaderStack.entries + ShaderStackEntry(shaderId, displayName)
         shaderStack = shaderStack.copy(
             entries = newEntries,
@@ -92,7 +91,7 @@ class ShaderChainManager(
         renderPreview()
     }
 
-    fun removeShaderFromStack() {
+    actual fun removeShaderFromStack() {
         if (shaderStack.entries.isEmpty()) return
         val newEntries = shaderStack.entries.toMutableList().apply {
             removeAt(shaderStack.selectedIndex)
@@ -109,30 +108,30 @@ class ShaderChainManager(
         renderPreview()
     }
 
-    fun liftShader() {
+    actual fun liftShader() {
         if (shaderStack.isReordering) return
         val reorder = ListReorder.lift(shaderStack.entries, shaderStack.selectedIndex) ?: return
         shaderStack = shaderStack.copy(reorder = reorder)
     }
 
-    fun moveHeldShader(delta: Int): Boolean {
+    actual fun moveHeldShader(delta: Int): Boolean {
         val reorder = shaderStack.reorder ?: return false
         return applyShaderStep(reorder.moveBy(shaderStack.entries, delta))
     }
 
-    fun moveHeldShaderTo(index: Int): Boolean {
+    actual fun moveHeldShaderTo(index: Int): Boolean {
         val reorder = shaderStack.reorder ?: return false
         return applyShaderStep(reorder.moveTo(shaderStack.entries, index))
     }
 
-    fun dropShader() {
+    actual fun dropShader() {
         val reorder = shaderStack.reorder ?: return
         val changed = reorder.changedOrder(shaderStack.entries) != null
         shaderStack = shaderStack.copy(reorder = null)
         if (changed) notifyChainChanged()
     }
 
-    fun cancelShaderLift() {
+    actual fun cancelShaderLift() {
         val reorder = shaderStack.reorder ?: return
         val changed = reorder.changedOrder(shaderStack.entries) != null
         shaderStack = shaderStack.copy(
@@ -154,7 +153,7 @@ class ShaderChainManager(
         return true
     }
 
-    fun selectShaderInStack(index: Int) {
+    actual fun selectShaderInStack(index: Int) {
         if (index < 0 || index >= shaderStack.entries.size) return
         if (index == shaderStack.selectedIndex) return
         shaderStack = shaderStack.copy(
@@ -164,7 +163,7 @@ class ShaderChainManager(
         loadParamsForSelectedShader()
     }
 
-    fun cycleShaderTab(direction: Int) {
+    actual fun cycleShaderTab(direction: Int) {
         if (shaderStack.entries.isEmpty()) return
         val newIndex = (shaderStack.selectedIndex + direction).let {
             when {
@@ -176,14 +175,14 @@ class ShaderChainManager(
         selectShaderInStack(newIndex)
     }
 
-    fun moveShaderParamFocus(delta: Int) {
+    actual fun moveShaderParamFocus(delta: Int) {
         if (shaderStack.selectedShaderParams.isEmpty()) return
         val newIndex = (shaderStack.paramFocusIndex + delta)
             .coerceIn(0, shaderStack.maxParamFocusIndex)
         shaderStack = shaderStack.copy(paramFocusIndex = newIndex)
     }
 
-    fun adjustShaderParam(direction: Int) {
+    actual fun adjustShaderParam(direction: Int) {
         val entry = shaderStack.selectedEntry ?: return
         val paramDef = shaderStack.selectedShaderParams
             .getOrNull(shaderStack.paramFocusIndex) ?: return
@@ -205,7 +204,7 @@ class ShaderChainManager(
         debouncedRenderPreview()
     }
 
-    fun resetShaderParam() {
+    actual fun resetShaderParam() {
         val entry = shaderStack.selectedEntry ?: return
         val paramDef = shaderStack.selectedShaderParams
             .getOrNull(shaderStack.paramFocusIndex) ?: return
@@ -220,7 +219,7 @@ class ShaderChainManager(
         debouncedRenderPreview()
     }
 
-    fun showShaderPicker() {
+    actual fun showShaderPicker() {
         shaderStack = shaderStack.copy(
             showShaderPicker = true,
             shaderPickerFocusIndex = 0,
@@ -228,15 +227,15 @@ class ShaderChainManager(
         )
     }
 
-    fun dismissShaderPicker() {
+    actual fun dismissShaderPicker() {
         shaderStack = shaderStack.copy(showShaderPicker = false)
     }
 
-    fun setShaderPickerFocusIndex(index: Int) {
+    actual fun setShaderPickerFocusIndex(index: Int) {
         shaderStack = shaderStack.copy(shaderPickerFocusIndex = index)
     }
 
-    fun moveShaderPickerFocus(delta: Int) {
+    actual fun moveShaderPickerFocus(delta: Int) {
         val maxIndex = (shaderRegistry.getShadersForPicker().size - 1)
             .coerceAtLeast(0)
         val newIndex = (shaderStack.shaderPickerFocusIndex + delta)
@@ -244,7 +243,7 @@ class ShaderChainManager(
         shaderStack = shaderStack.copy(shaderPickerFocusIndex = newIndex)
     }
 
-    fun jumpShaderPickerSection(direction: Int) {
+    actual fun jumpShaderPickerSection(direction: Int) {
         val shaders = shaderRegistry.getShadersForPicker()
         val grouped = shaders.groupBy { it.category }
         val sectionStarts = mutableListOf<Int>()
@@ -265,7 +264,7 @@ class ShaderChainManager(
         shaderStack = shaderStack.copy(shaderPickerFocusIndex = targetIndex)
     }
 
-    fun confirmShaderPickerSelection() {
+    actual fun confirmShaderPickerSelection() {
         val shaders = shaderRegistry.getShadersForPicker()
         val grouped = shaders.groupBy { it.category }
         val categoryOrdered = buildList {
@@ -283,7 +282,7 @@ class ShaderChainManager(
         }
     }
 
-    fun renderPreview() {
+    actual fun renderPreview() {
         previewJob?.cancel()
         previewJob = scope.launch(Dispatchers.Default) {
             val entries = shaderStack.entries
@@ -359,7 +358,7 @@ class ShaderChainManager(
         }
     }
 
-    fun debouncedRenderPreview() {
+    actual fun debouncedRenderPreview() {
         previewJob?.cancel()
         previewJob = scope.launch {
             delay(150)
@@ -367,7 +366,7 @@ class ShaderChainManager(
         }
     }
 
-    fun destroy() {
+    actual fun destroy() {
         previewJob?.cancel()
         previewRenderer.destroy()
     }

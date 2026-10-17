@@ -16,29 +16,9 @@ import javax.inject.Singleton
 
 private const val TAG = "RomStagingManager"
 private const val MANIFEST_NAME = "staging.manifest"
-private const val ARCHIVE_SUBDIR = "archive"
-private const val OUTPUT_SUBDIR = "out"
 private const val PARTIAL_SUFFIX = ".partial"
 private const val COPY_BUFFER_SIZE = 256 * 1024
 private const val PROGRESS_REPORT_INTERVAL_BYTES = 4L * 1024 * 1024
-
-enum class StagingPhase { DOWNLOADING, EXTRACTING, MOVING }
-
-data class StagingManifest(
-    val downloadId: Long,
-    val gameId: Long,
-    val gameTitle: String,
-    val fileName: String,
-    val destinationDir: String,
-    val phase: StagingPhase,
-    val launchRelPath: String? = null
-)
-
-class StagingArea(val root: File, val manifest: StagingManifest) {
-    val archiveDir: File get() = File(root, ARCHIVE_SUBDIR)
-    val outputDir: File get() = File(root, OUTPUT_SUBDIR)
-    val destinationDir: File get() = File(manifest.destinationDir)
-}
 
 /**
  * App-private workspace for one rom download: the archive lands here, unpacks here, and only the
@@ -53,26 +33,26 @@ class StagingArea(val root: File, val manifest: StagingManifest) {
  * unpack jobs on the same flash at once, which is the contention this whole path exists to avoid.
  */
 @Singleton
-class RomStagingManager @Inject constructor(
+actual class RomStagingManager @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
     private val lock = Any()
     private var holderId: Long? = null
 
-    val stagingRoot: File get() = AppPaths.romStagingRoot(context.filesDir)
+    actual val stagingRoot: File get() = AppPaths.romStagingRoot(context.filesDir)
 
-    fun claim(downloadId: Long): Boolean = synchronized(lock) {
+    actual fun claim(downloadId: Long): Boolean = synchronized(lock) {
         val current = holderId
         if (current != null && current != downloadId) return false
         holderId = downloadId
         true
     }
 
-    fun release(downloadId: Long) = synchronized(lock) {
+    actual fun release(downloadId: Long) = synchronized(lock) {
         if (holderId == downloadId) holderId = null
     }
 
-    fun internalAvailableBytes(): Long? = availableBytes(context.filesDir)
+    actual fun internalAvailableBytes(): Long? = availableBytes(context.filesDir)
 
     /**
      * Free bytes on the volume holding [dir], or null when no ancestor of it can be stat'ed.
@@ -81,7 +61,7 @@ class RomStagingManager @Inject constructor(
      * folders inside another app's `Android/data` raise on the directory itself and answer on a
      * parent, so the walk is what keeps the check from throwing on the devices it matters for.
      */
-    fun availableBytes(dir: File): Long? {
+    actual fun availableBytes(dir: File): Long? {
         var probe: File? = dir
         while (probe != null) {
             val candidate: File = probe
@@ -92,7 +72,7 @@ class RomStagingManager @Inject constructor(
         return null
     }
 
-    fun open(manifest: StagingManifest): StagingArea {
+    actual fun open(manifest: StagingManifest): StagingArea {
         val root = AppPaths.romStagingDir(context.filesDir, manifest.downloadId)
         val area = StagingArea(root, manifest)
         area.archiveDir.mkdirs()
@@ -101,7 +81,7 @@ class RomStagingManager @Inject constructor(
         return area
     }
 
-    fun advance(area: StagingArea, phase: StagingPhase, launchRelPath: String? = null): StagingArea {
+    actual fun advance(area: StagingArea, phase: StagingPhase, launchRelPath: String?): StagingArea {
         val next = StagingArea(
             area.root,
             area.manifest.copy(phase = phase, launchRelPath = launchRelPath ?: area.manifest.launchRelPath)
@@ -116,13 +96,13 @@ class RomStagingManager @Inject constructor(
      * Only the `.partial` names this area's own output would produce are removed, so a discard can
      * never reach a finished rom or another download's work in the same folder.
      */
-    fun discard(area: StagingArea) {
+    actual fun discard(area: StagingArea) {
         removeOwnPartials(area)
         area.root.deleteRecursively()
         release(area.manifest.downloadId)
     }
 
-    fun list(): List<StagingArea> {
+    actual fun list(): List<StagingArea> {
         val roots = stagingRoot.listFiles()?.filter { it.isDirectory } ?: return emptyList()
         return roots.mapNotNull { root -> readManifest(root)?.let { StagingArea(root, it) } }
     }
@@ -131,7 +111,7 @@ class RomStagingManager @Inject constructor(
      * Removes every staging directory whose download is no longer queued, plus any directory with
      * no readable manifest at all. Returns the bytes reclaimed.
      */
-    fun cleanAbandoned(liveDownloadIds: Set<Long>): Long {
+    actual fun cleanAbandoned(liveDownloadIds: Set<Long>): Long {
         val roots = stagingRoot.listFiles()?.filter { it.isDirectory } ?: return 0L
         var freed = 0L
         for (root in roots) {
@@ -149,9 +129,9 @@ class RomStagingManager @Inject constructor(
         return freed
     }
 
-    fun stagedBytes(): Long = directoryBytes(stagingRoot)
+    actual fun stagedBytes(): Long = directoryBytes(stagingRoot)
 
-    fun outputBytes(area: StagingArea): Long = directoryBytes(area.outputDir)
+    actual fun outputBytes(area: StagingArea): Long = directoryBytes(area.outputDir)
 
     /**
      * Carries the finished tree from [StagingArea.outputDir] into [StagingArea.destinationDir].
@@ -163,7 +143,7 @@ class RomStagingManager @Inject constructor(
      * than its source is resumed from its own length, which is what lets a transfer that died
      * mid-copy continue without downloading or unpacking anything again.
      */
-    suspend fun deploy(
+    actual suspend fun deploy(
         area: StagingArea,
         onProgress: (copiedBytes: Long, totalBytes: Long) -> Unit
     ): Boolean {

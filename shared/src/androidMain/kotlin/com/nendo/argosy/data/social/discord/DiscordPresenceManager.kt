@@ -28,7 +28,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class DiscordPresenceManager @Inject constructor(
+actual class DiscordPresenceManager @Inject constructor(
     private val tokenHolder: DiscordTokenHolder,
     private val playSessionTracker: PlaySessionTracker,
     private val preferencesRepository: UserPreferencesRepository,
@@ -37,7 +37,7 @@ class DiscordPresenceManager @Inject constructor(
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     private val _state = MutableStateFlow<DiscordPresenceState>(DiscordPresenceState.Disconnected)
-    val state: StateFlow<DiscordPresenceState> = _state.asStateFlow()
+    actual val state: StateFlow<DiscordPresenceState> = _state.asStateFlow()
 
     private var sdkAvailable = false
     private var sdkClient: Any? = null
@@ -211,7 +211,7 @@ class DiscordPresenceManager @Inject constructor(
         }
     }
 
-    companion object {
+    actual companion object {
         private const val TAG = "DiscordPresenceManager"
         private const val CALLBACK_INTERVAL_MS = 100L
     }

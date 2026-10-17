@@ -1,6 +1,7 @@
 package com.nendo.argosy.ui.input
 
 import com.nendo.argosy.platform.PlatformKeyEvent as KeyEvent
+import com.nendo.argosy.platform.name
 import com.nendo.argosy.platform.action
 import com.nendo.argosy.platform.device
 import com.nendo.argosy.platform.deviceId

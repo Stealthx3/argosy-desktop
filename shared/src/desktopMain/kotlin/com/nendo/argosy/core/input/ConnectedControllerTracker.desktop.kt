@@ -5,6 +5,7 @@ import javax.inject.Singleton
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import com.nendo.argosy.platform.PlatformInputDevice as InputDevice
+import com.nendo.argosy.platform.PlatformInputEvent as InputEvent
 
 @Singleton
 actual class ConnectedControllerTracker @Inject constructor() {
@@ -19,5 +20,8 @@ actual class ConnectedControllerTracker @Inject constructor() {
     actual fun detectActive(): DetectionResult = TODO("desktop: detectActive")
 
     actual fun refresh() {
+    }
+
+    actual fun noteInput(event: InputEvent) {
     }
 }

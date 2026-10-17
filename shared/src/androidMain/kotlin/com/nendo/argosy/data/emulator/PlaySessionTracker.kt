@@ -57,40 +57,8 @@ import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import javax.inject.Singleton
 
-data class ActiveSession(
-    val gameId: Long,
-    val startTime: Instant,
-    val emulatorPackage: String,
-    val coreName: String? = null,
-    val isHardcore: Boolean = false,
-    val isNewGame: Boolean = false,
-    val channelName: String? = null,
-    val isNetplayGuest: Boolean = false,
-    val variantFileId: Long? = null,
-    val origin: LaunchOrigin = LaunchOrigin.INTERNAL
-)
-
-sealed class SessionEndResult {
-    data object Success : SessionEndResult()
-    data object Duplicate : SessionEndResult()
-    data object Skipped : SessionEndResult()
-    data class SaveUnreadable(val dirPath: String, val emulatorId: String) : SessionEndResult()
-    data class Error(val message: String) : SessionEndResult()
-}
-
-data class SaveConflictEvent(
-    val gameId: Long,
-    val emulatorId: String,
-    val channelName: String?,
-    val localTimestamp: Instant,
-    val serverTimestamp: Instant,
-    val serverDeviceName: String? = null,
-    val conflictId: Long? = null,
-    val isHardcoreDowngrade: Boolean = false
-)
-
 @Singleton
-class PlaySessionTracker @Inject constructor(
+actual class PlaySessionTracker @Inject constructor(
     private val application: Application,
     private val gameDao: GameDao,
     private val overlayWriter: com.nendo.argosy.data.repository.GameUserOverlayWriter,
@@ -115,7 +83,7 @@ class PlaySessionTracker @Inject constructor(
     private val snapshotRouter: dagger.Lazy<com.nendo.argosy.data.sync.snapshot.SnapshotSyncRouter>,
     private val sessionRecapFactsRecorder: SessionRecapFactsRecorder
 ) {
-    companion object {
+    actual companion object {
         private const val TAG = "PlaySessionTracker"
         private const val MIN_PLAY_SECONDS_FOR_COMPLETION = 20
         private const val MAX_SESSION_RECOVERY_ATTEMPTS = 3
@@ -163,8 +131,8 @@ class PlaySessionTracker @Inject constructor(
     }
 
     private val _activeSession = MutableStateFlow<ActiveSession?>(null)
-    val activeSession: StateFlow<ActiveSession?> = _activeSession.asStateFlow()
-    val hasActiveSession: StateFlow<Boolean> = _activeSession
+    actual val activeSession: StateFlow<ActiveSession?> = _activeSession.asStateFlow()
+    actual val hasActiveSession: StateFlow<Boolean> = _activeSession
         .map { it != null }
         .stateIn(scope, kotlinx.coroutines.flow.SharingStarted.Eagerly, false)
 
@@ -174,9 +142,9 @@ class PlaySessionTracker @Inject constructor(
      * The session-end save conflict awaiting the user's answer, or null once answered. Launch paths
      * hold a new launch on this so the next game's own prompts never stack on an unanswered one.
      */
-    val pendingSessionConflict: StateFlow<SaveConflictEvent?> = _pendingSessionConflict.asStateFlow()
+    actual val pendingSessionConflict: StateFlow<SaveConflictEvent?> = _pendingSessionConflict.asStateFlow()
 
-    fun clearPendingSessionConflict() {
+    actual fun clearPendingSessionConflict() {
         _pendingSessionConflict.value = null
     }
 
@@ -188,7 +156,7 @@ class PlaySessionTracker @Inject constructor(
      * so a launcher opened by hand afterwards never reacts to it. A save conflict raised by that
      * close may still be waiting in [pendingSessionConflict] when this fires.
      */
-    val externalSessionClosed: SharedFlow<Unit> = _externalSessionClosed.asSharedFlow()
+    actual val externalSessionClosed: SharedFlow<Unit> = _externalSessionClosed.asSharedFlow()
 
     private fun signalSessionClosed(session: ActiveSession) {
         if (session.origin != LaunchOrigin.EXTERNAL) return
@@ -308,7 +276,7 @@ class PlaySessionTracker @Inject constructor(
         return outcome
     }
 
-    suspend fun checkOrphanedSession() {
+    actual suspend fun checkOrphanedSession() {
         if (!saveRecoveryGate.tryClaimSessionEnd()) {
             Logger.debug(TAG, "[SaveSync] ORPHAN | Skipping orphan check, endSession is handling recovery")
             saveRecoveryGate.markComplete()
@@ -488,16 +456,15 @@ class PlaySessionTracker @Inject constructor(
      * running session first, so a live session here is a caller that skipped it: the call is
      * refused and logged rather than clobbering the running session's play time and save sync.
      */
-    fun startSession(
+    actual fun startSession(
         gameId: Long,
         emulatorPackage: String,
-        coreName: String? = null,
-        isHardcore: Boolean = false,
-        isNewGame: Boolean = false,
-        isNetplayGuest: Boolean = false,
-        variantFileId: Long? = null,
-        origin: LaunchOrigin = LaunchOrigin.INTERNAL
-    ) {
+        coreName: String?,
+        isHardcore: Boolean,
+        isNewGame: Boolean,
+        isNetplayGuest: Boolean,
+        variantFileId: Long?,
+        origin: LaunchOrigin) {
         val running = _activeSession.value
         if (running != null) {
             Logger.error(
@@ -575,7 +542,7 @@ class PlaySessionTracker @Inject constructor(
      * than the launch flag. Hardcore saves live outside named channels, so the channel is
      * recomputed exactly as startSession does.
      */
-    fun updateSessionHardcore(gameId: Long, isHardcore: Boolean) {
+    actual fun updateSessionHardcore(gameId: Long, isHardcore: Boolean) {
         scope.launch {
             sessionServiceMutex.withLock {
                 val session = _activeSession.value ?: return@withLock
@@ -679,7 +646,7 @@ class PlaySessionTracker @Inject constructor(
         sessionServiceStarted.set(true)
     }
 
-    suspend fun endSession(stopService: Boolean = true, skipSaveSync: Boolean = false): SessionEndResult {
+    actual suspend fun endSession(stopService: Boolean, skipSaveSync: Boolean): SessionEndResult {
         if (!saveRecoveryGate.tryClaimSessionEnd()) {
             Logger.debug(TAG, "[SaveSync] SESSION | endSession already in progress, skipping")
             return SessionEndResult.Skipped
@@ -970,9 +937,9 @@ class PlaySessionTracker @Inject constructor(
      * that produced a save is still a session worth archiving, so this is stronger evidence than
      * elapsed time about whether there is anything to keep.
      */
-    fun sawSaveActivity(): Boolean = saveObserved.get()
+    actual fun sawSaveActivity(): Boolean = saveObserved.get()
 
-    fun markSaveObserved() {
+    actual fun markSaveObserved() {
         saveObserved.set(true)
     }
 
@@ -981,14 +948,14 @@ class PlaySessionTracker @Inject constructor(
         onBufferOverflow = kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
     )
 
-    val saveWrites: kotlinx.coroutines.flow.SharedFlow<Unit> = _saveWrites
+    actual val saveWrites: kotlinx.coroutines.flow.SharedFlow<Unit> = _saveWrites
 
-    fun reportSaveWritten() {
+    actual fun reportSaveWritten() {
         markSaveObserved()
         _saveWrites.tryEmit(Unit)
     }
 
-    fun getSessionDuration(): Duration? {
+    actual fun getSessionDuration(): Duration? {
         val session = _activeSession.value ?: return null
         return Duration.between(session.startTime, Instant.now())
     }
@@ -1003,7 +970,7 @@ class PlaySessionTracker @Inject constructor(
      * queued for upload by [endSession], so without this flush the row has nothing left to drain
      * it until some later, longer session for the same game happens to run.
      */
-    fun cancelSession() {
+    actual fun cancelSession() {
         val session = _activeSession.value ?: return
         if (!saveRecoveryGate.tryClaimSessionEnd()) {
             Logger.debug(TAG, "[SaveSync] SESSION | cancelSession skipped: endSession already in progress")
@@ -1029,7 +996,7 @@ class PlaySessionTracker @Inject constructor(
      * Ends the session on the tracker's own scope. A caller whose scope dies with the watcher
      * service passes stopService=false and stops the service itself once the job completes.
      */
-    fun endSessionInBackground(skipSaveSync: Boolean = false, stopService: Boolean = true): Job =
+    actual fun endSessionInBackground(skipSaveSync: Boolean, stopService: Boolean): Job =
         scope.launch { endSession(stopService = stopService, skipSaveSync = skipSaveSync) }
 
     private fun reconcileAchievementsInBackground(gameId: Long) {
@@ -1043,7 +1010,7 @@ class PlaySessionTracker @Inject constructor(
     }
 
     /** Cache the current session's save to local Room with needsRemoteSync=true, synchronously. Called from the in-game Quit handler so the save is persisted before libretro core teardown begins -- teardown can be slow enough on some cores (PSP shader cache, etc.) to trigger an OS-imposed process kill, taking endSession's coroutine with it. The upload itself is handled later by the sync coordinator draining the dirty cache row. */
-    suspend fun cacheCurrentSessionForQuit(): SaveCacheManager.CacheResult? {
+    actual suspend fun cacheCurrentSessionForQuit(): SaveCacheManager.CacheResult? {
         val session = _activeSession.value ?: return null
         if (session.variantFileId != null) return null
         val game = gameDao.getById(session.gameId) ?: return null
@@ -1087,7 +1054,7 @@ class PlaySessionTracker @Inject constructor(
     /** Cache the current session's save STATES into local Room synchronously, before core teardown.
      * Mirrors [cacheCurrentSessionForQuit]: local cache only, uploads deferred to the sync coordinator,
      * so states survive an OS process kill during teardown instead of dying with endSession's coroutine. */
-    suspend fun cacheCurrentSessionStatesForQuit() {
+    actual suspend fun cacheCurrentSessionStatesForQuit() {
         val session = _activeSession.value ?: return
         if (session.variantFileId != null) return
         val result = syncStatesOnSessionEndUseCase.get()(
@@ -1098,13 +1065,13 @@ class PlaySessionTracker @Inject constructor(
         Logger.debug(TAG, "[StateSync] QUIT gameId=${session.gameId} | Pre-quit state cache result=${result::class.simpleName}")
     }
 
-    fun forceStopService() {
+    actual fun forceStopService() {
         GameSessionService.stop(application)
         scope.launch { clearSessionAndBroadcast() }
         Logger.debug(TAG, "[SaveSync] SESSION | Force stopped service (no active session)")
     }
 
-    fun canResumeSession(gameId: Long, variantFileId: Long? = null): Boolean {
+    actual fun canResumeSession(gameId: Long, variantFileId: Long?): Boolean {
         val session = _activeSession.value
         if (session == null) {
             Logger.debug(TAG, "canResumeSession($gameId): no active session")

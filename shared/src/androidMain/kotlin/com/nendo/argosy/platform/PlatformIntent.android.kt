@@ -1,5 +1,6 @@
 package com.nendo.argosy.platform
 
+import android.content.ComponentName
 import android.content.Intent
 
 actual object PlatformIntent {
@@ -30,6 +31,16 @@ actual object PlatformIntent {
 }
 
 actual typealias PlatformIntentType = Intent
+
+actual typealias PlatformComponentName = ComponentName
+
+actual val PlatformComponentName.packageName: String get() = packageName
+
+actual val PlatformIntentType.component: PlatformComponentName? get() = component
+
+actual val PlatformIntentType.`package`: String? get() = `package`
+
+actual fun PlatformIntentType.getStringExtra(name: String): String? = getStringExtra(name)
 
 actual val PlatformIntentType.action: String? get() = action
 

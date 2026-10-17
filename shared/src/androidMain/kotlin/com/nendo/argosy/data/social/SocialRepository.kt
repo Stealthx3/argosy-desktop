@@ -63,7 +63,7 @@ private const val OFFLINE_GRACE_MS = 20_000L
 private const val ONLINE_NOTICE_MIN_OFFLINE_MS = 5 * 60_000L
 
 @Singleton
-class SocialRepository @Inject constructor(
+actual class SocialRepository @Inject constructor(
     @ApplicationContext private val context: Context,
     private val authManager: SocialAuthManager,
     private val socialService: ArgosSocialService,
@@ -91,15 +91,15 @@ class SocialRepository @Inject constructor(
     private var achievementSyncSuppressed = false
 
     private val _connectionState = MutableStateFlow<SocialConnectionState>(SocialConnectionState.Disconnected)
-    val connectionState: StateFlow<SocialConnectionState> = _connectionState.asStateFlow()
+    actual val connectionState: StateFlow<SocialConnectionState> = _connectionState.asStateFlow()
 
-    data class FriendCode(val code: String, val url: String)
+    actual data class FriendCode(actual val code: String, actual val url: String)
 
     private val _friendCode = MutableStateFlow<FriendCode?>(null)
-    val friendCode: StateFlow<FriendCode?> = _friendCode.asStateFlow()
+    actual val friendCode: StateFlow<FriendCode?> = _friendCode.asStateFlow()
 
     private val _friends = MutableStateFlow<List<Friend>>(emptyList())
-    val friends: StateFlow<List<Friend>> = _friends.asStateFlow()
+    actual val friends: StateFlow<List<Friend>> = _friends.asStateFlow()
 
     private val _recentPlaysByFriend = MutableStateFlow<Map<String, List<ActiveGameRow>>>(emptyMap())
     private var recentPlaysFetchedAtMillis = 0L
@@ -108,7 +108,7 @@ class SocialRepository @Inject constructor(
      * Friends tied to each game, keyed by the game's IGDB id: playing it now, or played it inside
      * the recent-play window. The one source every surface that names friends beside a game reads.
      */
-    val friendsActivity: StateFlow<Map<Int, List<FriendActivity>>> =
+    actual val friendsActivity: StateFlow<Map<Int, List<FriendActivity>>> =
         combine(_friends, _recentPlaysByFriend) { friends, plays ->
             mergeFriendActivity(
                 live = liveFriendActivity(friends),
@@ -132,92 +132,92 @@ class SocialRepository @Inject constructor(
     }
 
     private val _quayPassCheckins = MutableStateFlow<List<QuayPassCheckin>>(emptyList())
-    val quayPassCheckins: StateFlow<List<QuayPassCheckin>> = _quayPassCheckins.asStateFlow()
+    actual val quayPassCheckins: StateFlow<List<QuayPassCheckin>> = _quayPassCheckins.asStateFlow()
 
     private val _sharedCollections = MutableStateFlow<List<CollectionSummary>>(emptyList())
-    val sharedCollections: StateFlow<List<CollectionSummary>> = _sharedCollections.asStateFlow()
+    actual val sharedCollections: StateFlow<List<CollectionSummary>> = _sharedCollections.asStateFlow()
 
     private val _savedCollections = MutableStateFlow<List<CollectionSummary>>(emptyList())
-    val savedCollections: StateFlow<List<CollectionSummary>> = _savedCollections.asStateFlow()
+    actual val savedCollections: StateFlow<List<CollectionSummary>> = _savedCollections.asStateFlow()
 
     private val _feedEvents = MutableStateFlow<List<FeedEventDto>>(emptyList())
-    val feedEvents: StateFlow<List<FeedEventDto>> = _feedEvents.asStateFlow()
+    actual val feedEvents: StateFlow<List<FeedEventDto>> = _feedEvents.asStateFlow()
 
     /**
      * Keyed by igdb id so both the primary and the companion read the same reviews for a game
      * instead of each fetching its own copy.
      */
     private val _reviewSummaries = MutableStateFlow<Map<Int, ReviewSummary>>(emptyMap())
-    val reviewSummaries: StateFlow<Map<Int, ReviewSummary>> = _reviewSummaries.asStateFlow()
+    actual val reviewSummaries: StateFlow<Map<Int, ReviewSummary>> = _reviewSummaries.asStateFlow()
 
     private val _gameReviews = MutableStateFlow<Map<Int, GameReviewsPage>>(emptyMap())
-    val gameReviews: StateFlow<Map<Int, GameReviewsPage>> = _gameReviews.asStateFlow()
+    actual val gameReviews: StateFlow<Map<Int, GameReviewsPage>> = _gameReviews.asStateFlow()
 
     private val _reviewWriteEvents = MutableSharedFlow<ReviewWriteEvent>(extraBufferCapacity = 8)
-    val reviewWriteEvents: SharedFlow<ReviewWriteEvent> = _reviewWriteEvents.asSharedFlow()
+    actual val reviewWriteEvents: SharedFlow<ReviewWriteEvent> = _reviewWriteEvents.asSharedFlow()
 
     private var pendingReviewWriteIgdbId: Int? = null
 
     private val _discordLinked = MutableStateFlow(false)
-    val discordLinked: StateFlow<Boolean> = _discordLinked.asStateFlow()
+    actual val discordLinked: StateFlow<Boolean> = _discordLinked.asStateFlow()
 
     private val _discordUsername = MutableStateFlow<String?>(null)
-    val discordUsername: StateFlow<String?> = _discordUsername.asStateFlow()
+    actual val discordUsername: StateFlow<String?> = _discordUsername.asStateFlow()
 
     private val _feedHasMore = MutableStateFlow(false)
-    val feedHasMore: StateFlow<Boolean> = _feedHasMore.asStateFlow()
+    actual val feedHasMore: StateFlow<Boolean> = _feedHasMore.asStateFlow()
 
     private val _isLoadingFeed = MutableStateFlow(false)
-    val isLoadingFeed: StateFlow<Boolean> = _isLoadingFeed.asStateFlow()
+    actual val isLoadingFeed: StateFlow<Boolean> = _isLoadingFeed.asStateFlow()
 
     private var _isLoadingMoreFeed = false
     private var _currentFeedUserId: String? = null
 
     private val _eventComments = MutableStateFlow<Map<String, List<FeedComment>>>(emptyMap())
-    val eventComments: StateFlow<Map<String, List<FeedComment>>> = _eventComments.asStateFlow()
+    actual val eventComments: StateFlow<Map<String, List<FeedComment>>> = _eventComments.asStateFlow()
 
     private val _unreadCount = MutableStateFlow(0)
-    val unreadCount: StateFlow<Int> = _unreadCount.asStateFlow()
+    actual val unreadCount: StateFlow<Int> = _unreadCount.asStateFlow()
 
     private val _notifications = MutableStateFlow<List<SocialNotification>>(emptyList())
-    val notifications: StateFlow<List<SocialNotification>> = _notifications.asStateFlow()
+    actual val notifications: StateFlow<List<SocialNotification>> = _notifications.asStateFlow()
 
     private val _notificationsHasMore = MutableStateFlow(false)
-    val notificationsHasMore: StateFlow<Boolean> = _notificationsHasMore.asStateFlow()
+    actual val notificationsHasMore: StateFlow<Boolean> = _notificationsHasMore.asStateFlow()
 
     private val _isLoadingNotifications = MutableStateFlow(false)
-    val isLoadingNotifications: StateFlow<Boolean> = _isLoadingNotifications.asStateFlow()
+    actual val isLoadingNotifications: StateFlow<Boolean> = _isLoadingNotifications.asStateFlow()
 
     private var _isLoadingMoreNotifications = false
     private var _notificationsCursor: String? = null
 
     private val _communityFollows = MutableStateFlow<List<CommunityFollow>>(emptyList())
-    val communityFollows: StateFlow<List<CommunityFollow>> = _communityFollows.asStateFlow()
+    actual val communityFollows: StateFlow<List<CommunityFollow>> = _communityFollows.asStateFlow()
 
     private val _communityFeed = MutableStateFlow<List<FeedEventDto>>(emptyList())
-    val communityFeed: StateFlow<List<FeedEventDto>> = _communityFeed.asStateFlow()
+    actual val communityFeed: StateFlow<List<FeedEventDto>> = _communityFeed.asStateFlow()
 
     private val _communityFeedHasMore = MutableStateFlow(false)
-    val communityFeedHasMore: StateFlow<Boolean> = _communityFeedHasMore.asStateFlow()
+    actual val communityFeedHasMore: StateFlow<Boolean> = _communityFeedHasMore.asStateFlow()
 
     private val _isLoadingCommunityFeed = MutableStateFlow(false)
-    val isLoadingCommunityFeed: StateFlow<Boolean> = _isLoadingCommunityFeed.asStateFlow()
+    actual val isLoadingCommunityFeed: StateFlow<Boolean> = _isLoadingCommunityFeed.asStateFlow()
 
     private var _isLoadingMoreCommunityFeed = false
 
     private val _userSettings = MutableStateFlow(UserSettings())
-    val userSettings: StateFlow<UserSettings> = _userSettings.asStateFlow()
+    actual val userSettings: StateFlow<UserSettings> = _userSettings.asStateFlow()
 
     private val _hiddenGameIds = MutableStateFlow<Set<Int>>(emptySet())
-    val hiddenGameIds: StateFlow<Set<Int>> = _hiddenGameIds.asStateFlow()
+    actual val hiddenGameIds: StateFlow<Set<Int>> = _hiddenGameIds.asStateFlow()
     private var hiddenGameToggleJob: Job? = null
     private var pendingToggleGameId: Int? = null
 
     private val _userProfile = MutableStateFlow<UserProfileData?>(null)
-    val userProfile: StateFlow<UserProfileData?> = _userProfile.asStateFlow()
+    actual val userProfile: StateFlow<UserProfileData?> = _userProfile.asStateFlow()
 
     private val _isLoadingProfile = MutableStateFlow(false)
-    val isLoadingProfile: StateFlow<Boolean> = _isLoadingProfile.asStateFlow()
+    actual val isLoadingProfile: StateFlow<Boolean> = _isLoadingProfile.asStateFlow()
 
     private val _usersCache = mutableMapOf<String, SocialUser>()
 
@@ -225,10 +225,10 @@ class SocialRepository @Inject constructor(
         replay = 0,
         extraBufferCapacity = 4
     )
-    val netplayInvites: SharedFlow<NetplayInvitePayload> = _netplayInvites.asSharedFlow()
+    actual val netplayInvites: SharedFlow<NetplayInvitePayload> = _netplayInvites.asSharedFlow()
 
-    val authState: StateFlow<SocialAuthManager.AuthState> = authManager.authState
-    val serviceConnectionState: StateFlow<ArgosSocialService.ConnectionState> = socialService.connectionState
+    actual val authState: StateFlow<SocialAuthManager.AuthState> = authManager.authState
+    actual val serviceConnectionState: StateFlow<ArgosSocialService.ConnectionState> = socialService.connectionState
 
     init {
         observeAuthState()
@@ -652,12 +652,12 @@ class SocialRepository @Inject constructor(
         socialService.connect(token)
     }
 
-    suspend fun startAuth(): SocialAuthManager.AuthResult {
+    actual suspend fun startAuth(): SocialAuthManager.AuthResult {
         _connectionState.value = SocialConnectionState.Connecting
         return authManager.startAuth()
     }
 
-    fun cancelAuth() {
+    actual fun cancelAuth() {
         authManager.cancelAuth()
         _connectionState.value = SocialConnectionState.Disconnected
     }
@@ -669,7 +669,7 @@ class SocialRepository @Inject constructor(
      * the switch moves that out from under them. Going quiet is the only way they cannot
      * announce the wrong person mid-swap.
      */
-    suspend fun suspendForAccountSwitch() {
+    actual suspend fun suspendForAccountSwitch() {
         hasCompletedInitialSync = false
         quayPassService.get().holdForAccountSwitch()
         socialService.disconnect()
@@ -680,7 +680,7 @@ class SocialRepository @Inject constructor(
     /**
      * Brings social back up on the account that is now active, if it has a social link.
      */
-    suspend fun resumeAfterAccountSwitch() {
+    actual suspend fun resumeAfterAccountSwitch() {
         val prefs = preferencesRepository.userPreferences.first()
         if (prefs.isSocialLinked && prefs.socialSessionToken != null) {
             connectService()
@@ -688,7 +688,7 @@ class SocialRepository @Inject constructor(
         quayPassService.get().releaseAccountSwitchHold()
     }
 
-    suspend fun logout() {
+    actual suspend fun logout() {
         hasCompletedInitialSync = false
         socialService.disconnect()
         authManager.logout()
@@ -719,36 +719,35 @@ class SocialRepository @Inject constructor(
         _usersCache.clear()
     }
 
-    fun sendPresence(
+    actual fun sendPresence(
         status: PresenceStatus,
-        gameIgdbId: Int? = null,
-        gameTitle: String? = null,
-        media: MediaPresence? = null
-    ): Boolean {
+        gameIgdbId: Int?,
+        gameTitle: String?,
+        media: MediaPresence?): Boolean {
         if (!socialService.isConnected()) return false
         return socialService.sendPresence(status, gameIgdbId, gameTitle, android.os.Build.MODEL, media)
     }
 
-    fun isConnected(): Boolean = socialService.isConnected()
+    actual fun isConnected(): Boolean = socialService.isConnected()
 
-    fun reconnectIfNeeded() {
+    actual fun reconnectIfNeeded() {
         socialService.reconnectIfNeeded()
     }
 
-    fun requestUserProfile(userId: String? = null) {
+    actual fun requestUserProfile(userId: String?) {
         if (socialService.isConnected()) {
             _isLoadingProfile.value = true
             socialService.requestUserProfile(userId)
         }
     }
 
-    fun sendFriendRequest(userId: String) {
+    actual fun sendFriendRequest(userId: String) {
         if (socialService.isConnected()) {
             socialService.sendFriendRequest(userId)
         }
     }
 
-    fun acceptFriend(userId: String) {
+    actual fun acceptFriend(userId: String) {
         if (socialService.isConnected()) {
             socialService.acceptFriend(userId)
         }
@@ -758,31 +757,31 @@ class SocialRepository @Inject constructor(
      * Declines a received request, cancels a sent one, or unfriends. The server
      * routes by the relationship, so the caller does not distinguish them.
      */
-    fun removeFriend(userId: String) {
+    actual fun removeFriend(userId: String) {
         if (socialService.isConnected()) {
             socialService.removeFriend(userId)
         }
     }
 
-    fun requestQuayPassCheckins() {
+    actual fun requestQuayPassCheckins() {
         if (socialService.isConnected()) {
             socialService.requestQuayPassCheckins(limit = 100)
         }
     }
 
-    fun requestDiscordTokens() {
+    actual fun requestDiscordTokens() {
         if (socialService.isConnected()) {
             socialService.requestDiscordTokens()
         }
     }
 
-    fun toggleFavoriteFriend(friendId: String) {
+    actual fun toggleFavoriteFriend(friendId: String) {
         if (socialService.isConnected()) {
             socialService.toggleFavoriteFriend(friendId)
         }
     }
 
-    fun toggleGameVisibility(igdbGameId: Int?, steamAppId: Int? = null, isCurrentlyHidden: Boolean = false) {
+    actual fun toggleGameVisibility(igdbGameId: Int?, steamAppId: Int?, isCurrentlyHidden: Boolean) {
         if (!socialService.isConnected()) return
         if (igdbGameId != null && igdbGameId != 0) {
             val isHidden = igdbGameId in _hiddenGameIds.value
@@ -809,7 +808,7 @@ class SocialRepository @Inject constructor(
         }
     }
 
-    fun requestFriendCode() {
+    actual fun requestFriendCode() {
         val connected = socialService.isConnected()
         Log.d(TAG, "requestFriendCode: isConnected=$connected, serviceState=${socialService.connectionState.value}, repoState=${_connectionState.value}")
         if (connected) {
@@ -820,13 +819,13 @@ class SocialRepository @Inject constructor(
         }
     }
 
-    fun regenerateFriendCode() {
+    actual fun regenerateFriendCode() {
         if (socialService.isConnected()) {
             socialService.regenerateFriendCode()
         }
     }
 
-    fun addFriendByCode(code: String) {
+    actual fun addFriendByCode(code: String) {
         if (socialService.isConnected()) {
             socialService.addFriendByCode(code)
         }
@@ -897,7 +896,7 @@ class SocialRepository @Inject constructor(
         return SyncResult.Success(queued)
     }
 
-    suspend fun backfillRomMPlaySessions(): PlaySessionBackfill.Summary = playSessionBackfill.run()
+    actual suspend fun backfillRomMPlaySessions(): PlaySessionBackfill.Summary = playSessionBackfill.run()
 
     private fun observeAchievementUpdates() {
         scope.launch {
@@ -922,7 +921,7 @@ class SocialRepository @Inject constructor(
         }
     }
 
-    suspend fun syncUnsharedAchievements() {
+    actual suspend fun syncUnsharedAchievements() {
         if (!socialService.isConnected()) return
         if (achievementSyncSuppressed) return
 
@@ -978,12 +977,12 @@ class SocialRepository @Inject constructor(
         data class Error(val message: String) : SyncResult()
     }
 
-    fun requestReviewSummary(igdbId: Int) {
+    actual fun requestReviewSummary(igdbId: Int) {
         if (igdbId <= 0) return
         if (socialService.isConnected()) socialService.getReviewSummary(igdbId)
     }
 
-    fun requestGameReviews(igdbId: Int) {
+    actual fun requestGameReviews(igdbId: Int) {
         if (igdbId <= 0) return
         if (socialService.isConnected()) socialService.getGameReviews(igdbId)
     }
@@ -992,7 +991,7 @@ class SocialRepository @Inject constructor(
      * Asks for the next page of the public list. The friends block arrives with the first page
      * only, so a later page carrying an empty one is not a sign the friends went away.
      */
-    fun loadMoreGameReviews(igdbId: Int) {
+    actual fun loadMoreGameReviews(igdbId: Int) {
         val page = _gameReviews.value[igdbId] ?: return
         val cursor = page.nextCursor
         if (!page.hasMore || cursor == null) return
@@ -1004,7 +1003,7 @@ class SocialRepository @Inject constructor(
      * and sent absent when empty, matching what the server would store anyway, so the cached copy
      * the reply updates never disagrees with the draft that produced it.
      */
-    fun upsertReview(igdbId: Int, recommended: Boolean, body: String?, visibility: String): Boolean {
+    actual fun upsertReview(igdbId: Int, recommended: Boolean, body: String?, visibility: String): Boolean {
         if (igdbId <= 0) return false
         if (!socialService.isConnected()) {
             failReviewWrite(igdbId, NotificationText.Res(R.string.notif_review_error_offline))
@@ -1017,7 +1016,7 @@ class SocialRepository @Inject constructor(
         return sent
     }
 
-    fun deleteReview(igdbId: Int): Boolean {
+    actual fun deleteReview(igdbId: Int): Boolean {
         if (igdbId <= 0) return false
         if (!socialService.isConnected()) {
             failReviewWrite(igdbId, NotificationText.Res(R.string.notif_review_error_offline))
@@ -1078,7 +1077,7 @@ class SocialRepository @Inject constructor(
         )
     }
 
-    fun requestFeed(limit: Int = FEED_PAGE_SIZE, beforeId: String? = null, userId: String? = null) {
+    actual fun requestFeed(limit: Int, beforeId: String?, userId: String?) {
         Log.d(TAG, "requestFeed: limit=$limit, beforeId=$beforeId, userId=$userId, connected=${socialService.isConnected()}")
         if (socialService.isConnected()) {
             _isLoadingFeed.value = true
@@ -1090,7 +1089,7 @@ class SocialRepository @Inject constructor(
         }
     }
 
-    fun loadMoreFeed() {
+    actual fun loadMoreFeed() {
         val lastEvent = _feedEvents.value.lastOrNull()
         Log.d(TAG, "loadMoreFeed: lastEvent=${lastEvent?.id}, hasMore=$_feedHasMore, isLoading=${_isLoadingFeed.value}")
         if (lastEvent == null) {
@@ -1107,7 +1106,7 @@ class SocialRepository @Inject constructor(
         }
     }
 
-    fun likeEvent(eventId: String) {
+    actual fun likeEvent(eventId: String) {
         Log.d(TAG, "likeEvent: eventId=$eventId, connected=${socialService.isConnected()}")
         if (socialService.isConnected()) {
             val events = _feedEvents.value.toMutableList()
@@ -1126,7 +1125,7 @@ class SocialRepository @Inject constructor(
         }
     }
 
-    fun hideEvent(eventId: String) {
+    actual fun hideEvent(eventId: String) {
         Log.d(TAG, "hideEvent: eventId=$eventId, connected=${socialService.isConnected()}")
         if (socialService.isConnected()) {
             val prevCount = _feedEvents.value.size
@@ -1136,14 +1135,14 @@ class SocialRepository @Inject constructor(
         }
     }
 
-    fun reportEvent(eventId: String, reason: String? = null) {
+    actual fun reportEvent(eventId: String, reason: String?) {
         Log.d(TAG, "reportEvent: eventId=$eventId, reason=$reason, connected=${socialService.isConnected()}")
         if (socialService.isConnected()) {
             socialService.reportEvent(eventId, reason)
         }
     }
 
-    fun requestNotifications(limit: Int = NOTIFICATIONS_PAGE_SIZE) {
+    actual fun requestNotifications(limit: Int) {
         if (socialService.isConnected()) {
             _isLoadingNotifications.value = true
             _notificationsCursor = null
@@ -1151,7 +1150,7 @@ class SocialRepository @Inject constructor(
         }
     }
 
-    fun loadMoreNotifications() {
+    actual fun loadMoreNotifications() {
         val cursor = _notificationsCursor ?: return
         if (_notificationsHasMore.value && !_isLoadingNotifications.value) {
             _isLoadingNotifications.value = true
@@ -1160,7 +1159,7 @@ class SocialRepository @Inject constructor(
         }
     }
 
-    fun markNotificationRead(notificationId: String) {
+    actual fun markNotificationRead(notificationId: String) {
         if (socialService.isConnected()) {
             socialService.markNotificationRead(notificationId = notificationId)
             _notifications.value = _notifications.value.map {
@@ -1171,7 +1170,7 @@ class SocialRepository @Inject constructor(
         }
     }
 
-    fun markAllNotificationsRead() {
+    actual fun markAllNotificationsRead() {
         if (socialService.isConnected()) {
             socialService.markAllNotificationsRead()
             val now = java.time.Instant.now().toString()
@@ -1182,7 +1181,7 @@ class SocialRepository @Inject constructor(
         }
     }
 
-    fun getEvent(eventId: String) {
+    actual fun getEvent(eventId: String) {
         if (socialService.isConnected()) {
             socialService.getEvent(eventId)
         }
@@ -1197,34 +1196,33 @@ class SocialRepository @Inject constructor(
         return if (list.size > NOTIFICATIONS_MAX_CACHE) list.take(NOTIFICATIONS_MAX_CACHE) else list
     }
 
-    fun requestEventComments(eventId: String) {
+    actual fun requestEventComments(eventId: String) {
         Log.d(TAG, "requestEventComments: eventId=$eventId, connected=${socialService.isConnected()}")
         if (socialService.isConnected()) {
             socialService.getEventComments(eventId)
         }
     }
 
-    fun commentEvent(eventId: String, content: String) {
+    actual fun commentEvent(eventId: String, content: String) {
         Log.d(TAG, "commentEvent: eventId=$eventId, connected=${socialService.isConnected()}")
         if (socialService.isConnected()) {
             socialService.commentEvent(eventId, content)
         }
     }
 
-    fun createPost(
+    actual fun createPost(
         body: String,
-        canvasSize: Int? = null,
-        doodleData: String? = null,
-        igdbId: Int? = null,
-        gameTitle: String? = null,
-        public: Boolean = false
-    ) {
+        canvasSize: Int?,
+        doodleData: String?,
+        igdbId: Int?,
+        gameTitle: String?,
+        public: Boolean) {
         if (socialService.isConnected()) {
             socialService.createPost(body, canvasSize, doodleData, igdbId, gameTitle, public)
         }
     }
 
-    fun requestCommunityFeed(igdbGameId: Int? = null, limit: Int = FEED_PAGE_SIZE) {
+    actual fun requestCommunityFeed(igdbGameId: Int?, limit: Int) {
         if (socialService.isConnected()) {
             _isLoadingCommunityFeed.value = true
             _isLoadingMoreCommunityFeed = false
@@ -1232,7 +1230,7 @@ class SocialRepository @Inject constructor(
         }
     }
 
-    fun loadMoreCommunityFeed(igdbGameId: Int? = null) {
+    actual fun loadMoreCommunityFeed(igdbGameId: Int?) {
         val last = _communityFeed.value.lastOrNull() ?: return
         if (_communityFeedHasMore.value && !_isLoadingCommunityFeed.value) {
             _isLoadingCommunityFeed.value = true
@@ -1241,38 +1239,38 @@ class SocialRepository @Inject constructor(
         }
     }
 
-    fun requestCommunityFollows() {
+    actual fun requestCommunityFollows() {
         if (socialService.isConnected()) {
             socialService.getCommunityFollows()
         }
     }
 
-    fun followCommunity(igdbGameId: Int, isPrivate: Boolean = false, anonymous: Boolean = false) {
+    actual fun followCommunity(igdbGameId: Int, isPrivate: Boolean, anonymous: Boolean) {
         if (socialService.isConnected()) {
             socialService.followCommunity(igdbGameId, isPrivate, anonymous)
         }
     }
 
-    fun unfollowCommunity(igdbGameId: Int) {
+    actual fun unfollowCommunity(igdbGameId: Int) {
         if (socialService.isConnected()) {
             socialService.unfollowCommunity(igdbGameId)
             _communityFollows.value = _communityFollows.value.filter { it.igdbGameId != igdbGameId }
         }
     }
 
-    fun updateCommunityFollow(igdbGameId: Int, isPrivate: Boolean, anonymous: Boolean) {
+    actual fun updateCommunityFollow(igdbGameId: Int, isPrivate: Boolean, anonymous: Boolean) {
         if (socialService.isConnected()) {
             socialService.updateCommunityFollow(igdbGameId, isPrivate, anonymous)
         }
     }
 
-    fun requestUserSettings() {
+    actual fun requestUserSettings() {
         if (socialService.isConnected()) {
             socialService.getUserSettings()
         }
     }
 
-    fun updateUserSettings(communityAutoShare: Boolean? = null) {
+    actual fun updateUserSettings(communityAutoShare: Boolean?) {
         if (socialService.isConnected()) {
             socialService.updateUserSettings(communityAutoShare)
             if (communityAutoShare != null) {
@@ -1281,13 +1279,13 @@ class SocialRepository @Inject constructor(
         }
     }
 
-    fun updateEventVisibility(eventId: String, public: Boolean) {
+    actual fun updateEventVisibility(eventId: String, public: Boolean) {
         if (socialService.isConnected()) {
             socialService.updateEventVisibility(eventId, public)
         }
     }
 
-    fun emitAchievementUnlocked(
+    actual fun emitAchievementUnlocked(
         igdbId: Long?,
         raGameId: Long?,
         gameTitle: String,
@@ -1321,7 +1319,7 @@ class SocialRepository @Inject constructor(
         )
     }
 
-    fun emitPerfectGame(
+    actual fun emitPerfectGame(
         igdbId: Long?,
         gameTitle: String,
         isHardcore: Boolean,
@@ -1341,7 +1339,7 @@ class SocialRepository @Inject constructor(
         )
     }
 
-    suspend fun emitStartedPlaying(igdbId: Long?, gameTitle: String, platformSlug: String) {
+    actual suspend fun emitStartedPlaying(igdbId: Long?, gameTitle: String, platformSlug: String) {
         queueFeedEvent(
             eventType = FeedEventType.STARTED_PLAYING.value,
             igdbId = igdbId,
@@ -1350,7 +1348,7 @@ class SocialRepository @Inject constructor(
         )
     }
 
-    suspend fun emitMarathonSession(igdbId: Long?, gameTitle: String, durationMins: Int, platformSlug: String) {
+    actual suspend fun emitMarathonSession(igdbId: Long?, gameTitle: String, durationMins: Int, platformSlug: String) {
         queueFeedEvent(
             eventType = FeedEventType.MARATHON_SESSION.value,
             igdbId = igdbId,
@@ -1400,7 +1398,7 @@ class SocialRepository @Inject constructor(
         }
     }
 
-    fun createDoodle(
+    actual fun createDoodle(
         canvasSize: Int,
         data: String,
         caption: String?,
@@ -1630,7 +1628,7 @@ class SocialRepository @Inject constructor(
     }
 
     /** Deletes cached friend-presence cover thumbnails; they re-download with the next presence event. */
-    suspend fun clearPresenceCovers() = withContext(Dispatchers.IO) {
+    actual suspend fun clearPresenceCovers() = withContext(Dispatchers.IO) {
         val cacheDir = File(context.cacheDir, "presence_covers")
         if (cacheDir.exists()) cacheDir.deleteRecursively()
         attributionRepository.markDirty(StorageCategory.MISC_DOWNLOADS)
@@ -1665,7 +1663,7 @@ class SocialRepository @Inject constructor(
     private val friendComparator = compareByDescending<Friend> { it.isFavorite }
         .thenBy { it.displayName.lowercase() }
 
-    companion object {
+    actual companion object {
         private const val THUMB_WIDTH = 144
         private const val THUMB_HEIGHT = 192
         private const val THUMB_QUALITY = 80

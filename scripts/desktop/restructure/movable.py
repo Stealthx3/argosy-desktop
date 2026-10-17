@@ -41,7 +41,7 @@ SHARED = Path("shared/src/commonMain/kotlin")
 SHARED_ANDROID = Path("shared/src/androidMain/kotlin")
 ALLOWED = (
     "kotlin.", "kotlinx.coroutines.", "java.", "javax.",
-    "androidx.room.", "androidx.sqlite.", "androidx.compose.runtime.",
+    "androidx.room.", "androidx.sqlite.", "androidx.compose.runtime.", "in.dragonbra.javasteam.",
     "retrofit2.", "okhttp3.", "okio.", "com.squareup.moshi.", "io.socket.", "org.json.",
     "org.apache.commons.compress.", "org.tukaani.xz.", "com.github.luben.zstd.",
     "`in`.dragonbra.", "org.bouncycastle.", "com.upokecenter.cbor.", "com.google.protobuf.",
@@ -296,9 +296,9 @@ FORBIDDEN_WORDS = re.compile(r"(?<!android\.)\bR\.(color|dimen|font|xml|array|mi
 DECL = re.compile(
     r"^(?:@\S+\s+)*(?:(?:private|internal|public|data|enum|sealed|abstract|open|inline|value|const|"
     r"annotation|suspend|operator|infix|tailrec|external|fun|expect|actual)\s+)*"
-    r"(?:class|interface|object|fun|val|var|typealias)\s+(?:<[^>]*>\s*)?(?:([\w.<>?, ]+)\.)?(\w+)"
+    r"(?:class|interface|object|fun|val|var|typealias)\s+(?:<[^>]*>\s*)?(?:([\w.<>?, ]+)\.)?`?(\w+)"
 )
-IMPORT = re.compile(r"^import\s+([\w.]+)(?:\s+as\s+\w+)?", re.M)
+IMPORT = re.compile(r"^import\s+([\w.`]+)(?:\s+as\s+\w+)?", re.M)
 FQ = re.compile(r"\bcom\.nendo\.argosy(?:\.\w+)+")
 WORD = re.compile(r"\b[A-Za-z_]\w*\b")
 
@@ -360,7 +360,7 @@ def analyse(u, index, packages):
         if not name.startswith(ANDROID_MAIN_ALLOWED):
             android.append(f"{kind} {name}")
 
-    for imp in u.imports:
+    for imp in (i.replace("`", "") for i in u.imports):
         short = imp.rsplit(".", 1)[-1]
         alias_m = re.search(rf"^import {re.escape(imp)} as (\w+)$", u.text, re.M)
         if imp.startswith(("android.", "coil.")) and not re.search(rf"\b{re.escape(alias_m.group(1) if alias_m else short)}\b", u.body):
@@ -419,7 +419,7 @@ def analyse(u, index, packages):
         common.append("BuildConfig without an import")
     imported_names = {
         (m.group(2) or m.group(1).rsplit(".", 1)[-1])
-        for m in re.finditer(r"^import ([\w.]+)(?: as (\w+))?$", u.text, re.M)
+        for m in re.finditer(r"^import ([\w.`]+)(?: as (\w+))?$", u.text, re.M)
     }
     words = set(WORD.findall(u.body)) - imported_names
     for w in words:
@@ -639,7 +639,7 @@ def main():
     if args[:1] == ["--rehome"]:
         candidates = {
             u for u in android_shared
-            if not common_reasons[u] and not re.search(r"^\s*(?:@\w+\s+)*(?:\w+\s+)*actual\b", u.text, re.M)
+            if not common_reasons[u] and not held_back(u) and not re.search(r"^\s*(?:@\w+\s+)*(?:\w+\s+)*actual\b", u.text, re.M)
         }
         changed = True
         while changed:

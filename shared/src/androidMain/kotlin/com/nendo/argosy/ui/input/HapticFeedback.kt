@@ -46,11 +46,11 @@ actual class HapticFeedbackManager @Inject constructor(
             null
         }
 
-    fun setEnabled(enabled: Boolean) {
+    actual fun setEnabled(enabled: Boolean) {
         this.enabled = enabled
     }
 
-    fun setStrength(strength: Float) {
+    actual fun setStrength(strength: Float) {
         this.strength = strength.coerceIn(0f, 1f)
     }
 

@@ -1,6 +1,10 @@
 package com.nendo.argosy.data.netplay
 
 import com.nendo.argosy.platform.PlatformIntentType as Intent
+import com.nendo.argosy.platform.component
+import com.nendo.argosy.platform.`package`
+import com.nendo.argosy.platform.getStringExtra
+import com.nendo.argosy.platform.packageName
 import com.nendo.argosy.platform.action
 import com.nendo.argosy.platform.addFlags
 import com.nendo.argosy.platform.data

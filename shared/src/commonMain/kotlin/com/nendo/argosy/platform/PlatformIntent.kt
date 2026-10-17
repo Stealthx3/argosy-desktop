@@ -31,7 +31,18 @@ expect open class PlatformIntentType {
     constructor()
     constructor(action: String?)
     constructor(action: String?, uri: PlatformUri?)
+    constructor(original: PlatformIntentType)
 }
+
+expect class PlatformComponentName
+
+expect val PlatformComponentName.packageName: String
+
+expect val PlatformIntentType.component: PlatformComponentName?
+
+expect val PlatformIntentType.`package`: String?
+
+expect fun PlatformIntentType.getStringExtra(name: String): String?
 
 expect val PlatformIntentType.action: String?
 

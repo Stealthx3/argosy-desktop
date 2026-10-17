@@ -49,58 +49,8 @@ import javax.inject.Singleton
 private const val TAG = "SteamContentManager"
 private const val DOWNLOAD_INFO_DIR = ".DownloadInfo"
 
-sealed class SteamDownloadState {
-    data object Idle : SteamDownloadState()
-    data class Preparing(val appId: Long, val gameName: String) : SteamDownloadState()
-    data class Connecting(val appId: Long, val gameName: String) : SteamDownloadState()
-    data class FetchingManifest(val appId: Long, val gameName: String, val depotId: Int) : SteamDownloadState()
-    data class Validating(val appId: Long, val gameName: String, val statusDetail: String = "") : SteamDownloadState()
-    data class Downloading(
-        val appId: Long,
-        val gameName: String,
-        val progress: Float,
-        val currentDepot: Int,
-        val totalDepots: Int
-    ) : SteamDownloadState()
-    data class Moving(val appId: Long, val gameName: String) : SteamDownloadState()
-    data class Completed(val appId: Long, val gameName: String, val installPath: String) : SteamDownloadState()
-    data class Failed(val appId: Long, val gameName: String, val error: String) : SteamDownloadState()
-    data class Paused(val appId: Long, val gameName: String, val progress: Float, val needsVerification: Boolean = false) : SteamDownloadState()
-    data class Cleaning(val appId: Long, val gameName: String) : SteamDownloadState()
-}
-
-data class DepotInfo(
-    val depotId: Int,
-    val manifestId: Long,
-    val name: String,
-    val os: String?,
-    val arch: String?,
-    val size: Long
-)
-
-data class SteamDownloadProgress(
-    val appId: Long,
-    val gameName: String,
-    val coverPath: String?,
-    val progress: Float,
-    val totalBytes: Long,
-    val bytesDownloaded: Long,
-    val state: SteamDownloadState,
-    val bytesPerSecond: Long = 0L
-) {
-    val progressPercent: Int get() = (progress * 100).toInt()
-}
-
-data class QueuedSteamDownload(
-    val appId: Long,
-    val gameName: String,
-    val coverPath: String?,
-    val appInfo: KeyValue?,
-    val targetInstallPath: String? = null
-)
-
 @Singleton
-class SteamContentManager @Inject constructor(
+actual class SteamContentManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val gameDao: GameDao,
     private val steamAuthManager: SteamAuthManager,
@@ -126,18 +76,18 @@ class SteamContentManager @Inject constructor(
     private var picsSubscription: Closeable? = null
 
     private val _downloadState = MutableStateFlow<SteamDownloadState>(SteamDownloadState.Idle)
-    val downloadState: StateFlow<SteamDownloadState> = _downloadState.asStateFlow()
+    actual val downloadState: StateFlow<SteamDownloadState> = _downloadState.asStateFlow()
 
     private val _activeDownload = MutableStateFlow<SteamDownloadProgress?>(null)
-    val activeDownload: StateFlow<SteamDownloadProgress?> = _activeDownload.asStateFlow()
+    actual val activeDownload: StateFlow<SteamDownloadProgress?> = _activeDownload.asStateFlow()
 
     private val _downloadQueue = MutableStateFlow<List<QueuedSteamDownload>>(emptyList())
-    val downloadQueue: StateFlow<List<QueuedSteamDownload>> = _downloadQueue.asStateFlow()
+    actual val downloadQueue: StateFlow<List<QueuedSteamDownload>> = _downloadQueue.asStateFlow()
 
     private val _completedDownloads = MutableStateFlow<List<SteamDownloadProgress>>(emptyList())
-    val completedDownloads: StateFlow<List<SteamDownloadProgress>> = _completedDownloads.asStateFlow()
+    actual val completedDownloads: StateFlow<List<SteamDownloadProgress>> = _completedDownloads.asStateFlow()
 
-    fun clearCompletedDownloads() {
+    actual fun clearCompletedDownloads() {
         _completedDownloads.value = emptyList()
         if (_activeDownload.value?.state is SteamDownloadState.Completed) {
             _activeDownload.value = null
@@ -365,18 +315,18 @@ class SteamContentManager @Inject constructor(
         attributionRepository.markDirty(StorageCategory.STEAM)
     }
 
-    fun initialize(client: SteamClient, apps: SteamApps, cm: CallbackManager) {
+    actual fun initialize(client: SteamClient, apps: SteamApps, cm: CallbackManager) {
         steamClient = client
         val content = client.getHandler(SteamContent::class.java)!!
         depotManager.initialize(client, apps, content, cm)
         Log.d(TAG, "SteamContentManager initialized")
     }
 
-    suspend fun hasPendingDownloads(): Boolean {
+    actual suspend fun hasPendingDownloads(): Boolean {
         return steamDownloadQueueDao.getPendingDownloads().isNotEmpty()
     }
 
-    suspend fun restorePausedDownloads() {
+    actual suspend fun restorePausedDownloads() {
         val active = _activeDownload.value ?: return
         if (active.state !is SteamDownloadState.Paused) return
         if (!isConnected() || currentDownloadJob?.isActive == true) return
@@ -385,14 +335,14 @@ class SteamContentManager @Inject constructor(
         queueDownloadOptimistic(active.appId, active.gameName, active.coverPath)
     }
 
-    fun onDownloadSlotFreed() {
+    actual fun onDownloadSlotFreed() {
         if (_downloadQueue.value.isNotEmpty() && currentDownloadJob?.isActive != true) {
             Log.d(TAG, "Download slot freed, checking Steam queue")
             processNextInQueue()
         }
     }
 
-    fun hasActiveSteamDownload(): Boolean {
+    actual fun hasActiveSteamDownload(): Boolean {
         val state = _downloadState.value
         return state is SteamDownloadState.Downloading ||
             state is SteamDownloadState.Preparing ||
@@ -402,11 +352,11 @@ class SteamContentManager @Inject constructor(
             state is SteamDownloadState.Moving
     }
 
-    fun hasBlockingDownloadState(): Boolean =
+    actual fun hasBlockingDownloadState(): Boolean =
         hasActiveSteamDownload() || _downloadState.value is SteamDownloadState.Paused
 
     /** Deletes staged download data and queue rows together; returns false while a download is active or paused. */
-    suspend fun clearDownloadData(): Boolean = withContext(Dispatchers.IO) {
+    actual suspend fun clearDownloadData(): Boolean = withContext(Dispatchers.IO) {
         if (hasBlockingDownloadState()) return@withContext false
         val pending = steamDownloadQueueDao.getPendingDownloads()
         for (entity in pending) {
@@ -430,14 +380,14 @@ class SteamContentManager @Inject constructor(
         true
     }
 
-    fun isConnected(): Boolean {
+    actual fun isConnected(): Boolean {
         val hasHandlers = depotManager.isConnected()
         val loggedIn = steamAuthManager.isLoggedIn.value
         Log.v(TAG, "isConnected check: hasHandlers=$hasHandlers, loggedIn=$loggedIn")
         return hasHandlers && loggedIn
     }
 
-    fun onDisconnected() {
+    actual fun onDisconnected() {
         Log.d(TAG, "Steam disconnected, clearing handlers")
         val state = _downloadState.value
         // Moving and Cleaning are local file operations that don't need Steam -- let them finish
@@ -456,7 +406,7 @@ class SteamContentManager @Inject constructor(
         depotManager.clearHandlers()
     }
 
-    suspend fun ensureConnected(): Boolean {
+    actual suspend fun ensureConnected(): Boolean {
         if (isConnected()) return true
 
         if (steamAuthManager.sessionDead) {
@@ -495,11 +445,11 @@ class SteamContentManager @Inject constructor(
         return false
     }
 
-    fun notifyConnected() {
+    actual fun notifyConnected() {
         Log.v(TAG, "notifyConnected called")
     }
 
-    suspend fun fetchAppInfo(appId: Int): KeyValue {
+    actual suspend fun fetchAppInfo(appId: Int): KeyValue {
         if (!isConnected()) {
             if (!ensureConnected()) {
                 throw IllegalStateException("Steam not connected")
@@ -517,7 +467,7 @@ class SteamContentManager @Inject constructor(
         downloadGame(appId, gameName, appInfo, coverPath)
     }
 
-    fun queueDownloadOptimistic(appId: Long, gameName: String, coverPath: String?) {
+    actual fun queueDownloadOptimistic(appId: Long, gameName: String, coverPath: String?) {
         if (!canQueue(appId)) return
         if (steamAuthManager.sessionDead) {
             notificationManager.show(
@@ -603,7 +553,7 @@ class SteamContentManager @Inject constructor(
         }
     }
 
-    fun queueDownload(appId: Long, gameName: String, appInfo: KeyValue, coverPath: String?) {
+    actual fun queueDownload(appId: Long, gameName: String, appInfo: KeyValue, coverPath: String?) {
         if (!canQueue(appId)) return
         DownloadForegroundService.start(context)
 
@@ -700,7 +650,7 @@ class SteamContentManager @Inject constructor(
         }
     }
 
-    suspend fun downloadGame(
+    actual suspend fun downloadGame(
         appId: Long,
         gameName: String,
         appInfo: KeyValue,
@@ -1194,7 +1144,7 @@ class SteamContentManager @Inject constructor(
         }
     }
 
-    suspend fun checkForUpdate(appId: Long, currentBuildId: Long?, appInfo: KeyValue): Boolean {
+    actual suspend fun checkForUpdate(appId: Long, currentBuildId: Long?, appInfo: KeyValue): Boolean {
         if (currentBuildId == null) return true
 
         val latestBuildId = appInfo["depots"]["branches"]["public"]["buildid"]
@@ -1205,15 +1155,15 @@ class SteamContentManager @Inject constructor(
         return hasUpdate
     }
 
-    fun getEstimatedSize(appInfo: KeyValue): Long {
+    actual fun getEstimatedSize(appInfo: KeyValue): Long {
         return depotManager.getEstimatedSize(appInfo)
     }
 
-    suspend fun isGameInstalled(appId: Long): Boolean {
+    actual suspend fun isGameInstalled(appId: Long): Boolean {
         return pathResolver.isGameInstalled(appId)
     }
 
-    fun cancelDownload() {
+    actual fun cancelDownload() {
         val activeAppId = _activeDownload.value?.appId
         Log.d(TAG, "cancelDownload called, activeAppId=$activeAppId")
 
@@ -1274,7 +1224,7 @@ class SteamContentManager @Inject constructor(
         }
     }
 
-    fun cancelQueuedDownload(appId: Long) {
+    actual fun cancelQueuedDownload(appId: Long) {
         _downloadQueue.value = _downloadQueue.value.filter { it.appId != appId }
         scope.launch(Dispatchers.IO) {
             steamDownloadQueueDao.deleteByAppId(appId)
@@ -1282,7 +1232,7 @@ class SteamContentManager @Inject constructor(
         Log.d(TAG, "Removed $appId from queue (new queue size: ${_downloadQueue.value.size})")
     }
 
-    fun pauseDownload() {
+    actual fun pauseDownload() {
         val active = _activeDownload.value ?: return
         val currentProgress = active.progress
         val currentState = _downloadState.value
@@ -1312,7 +1262,7 @@ class SteamContentManager @Inject constructor(
         Log.d(TAG, "Download paused at ${(currentProgress * 100).toInt()}% (needsVerification=$needsVerification)")
     }
 
-    suspend fun deleteGame(appId: Long): Boolean = withContext(Dispatchers.IO) {
+    actual suspend fun deleteGame(appId: Long): Boolean = withContext(Dispatchers.IO) {
         try {
             val game = gameDao.getBySteamAppId(appId) ?: return@withContext false
             val installPath = game.localPath ?: return@withContext false
@@ -1339,12 +1289,12 @@ class SteamContentManager @Inject constructor(
         }
     }
 
-    data class IncompleteDownload(
-        val appId: Long,
-        val installPath: String,
-        val stagingPath: String,
-        val bytesDownloaded: Long,
-        val gameName: String?
+    actual data class IncompleteDownload(
+        actual val appId: Long,
+        actual val installPath: String,
+        actual val stagingPath: String,
+        actual val bytesDownloaded: Long,
+        actual val gameName: String?
     )
 
     private suspend fun reclaimStrandedInstalls() {
@@ -1412,7 +1362,7 @@ class SteamContentManager @Inject constructor(
         }
     }
 
-    suspend fun discoverLocalSteamGames(): Int = withContext(Dispatchers.IO) {
+    actual suspend fun discoverLocalSteamGames(): Int = withContext(Dispatchers.IO) {
         var discovered = 0
 
         val steamDir = pathResolver.getSteamDir()
@@ -1510,7 +1460,7 @@ class SteamContentManager @Inject constructor(
         return discovered
     }
 
-    suspend fun getIncompleteDownloads(): List<IncompleteDownload> = withContext(Dispatchers.IO) {
+    actual suspend fun getIncompleteDownloads(): List<IncompleteDownload> = withContext(Dispatchers.IO) {
         val incomplete = mutableListOf<IncompleteDownload>()
 
         val steamDir = pathResolver.getSteamDir()
@@ -1594,7 +1544,7 @@ class SteamContentManager @Inject constructor(
         incomplete
     }
 
-    suspend fun recoverDownload(appId: Long): Boolean = withContext(Dispatchers.IO) {
+    actual suspend fun recoverDownload(appId: Long): Boolean = withContext(Dispatchers.IO) {
         if (!isConnected()) {
             Log.w(TAG, "Cannot recover download - not connected to Steam")
             return@withContext false
@@ -1617,7 +1567,7 @@ class SteamContentManager @Inject constructor(
         }
     }
 
-    suspend fun cleanupIncompleteDownload(appId: Long): Boolean = withContext(Dispatchers.IO) {
+    actual suspend fun cleanupIncompleteDownload(appId: Long): Boolean = withContext(Dispatchers.IO) {
         var cleaned = false
 
         val pathsToClean = mutableSetOf<File>()
@@ -1657,7 +1607,7 @@ class SteamContentManager @Inject constructor(
         cleaned
     }
 
-    suspend fun recoverAllIncomplete(): Int = withContext(Dispatchers.IO) {
+    actual suspend fun recoverAllIncomplete(): Int = withContext(Dispatchers.IO) {
         if (!isConnected()) {
             Log.w(TAG, "Cannot recover downloads - not connected to Steam")
             return@withContext 0
@@ -1676,7 +1626,7 @@ class SteamContentManager @Inject constructor(
         recovered
     }
 
-    fun cleanup() {
+    actual fun cleanup() {
         cancelDownload()
         heartbeatDispatcher.close()
         picsSubscription?.close()

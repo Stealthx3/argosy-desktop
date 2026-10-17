@@ -87,7 +87,7 @@ actual class SoundFeedbackManager @Inject constructor(
         private const val BOUNDARY_RATE_LIMIT_MS = 500L
     }
 
-    fun setEnabled(enabled: Boolean) {
+    actual fun setEnabled(enabled: Boolean) {
         this.enabled = enabled
         if (enabled) preload() else releaseSoundPool()
     }
@@ -298,7 +298,7 @@ actual class SoundFeedbackManager @Inject constructor(
     }
 
     /** Deletes transcoded SFX WAVs; loaded samples stay in memory and re-transcode on next load. */
-    suspend fun clearSfxCache() = withContext(Dispatchers.IO) {
+    suspend actual fun clearSfxCache() = withContext(Dispatchers.IO) {
         val dir = File(context.cacheDir, "sfx")
         if (dir.exists()) dir.deleteRecursively()
         attributionRepository.markDirty(StorageCategory.SFX_CACHE)

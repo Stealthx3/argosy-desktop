@@ -42,24 +42,8 @@ import javax.inject.Inject
 
 private const val TAG = "SteamService"
 
-enum class SteamConnectionState {
-    DISCONNECTED,
-    CONNECTING,
-    CONNECTED,
-    LOGGING_IN,
-    LOGGED_IN,
-    LOGGED_OUT
-}
-
-data class SteamServiceState(
-    val connectionState: SteamConnectionState = SteamConnectionState.DISCONNECTED,
-    val username: String? = null,
-    val steamId: Long? = null,
-    val error: String? = null
-)
-
 @AndroidEntryPoint
-class SteamService : Service() {
+actual class SteamService : Service() {
 
     override fun attachBaseContext(newBase: Context) {
         val tag = com.nendo.argosy.data.preferences.SessionStateStore(newBase).getAppLanguage()
@@ -84,7 +68,7 @@ class SteamService : Service() {
     private var steamApps: SteamApps? = null
 
     private val _state = MutableStateFlow(SteamServiceState())
-    val state: StateFlow<SteamServiceState> = _state.asStateFlow()
+    actual val state: StateFlow<SteamServiceState> = _state.asStateFlow()
 
     private val subscriptions = mutableListOf<Closeable>()
     private var isRunning = false
@@ -196,10 +180,10 @@ class SteamService : Service() {
         nm.notify(NOTIFICATION_ID, notification)
     }
 
-    companion object {
-        const val EXTRA_AUTO_CONNECT = "auto_connect"
-        const val EXTRA_FORCE_CONNECT = "force_connect"
-        const val EXTRA_CONNECT_FOR_AUTH = "connect_for_auth"
+    actual companion object {
+        actual const val EXTRA_AUTO_CONNECT = "auto_connect"
+        actual const val EXTRA_FORCE_CONNECT = "force_connect"
+        actual const val EXTRA_CONNECT_FOR_AUTH = "connect_for_auth"
         private const val MAX_RECONNECT_ATTEMPTS = 5
         private const val NOTIFICATION_ID = ServiceNotificationIds.STEAM
     }
@@ -405,7 +389,7 @@ class SteamService : Service() {
         }
     }
 
-    fun connect() {
+    actual fun connect() {
         val currentState = _state.value.connectionState
         if (currentState == SteamConnectionState.CONNECTING) {
             val elapsed = System.currentTimeMillis() - connectStartedAt
@@ -450,7 +434,7 @@ class SteamService : Service() {
         }
     }
 
-    fun disconnect() {
+    actual fun disconnect() {
         isRunning = false
         callbackJob?.cancel()
         callbackJob = null
@@ -535,10 +519,10 @@ class SteamService : Service() {
     }
 
 
-    fun getSteamClient(): SteamClient? = steamClient
-    fun getSteamUser(): SteamUser? = steamUser
-    fun getSteamApps(): SteamApps? = steamApps
-    fun getCallbackManager(): CallbackManager? = callbackManager
-    fun getContentManager(): SteamContentManager = steamContentManager
-    fun getLibraryManager(): SteamLibraryManager = steamLibraryManager
+    actual fun getSteamClient(): SteamClient? = steamClient
+    actual fun getSteamUser(): SteamUser? = steamUser
+    actual fun getSteamApps(): SteamApps? = steamApps
+    actual fun getCallbackManager(): CallbackManager? = callbackManager
+    actual fun getContentManager(): SteamContentManager = steamContentManager
+    actual fun getLibraryManager(): SteamLibraryManager = steamLibraryManager
 }

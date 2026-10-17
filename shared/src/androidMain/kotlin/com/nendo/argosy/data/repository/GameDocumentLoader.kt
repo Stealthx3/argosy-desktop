@@ -8,21 +8,8 @@ import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 
-sealed interface DocumentContent {
-    data class Text(val body: String) : DocumentContent
-    data class Pages(val pages: List<android.graphics.Bitmap>) : DocumentContent
-    data class Unavailable(val reason: String?) : DocumentContent
-}
-
-/**
- * The stable name a document is cached and annotated under: its RomM file id, else a hash of its
- * url. Null for a document with neither.
- */
-fun documentKey(rommFileId: Long?, remoteUrl: String?): String? =
-    rommFileId?.let { "romm_$it" } ?: remoteUrl?.let { "url_${it.hashCode().toUInt()}" }
-
 @Singleton
-class GameDocumentLoader @Inject constructor(
+actual class GameDocumentLoader @Inject constructor(
     private val romMRepository: RomMRepository,
     @dagger.hilt.android.qualifiers.ApplicationContext private val context: android.content.Context
 ) {
@@ -30,7 +17,7 @@ class GameDocumentLoader @Inject constructor(
      * A PDF rendered to one bitmap per page, up to [MAX_PDF_PAGES]. A remote document is kept in
      * the document cache after its first open, so later opens read it from disk.
      */
-    suspend fun readPdf(
+    actual suspend fun readPdf(
         localPath: String?,
         rommFileId: Long?,
         remoteUrl: String?,
@@ -52,10 +39,10 @@ class GameDocumentLoader @Inject constructor(
      * Downloads a remote document into the document cache unless it is already there. Returns the
      * cached file, or null when the document has no remote source or cannot be fetched.
      */
-    suspend fun cacheDocument(rommFileId: Long?, remoteUrl: String?, fileName: String): File? =
+    actual suspend fun cacheDocument(rommFileId: Long?, remoteUrl: String?, fileName: String): File? =
         withContext(Dispatchers.IO) { cachedOrFetched(rommFileId, remoteUrl, fileName) }
 
-    fun isCached(rommFileId: Long?, remoteUrl: String?, fileName: String): Boolean =
+    actual fun isCached(rommFileId: Long?, remoteUrl: String?, fileName: String): Boolean =
         cacheFileFor(rommFileId, remoteUrl, fileName)?.isFile == true
 
     private suspend fun cachedOrFetched(rommFileId: Long?, remoteUrl: String?, fileName: String): File? {
@@ -127,13 +114,12 @@ class GameDocumentLoader @Inject constructor(
      * A document's text, from the downloaded game's folder when present, else from the document
      * cache, which a first open fills from the server.
      */
-    suspend fun readText(
+    actual suspend fun readText(
         localPath: String?,
         rommFileId: Long?,
-        remoteUrl: String? = null,
+        remoteUrl: String?,
         fileName: String,
-        maxBytes: Int = MAX_TEXT_BYTES
-    ): DocumentContent = withContext(Dispatchers.IO) {
+        maxBytes: Int): DocumentContent = withContext(Dispatchers.IO) {
         localPath?.let { path ->
             val file = File(path)
             if (file.isFile) {

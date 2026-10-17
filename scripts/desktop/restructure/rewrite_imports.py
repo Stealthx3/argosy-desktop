@@ -24,6 +24,9 @@ RULES = [
     (re.compile(r"\bandroid\.util\.Log\."), "com.nendo.argosy.util.PlatformLog."),
     (re.compile(r"^import com\.nendo\.argosy\.R$", re.M), "import com.nendo.argosy.res.ArgosyR as R"),
     (re.compile(r"\bcom\.nendo\.argosy\.R\."), "com.nendo.argosy.res.ArgosyR."),
+    (re.compile(r"(?<!import )\bandroidx\.compose\.ui\.platform\.LocalConfiguration\b"), "com.nendo.argosy.platform.LocalPlatformConfiguration"),
+    (re.compile(r"^import com\.nendo\.argosy\.shared\.R$", re.M), "import com.nendo.argosy.res.ArgosyR as R"),
+    (re.compile(r"\bcom\.nendo\.argosy\.shared\.R\."), "com.nendo.argosy.res.ArgosyR."),
     (
         re.compile(r"^import androidx\.compose\.ui\.res\.(stringResource|pluralStringResource|painterResource)$", re.M),
         r"import com.nendo.argosy.res.\1",
@@ -224,15 +227,22 @@ COMPANION_IMPORTS = {
         "com.nendo.argosy.platform.image.bitmap", "com.nendo.argosy.platform.image.intrinsicHeight",
         "com.nendo.argosy.platform.image.intrinsicWidth",
     ],
+    "com.nendo.argosy.platform.LocalPlatformConfiguration": [
+        "com.nendo.argosy.platform.orientation", "com.nendo.argosy.platform.screenHeightDp",
+        "com.nendo.argosy.platform.screenWidthDp",
+    ],
     "com.nendo.argosy.platform.PlatformIntentType": [
         "com.nendo.argosy.platform.action", "com.nendo.argosy.platform.addFlags", "com.nendo.argosy.platform.data",
         "com.nendo.argosy.platform.flags", "com.nendo.argosy.platform.putExtra",
+        "com.nendo.argosy.platform.component", "com.nendo.argosy.platform.`package`",
+        "com.nendo.argosy.platform.getStringExtra", "com.nendo.argosy.platform.packageName",
     ],
     "com.nendo.argosy.platform.PlatformInputEvent": [
         "com.nendo.argosy.platform.device", "com.nendo.argosy.platform.deviceId", "com.nendo.argosy.platform.eventTime",
         "com.nendo.argosy.platform.isFromSource", "com.nendo.argosy.platform.source",
     ],
     "com.nendo.argosy.platform.PlatformKeyEvent": [
+        "com.nendo.argosy.platform.name",
         "com.nendo.argosy.platform.action", "com.nendo.argosy.platform.device", "com.nendo.argosy.platform.deviceId",
         "com.nendo.argosy.platform.downTime", "com.nendo.argosy.platform.eventTime", "com.nendo.argosy.platform.isFromSource",
         "com.nendo.argosy.platform.keyCode", "com.nendo.argosy.platform.metaState", "com.nendo.argosy.platform.repeatCount",

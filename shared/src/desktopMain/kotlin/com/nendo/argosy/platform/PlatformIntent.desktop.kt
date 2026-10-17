@@ -40,7 +40,27 @@ actual open class PlatformIntentType actual constructor() {
     actual constructor(action: String?, uri: PlatformUri?) : this(action) {
         intentData = uri
     }
+
+    actual constructor(original: PlatformIntentType) : this(original.intentAction, original.intentData) {
+        intentFlags = original.intentFlags
+        intentComponent = original.intentComponent
+        intentPackage = original.intentPackage
+        extras.putAll(original.extras)
+    }
+
+    internal var intentComponent: PlatformComponentName? = null
+    internal var intentPackage: String? = null
 }
+
+actual class PlatformComponentName(internal val pkg: String, internal val cls: String)
+
+actual val PlatformComponentName.packageName: String get() = pkg
+
+actual val PlatformIntentType.component: PlatformComponentName? get() = intentComponent
+
+actual val PlatformIntentType.`package`: String? get() = intentPackage
+
+actual fun PlatformIntentType.getStringExtra(name: String): String? = extras[name] as? String
 
 actual val PlatformIntentType.action: String? get() = intentAction
 

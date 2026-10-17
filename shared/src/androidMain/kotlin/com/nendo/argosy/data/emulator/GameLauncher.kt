@@ -52,7 +52,7 @@ private val DISC_TAG_REGEX = Regex("\\(Disc \\d+\\)", RegexOption.IGNORE_CASE)
 private val DISC_NUMBER_REGEX = Regex("\\d+")
 
 @Singleton
-class GameLauncher @Inject constructor(
+actual class GameLauncher @Inject constructor(
     @ApplicationContext private val context: Context,
     private val gameDao: GameDao,
     private val overlayWriter: com.nendo.argosy.data.repository.GameUserOverlayWriter,
@@ -112,16 +112,15 @@ class GameLauncher @Inject constructor(
      * on the main dispatcher: left here, the work freezes the UI for as long as it takes and the
      * launch overlay drawn over it cannot paint.
      */
-    suspend fun launch(
+    actual suspend fun launch(
         gameId: Long,
-        discId: Long? = null,
-        forResume: Boolean = false,
-        selectedDiscPath: String? = null,
-        variantFileId: Long? = null,
-        skipVariantPrompt: Boolean = false,
-        allowVariantPrompt: Boolean = true,
-        prefetchedGame: GameEntity? = null
-    ): LaunchResult = withContext(Dispatchers.IO) {
+        discId: Long?,
+        forResume: Boolean,
+        selectedDiscPath: String?,
+        variantFileId: Long?,
+        skipVariantPrompt: Boolean,
+        allowVariantPrompt: Boolean,
+        prefetchedGame: GameEntity?): LaunchResult = withContext(Dispatchers.IO) {
         launchInternal(
             gameId = gameId,
             discId = discId,
@@ -1889,7 +1888,7 @@ class GameLauncher @Inject constructor(
         return "application/octet-stream"
     }
 
-    suspend fun buildInstallIntent(game: GameEntity, file: File): Intent? {
+    actual suspend fun buildInstallIntent(game: GameEntity, file: File): Intent? {
         val emulator = resolveEmulator(game) ?: return null
 
         Logger.debug(TAG, "buildInstallIntent: emulator=${emulator.displayName}, file=${file.name}")
@@ -1904,7 +1903,7 @@ class GameLauncher @Inject constructor(
         }
     }
 
-    suspend fun buildBatchInstallIntent(game: GameEntity, files: List<File>): Intent? {
+    actual suspend fun buildBatchInstallIntent(game: GameEntity, files: List<File>): Intent? {
         if (files.isEmpty()) return null
 
         val emulator = resolveEmulator(game) ?: return null

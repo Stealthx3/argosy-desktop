@@ -11,9 +11,9 @@ import com.nendo.argosy.hardware.SecondaryHomeActivity
  * release the bottom screen back to the OEM secondary home; finish() alone gets the
  * activity respawned by the OS.
  */
-object SecondaryHomeComponent {
+actual object SecondaryHomeComponent {
 
-    fun setEnabled(context: Context, enabled: Boolean) {
+    actual fun setEnabled(context: Context, enabled: Boolean) {
         val state = if (enabled) {
             PackageManager.COMPONENT_ENABLED_STATE_ENABLED
         } else {
@@ -26,7 +26,7 @@ object SecondaryHomeComponent {
         )
     }
 
-    fun isDefaultHome(context: Context): Boolean {
+    actual fun isDefaultHome(context: Context): Boolean {
         val intent = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME)
         val resolved = context.packageManager.resolveActivity(
             intent, PackageManager.MATCH_DEFAULT_ONLY

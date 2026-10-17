@@ -50,7 +50,7 @@ actual class ConnectedControllerTracker @Inject constructor(
         inputManager.registerInputDeviceListener(listener, null)
     }
 
-    fun noteInput(event: InputEvent) = activeState.noteInput(event)
+    actual fun noteInput(event: InputEvent) = activeState.noteInput(event)
 
     /**
      * Freezes [activeController] against input while a mapping capture waits for its press.

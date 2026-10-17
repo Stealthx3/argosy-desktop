@@ -7,4 +7,10 @@ import javax.inject.Singleton
 actual class HapticFeedbackManager @Inject constructor() {
     actual fun vibrate(pattern: HapticPattern) {
     }
+
+    actual fun setEnabled(enabled: Boolean) {
+    }
+
+    actual fun setStrength(strength: Float) {
+    }
 }

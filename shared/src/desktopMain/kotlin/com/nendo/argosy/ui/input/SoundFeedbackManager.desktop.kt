@@ -11,4 +11,10 @@ actual class SoundFeedbackManager @Inject constructor() {
 
     actual fun play(type: SoundType) {
     }
+
+    actual fun setEnabled(enabled: Boolean) {
+    }
+
+    actual suspend fun clearSfxCache() {
+    }
 }

@@ -23,14 +23,75 @@ ANDROID = Path("shared/src/androidMain/kotlin")
 DESKTOP = Path("shared/src/desktopMain/kotlin")
 MANIFEST = Path(__file__).with_name("slices.txt")
 PORTABLE_IMPORTS = (
-    "kotlin.", "kotlinx.coroutines.", "java.io.", "java.util.", "java.time.", "java.net.", "java.security.",
+    "kotlin.", "kotlinx.coroutines.", "java.lang.", "java.io.", "java.util.", "java.time.", "java.net.", "java.security.",
     "androidx.compose.ui.graphics.", "com.nendo.argosy.", "androidx.datastore.core.", "androidx.datastore.preferences.core.",
-    "androidx.room.", "com.swordfish.libretrodroid.Variable", "com.swordfish.libretrodroid.ShaderConfig",
+    "androidx.room.", "in.dragonbra.javasteam.", "com.swordfish.libretrodroid.Variable", "com.swordfish.libretrodroid.ShaderConfig",
 )
 NOT_A_TYPE_STAND_IN = ()
 
 
+DECL = re.compile(r"^(?:@\S+\s+)*(?:(?:public|internal|data|enum|sealed|abstract|open|value|inline|expect|actual|annotation|fun)\s+)*(?:class|object|interface|typealias)\s+(\w+)", re.M)
+_index = {}
+
+
+def declarations(root):
+    if root not in _index:
+        found = set()
+        for path in root.rglob("*.kt"):
+            text = path.read_text()
+            pm = re.search(r"^package ([\w.]+)", text, re.M)
+            if pm:
+                found |= {(pm.group(1), n) for n in DECL.findall(text)}
+                found |= {(pm.group(1), n) for n in re.findall(r"^(?:\w+\s+)*fun\s+(?:<[^>]*>\s*)?(\w+)\(", text, re.M)}
+        _index[root] = found
+    return _index[root]
+
+
+def sliced_classes():
+    found = set()
+    for line in MANIFEST.read_text().splitlines():
+        line = line.split("#")[0].strip()
+        if ":" not in line:
+            continue
+        rel, spec = (part.strip() for part in line.split(":", 1))
+        path = ANDROID / ROOT / rel
+        if path.exists():
+            pm = re.search(r"^package ([\w.]+)", path.read_text(), re.M)
+            found.add((pm.group(1), spec.split("(")[0]))
+    return found
+
+
+def android_only(pkg, name):
+    key = (pkg, name)
+    return key in declarations(ANDROID) and key not in declarations(COMMON) and key not in sliced_classes()
+
+
+def widen_imports(imported, text, pkg):
+    """
+    Adds the names a text uses without importing them (same package in-repo names, or any fully qualified name),
+    so the portability checks see them.
+    """
+    code = re.sub(r'"(?:\\.|[^"\\\n])*"', '""', re.sub(r"/\*.*?\*/|//[^\n]*|^(?:import|package)\s[^\n]*", "", text, flags=re.S | re.M))
+    roots = r"(?:android|androidx|coil|com|org|dagger|io|okhttp3|retrofit2|java|javax)"
+    for fq in re.findall(rf"(?<![\w.]){roots}(?:\.[a-z]\w*)+\.[A-Z]\w*", code):
+        short = fq.rsplit(".", 1)[1]
+        if fq.startswith("com.nendo.argosy."):
+            if short not in imported or not portable_import(fq):
+                imported[short] = fq
+        elif not fq.startswith(PORTABLE_IMPORTS):
+            imported[short] = f"unrewritten:{fq}"
+    for w in set(re.findall(r"\b[A-Z]\w*", code)):
+        if w not in imported and android_only(pkg, w):
+            imported[w] = f"{pkg}.{w}"
+    return imported
+
+
 def portable_import(name):
+    name = name.replace("`", "")
+    if name.startswith("com.nendo.argosy.") and "." in name:
+        pkg, short = name.rsplit(".", 1)
+        if android_only(pkg, short):
+            return False
     if name.startswith(PORTABLE_IMPORTS):
         return True
     if name in NOT_A_TYPE_STAND_IN:
@@ -297,8 +358,8 @@ def slice_top_level(rel):
     path = ANDROID / ROOT / rel
     text = path.read_text()
     pkg = re.search(r"^package ([\w.]+)", text, re.M).group(1)
-    imports = re.findall(r"^import ([\w.]+)(?: as (\w+))?$", text, re.M)
-    imported = {alias or name.rsplit(".", 1)[1]: name for name, alias in imports}
+    imports = re.findall(r"^import ([\w.`]+)(?: as (\w+))?$", text, re.M)
+    imported = widen_imports({alias or name.rsplit(".", 1)[1]: name for name, alias in imports}, text, pkg)
     stem = Path(rel).stem
     expect_path = (COMMON / ROOT / rel).parent / f"{stem}.functions.expect.kt"
     previous = {}
@@ -388,8 +449,8 @@ def main():
         path = ANDROID / ROOT / rel
         text = path.read_text()
         pkg = re.search(r"^package ([\w.]+)", text, re.M).group(1)
-        imports = re.findall(r"^import ([\w.]+)(?: as (\w+))?$", text, re.M)
-        imported = {alias or name.rsplit(".", 1)[1]: name for name, alias in imports}
+        imports = re.findall(r"^import ([\w.`]+)(?: as (\w+))?$", text, re.M)
+        imported = widen_imports({alias or name.rsplit(".", 1)[1]: name for name, alias in imports}, text, pkg)
         sliced_here = {
             l.split(":", 1)[1].strip().split("(")[0]
             for l in MANIFEST.read_text().splitlines()
@@ -602,6 +663,9 @@ def main():
                 own_setter = next((l for l in next_lines if re.match(r"\s{8,}(?:private|internal|protected)\s+set\b", l)), None)
                 if kind == "var" and own_setter is not None:
                     skipped.append(f"{name}: a var with a restricted setter cannot actualize an expect val")
+                    continue
+                if re.search(r"\blateinit\b", mods):
+                    skipped.append(f"{name}: a lateinit var cannot actualize an expect property")
                     continue
             words = set(re.findall(r"\b[A-Z]\w*", sig.split("=")[0] if kind != "fun" else sig))
             blocked = sorted(

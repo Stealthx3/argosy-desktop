@@ -6,4 +6,8 @@ expect class SoundFeedbackManager {
     fun playSound(type: SoundType)
 
     fun play(type: SoundType)
+
+    fun setEnabled(enabled: Boolean)
+
+    suspend fun clearSfxCache()
 }

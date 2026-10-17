@@ -18,7 +18,7 @@ import java.nio.FloatBuffer
 import java.nio.IntBuffer
 import java.util.concurrent.Executors
 
-class ShaderPreviewRenderer {
+actual class ShaderPreviewRenderer {
 
     private val glDispatcher = Executors.newSingleThreadExecutor { r ->
         Thread(r, "ShaderPreviewGL").apply { isDaemon = true }
@@ -31,10 +31,10 @@ class ShaderPreviewRenderer {
     private var contextWidth = 0
     private var contextHeight = 0
 
-    suspend fun render(
+    actual suspend fun render(
         inputBitmap: Bitmap,
         shaderConfig: ShaderConfig.Custom,
-        passParams: List<Map<String, Float>> = emptyList(),
+        passParams: List<Map<String, Float>>,
         outputWidth: Int,
         outputHeight: Int
     ): Bitmap? {
@@ -214,7 +214,7 @@ class ShaderPreviewRenderer {
         contextHeight = 0
     }
 
-    fun destroy() {
+    actual fun destroy() {
         destroyContext()
         glDispatcher.close()
     }
@@ -388,7 +388,7 @@ class ShaderPreviewRenderer {
         val height: Int
     )
 
-    companion object {
+    actual companion object {
         private const val TAG = "ShaderPreview"
         private const val EGL_OPENGL_ES3_BIT = 0x40
 

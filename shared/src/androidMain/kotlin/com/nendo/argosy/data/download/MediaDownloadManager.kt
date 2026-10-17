@@ -90,90 +90,6 @@ private const val DISPLACED_SUFFIX = ".replaced"
 private const val STREAM_TYPE_SUBTITLE = "Subtitle"
 private const val FAILED_ROW_RETENTION_DAYS = 14L
 
-sealed class MediaDownloadState {
-    data object Idle : MediaDownloadState()
-    data class Preparing(val itemId: String, val itemName: String, val detail: String) : MediaDownloadState()
-    data class Downloading(val itemId: String, val itemName: String, val progress: Float) : MediaDownloadState()
-    data class Paused(
-        val itemId: String,
-        val itemName: String,
-        val progress: Float,
-        val reason: String? = null
-    ) : MediaDownloadState()
-    data class Completed(val itemId: String, val itemName: String, val path: String) : MediaDownloadState()
-    data class Failed(val itemId: String, val itemName: String, val error: String) : MediaDownloadState()
-}
-
-/**
- * Whether this state is work the queue still owes the user. A finished or failed download is neither
- * queued nor in progress, and counting it as either is what leaves a failure reading as pending.
- */
-val MediaDownloadState.isInFlight: Boolean
-    get() = this is MediaDownloadState.Preparing ||
-        this is MediaDownloadState.Downloading ||
-        this is MediaDownloadState.Paused
-
-data class MediaDownloadProgress(
-    val itemId: String,
-    val itemName: String,
-    val seriesId: String? = null,
-    val seriesName: String? = null,
-    val posterUrl: String? = null,
-    val quality: MediaDownloadQuality,
-    val totalBytes: Long,
-    val bytesDownloaded: Long,
-    val state: MediaDownloadState,
-    val bytesPerSecond: Long = 0L,
-    val sizeIsEstimated: Boolean = false
-) {
-    val progress: Float get() = if (totalBytes > 0) (bytesDownloaded.toFloat() / totalBytes).coerceIn(0f, 1f) else 0f
-
-    val displayTitle: String get() = if (seriesName.isNullOrBlank()) itemName else "$seriesName - $itemName"
-}
-
-/**
- * A batch's size at one quality. [isSourceSize] marks a figure taken from what the server reported
- * about the file rather than computed from a tier's bitrate, so a caller can say which it is showing.
- */
-data class MediaSizeEstimate(
-    val bytes: Long,
-    val isSourceSize: Boolean
-)
-
-/**
- * What subtitles a batch can be expected to keep, as far as anything already negotiated shows.
- *
- * [anythingKnown] separates a batch with no subtitles from one nothing has described yet, which are
- * different answers: the first means there is nothing to say, the second means the rule has to be
- * stated without promising the titles have any.
- */
-data class MediaSubtitleOutlook(
-    val hasTextSubtitles: Boolean,
-    val hasImageSubtitles: Boolean,
-    val burnsInImageSubtitles: Boolean,
-    val anythingKnown: Boolean
-)
-
-data class QueuedMediaDownload(
-    val itemId: String,
-    val itemName: String,
-    val seriesId: String? = null,
-    val seriesName: String? = null,
-    val itemType: String,
-    val quality: MediaDownloadQuality,
-    val posterUrl: String? = null
-)
-
-/**
- * What a removal batch did. [unreachable] is the count kept because their storage is not mounted -
- * those are still downloaded, and the caller is expected to say so rather than report a clean sweep.
- */
-data class MediaRemovalResult(
-    val removed: Int,
-    val unreachable: Int,
-    val absent: Int
-)
-
 /**
  * Fetches movies and episodes for offline playback.
  *
@@ -191,7 +107,7 @@ data class MediaRemovalResult(
  */
 @Singleton
 @Suppress("TooManyFunctions")
-class MediaDownloadManager @Inject constructor(
+actual class MediaDownloadManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val mediaDownloadQueueDao: MediaDownloadQueueDao,
     private val mediaRepository: MediaRepository,
@@ -209,16 +125,16 @@ class MediaDownloadManager @Inject constructor(
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     private val _downloadState = MutableStateFlow<MediaDownloadState>(MediaDownloadState.Idle)
-    val downloadState: StateFlow<MediaDownloadState> = _downloadState.asStateFlow()
+    actual val downloadState: StateFlow<MediaDownloadState> = _downloadState.asStateFlow()
 
     private val _activeDownload = MutableStateFlow<MediaDownloadProgress?>(null)
-    val activeDownload: StateFlow<MediaDownloadProgress?> = _activeDownload.asStateFlow()
+    actual val activeDownload: StateFlow<MediaDownloadProgress?> = _activeDownload.asStateFlow()
 
     private val _downloadQueue = MutableStateFlow<List<QueuedMediaDownload>>(emptyList())
-    val downloadQueue: StateFlow<List<QueuedMediaDownload>> = _downloadQueue.asStateFlow()
+    actual val downloadQueue: StateFlow<List<QueuedMediaDownload>> = _downloadQueue.asStateFlow()
 
     private val _completedDownloads = MutableStateFlow<List<MediaDownloadProgress>>(emptyList())
-    val completedDownloads: StateFlow<List<MediaDownloadProgress>> = _completedDownloads.asStateFlow()
+    actual val completedDownloads: StateFlow<List<MediaDownloadProgress>> = _completedDownloads.asStateFlow()
 
     private var currentDownloadJob: Job? = null
     private var isCancelled = false
@@ -228,12 +144,12 @@ class MediaDownloadManager @Inject constructor(
         scope.launch { restoreQueueFromDatabase() }
     }
 
-    fun hasActiveMediaDownload(): Boolean {
+    actual fun hasActiveMediaDownload(): Boolean {
         val state = _downloadState.value
         return state is MediaDownloadState.Preparing || state is MediaDownloadState.Downloading
     }
 
-    fun hasBlockingDownloadState(): Boolean =
+    actual fun hasBlockingDownloadState(): Boolean =
         hasActiveMediaDownload() || _downloadState.value is MediaDownloadState.Paused
 
     /**
@@ -242,7 +158,7 @@ class MediaDownloadManager @Inject constructor(
      * dropping either would strand both. Dismissing one is [removeFromCompleted], which is a
      * deliberate act on that title rather than a sweep of everything finished.
      */
-    fun clearCompletedDownloads() {
+    actual fun clearCompletedDownloads() {
         _completedDownloads.value = _completedDownloads.value.filter {
             it.state is MediaDownloadState.Failed
         }
@@ -260,7 +176,7 @@ class MediaDownloadManager @Inject constructor(
         }
     }
 
-    fun removeFromCompleted(itemId: String) {
+    actual fun removeFromCompleted(itemId: String) {
         _completedDownloads.value = _completedDownloads.value.filterNot { it.itemId == itemId }
         scope.launch {
             val owner = mediaRepository.currentUserId() ?: return@launch
@@ -269,7 +185,7 @@ class MediaDownloadManager @Inject constructor(
         }
     }
 
-    fun onDownloadSlotFreed() {
+    actual fun onDownloadSlotFreed() {
         if (_downloadQueue.value.isNotEmpty() && currentDownloadJob?.isActive != true) {
             processNextInQueue()
         }
@@ -291,7 +207,7 @@ class MediaDownloadManager @Inject constructor(
      * said about. The batch is read once and every quality answered from that reading, because the
      * quality picker asks about all of them at the same moment.
      */
-    suspend fun estimateBatch(itemIds: List<String>): Map<MediaDownloadQuality, MediaSizeEstimate> {
+    actual suspend fun estimateBatch(itemIds: List<String>): Map<MediaDownloadQuality, MediaSizeEstimate> {
         if (itemIds.isEmpty()) return emptyMap()
         val batch = itemIds.map { itemId ->
             KnownItem(
@@ -337,7 +253,7 @@ class MediaDownloadManager @Inject constructor(
      * previous negotiations recorded, so a title the app has only listed answers "unknown" rather
      * than "none" - the difference between saying nothing and promising something.
      */
-    suspend fun subtitleOutlook(itemIds: List<String>): MediaSubtitleOutlook {
+    actual suspend fun subtitleOutlook(itemIds: List<String>): MediaSubtitleOutlook {
         val streams = itemIds.flatMap { mediaRepository.knownSubtitleStreams(it) }
         val text = streams.count { subtitleDeliveryFor(it.codec, isTextSubtitleStream = false) != null }
         return MediaSubtitleOutlook(
@@ -349,18 +265,18 @@ class MediaDownloadManager @Inject constructor(
         )
     }
 
-    suspend fun availableBytes(): Long = withContext(Dispatchers.IO) {
+    actual suspend fun availableBytes(): Long = withContext(Dispatchers.IO) {
         val dir = directoryManager.resolveMediaDir()
         if (!fileAccessLayer.exists(dir.absolutePath)) fileAccessLayer.mkdirs(dir.absolutePath)
         runCatching { StatFs(dir.absolutePath).availableBytes }.getOrDefault(0L)
     }
 
-    suspend fun defaultQuality(): MediaDownloadQuality =
+    actual suspend fun defaultQuality(): MediaDownloadQuality =
         preferencesRepository.userPreferences.first().mediaDownloadQuality
 
-    fun enqueue(itemId: String, quality: MediaDownloadQuality) = enqueueAll(listOf(itemId), quality)
+    actual fun enqueue(itemId: String, quality: MediaDownloadQuality) = enqueueAll(listOf(itemId), quality)
 
-    fun enqueueAll(itemIds: List<String>, quality: MediaDownloadQuality) {
+    actual fun enqueueAll(itemIds: List<String>, quality: MediaDownloadQuality) {
         if (itemIds.isEmpty()) return
         scope.launch {
             val owner = mediaRepository.currentUserId()
@@ -415,7 +331,7 @@ class MediaDownloadManager @Inject constructor(
     private fun titleCount(count: Int): String =
         context.resources.getQuantityString(R.plurals.sync_media_title_count, count, count)
 
-    fun pauseActiveDownload() {
+    actual fun pauseActiveDownload() {
         val active = _activeDownload.value ?: return
         isCancelled = true
         currentDownloadJob?.cancel()
@@ -436,7 +352,7 @@ class MediaDownloadManager @Inject constructor(
      * the same path a single download takes, so its partial file and its transcode session are
      * handled exactly once; everything still waiting is simply moved out of the queue's way.
      */
-    fun pauseSeries(seriesId: String) {
+    actual fun pauseSeries(seriesId: String) {
         scope.launch {
             val owner = mediaRepository.currentUserId() ?: return@launch
             if (_activeDownload.value?.seriesId == seriesId) pauseActiveDownload()
@@ -454,7 +370,7 @@ class MediaDownloadManager @Inject constructor(
      * Puts a paused series back in line, in the order its episodes were queued in rather than the
      * order they happen to be read back in.
      */
-    fun resumeSeries(seriesId: String) {
+    actual fun resumeSeries(seriesId: String) {
         scope.launch {
             val owner = mediaRepository.currentUserId() ?: return@launch
             mediaDownloadQueueDao.updateSeriesState(
@@ -476,7 +392,7 @@ class MediaDownloadManager @Inject constructor(
      * Drops a series from the queue entirely. Each episode goes through the single-item path so an
      * in-flight one is torn down properly rather than left with a transcode running on the server.
      */
-    fun cancelSeries(seriesId: String) {
+    actual fun cancelSeries(seriesId: String) {
         scope.launch {
             val owner = mediaRepository.currentUserId() ?: return@launch
             mediaDownloadQueueDao.getBySeries(owner, seriesId)
@@ -485,7 +401,7 @@ class MediaDownloadManager @Inject constructor(
         }
     }
 
-    fun resumeDownload(itemId: String) {
+    actual fun resumeDownload(itemId: String) {
         scope.launch {
             val owner = mediaRepository.currentUserId() ?: return@launch
             val row = mediaDownloadQueueDao.getByItemId(owner, itemId) ?: return@launch
@@ -498,7 +414,7 @@ class MediaDownloadManager @Inject constructor(
         }
     }
 
-    fun cancelDownload(itemId: String) {
+    actual fun cancelDownload(itemId: String) {
         scope.launch {
             val owner = mediaRepository.currentUserId() ?: return@launch
             val active = _activeDownload.value
@@ -520,7 +436,7 @@ class MediaDownloadManager @Inject constructor(
         }
     }
 
-    suspend fun removeDownload(itemId: String): Boolean = removeDownloads(listOf(itemId)).removed > 0
+    actual suspend fun removeDownload(itemId: String): Boolean = removeDownloads(listOf(itemId)).removed > 0
 
     /**
      * Forgets downloaded copies and deletes their files.
@@ -533,7 +449,7 @@ class MediaDownloadManager @Inject constructor(
      * attribution pass is still listed until it is, and acting on the stale list is what turns an
      * unreachable copy into a record cleared for a file nobody deleted.
      */
-    suspend fun removeDownloads(itemIds: List<String>): MediaRemovalResult = withContext(Dispatchers.IO) {
+    actual suspend fun removeDownloads(itemIds: List<String>): MediaRemovalResult = withContext(Dispatchers.IO) {
         storageAttribution.refreshVolumes()
         var removed = 0
         var unreachable = 0

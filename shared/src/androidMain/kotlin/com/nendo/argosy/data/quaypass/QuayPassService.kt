@@ -47,7 +47,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class QuayPassService @Inject constructor(
+actual class QuayPassService @Inject constructor(
     private val application: Application,
     private val preferencesRepository: UserPreferencesRepository,
     private val credentialManager: QuayPassCredentialManager,
@@ -62,7 +62,7 @@ class QuayPassService @Inject constructor(
     private val exchangeMutex = Mutex()
 
     private val _runState = MutableStateFlow(QuayPassRunState.DISABLED)
-    val runState: StateFlow<QuayPassRunState> = _runState.asStateFlow()
+    actual val runState: StateFlow<QuayPassRunState> = _runState.asStateFlow()
 
     private val isRunningNow: Boolean get() = _runState.value == QuayPassRunState.RUNNING
 
@@ -174,7 +174,7 @@ class QuayPassService @Inject constructor(
         val quayPassEnabled: Boolean
     )
 
-    enum class QuayPassRunState {
+    actual enum class QuayPassRunState {
         RUNNING,
         DISABLED,
         NOT_LINKED,
@@ -194,8 +194,8 @@ class QuayPassService @Inject constructor(
         val socialAvatarUseDoodle: Boolean
     )
 
-    fun isBleSupported(): Boolean = bluetoothManager?.adapter != null
-    fun isBleEnabled(): Boolean = bluetoothManager?.adapter?.isEnabled == true
+    actual fun isBleSupported(): Boolean = bluetoothManager?.adapter != null
+    actual fun isBleEnabled(): Boolean = bluetoothManager?.adapter?.isEnabled == true
 
     private fun hasPermissions(): Boolean = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         listOf(
@@ -213,12 +213,12 @@ class QuayPassService @Inject constructor(
      * Stops advertising for the duration of a RomM account switch. The pass identifies a person,
      * and mid-swap there is no settled answer to which one, so it must not be on the air.
      */
-    suspend fun holdForAccountSwitch() {
+    actual suspend fun holdForAccountSwitch() {
         accountSwitchHold = true
         if (isRunningNow) stop(QuayPassRunState.DISABLED)
     }
 
-    suspend fun releaseAccountSwitchHold() {
+    actual suspend fun releaseAccountSwitchHold() {
         accountSwitchHold = false
         if (shouldBeRunning && !isRunningNow) tryStart()
     }
@@ -343,7 +343,7 @@ class QuayPassService @Inject constructor(
         return QuayPassDoodleCodec.encodeFromSparseBase64(doodleBase64) ?: ByteArray(0)
     }
 
-    fun updateLastGame(game: GameEntity) {
+    actual fun updateLastGame(game: GameEntity) {
         cachedLastGame = game
         scope.launch { refreshOurBytes() }
     }
@@ -357,7 +357,7 @@ class QuayPassService @Inject constructor(
         }
     }
 
-    companion object {
+    actual companion object {
         private const val TAG = "QuayPassService"
         private val RE_ENCODE_INTERVAL_MS =
             com.nendo.argosy.data.quaypass.ble.QuayPassConfig.FRESHNESS_WINDOW_SECS * 1000 / 3
@@ -365,6 +365,6 @@ class QuayPassService @Inject constructor(
         @Volatile
         private var instance: QuayPassService? = null
 
-        fun getInstance(): QuayPassService? = instance
+        actual fun getInstance(): QuayPassService? = instance
     }
 }

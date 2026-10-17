@@ -50,7 +50,7 @@ private const val LAUNCH_RECOLOR_WAIT_MS = 600L
 internal const val PREVIEW_RETRY_MS = 2_000L
 
 @Singleton
-class LockScreenArtManager @Inject constructor(
+actual class LockScreenArtManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val displayPrefs: DisplayPreferencesRepository,
     private val gameRepository: GameRepository,
@@ -66,7 +66,7 @@ class LockScreenArtManager @Inject constructor(
 
     private class LoadedArt<T>(val art: Pair<String, T?>?)
 
-    companion object {
+    actual companion object {
         internal fun mayDraw(gameId: Long?, shownKey: String?, isLaunch: Boolean): Boolean =
             isLaunch || gameId == null || shownKey?.startsWith("game:$gameId:") == true
 
@@ -88,7 +88,7 @@ class LockScreenArtManager @Inject constructor(
         }
     }
 
-    fun start() {
+    actual fun start() {
         context.registerReceiver(screenOffReceiver, IntentFilter(Intent.ACTION_SCREEN_OFF))
         scope.launch {
             displayPrefs.preferences
@@ -103,7 +103,7 @@ class LockScreenArtManager @Inject constructor(
      * system to finish recoloring its theme from it. A recolor applied later, while the game
      * screen is alive, makes Android rebuild that screen.
      */
-    suspend fun showBeforeLaunch(gameId: Long) {
+    actual suspend fun showBeforeLaunch(gameId: Long) {
         libraryRefresh?.cancel()
         val recolored = CompletableDeferred<Unit>()
         val callbacks = object : ComponentCallbacks {
@@ -135,7 +135,7 @@ class LockScreenArtManager @Inject constructor(
         }
     }
 
-    fun showLibraryAfterCancelledLaunch() {
+    actual fun showLibraryAfterCancelledLaunch() {
         libraryRefresh = scope.launch { refresh(gameId = null) }
     }
 
@@ -242,7 +242,7 @@ class LockScreenArtManager @Inject constructor(
             .onFailure { Logger.warn(TAG, "releaseStaticLockForLive: could not clear the lock wallpaper | ${it.message}") }
     }
 
-    fun onLiveWallpaperBound() {
+    actual fun onLiveWallpaperBound() {
         libraryRefresh = scope.launch { refresh() }
     }
 
@@ -250,7 +250,7 @@ class LockScreenArtManager @Inject constructor(
      * Builds the mosaic for the wallpaper picker's preview, retrying until the library has covers
      * to draw. The caller cancels the returned job when its preview engine goes away.
      */
-    fun prepareLivePreview(): Job = scope.launch {
+    actual fun prepareLivePreview(): Job = scope.launch {
         showWhenReady(scenes, PREVIEW_RETRY_MS) {
             screenSize()?.let { (width, height) ->
                 scrollingScene(gameRepository.coversOnePerTitle().distinct(), width, height)

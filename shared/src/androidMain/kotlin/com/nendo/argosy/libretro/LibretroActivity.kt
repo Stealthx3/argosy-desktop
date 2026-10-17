@@ -168,7 +168,7 @@ import java.io.File
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class LibretroActivity : ComponentActivity() {
+actual class LibretroActivity : ComponentActivity() {
 
     private var languageTag: String = com.nendo.argosy.core.locale.LocaleHelper.SYSTEM_LANGUAGE_TAG
 
@@ -3212,7 +3212,7 @@ class LibretroActivity : ComponentActivity() {
         }
     }
 
-    fun enterTouchEditMode() {
+    actual fun enterTouchEditMode() {
         menuVisible = false
         closeMenuSection()
         retroView.pauseEmulation()
@@ -3288,7 +3288,7 @@ class LibretroActivity : ComponentActivity() {
         return hotkeyDispatcher.isMenuToggleKey(event.keyCode, controllerId)
     }
 
-    fun dispatchTouchKey(action: Int, keyCode: Int) {
+    actual fun dispatchTouchKey(action: Int, keyCode: Int) {
         if (isAnyMenuOpen) return
         val event = KeyEvent(action, keyCode)
         if (action == KeyEvent.ACTION_DOWN) {
@@ -3844,7 +3844,7 @@ class LibretroActivity : ComponentActivity() {
         return RetroButton.L2 !in buttons && RetroButton.R2 !in buttons
     }
 
-    companion object {
+    actual companion object {
         private const val TAG = "LibretroActivity"
 
         private const val CORE_INPUT_PULSE_MS = 50L
@@ -3864,27 +3864,27 @@ class LibretroActivity : ComponentActivity() {
         private const val SPEEDRUN_PANEL_FRACTION_DEFAULT = 0.30f
         private val SPEEDRUN_PANEL_FRACTION_RANGE = 0.20f..0.40f
 
-        const val EXTRA_ROM_PATH = "rom_path"
-        const val EXTRA_CORE_PATH = "core_path"
-        const val EXTRA_SYSTEM_DIR = "system_dir"
-        const val EXTRA_GAME_NAME = "game_name"
-        const val EXTRA_GAME_ID = "game_id"
-        const val EXTRA_VARIANT_FILE_ID = "variant_file_id"
-        const val EXTRA_DISC_M3U_PATH = "disc_m3u_path"
-        const val EXTRA_PLATFORM_SLUG = "platform_slug"
-        const val EXTRA_CORE_NAME = "core_name"
-        const val EXTRA_CORE_VAR_KEYS = "core_var_keys"
-        const val EXTRA_CORE_VAR_VALUES = "core_var_values"
-        const val EXTRA_PREFER_VULKAN = "prefer_vulkan"
-        const val EXTRA_VULKAN_DRIVER_DIR = "vulkan_driver_dir"
-        const val EXTRA_VULKAN_DRIVER_LIBRARY = "vulkan_driver_library"
-        const val EXTRA_SAVES_DIR = "saves_dir"
-        const val EXTRA_STATES_DIR = "states_dir"
-        const val EXTRA_NETPLAY_JOIN_SESSION_ID = "netplay_join_session_id"
-        const val EXTRA_NETPLAY_JOIN_HOST_USER_ID = "netplay_join_host_user_id"
-        const val EXTRA_LAUNCH_CONTROLLER_ID = "launch_controller_id"
-        const val ACTION_SHOW_MENU = "com.nendo.argosy.action.SHOW_MENU"
-        const val ACTION_QUIT = "com.nendo.argosy.action.QUIT"
+        actual const val EXTRA_ROM_PATH = "rom_path"
+        actual const val EXTRA_CORE_PATH = "core_path"
+        actual const val EXTRA_SYSTEM_DIR = "system_dir"
+        actual const val EXTRA_GAME_NAME = "game_name"
+        actual const val EXTRA_GAME_ID = "game_id"
+        actual const val EXTRA_VARIANT_FILE_ID = "variant_file_id"
+        actual const val EXTRA_DISC_M3U_PATH = "disc_m3u_path"
+        actual const val EXTRA_PLATFORM_SLUG = "platform_slug"
+        actual const val EXTRA_CORE_NAME = "core_name"
+        actual const val EXTRA_CORE_VAR_KEYS = "core_var_keys"
+        actual const val EXTRA_CORE_VAR_VALUES = "core_var_values"
+        actual const val EXTRA_PREFER_VULKAN = "prefer_vulkan"
+        actual const val EXTRA_VULKAN_DRIVER_DIR = "vulkan_driver_dir"
+        actual const val EXTRA_VULKAN_DRIVER_LIBRARY = "vulkan_driver_library"
+        actual const val EXTRA_SAVES_DIR = "saves_dir"
+        actual const val EXTRA_STATES_DIR = "states_dir"
+        actual const val EXTRA_NETPLAY_JOIN_SESSION_ID = "netplay_join_session_id"
+        actual const val EXTRA_NETPLAY_JOIN_HOST_USER_ID = "netplay_join_host_user_id"
+        actual const val EXTRA_LAUNCH_CONTROLLER_ID = "launch_controller_id"
+        actual const val ACTION_SHOW_MENU = "com.nendo.argosy.action.SHOW_MENU"
+        actual const val ACTION_QUIT = "com.nendo.argosy.action.QUIT"
 
         private const val DIGITAL_RIGHT_STICK_DEADZONE = 0.5f
         private val PLATFORMS_WITH_DIGITAL_RIGHT_STICK = setOf("n64", "n64dd")

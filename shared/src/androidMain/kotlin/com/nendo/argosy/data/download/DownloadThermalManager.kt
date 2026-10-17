@@ -24,17 +24,8 @@ import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 
-enum class ThermalState { NORMAL, THROTTLED, PAUSED }
-
-data class ThermalStatus(
-    val state: ThermalState = ThermalState.NORMAL,
-    val cpuTemp: Float = 0f,
-    val batteryTemp: Float = 0f,
-    val throttleMultiplier: Float = 1.0f
-)
-
 @Singleton
-class DownloadThermalManager @Inject constructor(
+actual class DownloadThermalManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val downloadManager: DownloadManager,
     private val steamContentManager: com.nendo.argosy.data.steam.SteamContentManager,
@@ -42,7 +33,7 @@ class DownloadThermalManager @Inject constructor(
     private val fanController: FanController
 ) {
     private val _thermalStatus = MutableStateFlow(ThermalStatus())
-    val thermalStatus: StateFlow<ThermalStatus> = _thermalStatus.asStateFlow()
+    actual val thermalStatus: StateFlow<ThermalStatus> = _thermalStatus.asStateFlow()
 
     private val scope = SafeCoroutineScope(Dispatchers.IO, "DownloadThermalManager")
     private val wakeLock: PowerManager.WakeLock =
@@ -64,7 +55,7 @@ class DownloadThermalManager @Inject constructor(
         }
     }
 
-    fun start() {
+    actual fun start() {
         if (!isReceiverRegistered) {
             val filter = IntentFilter().apply {
                 addAction(Intent.ACTION_SCREEN_OFF)
@@ -76,7 +67,7 @@ class DownloadThermalManager @Inject constructor(
         observeDownloads()
     }
 
-    fun stop() {
+    actual fun stop() {
         if (isReceiverRegistered) {
             runCatching { context.unregisterReceiver(screenReceiver) }
             isReceiverRegistered = false
@@ -292,7 +283,7 @@ class DownloadThermalManager @Inject constructor(
 
     private fun fanControlAvailable() = fanController.isControllable()
 
-    companion object {
+    actual companion object {
         private const val TAG = "DownloadThermalManager"
         private const val MONITOR_INTERVAL_MS = 5000L
         private const val FAN_REFRESH_INTERVAL_MS = 1_000L

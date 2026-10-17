@@ -23,16 +23,8 @@ private const val STEAM_PLATFORM_DIR = "steam"
 private const val GN_PACKAGE = "app.gamenative"
 private const val DOWNLOAD_INFO_DIR = ".DownloadInfo"
 
-data class SteamInstallVolume(
-    val path: String,
-    val label: String,
-    val freeBytes: Long,
-    val hasGnPath: Boolean,
-    val target: SteamInstallTarget
-)
-
 @Singleton
-class SteamPathResolver @Inject constructor(
+actual class SteamPathResolver @Inject constructor(
     @ApplicationContext private val context: Context,
     private val gameDao: GameDao,
     private val platformDao: PlatformDao,
@@ -42,12 +34,12 @@ class SteamPathResolver @Inject constructor(
     private val gnInstallProbe: GnInstallProbe
 ) {
 
-    suspend fun getConfiguredTarget(): SteamInstallTarget {
+    actual suspend fun getConfiguredTarget(): SteamInstallTarget {
         val raw = preferencesRepository.userPreferences.first().steamInstallVolume
         return SteamInstallTarget.fromPreferenceValue(raw)
     }
 
-    fun resolveBaseForTarget(target: SteamInstallTarget): String? {
+    actual fun resolveBaseForTarget(target: SteamInstallTarget): String? {
         val result = gnInstallProbe.probe(target)
         val pkgRoot = result.resolvedPackageRoot ?: fallbackPackageRoot(target)
         if (!result.writable) {
@@ -66,7 +58,7 @@ class SteamPathResolver @Inject constructor(
         return if (target is SteamInstallTarget.Internal) androidDataAccessor.transformPath(raw) else raw
     }
 
-    suspend fun getInstallDirByName(dirName: String): File {
+    actual suspend fun getInstallDirByName(dirName: String): File {
         val steamBase = getResolvedSteamBase()
         if (steamBase != null) {
             return File("$steamBase/$dirName")
@@ -79,11 +71,11 @@ class SteamPathResolver @Inject constructor(
         return File(basePath, "$STEAM_PLATFORM_DIR/$dirName")
     }
 
-    suspend fun snapshotInstallDirAtEnqueue(appId: Long, steamInstallDir: String?): File {
+    actual suspend fun snapshotInstallDirAtEnqueue(appId: Long, steamInstallDir: String?): File {
         return if (steamInstallDir != null) getInstallDirByName(steamInstallDir) else getInstallDir(appId)
     }
 
-    suspend fun getInstallDir(appId: Long): File {
+    actual suspend fun getInstallDir(appId: Long): File {
         val steamBase = getResolvedSteamBase()
         if (steamBase != null) {
             val game = gameDao.getBySteamAppId(appId)
@@ -97,7 +89,7 @@ class SteamPathResolver @Inject constructor(
         return File(basePath, "$STEAM_PLATFORM_DIR/$appId")
     }
 
-    suspend fun getSteamDir(): File {
+    actual suspend fun getSteamDir(): File {
         val prefs = preferencesRepository.userPreferences.first()
         val basePath = prefs.romStoragePath
             ?: externalFilesDir()
@@ -105,7 +97,7 @@ class SteamPathResolver @Inject constructor(
         return File(basePath, STEAM_PLATFORM_DIR)
     }
 
-    suspend fun getResolvedSteamBase(): String? {
+    actual suspend fun getResolvedSteamBase(): String? {
         val steam = platformDao.getById(LocalPlatformIds.STEAM)
         steam?.customRomPath?.takeIf { it.isNotBlank() }?.let { return it }
         val romsRoot = preferencesRepository.userPreferences.first().romStoragePath
@@ -120,12 +112,12 @@ class SteamPathResolver @Inject constructor(
         return game.title.takeIf { it.isNotBlank() }?.let { sanitizeGameName(it) }
     }
 
-    suspend fun isGameInstalled(appId: Long): Boolean {
+    actual suspend fun isGameInstalled(appId: Long): Boolean {
         val game = gameDao.getBySteamAppId(appId) ?: return false
         return isGameInstalled(game)
     }
 
-    suspend fun isGameInstalled(game: com.nendo.argosy.data.local.entity.GameEntity): Boolean {
+    actual suspend fun isGameInstalled(game: com.nendo.argosy.data.local.entity.GameEntity): Boolean {
         if (game.isExternallyManaged) return true
         val path = game.localPath
         if (path != null) {
@@ -166,9 +158,9 @@ class SteamPathResolver @Inject constructor(
         return !File(path).exists() && !androidDataAccessor.exists(path)
     }
 
-    fun findGnStoragePath(): String? = findAllGnStoragePaths().firstOrNull()
+    actual fun findGnStoragePath(): String? = findAllGnStoragePaths().firstOrNull()
 
-    fun findAllGnStoragePaths(): List<String> {
+    actual fun findAllGnStoragePaths(): List<String> {
         val primary = Environment.getExternalStorageDirectory().absolutePath
         val removables = storageVolumeDetector.detectStorageVolumes().map { it.path }
         val roots = (removables + primary).distinct()
@@ -187,11 +179,11 @@ class SteamPathResolver @Inject constructor(
         return results.distinct()
     }
 
-    fun sanitizeGameName(name: String): String {
+    actual fun sanitizeGameName(name: String): String {
         return name.replace(Regex("[<>:\"/\\\\|?*]"), "_").trim()
     }
 
-    fun getAvailableBytes(dir: File): Long? {
+    actual fun getAvailableBytes(dir: File): Long? {
         return try {
             var check: File? = dir
             while (check != null) {
@@ -207,7 +199,7 @@ class SteamPathResolver @Inject constructor(
         }
     }
 
-    fun getDirectorySize(dir: File): Long {
+    actual fun getDirectorySize(dir: File): Long {
         if (!dir.exists()) return 0L
         var totalSize = 0L
         var fileCount = 0
@@ -225,7 +217,7 @@ class SteamPathResolver @Inject constructor(
         return totalSize
     }
 
-    fun moveDirectory(source: File, destination: File): Boolean {
+    actual fun moveDirectory(source: File, destination: File): Boolean {
         try {
             if (source.renameTo(destination)) {
                 Log.d(TAG, "Moved directory via rename")
@@ -274,7 +266,7 @@ class SteamPathResolver @Inject constructor(
         }
     }
 
-    fun getAvailableVolumes(): List<SteamInstallVolume> {
+    actual fun getAvailableVolumes(): List<SteamInstallVolume> {
         return storageVolumeDetector.detectStorageVolumes().map { vol ->
             val target = SteamInstallTarget.CustomVolume(vol.path)
             SteamInstallVolume(
