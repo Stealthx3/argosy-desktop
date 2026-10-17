@@ -73,7 +73,7 @@ def imports_used(header, text):
 
 
 def extract(source, new_name, names, widen):
-    path = ROOT / source
+    path = next((r / source for r in [ROOT] + SHARED_ROOTS if (r / source).exists()), ROOT / source)
     text = path.read_text()
     header, items, lines = parse(text)
     wanted = [it for it in items if it[0] in names]
@@ -84,8 +84,8 @@ def extract(source, new_name, names, widen):
         return
     if missing:
         sys.exit(f"{source}: not found as top-level declarations: {sorted(missing)}")
-    rel_target = target.relative_to(ROOT)
-    existing = [p for p in [target] + [r / rel_target for r in SHARED_ROOTS] if p.exists()]
+    rel_target = target.relative_to(next(r for r in [ROOT] + SHARED_ROOTS if path.is_relative_to(r)))
+    existing = [p for p in [ROOT / rel_target] + [r / rel_target for r in SHARED_ROOTS] if p.exists()]
     if existing and not REFRESH:
         sys.exit(f"{existing[0]} exists while {source} still holds {sorted(names)}; rerun with --refresh")
     for stale in existing:

@@ -1,13 +1,10 @@
 package com.nendo.argosy.ui.input
 
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
-import com.nendo.argosy.core.input.SoundType
 import com.nendo.argosy.data.preferences.MenuWrapMode
 
 @Stable
@@ -273,8 +270,6 @@ class InputDispatcher(
 val LocalInputDispatcher = staticCompositionLocalOf<InputDispatcher> {
     error("No InputDispatcher provided")
 }
-
-val LocalGamepadInputHandler = staticCompositionLocalOf<RawInputInterceptor?> { null }
 
 val LocalABIconsSwapped = staticCompositionLocalOf { false }
 

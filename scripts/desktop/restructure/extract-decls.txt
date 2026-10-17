@@ -9,3 +9,5 @@ ui/screens/library/LibraryViewModel.kt -> LibraryUiState.kt: FilterCategory Acti
 ui/theme/ThemeViewModel.kt -> ThemeState.kt: ThemeState
 ui/screens/common/GameLaunchDelegate.kt -> LaunchStates.kt: HardcoreConflictChoice LocalModifiedChoice LaunchResultCallbacks SyncOverlayState DiscPickerState VariantPickerState MemcardPickerState
 ui/theme/CustomFonts.kt -> CustomFontLoader.kt: CustomFontLoader
+ui/input/GamepadInputHandler.kt -> GamepadEvents.kt: GamepadInput GamepadEvent mapKeycodeToGamepadEvent gamepadEventToKeyCode
+ui/input/InputDispatcher.kt -> GamepadInputLocals.kt: LocalGamepadInputHandler
