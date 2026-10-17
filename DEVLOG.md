@@ -506,3 +506,6 @@ The same rules as Phase 1 hold for anything that touches Android: scripted, re-r
 - **Detached from the orchestrator,** so finishing a turn no longer wakes a second large context.
 - **Quiet shell work.** Multi-step sequences go into one script; builds, tests and verification run through `scripts/desktop/quiet.sh` (full log on disk, summary printed); logs and large files are read by `grep` or line range.
 - `CLAUDE.md` now starts from the handoff and no longer carries the finished Phase 0 setup text (loaded into every session).
+
+**Rule (owner, 2026-10-17): one handoff file per phase.** `docs/desktop/HANDOFF.md` became `docs/desktop/handoff/phase-2.md`; `docs/desktop/handoff/README.md` names the current phase and lists every phase's file and status. Closed summaries were written for Phase 0 and Phase 1 (outcome, what carries forward, where the details are). At each phase end the closing file is rewritten as a closed summary and the next phase's file is created from its carried-forward items, in the phase-close commit. `CLAUDE.md` describes both.
+**Reasoning:** A session starting a new phase reads one short file per earlier phase instead of the long log, and each phase's state stays separate from the next.

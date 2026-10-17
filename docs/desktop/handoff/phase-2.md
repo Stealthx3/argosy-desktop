@@ -1,7 +1,8 @@
-# Handoff — read this first
+# Phase 2 · Desktop UI — handoff (current phase)
 
 Rewritten (not appended) at the end of every work unit, so a fresh session can start from it alone.
-History and reasoning live in `DEVLOG.md`; read only the parts this file points to.
+History and reasoning live in `DEVLOG.md`; read only the parts this file points to. Earlier phases:
+`phase-0.md`, `phase-1.md` (closed summaries; carried-forward items are listed there).
 
 **Updated:** 2026-10-17 (seeded by the orchestrator session when work units were introduced)
 
