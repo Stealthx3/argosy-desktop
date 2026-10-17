@@ -25,7 +25,7 @@ private const val CLOCK_DATE_PATTERN = "MMM d"
  * on the next display policy pass as one and the same value.
  */
 @Singleton
-class SystemSettings @Inject constructor(
+actual class SystemSettings @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
     private val maxBrightness: Int by lazy {
@@ -37,7 +37,7 @@ class SystemSettings @Inject constructor(
             .coerceIn(0, maxBrightness)
     }
 
-    fun screenBrightness(): Float? {
+    actual fun screenBrightness(): Float? {
         val stored = readBrightness() ?: return null
         return (stored.toFloat() / maxBrightness.toFloat()).coerceIn(0f, 1f)
     }
@@ -49,7 +49,7 @@ class SystemSettings @Inject constructor(
      * Returns false when neither the privileged settings channel nor the WRITE_SETTINGS
      * permission is available, leaving the current brightness untouched.
      */
-    fun setScreenBrightness(fraction: Float): Boolean {
+    actual fun setScreenBrightness(fraction: Float): Boolean {
         val value = brightnessValueFor(fraction.coerceIn(0f, 1f))
         return storeBrightnessPrivileged(value) || storeBrightnessDirect(value)
     }

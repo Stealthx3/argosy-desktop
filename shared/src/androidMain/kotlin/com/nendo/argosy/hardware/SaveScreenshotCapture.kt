@@ -18,22 +18,22 @@ import javax.inject.Singleton
  * else not at all.
  */
 @Singleton
-class SaveScreenshotCapture @Inject constructor(
+actual class SaveScreenshotCapture @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
     private val dir: File get() = File(context.filesDir, DIR).apply { mkdirs() }
 
-    fun fileFor(gameId: Long): File = File(dir, "$gameId$EXTENSION")
+    actual fun fileFor(gameId: Long): File = File(dir, "$gameId$EXTENSION")
 
     /**
      * The screenshot taken for [gameId]'s save, when one was captured within [maxAgeMs].
      */
-    fun recentFor(gameId: Long, maxAgeMs: Long = MAX_AGE_MS): File? =
+    actual fun recentFor(gameId: Long, maxAgeMs: Long): File? =
         fileFor(gameId).takeIf {
             it.isFile && it.length() > 0 && System.currentTimeMillis() - it.lastModified() <= maxAgeMs
         }
 
-    suspend fun capture(gameId: Long, displayId: Int): Boolean = withContext(Dispatchers.IO) {
+    actual suspend fun capture(gameId: Long, displayId: Int): Boolean = withContext(Dispatchers.IO) {
         val bitmap = FocusAccessibilityService.instance?.captureDisplay(displayId) ?: rootCapture(displayId)
         if (bitmap == null) {
             Logger.debug(TAG, "No screenshot for game $gameId: no silent capture route on display $displayId")
@@ -42,7 +42,7 @@ class SaveScreenshotCapture @Inject constructor(
         store(gameId, bitmap).also { bitmap.recycle() }
     }
 
-    fun store(gameId: Long, frame: Bitmap): Boolean {
+    actual fun store(gameId: Long, frame: Bitmap): Boolean {
         val scaled = scale(frame)
         val written = writeJpeg(fileFor(gameId), scaled)
         if (scaled !== frame) scaled.recycle()
@@ -54,10 +54,10 @@ class SaveScreenshotCapture @Inject constructor(
      * The frame kept locally for [snapshotId] after this device pushed it, so the snapshot view
      * shows it without fetching from the server.
      */
-    fun snapshotThumbFor(snapshotId: Long): File? =
+    actual fun snapshotThumbFor(snapshotId: Long): File? =
         File(snapshotDir, "$snapshotId$EXTENSION").takeIf { it.isFile && it.length() > 0 }
 
-    fun keepForSnapshot(snapshotId: Long, frame: File): Boolean {
+    actual fun keepForSnapshot(snapshotId: Long, frame: File): Boolean {
         val bitmap = BitmapFactory.decodeFile(frame.absolutePath)
         if (bitmap == null) {
             Logger.warn(TAG, "Snapshot $snapshotId frame unreadable: ${frame.name}")
@@ -71,7 +71,7 @@ class SaveScreenshotCapture @Inject constructor(
         return written
     }
 
-    fun carrySnapshotThumb(fromSnapshotId: Long, toSnapshotId: Long) {
+    actual fun carrySnapshotThumb(fromSnapshotId: Long, toSnapshotId: Long) {
         val source = snapshotThumbFor(fromSnapshotId) ?: return
         writeAtomically(File(snapshotDir, "$toSnapshotId$EXTENSION")) { temp -> source.copyTo(temp, overwrite = true) }
         pruneSnapshotThumbs()

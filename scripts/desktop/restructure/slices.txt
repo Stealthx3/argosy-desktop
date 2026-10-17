@@ -3,3 +3,15 @@
 #   <file under shared androidMain>: <Class>(<member>: <return type>, ...)
 # The optional list gives return types the generator cannot infer (expression bodies).
 data/cache/ImageCacheManager.kt: ImageCacheManager(clearCache: Unit, migrateLegacyCacheDirs: Unit)
+util/PServerExecutor.kt: PServerExecutor
+util/RootShell.kt: RootShell
+util/SystemSettings.kt: SystemSettings
+data/storage/AndroidDataMirror.kt: AndroidDataMirror
+data/storage/AndroidDataAccessor.kt: AndroidDataAccessor
+data/repository/AppsRepository.kt: AppsRepository
+data/emulator/EmulatorDetector.kt: EmulatorDetector
+libretro/LibretroCoreManager.kt: LibretroCoreManager(blockInstalledVersion: Unit)
+data/quaypass/QuayPassKeystore.kt: QuayPassKeystore
+data/platform/InstalledAppResolver.kt: InstalledAppResolver
+data/titledb/RequestSigner.kt: RequestSigner
+hardware/SaveScreenshotCapture.kt: SaveScreenshotCapture

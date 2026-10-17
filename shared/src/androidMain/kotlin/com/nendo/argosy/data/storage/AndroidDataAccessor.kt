@@ -4,7 +4,7 @@ import android.content.Context
 import android.os.Build
 import android.os.Environment
 import android.system.Os
-import com.nendo.argosy.BuildConfig
+import com.nendo.argosy.config.AppBuildConfig as BuildConfig
 import com.nendo.argosy.util.Logger
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
@@ -14,7 +14,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class AndroidDataAccessor @Inject constructor(
+actual class AndroidDataAccessor @Inject constructor(
     @ApplicationContext private val context: Context,
     private val mirror: AndroidDataMirror,
     private val volumeDetector: StorageVolumeDetector
@@ -37,11 +37,11 @@ class AndroidDataAccessor @Inject constructor(
     @Volatile
     private var altPathSupported: Boolean? = null
 
-    fun resetAltAccessCache() {
+    actual fun resetAltAccessCache() {
         altPathSupported = null
     }
 
-    fun isAltAccessSupported(): Boolean {
+    actual fun isAltAccessSupported(): Boolean {
         if (mirror.isActive) return true
         if (ALT_PATH == null) return false
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return false
@@ -67,7 +67,7 @@ class AndroidDataAccessor @Inject constructor(
         }
     }
 
-    fun getAllStorageRoots(): List<String> {
+    actual fun getAllStorageRoots(): List<String> {
         val roots = mutableListOf(Environment.getExternalStorageDirectory().absolutePath)
         volumeDetector.volumeRootPaths().forEach { path ->
             if (path !in roots) roots.add(path)
@@ -120,12 +120,12 @@ class AndroidDataAccessor @Inject constructor(
      * Reconciles the mirrored copies of [paths] with the real folders now and reports whether every
      * copy succeeded. Null when Android/data is not mirrored on this device.
      */
-    fun syncMirror(paths: Collection<String>): Boolean? {
+    actual fun syncMirror(paths: Collection<String>): Boolean? {
         if (!mirror.isActive) return null
         return mirror.sync(paths.map { mirror.realPathOf(it) ?: it })
     }
 
-    fun transformPath(path: String): String {
+    actual fun transformPath(path: String): String {
         if (mirror.isActive) {
             if (mirror.isMirrorPath(path)) {
                 mirror.realPathOf(path)?.let { mirror.mirrorPathFor(it) }
@@ -143,13 +143,13 @@ class AndroidDataAccessor @Inject constructor(
         return path.replaceFirst(ANDROID_PATH, altPath)
     }
 
-    fun normalizePathForDisplay(path: String): String {
+    actual fun normalizePathForDisplay(path: String): String {
         mirror.realPathOf(path)?.let { return it }
         val altPath = ALT_PATH ?: return path
         return path.replace(altPath, ANDROID_PATH)
     }
 
-    fun isRestrictedAndroidPath(path: String): Boolean {
+    actual fun isRestrictedAndroidPath(path: String): Boolean {
         val altPath = ALT_PATH
         return path.contains("/Android/data/") ||
             path.contains("/Android/obb/") ||
@@ -158,32 +158,32 @@ class AndroidDataAccessor @Inject constructor(
             (altPath != null && path.contains(altPath))
     }
 
-    fun listFiles(path: String): Array<File>? {
+    actual fun listFiles(path: String): Array<File>? {
         val transformedPath = transformPath(path)
         val dir = File(transformedPath)
         return if (dir.exists() && dir.isDirectory) dir.listFiles() else null
     }
 
-    fun exists(path: String): Boolean {
+    actual fun exists(path: String): Boolean {
         return File(transformPath(path)).exists()
     }
 
-    fun canRead(path: String): Boolean {
+    actual fun canRead(path: String): Boolean {
         return File(transformPath(path)).canRead()
     }
 
-    fun canWrite(path: String): Boolean {
+    actual fun canWrite(path: String): Boolean {
         return File(transformPath(path)).canWrite()
     }
 
-    fun readBytes(path: String): ByteArray? {
+    actual fun readBytes(path: String): ByteArray? {
         val file = File(transformPath(path))
         return if (file.exists() && file.canRead()) {
             try { file.readBytes() } catch (e: Exception) { null }
         } else null
     }
 
-    fun writeBytes(path: String, data: ByteArray): Boolean {
+    actual fun writeBytes(path: String, data: ByteArray): Boolean {
         return try {
             val file = File(transformPath(path))
             file.parentFile?.mkdirs()
@@ -192,11 +192,11 @@ class AndroidDataAccessor @Inject constructor(
         } catch (e: Exception) { false }
     }
 
-    fun delete(path: String): Boolean {
+    actual fun delete(path: String): Boolean {
         return try { File(transformPath(path)).delete() } catch (e: Exception) { false }
     }
 
-    fun deleteRecursively(path: String): Boolean {
+    actual fun deleteRecursively(path: String): Boolean {
         return try { File(transformPath(path)).deleteRecursively() } catch (e: Exception) { false }
     }
 
@@ -204,18 +204,18 @@ class AndroidDataAccessor @Inject constructor(
      * Get a File object with the transformed path.
      * Use this when you need direct File access.
      */
-    fun getFile(path: String): File {
+    actual fun getFile(path: String): File {
         return File(transformPath(path))
     }
 
-    fun getInputStream(path: String): InputStream? {
+    actual fun getInputStream(path: String): InputStream? {
         val file = File(transformPath(path))
         return if (file.exists() && file.canRead()) {
             try { file.inputStream() } catch (e: Exception) { null }
         } else null
     }
 
-    fun getOutputStream(path: String): OutputStream? {
+    actual fun getOutputStream(path: String): OutputStream? {
         val transformedPath = transformPath(path)
         return try {
             val file = File(transformedPath)
@@ -227,21 +227,21 @@ class AndroidDataAccessor @Inject constructor(
         }
     }
 
-    fun lastModified(path: String): Long =
+    actual fun lastModified(path: String): Long =
         File(path).takeIf { it.exists() }?.lastModified() ?: File(transformPath(path)).lastModified()
 
-    fun length(path: String): Long =
+    actual fun length(path: String): Long =
         File(path).takeIf { it.exists() }?.length() ?: File(transformPath(path)).length()
 
-    fun isDirectory(path: String): Boolean {
+    actual fun isDirectory(path: String): Boolean {
         return File(transformPath(path)).isDirectory
     }
 
-    fun isFile(path: String): Boolean {
+    actual fun isFile(path: String): Boolean {
         return File(transformPath(path)).isFile
     }
 
-    fun mkdirs(path: String): Boolean {
+    actual fun mkdirs(path: String): Boolean {
         val file = File(transformPath(path))
         return try { file.mkdirs() || file.exists() } catch (e: Exception) { false }
     }
@@ -249,11 +249,11 @@ class AndroidDataAccessor @Inject constructor(
     /**
      * Walk directory tree, yielding all files and directories.
      */
-    fun walk(path: String): Sequence<File> {
+    actual fun walk(path: String): Sequence<File> {
         return File(transformPath(path)).walkTopDown()
     }
 
-    fun copyFile(sourcePath: String, destPath: String): Boolean {
+    actual fun copyFile(sourcePath: String, destPath: String): Boolean {
         return try {
             val sourceFile = File(transformPath(sourcePath))
             val destFile = File(transformPath(destPath))
@@ -263,13 +263,13 @@ class AndroidDataAccessor @Inject constructor(
         } catch (e: Exception) { false }
     }
 
-    fun copyDirectory(sourcePath: String, destPath: String): Boolean {
+    actual fun copyDirectory(sourcePath: String, destPath: String): Boolean {
         return try {
             File(transformPath(sourcePath)).copyRecursively(File(transformPath(destPath)), overwrite = true)
         } catch (e: Exception) { false }
     }
 
-    fun moveDirectory(sourcePath: String, destPath: String): Boolean {
+    actual fun moveDirectory(sourcePath: String, destPath: String): Boolean {
         val sourceDir = File(sourcePath)
         val destDir = File(transformPath(destPath))
 

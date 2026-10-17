@@ -30,22 +30,16 @@ fun getSharedEmulatorDetector(context: Context): EmulatorDetector =
     EntryPointAccessors.fromApplication(context.applicationContext, EmulatorDetectorEntryPoint::class.java)
         .emulatorDetector()
 
-data class InstalledEmulator(
-    val def: EmulatorDef,
-    val versionName: String?,
-    val versionCode: Long
-)
-
 @Singleton
-class EmulatorDetector @Inject constructor(
+actual class EmulatorDetector @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
     private val _installedEmulators = MutableStateFlow<List<InstalledEmulator>>(emptyList())
-    val installedEmulators: StateFlow<List<InstalledEmulator>> = _installedEmulators.asStateFlow()
+    actual val installedEmulators: StateFlow<List<InstalledEmulator>> = _installedEmulators.asStateFlow()
 
     private val packageManager: PackageManager = context.packageManager
 
-    suspend fun detectEmulators(): List<InstalledEmulator> = withContext(Dispatchers.IO) {
+    actual suspend fun detectEmulators(): List<InstalledEmulator> = withContext(Dispatchers.IO) {
         val installed = mutableListOf<InstalledEmulator>()
         val detectedPackages = mutableSetOf<String>()
 
@@ -163,7 +157,7 @@ class EmulatorDetector @Inject constructor(
         )
     }
 
-    fun isInstalled(packageName: String): Boolean {
+    actual fun isInstalled(packageName: String): Boolean {
         return try {
             packageManager.getPackageInfo(packageName, 0)
             true
@@ -172,12 +166,12 @@ class EmulatorDetector @Inject constructor(
         }
     }
 
-    fun getInstalledForPlatform(platformId: String): List<InstalledEmulator> {
+    actual fun getInstalledForPlatform(platformId: String): List<InstalledEmulator> {
         val canonical = PlatformDefinitions.getCanonicalSlug(platformId)
         return _installedEmulators.value.filter { canonical in it.def.supportedPlatforms }
     }
 
-    fun getPreferredEmulator(platformId: String, builtinEnabled: Boolean = true): InstalledEmulator? {
+    actual fun getPreferredEmulator(platformId: String, builtinEnabled: Boolean): InstalledEmulator? {
         val canonical = PlatformDefinitions.getCanonicalSlug(platformId)
         val installed = getInstalledForPlatform(canonical).let { list ->
             if (builtinEnabled) list else list.filterNot { it.def.id == EmulatorRegistry.BUILTIN_ID }
@@ -198,12 +192,12 @@ class EmulatorDetector @Inject constructor(
         return standalone.firstOrNull() ?: installed.first()
     }
 
-    fun hasAnyEmulator(platformId: String): Boolean {
+    actual fun hasAnyEmulator(platformId: String): Boolean {
         val canonical = PlatformDefinitions.getCanonicalSlug(platformId)
         return _installedEmulators.value.any { canonical in it.def.supportedPlatforms }
     }
 
-    fun getByPackage(packageName: String): EmulatorDef? {
+    actual fun getByPackage(packageName: String): EmulatorDef? {
         EmulatorRegistry.getByPackage(packageName)?.let { return it }
 
         _installedEmulators.value

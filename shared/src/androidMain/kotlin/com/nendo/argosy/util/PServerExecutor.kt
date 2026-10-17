@@ -4,7 +4,7 @@ import android.os.IBinder
 import android.os.Parcel
 import java.nio.charset.Charset
 
-object PServerExecutor {
+actual object PServerExecutor {
 
     private val binder: IBinder? by lazy {
         runCatching {
@@ -14,10 +14,10 @@ object PServerExecutor {
         }.getOrNull()
     }
 
-    val isAvailable: Boolean
+    actual val isAvailable: Boolean
         get() = binder != null
 
-    fun execute(cmd: String): Result<String?> {
+    actual fun execute(cmd: String): Result<String?> {
         val b = binder ?: return Result.failure(IllegalStateException("PServerBinder not available"))
 
         val data = Parcel.obtain()
@@ -38,27 +38,27 @@ object PServerExecutor {
         }
     }
 
-    fun getSystemSetting(key: String, default: Int): Int {
+    actual fun getSystemSetting(key: String, default: Int): Int {
         return execute("settings get system $key")
             .mapCatching { it?.toIntOrNull() ?: default }
             .getOrDefault(default)
     }
 
-    fun setSystemSetting(key: String, value: Int): Boolean {
+    actual fun setSystemSetting(key: String, value: Int): Boolean {
         return execute("settings put system $key $value").isSuccess
     }
 
-    fun setSystemSetting(key: String, value: String): Boolean {
+    actual fun setSystemSetting(key: String, value: String): Boolean {
         return execute("settings put system $key '$value'").isSuccess
     }
 
-    fun getSystemSettingFloat(key: String, default: Float): Float {
+    actual fun getSystemSettingFloat(key: String, default: Float): Float {
         return execute("settings get system $key")
             .mapCatching { it?.toFloatOrNull() ?: default }
             .getOrDefault(default)
     }
 
-    fun setSystemSettingFloat(key: String, value: Float): Boolean {
+    actual fun setSystemSettingFloat(key: String, value: Float): Boolean {
         return execute("settings put system $key $value").isSuccess
     }
 }

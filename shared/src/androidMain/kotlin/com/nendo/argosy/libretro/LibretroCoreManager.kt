@@ -27,7 +27,7 @@ private const val TAG = "LibretroCoreManager"
 private const val CORE_HISTORY_LIMIT = 10
 
 @Singleton
-class LibretroCoreManager @Inject constructor(
+actual class LibretroCoreManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val coreVersionDao: CoreVersionDao,
     private val coreVersionHistoryDao: CoreVersionHistoryDao,
@@ -45,7 +45,7 @@ class LibretroCoreManager @Inject constructor(
         Log.i(TAG, "Buildbot URL: ${LibretroBuildbot.baseUrl}")
     }
 
-    suspend fun migrateAbiIfNeeded() {
+    actual suspend fun migrateAbiIfNeeded() {
         val storedAbi = if (abiMarkerFile.exists()) abiMarkerFile.readText().trim() else null
         val currentAbi = LibretroBuildbot.deviceAbi
 
@@ -60,10 +60,10 @@ class LibretroCoreManager @Inject constructor(
         }
     }
 
-    fun getCorePathForPlatform(platformSlug: String): String? =
+    actual fun getCorePathForPlatform(platformSlug: String): String? =
         getCorePathForPlatform(platformSlug, null)
 
-    fun getCorePathForPlatform(platformSlug: String, selectedCoreId: String?): String? {
+    actual fun getCorePathForPlatform(platformSlug: String, selectedCoreId: String?): String? {
         val coreInfo = resolveCoreForPlatform(platformSlug, selectedCoreId) ?: return null
         return getCorePath(coreInfo.fileName)
     }
@@ -96,49 +96,48 @@ class LibretroCoreManager @Inject constructor(
         )
     }
 
-    fun getCorePathForCoreId(coreId: String): String? {
+    actual fun getCorePathForCoreId(coreId: String): String? {
         val coreInfo = LibretroCoreRegistry.getCoreById(coreId) ?: return null
         return getCorePath(coreInfo.fileName)
     }
 
-    fun isCoreAvailable(platformSlug: String): Boolean =
+    actual fun isCoreAvailable(platformSlug: String): Boolean =
         getCorePathForPlatform(platformSlug) != null
 
-    fun isCoreInstalled(coreId: String): Boolean {
+    actual fun isCoreInstalled(coreId: String): Boolean {
         val coreInfo = LibretroCoreRegistry.getCoreById(coreId) ?: return false
         return getCorePath(coreInfo.fileName) != null
     }
 
-    fun isPlatformSupported(platformSlug: String): Boolean =
+    actual fun isPlatformSupported(platformSlug: String): Boolean =
         LibretroCoreRegistry.isPlatformSupported(platformSlug)
 
-    fun getInstalledCores(): List<LibretroCoreRegistry.CoreInfo> {
+    actual fun getInstalledCores(): List<LibretroCoreRegistry.CoreInfo> {
         val downloadedFiles = downloadedCoresDir.listFiles()?.map { it.name }?.toSet() ?: emptySet()
         return LibretroCoreRegistry.getAllCores().filter { core ->
             core.fileName in downloadedFiles || File(nativeLibDir, "lib${core.fileName}").exists()
         }
     }
 
-    fun getMissingCoresForPlatforms(platformSlugs: Set<String>): List<LibretroCoreRegistry.CoreInfo> {
+    actual fun getMissingCoresForPlatforms(platformSlugs: Set<String>): List<LibretroCoreRegistry.CoreInfo> {
         val neededCores = platformSlugs.mapNotNull { LibretroCoreRegistry.getDefaultCoreForPlatform(it) }
             .distinctBy { it.coreId }
         return neededCores.filter { !isCoreInstalled(it.coreId) }
     }
 
-    suspend fun downloadCoreForPlatform(platformSlug: String): Result<String> =
+    actual suspend fun downloadCoreForPlatform(platformSlug: String): Result<String> =
         downloadCoreForPlatform(platformSlug, null)
 
-    suspend fun downloadCoreForPlatform(
+    actual suspend fun downloadCoreForPlatform(
         platformSlug: String,
         selectedCoreId: String?,
-        onProgress: ((Float) -> Unit)? = null
-    ): Result<String> {
+        onProgress: ((Float) -> Unit)?): Result<String> {
         val coreInfo = resolveCoreForPlatform(platformSlug, selectedCoreId)
             ?: return Result.failure(IllegalArgumentException("No core registered for platform $platformSlug"))
         return downloadCore(coreInfo, onProgress).map { it.absolutePath }
     }
 
-    suspend fun downloadCoreById(coreId: String): Result<File> {
+    actual suspend fun downloadCoreById(coreId: String): Result<File> {
         val coreInfo = LibretroCoreRegistry.getCoreById(coreId)
             ?: return Result.failure(IllegalArgumentException("Unknown core: $coreId"))
         return downloadCore(coreInfo)
@@ -177,10 +176,9 @@ class LibretroCoreManager @Inject constructor(
         }
     }
 
-    suspend fun downloadCore(
+    actual suspend fun downloadCore(
         coreInfo: LibretroCoreRegistry.CoreInfo,
-        onProgress: ((Float) -> Unit)? = null
-    ): Result<File> =
+        onProgress: ((Float) -> Unit)?): Result<File> =
         withContext(Dispatchers.IO) {
             runCatching {
                 val targetFile = File(downloadedCoresDir, coreInfo.fileName)
@@ -282,7 +280,7 @@ class LibretroCoreManager @Inject constructor(
             }
         }
 
-    suspend fun resolveNetplayCorePath(coreId: String, hostCoreHash: String): NetplayCoreResolution {
+    actual suspend fun resolveNetplayCorePath(coreId: String, hostCoreHash: String): NetplayCoreResolution {
         val currentPath = getCorePathForCoreId(coreId)
         if (currentPath != null) {
             val currentHash = computeFileHash(File(currentPath))
@@ -338,10 +336,10 @@ class LibretroCoreManager @Inject constructor(
         attributionRepository.markDirty(StorageCategory.CORES_SYSTEM)
     }
 
-    suspend fun getCoreHistory(coreId: String): List<CoreVersionHistoryEntity> =
+    actual suspend fun getCoreHistory(coreId: String): List<CoreVersionHistoryEntity> =
         withContext(Dispatchers.IO) { coreVersionHistoryDao.getByCore(coreId) }
 
-    suspend fun rollbackToHistory(coreId: String, history: CoreVersionHistoryEntity): Boolean =
+    actual suspend fun rollbackToHistory(coreId: String, history: CoreVersionHistoryEntity): Boolean =
         withContext(Dispatchers.IO) {
             val coreInfo = LibretroCoreRegistry.getCoreById(coreId) ?: return@withContext false
             val archived = File(File(coreHistoryDir, coreId), history.fileName)
@@ -368,12 +366,12 @@ class LibretroCoreManager @Inject constructor(
             true
         }
 
-    suspend fun blockInstalledVersion(coreId: String) = withContext(Dispatchers.IO) {
+    actual suspend fun blockInstalledVersion(coreId: String) = withContext(Dispatchers.IO) {
         val installed = coreVersionDao.getByCoreId(coreId)?.installedVersion ?: return@withContext
         coreVersionDao.setBlockedVersion(coreId, installed)
     }
 
-    suspend fun verifyDownloadedCore(coreInfo: LibretroCoreRegistry.CoreInfo): Boolean? =
+    actual suspend fun verifyDownloadedCore(coreInfo: LibretroCoreRegistry.CoreInfo): Boolean? =
         withContext(Dispatchers.IO) {
             val file = File(downloadedCoresDir, coreInfo.fileName)
             if (!file.exists()) return@withContext null
@@ -399,12 +397,12 @@ class LibretroCoreManager @Inject constructor(
     private val systemDir: File
         get() = AppPaths.libretroSystemDir(context.filesDir).apply { mkdirs() }
 
-    fun getDownloadedCores(): List<LibretroCoreRegistry.CoreInfo> {
+    actual fun getDownloadedCores(): List<LibretroCoreRegistry.CoreInfo> {
         val downloadedFiles = downloadedCoresDir.listFiles()?.map { it.name }?.toSet() ?: emptySet()
         return downloadedFiles.mapNotNull { LibretroCoreRegistry.getCoreByFileName(it) }
     }
 
-    suspend fun deleteCore(coreId: String): Boolean {
+    actual suspend fun deleteCore(coreId: String): Boolean {
         val coreInfo = LibretroCoreRegistry.getCoreById(coreId) ?: return false
         val deleted = File(downloadedCoresDir, coreInfo.fileName).delete()
         if (deleted) {
@@ -414,9 +412,9 @@ class LibretroCoreManager @Inject constructor(
         return deleted
     }
 
-    fun getCoresDir(): File = downloadedCoresDir
+    actual fun getCoresDir(): File = downloadedCoresDir
 
-    suspend fun getPendingCoreUpdates(): List<PendingCoreUpdate> =
+    actual suspend fun getPendingCoreUpdates(): List<PendingCoreUpdate> =
         withContext(Dispatchers.IO) {
             coreVersionDao.getWithUpdatesAvailable().mapNotNull(::pendingUpdateOf)
         }
@@ -426,7 +424,7 @@ class LibretroCoreManager @Inject constructor(
      * [onCoreStarted] receives each core with its 1-based position and the total before its
      * download begins.
      */
-    suspend fun updateInstalledCores(
+    actual suspend fun updateInstalledCores(
         onCoreStarted: (core: LibretroCoreRegistry.CoreInfo, position: Int, total: Int) -> Unit
     ): CoreBulkUpdateResult {
         val pending = getPendingCoreUpdates().map { it.coreInfo }
@@ -471,14 +469,3 @@ class LibretroCoreManager @Inject constructor(
         }
     }
 }
-
-data class PendingCoreUpdate(
-    val coreInfo: LibretroCoreRegistry.CoreInfo,
-    val installedVersion: String,
-    val latestVersion: String
-)
-
-data class CoreBulkUpdateResult(
-    val updated: List<LibretroCoreRegistry.CoreInfo>,
-    val failed: List<LibretroCoreRegistry.CoreInfo>
-)

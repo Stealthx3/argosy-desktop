@@ -16,13 +16,6 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
-data class InstalledApp(
-    val packageName: String,
-    val label: String,
-    val isSystemApp: Boolean,
-    val declaresGameCategory: Boolean = false
-)
-
 /**
  * Whether the package itself claims to be a game.
  *
@@ -38,12 +31,12 @@ private fun ApplicationInfo.declaresGameCategory(): Boolean {
 }
 
 @Singleton
-class AppsRepository @Inject constructor(
+actual class AppsRepository @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
     private val packageManager: PackageManager = context.packageManager
 
-    val packageChanges: Flow<String> = callbackFlow {
+    actual val packageChanges: Flow<String> = callbackFlow {
         val receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 intent?.data?.schemeSpecificPart?.let { trySend(it) }
@@ -70,7 +63,7 @@ class AppsRepository @Inject constructor(
         }
     }
 
-    suspend fun getInstalledApps(includeSystemApps: Boolean = false): List<InstalledApp> = withContext(Dispatchers.IO) {
+    actual suspend fun getInstalledApps(includeSystemApps: Boolean): List<InstalledApp> = withContext(Dispatchers.IO) {
         val launcherIntent = Intent(Intent.ACTION_MAIN).apply {
             addCategory(Intent.CATEGORY_LAUNCHER)
         }
@@ -100,7 +93,7 @@ class AppsRepository @Inject constructor(
         return packageManager.getLaunchIntentForPackage(packageName)
     }
 
-    fun getAppLabel(packageName: String): String? = runCatching {
+    actual fun getAppLabel(packageName: String): String? = runCatching {
         packageManager.getApplicationLabel(
             packageManager.getApplicationInfo(packageName, 0)
         ).toString()
@@ -116,7 +109,7 @@ class AppsRepository @Inject constructor(
      * is running on, which ends the session that opened the drawer. That is a reason to demote
      * them, not to make them unreachable.
      */
-    fun isArgosy(packageName: String): Boolean =
+    actual fun isArgosy(packageName: String): Boolean =
         packageName == context.packageName ||
             packageName == ARGOSY_BASE_PACKAGE ||
             packageName.startsWith("$ARGOSY_BASE_PACKAGE.")

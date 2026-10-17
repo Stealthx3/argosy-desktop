@@ -20,7 +20,7 @@ import javax.inject.Singleton
  * changes into the copy and Argosy's changes out to the real folder.
  */
 @Singleton
-class AndroidDataMirror @Inject constructor(
+actual class AndroidDataMirror @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
     data class Entry(val isDirectory: Boolean, val size: Long, val mtimeSec: Long)
@@ -39,7 +39,7 @@ class AndroidDataMirror @Inject constructor(
     private val syncedAt = ConcurrentHashMap<String, Long>()
     private val lock = Any()
 
-    val isActive: Boolean by lazy {
+    actual val isActive: Boolean by lazy {
         val active = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
             !processHasGroup(EXT_DATA_RW_GID) &&
             RootShell.isAvailable
@@ -51,9 +51,9 @@ class AndroidDataMirror @Inject constructor(
         active
     }
 
-    fun isMirrorPath(path: String): Boolean = path.startsWith(root.absolutePath + "/")
+    actual fun isMirrorPath(path: String): Boolean = path.startsWith(root.absolutePath + "/")
 
-    fun realPathOf(mirrorPath: String): String? {
+    actual fun realPathOf(mirrorPath: String): String? {
         if (!isMirrorPath(mirrorPath)) return null
         val rest = mirrorPath.removePrefix(root.absolutePath + "/")
         val user = rest.substringBefore('/')
@@ -64,7 +64,7 @@ class AndroidDataMirror @Inject constructor(
      * The copy's path for [path], synced first unless synced within the last few seconds. Null
      * when [path] is outside internal Android/data and obb, or when the real folder is unreadable.
      */
-    fun mirrorPathFor(path: String): String? {
+    actual fun mirrorPathFor(path: String): String? {
         val key = lowerOf(path) ?: return null
         if (Looper.myLooper() != Looper.getMainLooper() && !ensureFresh(key)) return null
         return mirrorOf(key)
@@ -75,7 +75,7 @@ class AndroidDataMirror @Inject constructor(
      * its whole tree; a file path syncs its containing folder. False when any folder could not be
      * read or any copy in either direction failed.
      */
-    fun sync(paths: Collection<String>): Boolean =
+    actual fun sync(paths: Collection<String>): Boolean =
         paths.mapNotNull(::lowerOf).distinct().map { key ->
             val parentOk = parentScope(key)?.let { syncScope(it, recursive = false) } ?: true
             val treeOk = if (File(mirrorOf(key)).isDirectory) {

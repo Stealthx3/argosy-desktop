@@ -3,7 +3,7 @@ package com.nendo.argosy.data.titledb
 import android.content.Context
 import android.os.Build
 import android.provider.Settings
-import com.nendo.argosy.BuildConfig
+import com.nendo.argosy.config.AppBuildConfig as BuildConfig
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.net.URLEncoder
 import javax.crypto.Mac
@@ -12,7 +12,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class RequestSigner @Inject constructor(
+actual class RequestSigner @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
     private val secret: String = BuildConfig.TITLEDB_API_SECRET
@@ -42,7 +42,7 @@ class RequestSigner @Inject constructor(
         )
     }
 
-    fun isConfigured(): Boolean = secret.isNotBlank()
+    actual fun isConfigured(): Boolean = secret.isNotBlank()
 
     private fun collectFingerprint(): String {
         return listOf(

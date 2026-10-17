@@ -728,3 +728,19 @@
 + ui/common/InstallerVariantUi.kt
 + ui/deeplink/DeepLinkParser.kt
 + ui/screens/gamedetail/modals/CorePickerModal.kt
+
+# Phase 2: Android platform services kept as Android code, seen by commonMain through slices.txt.
+[androidMain]
++ util/PServerExecutor.kt
++ util/RootShell.kt
++ util/SystemSettings.kt
++ data/storage/AndroidDataMirror.kt
++ data/storage/AndroidDataAccessor.kt
++ data/repository/AppsRepository.kt
++ data/emulator/EmulatorDetector.kt
++ libretro/LibretroCoreManager.kt
++ data/quaypass/QuayPassKeystore.kt
++ data/platform/InstalledAppResolver.kt
++ data/titledb/RequestSigner.kt
++ hardware/FocusAccessibilityService.kt
++ hardware/SaveScreenshotCapture.kt

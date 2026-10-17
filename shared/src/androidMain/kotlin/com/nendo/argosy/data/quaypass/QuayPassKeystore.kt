@@ -24,12 +24,12 @@ import javax.inject.Singleton
  * other account's.
  */
 @Singleton
-class QuayPassKeystore @Inject constructor(
+actual class QuayPassKeystore @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
 
-    enum class KeyBacking { STRONGBOX, TEE, SOFTWARE, UNKNOWN }
-    enum class Algorithm { ED25519, EC_P256 }
+    actual enum class KeyBacking { STRONGBOX, TEE, SOFTWARE, UNKNOWN }
+    actual enum class Algorithm { ED25519, EC_P256 }
 
     data class KeyInfo(
         val publicKey: PublicKey,
@@ -56,7 +56,7 @@ class QuayPassKeystore @Inject constructor(
     /**
      * Signs with the install key; both algorithms return a fixed 64-byte signature.
      */
-    fun sign(data: ByteArray, alias: String): ByteArray {
+    actual fun sign(data: ByteArray, alias: String): ByteArray {
         val privateKey = getPrivateKey(alias)
         val info = getOrCreateKeyInfo(alias)
         val sigAlg = when (info.algorithm) {
@@ -78,7 +78,7 @@ class QuayPassKeystore @Inject constructor(
      * Ed25519 returns the raw 64-byte signature, EC P-256 returns ASN.1 DER
      * (no P1363 conversion). Used for the registration possession proof.
      */
-    fun signServerVerifiable(data: ByteArray, alias: String): ByteArray {
+    actual fun signServerVerifiable(data: ByteArray, alias: String): ByteArray {
         val privateKey = getPrivateKey(alias)
         val info = getOrCreateKeyInfo(alias)
         val sigAlg = when (info.algorithm) {
@@ -92,7 +92,7 @@ class QuayPassKeystore @Inject constructor(
     }
 
     @Synchronized
-    fun clear(alias: String) {
+    actual fun clear(alias: String) {
         try {
             val ks = openKeystore()
             if (ks.containsAlias(alias)) ks.deleteEntry(alias)
