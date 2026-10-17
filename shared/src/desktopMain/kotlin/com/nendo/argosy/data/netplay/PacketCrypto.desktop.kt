@@ -2,7 +2,7 @@ package com.nendo.argosy.data.netplay
 
 import javax.inject.Inject
 
-actual class PacketCrypto @Inject constructor() {
+actual class PacketCrypto @Inject constructor() : AutoCloseable {
     actual enum class Direction { HostToGuest, GuestToHost }
 
     actual companion object {
@@ -12,4 +12,7 @@ actual class PacketCrypto @Inject constructor() {
     actual fun encrypt(plaintext: ByteArray, direction: Direction): ByteArray = ByteArray(0)
 
     actual fun decrypt(wire: ByteArray, direction: Direction): ByteArray? = null
+
+    override fun close() {
+    }
 }

@@ -4,19 +4,19 @@ import android.os.Build
 import android.os.Process
 
 actual object PlatformBuild {
-    actual val MODEL: String get() = Build.MODEL
-    actual val MANUFACTURER: String get() = Build.MANUFACTURER
-    actual val BRAND: String get() = Build.BRAND
-    actual val DEVICE: String get() = Build.DEVICE
-    actual val PRODUCT: String get() = Build.PRODUCT
-    actual val BOARD: String get() = Build.BOARD
-    actual val FINGERPRINT: String get() = Build.FINGERPRINT
-    actual val SUPPORTED_64_BIT_ABIS: Array<String> get() = Build.SUPPORTED_64_BIT_ABIS
-    actual val SUPPORTED_32_BIT_ABIS: Array<String> get() = Build.SUPPORTED_32_BIT_ABIS
+    actual val MODEL: String get() = Build.MODEL.orEmpty()
+    actual val MANUFACTURER: String get() = Build.MANUFACTURER.orEmpty()
+    actual val BRAND: String get() = Build.BRAND.orEmpty()
+    actual val DEVICE: String get() = Build.DEVICE.orEmpty()
+    actual val PRODUCT: String get() = Build.PRODUCT.orEmpty()
+    actual val BOARD: String get() = Build.BOARD.orEmpty()
+    actual val FINGERPRINT: String get() = Build.FINGERPRINT.orEmpty()
+    actual val SUPPORTED_64_BIT_ABIS: Array<String> get() = Build.SUPPORTED_64_BIT_ABIS ?: emptyArray()
+    actual val SUPPORTED_32_BIT_ABIS: Array<String> get() = Build.SUPPORTED_32_BIT_ABIS ?: emptyArray()
 
     actual object VERSION {
         actual val SDK_INT: Int get() = Build.VERSION.SDK_INT
-        actual val RELEASE: String get() = Build.VERSION.RELEASE
+        actual val RELEASE: String get() = Build.VERSION.RELEASE.orEmpty()
     }
 
     actual object VERSION_CODES {

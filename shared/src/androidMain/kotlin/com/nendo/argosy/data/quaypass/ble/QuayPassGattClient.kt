@@ -18,7 +18,7 @@ import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
 import kotlin.coroutines.resume
 
-actual class QuayPassGattClient(private val application: Application) {
+actual class QuayPassGattClient actual constructor(private val application: Application) {
 
     private var currentGatt: BluetoothGatt? = null
 

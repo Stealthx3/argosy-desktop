@@ -1,6 +1,6 @@
 package com.nendo.argosy.data.repository
 
-import android.util.Log
+import com.nendo.argosy.util.PlatformLog as Log
 import com.nendo.argosy.data.local.dao.GameDao
 import com.nendo.argosy.data.social.ArgosSocialService
 import kotlinx.coroutines.Job

@@ -2,8 +2,8 @@ package com.nendo.argosy.ui.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.stringResource
-import com.nendo.argosy.R
+import com.nendo.argosy.res.stringResource
+import com.nendo.argosy.res.ArgosyR as R
 import androidx.compose.ui.Modifier
 import com.nendo.argosy.domain.model.CustomGridShape
 import com.nendo.argosy.domain.model.GRID_AXIS_STEPS

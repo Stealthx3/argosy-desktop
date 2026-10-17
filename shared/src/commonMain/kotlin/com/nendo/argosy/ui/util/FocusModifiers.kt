@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
+import com.nendo.argosy.platform.drawRoundRect
 import androidx.compose.ui.unit.Dp
 import com.nendo.argosy.ui.theme.Motion
 
@@ -26,9 +27,9 @@ fun Modifier.focusGlow(
             this.color = color
         }
         val frameworkPaint = paint.asFrameworkPaint().apply {
-            maskFilter = android.graphics.BlurMaskFilter(
+            maskFilter = com.nendo.argosy.platform.PlatformBlurMaskFilter(
                 blurRadius,
-                android.graphics.BlurMaskFilter.Blur.NORMAL
+                com.nendo.argosy.platform.PlatformBlur.NORMAL
             )
         }
         val radius = size.minDimension / 2

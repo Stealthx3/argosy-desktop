@@ -906,3 +906,23 @@
 + ui/input/UiShortcut.kt
 + ui/screens/settings/components/ControllerSeatController.kt
 + ui/screens/settings/components/MappingControllerTarget.kt
+
+# Phase 2: files freed by the graphics and Application stand-ins.
+[commonMain]
++ data/quaypass/QuayPassAvatarSyncCoordinator.kt
++ data/quaypass/QuayPassMessageSyncCoordinator.kt
++ data/quaypass/QuayPassWalletCoordinator.kt
++ data/repository/SteamIgdbResolver.kt
++ data/social/ArgosSocialService.kt
++ data/social/SocialAuthManager.kt
++ libretro/ui/cheats/AvailableTab.kt
++ libretro/ui/cheats/CheatsScreen.kt
++ libretro/ui/cheats/DiscoverTab.kt
++ ui/components/BoxArtFrame.kt
++ ui/components/ExpandablePreference.kt
++ ui/components/HomeLayoutSettingRows.kt
++ ui/components/MultiSelectPreference.kt
++ ui/components/PreferenceItem.kt
++ ui/screens/media/components/MediaCastRail.kt
++ ui/screens/settings/components/SyncFiltersModal.kt
++ ui/util/FocusModifiers.kt

@@ -18,10 +18,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusProperties
-import androidx.compose.ui.res.pluralStringResource
-import androidx.compose.ui.res.stringResource
+import com.nendo.argosy.res.pluralStringResource
+import com.nendo.argosy.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import com.nendo.argosy.R
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.libretro.scanner.MemoryMatch
 import com.nendo.argosy.ui.components.ActionPreference
 import com.nendo.argosy.ui.components.SliderPreference

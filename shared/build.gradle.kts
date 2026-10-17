@@ -183,12 +183,15 @@ tasks.matching { it.name.matches(Regex("ksp(Debug|Release)KotlinAndroid")) }.con
     doLast {
         outputs.files.asFileTree.matching { include("**/*.java") }.forEach { file ->
             val source = file.readText()
-            if ("com.nendo.argosy.platform.PlatformContext" !in source) return@forEach
+            if ("com.nendo.argosy.platform.Platform" !in source) return@forEach
             file.writeText(
                 source
                     .replace("import com.nendo.argosy.platform.PlatformContext;", "import android.content.Context;")
                     .replace(Regex("""\bcom\.nendo\.argosy\.platform\.PlatformContext\b"""), "android.content.Context")
                     .replace(Regex("""\bPlatformContext\b"""), "Context")
+                    .replace("import com.nendo.argosy.platform.PlatformApplication;", "import android.app.Application;")
+                    .replace(Regex("""\bcom\.nendo\.argosy\.platform\.PlatformApplication\b"""), "android.app.Application")
+                    .replace(Regex("""\bPlatformApplication\b"""), "Application")
             )
         }
     }
@@ -365,6 +368,7 @@ kotlin {
         androidMain.dependencies {
             implementation(project(":sigil"))
             implementation(project(":libretrodroid"))
+            implementation(project(":graphics-shim-android"))
             implementation(libs.work.runtime.ktx)
             implementation(libs.hilt.work)
             implementation("com.goterl:lazysodium-android:5.2.0@aar")
@@ -383,6 +387,7 @@ kotlin {
         getByName("desktopMain").dependencies {
             implementation(project(":sigil-jvm"))
             implementation(project(":libretrodroid-api"))
+            implementation(project(":graphics-shim-desktop"))
             implementation(libs.sqlite.bundled)
             implementation(libs.zstd.jni)
             implementation(libs.org.json)

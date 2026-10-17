@@ -1,9 +1,17 @@
 package com.nendo.argosy.data.social
 
-import android.app.Application
-import android.provider.Settings
-import android.util.Log
-import com.nendo.argosy.BuildConfig
+import com.nendo.argosy.platform.PlatformApplication as Application
+import com.nendo.argosy.platform.applicationContext
+import com.nendo.argosy.platform.cacheDir
+import com.nendo.argosy.platform.contentResolver
+import com.nendo.argosy.platform.filesDir
+import com.nendo.argosy.platform.getSharedPreferences
+import com.nendo.argosy.platform.getString
+import com.nendo.argosy.platform.packageName
+import com.nendo.argosy.platform.resources
+import com.nendo.argosy.platform.PlatformSettings as Settings
+import com.nendo.argosy.util.PlatformLog as Log
+import com.nendo.argosy.config.AppBuildConfig as BuildConfig
 import com.nendo.argosy.data.preferences.UserPreferencesRepository
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.CoroutineScope

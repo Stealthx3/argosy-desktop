@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.nativeCanvas
+import com.nendo.argosy.platform.drawRoundRect
 import androidx.compose.ui.graphics.toArgb
 import com.nendo.argosy.data.preferences.BoxArtBorderStyle
 import com.nendo.argosy.data.preferences.BoxArtOuterEffect
@@ -135,18 +136,18 @@ fun Modifier.boxArtFrame(
                         when (outerEffect) {
                             BoxArtOuterEffect.GLOW -> {
                                 val glowAlpha = boxArtStyle.glowAlpha
-                                val paint = android.graphics.Paint().apply {
-                                    maskFilter = android.graphics.BlurMaskFilter(
+                                val paint = com.nendo.argosy.platform.PlatformNativePaint().apply {
+                                    maskFilter = com.nendo.argosy.platform.PlatformBlurMaskFilter(
                                         outerEffectRadius,
-                                        android.graphics.BlurMaskFilter.Blur.NORMAL
+                                        com.nendo.argosy.platform.PlatformBlur.NORMAL
                                     )
                                     if (glowGradientColors != null) {
-                                        shader = android.graphics.LinearGradient(
+                                        shader = com.nendo.argosy.platform.PlatformLinearGradient(
                                             0f, 0f,
                                             0f, size.height,
                                             glowGradientColors.first.copy(alpha = glowAlpha).toArgb(),
                                             glowGradientColors.second.copy(alpha = glowAlpha).toArgb(),
-                                            android.graphics.Shader.TileMode.CLAMP
+                                            com.nendo.argosy.platform.PlatformTileMode.CLAMP
                                         )
                                     } else {
                                         color = glowColor.copy(alpha = glowAlpha).toArgb()
@@ -162,9 +163,9 @@ fun Modifier.boxArtFrame(
                             BoxArtOuterEffect.SHADOW -> {
                                 val paint = Paint().apply { color = Color.Black.copy(alpha = 0.3f) }
                                 val frameworkPaint = paint.asFrameworkPaint().apply {
-                                    maskFilter = android.graphics.BlurMaskFilter(
+                                    maskFilter = com.nendo.argosy.platform.PlatformBlurMaskFilter(
                                         outerEffectRadius,
-                                        android.graphics.BlurMaskFilter.Blur.NORMAL
+                                        com.nendo.argosy.platform.PlatformBlur.NORMAL
                                     )
                                 }
                                 canvas.nativeCanvas.drawRoundRect(
@@ -177,21 +178,21 @@ fun Modifier.boxArtFrame(
                             BoxArtOuterEffect.SHINE -> {
                                 val shineWidth = size.width * 0.4f
                                 val shineX = shineOffset * (size.width + shineWidth) - shineWidth
-                                val paint = android.graphics.Paint().apply {
-                                    maskFilter = android.graphics.BlurMaskFilter(
+                                val paint = com.nendo.argosy.platform.PlatformNativePaint().apply {
+                                    maskFilter = com.nendo.argosy.platform.PlatformBlurMaskFilter(
                                         outerEffectRadius / 2,
-                                        android.graphics.BlurMaskFilter.Blur.NORMAL
+                                        com.nendo.argosy.platform.PlatformBlur.NORMAL
                                     )
-                                    shader = android.graphics.LinearGradient(
+                                    shader = com.nendo.argosy.platform.PlatformLinearGradient(
                                         shineX, 0f,
                                         shineX + shineWidth, size.height,
                                         intArrayOf(
-                                            android.graphics.Color.TRANSPARENT,
-                                            android.graphics.Color.argb(150, 255, 255, 255),
-                                            android.graphics.Color.TRANSPARENT
+                                            com.nendo.argosy.platform.PlatformColor.TRANSPARENT,
+                                            com.nendo.argosy.platform.PlatformColor.argb(150, 255, 255, 255),
+                                            com.nendo.argosy.platform.PlatformColor.TRANSPARENT
                                         ),
                                         floatArrayOf(0f, 0.5f, 1f),
-                                        android.graphics.Shader.TileMode.CLAMP
+                                        com.nendo.argosy.platform.PlatformTileMode.CLAMP
                                     )
                                 }
                                 canvas.nativeCanvas.drawRoundRect(

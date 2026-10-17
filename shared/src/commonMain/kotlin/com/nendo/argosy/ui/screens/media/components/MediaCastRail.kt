@@ -20,7 +20,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import coil.compose.AsyncImage
+import com.nendo.argosy.platform.image.AsyncImage
 import com.nendo.argosy.ui.components.FocusedScroll
 import com.nendo.argosy.ui.components.boxArtFrame
 import com.nendo.argosy.ui.screens.media.MediaCastUi

@@ -1,6 +1,6 @@
 package com.nendo.argosy.data.netplay
 
-expect class PacketCrypto {
+expect class PacketCrypto : AutoCloseable {
     enum class Direction { HostToGuest, GuestToHost }
 
     companion object {

@@ -27,10 +27,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.res.stringResource
+import com.nendo.argosy.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.graphics.ColorUtils
-import com.nendo.argosy.R
+import com.nendo.argosy.platform.PlatformColorUtils as ColorUtils
+import com.nendo.argosy.res.ArgosyR as R
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Close

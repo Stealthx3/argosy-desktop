@@ -17,7 +17,7 @@ import java.net.DatagramSocket
 import java.net.InetSocketAddress
 import java.net.SocketException
 
-actual class NetplayTransport(
+actual class NetplayTransport actual constructor(
     private val crypto: PacketCrypto,
     private val socket: DatagramSocket,
     private val localDirection: PacketCrypto.Direction,
