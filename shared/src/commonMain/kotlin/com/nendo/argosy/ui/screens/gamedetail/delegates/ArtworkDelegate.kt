@@ -1,6 +1,6 @@
 package com.nendo.argosy.ui.screens.gamedetail.delegates
 
-import com.nendo.argosy.R
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.core.notification.NotificationManager
 import com.nendo.argosy.core.notification.NotificationText
 import com.nendo.argosy.core.notification.showError
