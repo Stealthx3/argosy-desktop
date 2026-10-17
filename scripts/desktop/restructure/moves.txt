@@ -744,3 +744,30 @@
 + data/titledb/RequestSigner.kt
 + hardware/FocusAccessibilityService.kt
 + hardware/SaveScreenshotCapture.kt
+
+# Phase 2: files freed by the first platform-service slices.
+[commonMain]
++ data/download/ExtContentOrganizer.kt
++ data/emulator/BuiltinSaveBase.kt
++ data/emulator/EmulatorResolver.kt
++ data/emulator/EmulatorSettingScope.kt
++ data/emulator/SavePathRegistry.kt
++ data/emulator/savepath/PpssppMemoryStick.kt
++ data/emulator/savepath/SavePathShapeRule.kt
++ data/netplay/NetplayPreflightChecker.kt
++ data/remote/romm/VariantSaveCarryOver.kt
++ data/repository/CoreVersionRepository.kt
++ data/repository/EmulatorSaveConfigRepository.kt
++ data/scanner/AndroidGameScanner.kt
++ data/steam/GnInstallProbe.kt
++ data/storage/RootFileAccessor.kt
++ data/sync/SaveArchiver.kt
++ data/titledb/TitleDbRepository.kt
++ data/titledb/TitleDbService.kt
++ domain/usecase/game/ConfigureEmulatorUseCase.kt
++ domain/usecase/libretro/LibretroMigrationUseCase.kt
++ hardware/DevicePerformance.kt
++ hardware/OdinLEDController.kt
++ ui/components/QuickSettingsInputRouter.kt
++ ui/components/QuickSettingsModels.kt
++ ui/dualscreen/DockReorderCoordinator.kt
