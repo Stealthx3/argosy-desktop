@@ -1,6 +1,6 @@
 package com.nendo.argosy.ui.input
 
-import android.view.KeyEvent
+import com.nendo.argosy.core.input.AndroidKeyCodes as KeyEvent
 import com.nendo.argosy.libretro.HotkeyManager
 
 enum class UiShortcut { OPEN_NAVIGATION, OPEN_QUICK_PANEL }

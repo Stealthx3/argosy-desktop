@@ -29,10 +29,10 @@ private const val SILENCE_FLOOR_DB = -60.0
  * result keyed by file identity, and returns the cached value without decoding when the file
  * is unchanged. Returns null for silence-only content or decode failure.
  */
-class MeasureTrackLoudnessUseCase @Inject constructor(
+actual class MeasureTrackLoudnessUseCase @Inject constructor(
     private val loudnessRepository: AudioLoudnessRepository
 ) {
-    suspend operator fun invoke(filePath: String): Double? = withContext(Dispatchers.IO) {
+    actual suspend operator fun invoke(filePath: String): Double? = withContext(Dispatchers.IO) {
         val file = File(filePath)
         if (!file.isFile) return@withContext null
         loudnessRepository.validatedMeanDb(filePath)?.let { return@withContext it }

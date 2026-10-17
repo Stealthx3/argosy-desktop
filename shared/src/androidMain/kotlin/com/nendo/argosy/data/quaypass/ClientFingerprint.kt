@@ -10,11 +10,11 @@ import javax.inject.Singleton
 
 /** Stable per-install identifier; identity only, not a credential. */
 @Singleton
-class ClientFingerprint @Inject constructor(
+actual class ClientFingerprint @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
 
-    val apkSigningCertHash: String by lazy {
+    actual val apkSigningCertHash: String by lazy {
         try {
             val packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 context.packageManager.getPackageInfo(

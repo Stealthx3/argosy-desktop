@@ -1,6 +1,6 @@
 package com.nendo.argosy.data.repository
 
-import android.view.MotionEvent
+import com.nendo.argosy.core.input.AndroidMotionAxes as MotionEvent
 
 sealed class InputSource {
     data class Button(val keyCode: Int) : InputSource()

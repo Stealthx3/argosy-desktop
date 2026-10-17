@@ -1,6 +1,17 @@
 package com.nendo.argosy.ui.screens.settings.components
 
-import android.view.InputDevice
+import com.nendo.argosy.platform.PlatformInputDevice as InputDevice
+import com.nendo.argosy.platform.controllerNumber
+import com.nendo.argosy.platform.descriptor
+import com.nendo.argosy.platform.id
+import com.nendo.argosy.platform.isEnabled
+import com.nendo.argosy.platform.isExternal
+import com.nendo.argosy.platform.isVirtual
+import com.nendo.argosy.platform.name
+import com.nendo.argosy.platform.productId
+import com.nendo.argosy.platform.sources
+import com.nendo.argosy.platform.vendorId
+import com.nendo.argosy.platform.PlatformInputDevices
 import com.nendo.argosy.core.input.controllerIdOf
 import com.nendo.argosy.core.input.isPhysicalGamepad
 import com.nendo.argosy.data.repository.InputConfigRepository
@@ -156,8 +167,8 @@ class ControllerSeatController(
     }
 
     private fun connectedPhysicalPads(): List<InputDevice> =
-        InputDevice.getDeviceIds().toList()
-            .mapNotNull { InputDevice.getDevice(it) }
+        PlatformInputDevices.getDeviceIds().toList()
+            .mapNotNull { PlatformInputDevices.getDevice(it) }
             .filter { it.isPhysicalGamepad() }
             .distinctBy { controllerIdOf(it) }
 }

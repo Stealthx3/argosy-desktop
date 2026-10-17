@@ -17,8 +17,6 @@ import com.nendo.argosy.data.iconpack.IconPackRepository
 private const val TAG = "AppIconFetcher"
 private const val ICON_SIZE = 192
 
-data class AppIconData(val packageName: String)
-
 class AppIconFetcher(
     private val data: AppIconData,
     private val packageManager: PackageManager,

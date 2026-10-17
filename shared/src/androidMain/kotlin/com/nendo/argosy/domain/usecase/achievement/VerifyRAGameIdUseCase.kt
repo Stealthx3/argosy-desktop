@@ -13,11 +13,11 @@ import javax.inject.Inject
 
 private const val TAG = "VerifyRAGameIdUseCase"
 
-class VerifyRAGameIdUseCase @Inject constructor(
+actual class VerifyRAGameIdUseCase @Inject constructor(
     private val gameDao: GameDao,
     private val raRepository: RetroAchievementsRepository
 ) {
-    suspend operator fun invoke(gameId: Long, forceRehash: Boolean = false): Long? {
+    actual suspend operator fun invoke(gameId: Long, forceRehash: Boolean): Long? {
         val game = gameDao.getById(gameId) ?: return null
 
         if (game.raIdVerified && !forceRehash) {

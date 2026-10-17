@@ -16,3 +16,26 @@ data/platform/InstalledAppResolver.kt: InstalledAppResolver
 data/titledb/RequestSigner.kt: RequestSigner
 hardware/SaveScreenshotCapture.kt: SaveScreenshotCapture
 data/sync/RAPatchBackfillWorker.kt: RAPatchBackfillWorker
+ui/audio/AmbientAudioManager.kt: AmbientAudioManager(playOverride: Unit)
+domain/usecase/music/MeasureTrackLoudnessUseCase.kt: MeasureTrackLoudnessUseCase
+util/StorageAccess.kt: StorageAccess
+util/StorageSettings.kt: *
+util/ApkArchive.kt: *
+data/cheats/CheatsRequestSigner.kt: CheatsRequestSigner
+data/quaypass/ClientFingerprint.kt: ClientFingerprint
+data/quaypass/ble/QuayPassGattClient.kt: QuayPassGattClient
+data/quaypass/QuayPassRasterPng.kt: QuayPassRasterPng
+data/storage/ManagedStorageAccessor.kt: ManagedStorageAccessor
+data/update/AppInstaller.kt: AppInstaller
+data/emulator/EmulatorUpdateManager.kt: EmulatorUpdateManager
+data/iconpack/IconPackRepository.kt: IconPackRepository
+data/netplay/PacketCrypto.kt: PacketCrypto
+data/netplay/NetplayTransport.kt: NetplayTransport
+domain/usecase/achievement/VerifyRAGameIdUseCase.kt: VerifyRAGameIdUseCase
+libretro/ControllerPortResolver.kt: ControllerPortResolver
+data/launcher/SteamLauncher.kt: SteamLauncher
+data/launcher/SteamLaunchers.kt: SteamLaunchers
+data/launcher/GameNativeLauncher.kt: GameNativeLauncher
+data/launcher/DroidDeckLauncher.kt: DroidDeckLauncher
+core/input/ConnectedControllerTracker.kt: ConnectedControllerTracker
+core/input/GamepadDevices.kt: *

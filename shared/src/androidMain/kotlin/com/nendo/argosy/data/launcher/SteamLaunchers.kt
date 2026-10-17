@@ -3,8 +3,8 @@ package com.nendo.argosy.data.launcher
 import android.content.Context
 import com.nendo.argosy.domain.model.LaunchPromptOption
 
-object SteamLaunchers {
-    val all: List<SteamLauncher> = listOf(
+actual object SteamLaunchers {
+    actual val all: List<SteamLauncher> = listOf(
         GameHubLauncher,
         GameHubLiteLauncher,
         GameHubLiteAntutuLauncher,
@@ -22,13 +22,13 @@ object SteamLaunchers {
         GameHubLitePubgLauncher
     )
 
-    fun getInstalled(context: Context): List<SteamLauncher> =
+    actual fun getInstalled(context: Context): List<SteamLauncher> =
         all.filter { it.isInstalled(context) }
 
-    fun getByPackage(packageName: String): SteamLauncher? =
+    actual fun getByPackage(packageName: String): SteamLauncher? =
         all.find { it.packageName == packageName }
 
-    fun getPreferred(context: Context): SteamLauncher? =
+    actual fun getPreferred(context: Context): SteamLauncher? =
         getInstalled(context).firstOrNull()
 
     private val promptOptions: Map<SteamLauncher, LaunchPromptOption> = mapOf(
@@ -36,10 +36,10 @@ object SteamLaunchers {
         DroidDeckLauncher to LaunchPromptOption.LAUNCH_WITH_DROIDDECK
     )
 
-    fun promptOptionFor(packageName: String): LaunchPromptOption? =
+    actual fun promptOptionFor(packageName: String): LaunchPromptOption? =
         promptOptions.entries.find { it.key.packageName == packageName }?.value
 
-    fun forPromptOption(option: LaunchPromptOption): SteamLauncher? =
+    actual fun forPromptOption(option: LaunchPromptOption): SteamLauncher? =
         promptOptions.entries.find { it.value == option }?.key
 
     /**
@@ -47,7 +47,7 @@ object SteamLaunchers {
      * Frontend Sync folder reports the game, when there are two or more and the game is not
      * pinned. Empty means launch without asking.
      */
-    fun launchChoices(
+    actual fun launchChoices(
         pinned: Boolean,
         reporting: List<String>,
         isInstalled: (String) -> Boolean
@@ -77,7 +77,7 @@ object SteamLaunchers {
     }
 
     /** Resolve a stored launcher package back to a user-friendly group label. */
-    fun displayNameForPackage(launcherPackage: String?): String = when {
+    actual fun displayNameForPackage(launcherPackage: String?): String = when {
         launcherPackage == null -> ""
         launcherPackage == GameNativeLauncher.packageName -> GameNativeLauncher.displayName
         gameHubVariants.any { it.packageName == launcherPackage } -> "GameHub"

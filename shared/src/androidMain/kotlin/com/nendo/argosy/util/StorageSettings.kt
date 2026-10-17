@@ -8,7 +8,7 @@ import android.os.Build
 import android.provider.Settings
 import android.util.Log
 
-fun Context.openStorageAccessSettings() {
+actual fun Context.openStorageAccessSettings() {
     val packageUri = Uri.fromParts("package", packageName, null)
     val intents = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
         listOf(

@@ -13,22 +13,22 @@ import com.swordfish.libretrodroid.PortResolver
  * and unseated, and gives its seat back once no external pad remains. Session seats come from
  * [ControllerSeating.launchPadSeats] and never change settings assignments.
  */
-class ControllerPortResolver : PortResolver {
+actual class ControllerPortResolver : PortResolver {
     private var controllerOrder: Map<String, Int> = emptyMap()
     private val claimedPorts = mutableMapOf<String, Int>()
     private var sessionSeats: Map<String, Int> = emptyMap()
     private var launchPadId: String? = null
     private var docked = false
 
-    var onPortClaimed: ((controllerId: String, port: Int) -> Unit)? = null
+    actual var onPortClaimed: ((controllerId: String, port: Int) -> Unit)? = null
 
-    fun setControllerOrder(orders: List<ControllerOrderEntity>) {
+    actual fun setControllerOrder(orders: List<ControllerOrderEntity>) {
         controllerOrder = orders.associate { it.controllerId to it.port }
         claimedPorts.keys.removeAll(controllerOrder.keys)
         reseatLaunchPad()
     }
 
-    fun clearControllerOrder() {
+    actual fun clearControllerOrder() {
         controllerOrder = emptyMap()
         claimedPorts.clear()
         reseatLaunchPad()
@@ -38,7 +38,7 @@ class ControllerPortResolver : PortResolver {
      * Names the pad that launched this session and whether an external display was docked when it
      * started. Read once at session start.
      */
-    fun setLaunchPad(controllerId: String?, isDocked: Boolean) {
+    actual fun setLaunchPad(controllerId: String?, isDocked: Boolean) {
         launchPadId = controllerId
         docked = isDocked
         reseatLaunchPad()
@@ -48,7 +48,7 @@ class ControllerPortResolver : PortResolver {
      * Drops the claims of disconnected pads, and of built-in pads once no external pad remains.
      * Settings assignments are kept.
      */
-    fun releaseDisconnected(connectedControllerIds: Set<String>) {
+    actual fun releaseDisconnected(connectedControllerIds: Set<String>) {
         claimedPorts.keys.retainAll(connectedControllerIds)
         val pads = connectedGamepads()
         if (pads.none { !ControllerDetector.isBuiltInPad(it) }) {
@@ -58,7 +58,7 @@ class ControllerPortResolver : PortResolver {
         reseatLaunchPad()
     }
 
-    fun playerOneControllerId(): String? =
+    actual fun playerOneControllerId(): String? =
         sessionSeats.entries.firstOrNull { it.value == 0 }?.key
             ?: controllerOrder.entries.firstOrNull { it.value == 0 }?.key
             ?: claimedPorts.entries.firstOrNull { it.value == 0 }?.key
@@ -74,13 +74,13 @@ class ControllerPortResolver : PortResolver {
     /**
      * The port this pad holds right now. Never seats the pad, so it never takes player one.
      */
-    fun peekPort(device: InputDevice): Int? = seatOf(controllerIdOf(device))
+    actual fun peekPort(device: InputDevice): Int? = seatOf(controllerIdOf(device))
 
-    fun getPort(controllerId: String, fallbackControllerNumber: Int): Int {
+    actual fun getPort(controllerId: String, fallbackControllerNumber: Int): Int {
         return seatOf(controllerId) ?: (fallbackControllerNumber - 1).coerceAtLeast(0)
     }
 
-    fun hasCustomOrder(): Boolean = controllerOrder.isNotEmpty()
+    actual fun hasCustomOrder(): Boolean = controllerOrder.isNotEmpty()
 
     private fun seatOf(controllerId: String): Int? =
         sessionSeats[controllerId] ?: controllerOrder[controllerId] ?: claimedPorts[controllerId]

@@ -1,6 +1,6 @@
 package com.nendo.argosy.libretro.touch
 
-import android.view.KeyEvent
+import com.nendo.argosy.core.input.AndroidKeyCodes as KeyEvent
 import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.Color
 import com.nendo.argosy.data.repository.MappingPlatform

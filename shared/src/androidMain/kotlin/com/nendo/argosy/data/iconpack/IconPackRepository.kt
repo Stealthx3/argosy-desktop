@@ -33,7 +33,7 @@ private const val COMPONENT_ATTR = "component"
 private const val DRAWABLE_ATTR = "drawable"
 
 @Singleton
-class IconPackRepository @Inject constructor(
+actual class IconPackRepository @Inject constructor(
     @ApplicationContext private val context: Context,
     private val displayPreferences: DisplayPreferencesRepository,
     appsRepository: AppsRepository
@@ -49,7 +49,7 @@ class IconPackRepository @Inject constructor(
         }
     }
 
-    suspend fun installedPacks(): List<IconPack> = withContext(Dispatchers.IO) {
+    actual suspend fun installedPacks(): List<IconPack> = withContext(Dispatchers.IO) {
         DISCOVERY_INTENTS.asSequence()
             .flatMap { intent -> packageManager.queryIntentActivities(intent, 0).asSequence() }
             .mapNotNull { it.activityInfo?.applicationInfo }

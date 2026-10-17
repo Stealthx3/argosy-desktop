@@ -1,7 +1,19 @@
 package com.nendo.argosy.data.repository
 
-import android.view.InputDevice
-import android.view.KeyEvent
+import com.nendo.argosy.platform.PlatformInputDevice as InputDevice
+import com.nendo.argosy.platform.controllerNumber
+import com.nendo.argosy.platform.descriptor
+import com.nendo.argosy.platform.id
+import com.nendo.argosy.platform.isEnabled
+import com.nendo.argosy.platform.isExternal
+import com.nendo.argosy.platform.isVirtual
+import com.nendo.argosy.platform.name
+import com.nendo.argosy.platform.productId
+import com.nendo.argosy.platform.sources
+import com.nendo.argosy.platform.vendorId
+import com.nendo.argosy.platform.PlatformInputDevices
+import com.nendo.argosy.core.input.AndroidKeyCodes as KeyEvent
+import com.nendo.argosy.platform.keyCodeToString
 import com.nendo.argosy.data.local.dao.ControllerMappingDao
 import com.nendo.argosy.data.local.dao.ControllerOrderDao
 import com.nendo.argosy.data.local.dao.GameControllerMappingDao
@@ -413,7 +425,7 @@ class InputConfigRepository @Inject constructor(
                 )
             )
         }
-        Logger.info(TAG, "Set hotkey for $action ($scopeType/${scopeKey ?: "-"}): ${canonicalKeyCodes.map { KeyEvent.keyCodeToString(it) }}")
+        Logger.info(TAG, "Set hotkey for $action ($scopeType/${scopeKey ?: "-"}): ${canonicalKeyCodes.map { keyCodeToString(it) }}")
     }
 
     /**
@@ -593,10 +605,10 @@ class InputConfigRepository @Inject constructor(
 
     fun getConnectedControllers(): List<ControllerInfo> {
         val controllers = mutableListOf<ControllerInfo>()
-        val deviceIds = InputDevice.getDeviceIds()
+        val deviceIds = PlatformInputDevices.getDeviceIds()
 
         for (deviceId in deviceIds) {
-            val device = InputDevice.getDevice(deviceId) ?: continue
+            val device = PlatformInputDevices.getDevice(deviceId) ?: continue
 
             if (device.actsAsGamepad()) {
                 val detection = ControllerDetector.detectFromDevice(device)

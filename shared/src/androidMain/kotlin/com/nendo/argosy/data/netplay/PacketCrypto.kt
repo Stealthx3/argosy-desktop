@@ -7,19 +7,17 @@ import com.goterl.lazysodium.interfaces.KeyDerivation
 import java.security.SecureRandom
 import java.util.Arrays
 
-class NetplayCryptoException(message: String, cause: Throwable? = null) : RuntimeException(message, cause)
-
-class PacketCrypto private constructor(
+actual class PacketCrypto private constructor(
     private val keyHostToGuest: ByteArray,
     private val keyGuestToHost: ByteArray
 ) : AutoCloseable {
 
-    enum class Direction { HostToGuest, GuestToHost }
+    actual enum class Direction { HostToGuest, GuestToHost }
 
     private val secureRandom = SecureRandom()
     private var closed = false
 
-    fun encrypt(plaintext: ByteArray, direction: Direction): ByteArray {
+    actual fun encrypt(plaintext: ByteArray, direction: Direction): ByteArray {
         check(!closed) { "PacketCrypto is closed" }
         val key = keyFor(direction)
         val nonce = ByteArray(AEAD.XCHACHA20POLY1305_IETF_NPUBBYTES)
@@ -46,7 +44,7 @@ class PacketCrypto private constructor(
         return wire
     }
 
-    fun decrypt(wire: ByteArray, direction: Direction): ByteArray? {
+    actual fun decrypt(wire: ByteArray, direction: Direction): ByteArray? {
         check(!closed) { "PacketCrypto is closed" }
         val nonceLen = AEAD.XCHACHA20POLY1305_IETF_NPUBBYTES
         val tagLen = AEAD.XCHACHA20POLY1305_IETF_ABYTES
@@ -90,7 +88,7 @@ class PacketCrypto private constructor(
         Arrays.fill(keyGuestToHost, 0)
     }
 
-    companion object {
+    actual companion object {
         private const val SUBKEY_LEN = 32
         private const val KDF_CONTEXT = "argnetpl"
         private const val SUBKEY_ID_H2G = 1L
@@ -108,7 +106,7 @@ class PacketCrypto private constructor(
             }
         }
 
-        fun fromMasterKey(masterKey: ByteArray): PacketCrypto {
+        actual fun fromMasterKey(masterKey: ByteArray): PacketCrypto {
             require(masterKey.size == KeyDerivation.MASTER_KEY_BYTES) {
                 "Master key must be ${KeyDerivation.MASTER_KEY_BYTES} bytes, got ${masterKey.size}"
             }

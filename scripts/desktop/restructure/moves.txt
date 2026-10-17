@@ -537,7 +537,6 @@
 [androidMain]
 + core/input/ActiveController.kt
 + core/input/ConnectedControllerTracker.kt
-+ core/input/ControllerDetector.kt
 + core/input/GamepadDevices.kt
 + hardware/AmbientLedManager.kt
 + hardware/FocusDirectorActivity.kt
@@ -828,3 +827,82 @@
 + ui/screens/player/PlayerTrickplay.kt
 + ui/screens/player/delegates/PlayerChromeDelegate.kt
 + ui/screens/player/delegates/PlayerQualityDelegate.kt
+
+# Phase 2: more Android platform services behind slices (and two used only by Android code).
+[androidMain]
++ ui/audio/AmbientAudioManager.kt
++ domain/usecase/music/MeasureTrackLoudnessUseCase.kt
++ util/StorageAccess.kt
++ util/StorageSettings.kt
++ util/ApkArchive.kt
++ core/service/ForegroundServiceStarter.kt
++ data/cheats/CheatsRequestSigner.kt
++ data/quaypass/ClientFingerprint.kt
++ data/quaypass/ble/QuayPassGattClient.kt
++ data/quaypass/QuayPassRasterPng.kt
++ data/storage/ManagedStorageAccessor.kt
++ data/update/AppInstaller.kt
++ data/emulator/EmulatorUpdateManager.kt
++ data/iconpack/IconPackRepository.kt
++ ui/coil/AppIconFetcher.kt
++ data/netplay/PacketCrypto.kt
++ data/netplay/NetplayTransport.kt
++ domain/usecase/achievement/VerifyRAGameIdUseCase.kt
++ libretro/ControllerPortResolver.kt
+
+# Phase 2: files freed by the second platform-service slice batch.
+[commonMain]
++ data/cheats/CheatsService.kt
++ ui/audio/BgmPlaylistCoordinator.kt
++ ui/components/AppLaunchMenu.kt
++ ui/components/CustomGridState.kt
++ ui/components/HomeTilePickerModal.kt
++ ui/components/MediaTileSetup.kt
++ ui/components/MediaTileSetupModal.kt
++ ui/components/PageChooserModal.kt
++ ui/home/grid/CustomGridCoordinator.kt
++ ui/home/grid/FeatureTileSetupController.kt
++ ui/home/grid/MediaTileCatalog.kt
++ ui/home/grid/MediaTileSetupController.kt
++ ui/screens/home/delegates/HomeVideoPreviewDelegate.kt
++ ui/screens/settings/BgmPlaylistManagerViewModel.kt
+
+# Phase 2: Steam launchers (Android intents) behind slices.
+[androidMain]
++ data/launcher/SteamLauncher.kt
++ data/launcher/SteamLaunchers.kt
++ data/launcher/DroidDeckLauncher.kt
++ data/launcher/GameNativeLauncher.kt
++ data/launcher/GameNativeScanner.kt
++ data/launcher/GameHubLauncher.kt
++ data/launcher/GameHubLiteLauncher.kt
++ data/launcher/GameHubLiteAntutuLauncher.kt
++ data/launcher/GameHubLiteLudashiLauncher.kt
++ data/launcher/GameHubLitePubgLauncher.kt
+
+# Phase 2: files freed by the launcher slices.
+[commonMain]
++ data/installer/GitHubRepoUrl.kt
++ data/installer/ManagedInstallerRepository.kt
++ data/installer/SeededInstallers.kt
++ ui/screens/gamedetail/modals/SteamLauncherPickerModal.kt
+
+# Phase 2: portable since PlatformInputDevice and SuppressLint (was androidMain).
+[commonMain]
++ core/input/ControllerDetector.kt
+
+# Phase 2: files freed by the InputDevice stand-in and the controller seams.
+[commonMain]
++ data/repository/CoreDeviceProfiles.kt
++ data/repository/InputConfigRepository.kt
++ data/repository/InputPresets.kt
++ data/repository/InputSource.kt
++ libretro/HotkeyManager.kt
++ libretro/HotkeyScopeResolver.kt
++ libretro/coreoptions/CoreControlManifestRegistry.kt
++ libretro/touch/TouchLayoutRegistry.kt
++ libretro/touch/TouchLayoutSpec.kt
++ ui/input/ButtonGlyphs.kt
++ ui/input/UiShortcut.kt
++ ui/screens/settings/components/ControllerSeatController.kt
++ ui/screens/settings/components/MappingControllerTarget.kt

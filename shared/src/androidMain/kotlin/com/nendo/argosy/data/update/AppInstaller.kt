@@ -11,13 +11,13 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class AppInstaller @Inject constructor() {
+actual class AppInstaller @Inject constructor() {
 
-    fun canInstallPackages(context: Context): Boolean {
+    actual fun canInstallPackages(context: Context): Boolean {
         return context.packageManager.canRequestPackageInstalls()
     }
 
-    fun openInstallPermissionSettings(context: Context) {
+    actual fun openInstallPermissionSettings(context: Context) {
         val intent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).apply {
             data = Uri.parse("package:${context.packageName}")
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -25,7 +25,7 @@ class AppInstaller @Inject constructor() {
         context.startActivity(intent)
     }
 
-    fun installApk(context: Context, apkFile: File) {
+    actual fun installApk(context: Context, apkFile: File) {
         val uri = FileProvider.getUriForFile(
             context,
             "${context.packageName}.fileprovider",
@@ -58,11 +58,11 @@ class AppInstaller @Inject constructor() {
             ?.activityInfo
             ?.packageName
 
-    fun getApkCacheFile(context: Context, version: String): File {
+    actual fun getApkCacheFile(context: Context, version: String): File {
         return File(context.cacheDir, "argosy-$version.apk")
     }
 
-    fun clearCachedApks(context: Context) {
+    actual fun clearCachedApks(context: Context) {
         context.cacheDir.listFiles()?.filter { it.name.startsWith("argosy-") && it.name.endsWith(".apk") }?.forEach { it.delete() }
     }
 

@@ -1,7 +1,7 @@
 package com.nendo.argosy.ui.components
 
 import androidx.annotation.StringRes
-import com.nendo.argosy.R
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.data.local.entity.MediaTilePlayMode
 
 /**

@@ -3,7 +3,7 @@ package com.nendo.argosy.data.cheats
 import android.content.Context
 import android.os.Build
 import android.provider.Settings
-import com.nendo.argosy.BuildConfig
+import com.nendo.argosy.config.AppBuildConfig as BuildConfig
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.net.URLEncoder
 import javax.crypto.Mac
@@ -12,19 +12,19 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class CheatsRequestSigner @Inject constructor(
+actual class CheatsRequestSigner @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
     private val secret: String = BuildConfig.CHEATSDB_API_SECRET
 
-    data class SignedRequest(
-        val deviceToken: String,
-        val timestamp: Long,
-        val signature: String,
-        val fpHash: String
+    actual data class SignedRequest(
+        actual val deviceToken: String,
+        actual val timestamp: Long,
+        actual val signature: String,
+        actual val fpHash: String
     )
 
-    fun sign(deviceToken: String, query: String): SignedRequest? {
+    actual fun sign(deviceToken: String, query: String): SignedRequest? {
         if (secret.isBlank()) return null
 
         val timestamp = System.currentTimeMillis() / 1000
@@ -42,7 +42,7 @@ class CheatsRequestSigner @Inject constructor(
         )
     }
 
-    fun isConfigured(): Boolean = secret.isNotBlank()
+    actual fun isConfigured(): Boolean = secret.isNotBlank()
 
     private fun collectFingerprint(): String {
         return listOf(

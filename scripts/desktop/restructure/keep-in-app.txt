@@ -1,2 +1,3 @@
 # Files that stay in app although movable.py's import rules accept them, with the reason.
 # One glob per line, relative to com/nendo/argosy; "#" starts the reason.
+data/quaypass/QuayPassCredentialManager.kt  # an exhaustive when over QuayPassKeystore.Algorithm, an expect enum once the keystore is sliced (K2 requires else there)

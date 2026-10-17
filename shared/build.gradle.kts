@@ -367,6 +367,8 @@ kotlin {
             implementation(project(":libretrodroid"))
             implementation(libs.work.runtime.ktx)
             implementation(libs.hilt.work)
+            implementation("com.goterl:lazysodium-android:5.2.0@aar")
+            implementation("net.java.dev.jna:jna:5.14.0@aar")
             implementation(libs.hilt.android)
             implementation(libs.hilt.navigation.compose)
             implementation(libs.androidx.activity.compose)

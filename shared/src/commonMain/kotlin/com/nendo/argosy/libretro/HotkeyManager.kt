@@ -1,7 +1,8 @@
 package com.nendo.argosy.libretro
 
-import android.os.SystemClock
-import android.view.KeyEvent
+import com.nendo.argosy.platform.PlatformSystemClock as SystemClock
+import com.nendo.argosy.core.input.AndroidKeyCodes as KeyEvent
+import com.nendo.argosy.platform.keyCodeToString
 import com.nendo.argosy.data.local.entity.CoreInputMode
 import com.nendo.argosy.data.local.entity.HotkeyAction
 import com.nendo.argosy.data.local.entity.HotkeyEntity
@@ -361,7 +362,7 @@ class HotkeyManager(
                 KeyEvent.KEYCODE_BUTTON_MODE -> "Mode"
                 in KeyEvent.KEYCODE_BUTTON_1..KeyEvent.KEYCODE_BUTTON_16 ->
                     "B${keyCode - KeyEvent.KEYCODE_BUTTON_1 + 1}"
-                else -> KeyEvent.keyCodeToString(keyCode).removePrefix("KEYCODE_")
+                else -> keyCodeToString(keyCode).removePrefix("KEYCODE_")
             }
         }
 

@@ -1,7 +1,7 @@
 package com.nendo.argosy.libretro.touch
 
 import androidx.compose.ui.graphics.Color
-import com.nendo.argosy.R
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.data.platform.PlatformDefinitions
 import com.nendo.argosy.data.repository.MappingPlatforms
 import com.nendo.argosy.data.repository.RetroButton

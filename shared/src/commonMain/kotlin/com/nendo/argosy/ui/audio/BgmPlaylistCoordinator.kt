@@ -1,6 +1,6 @@
 package com.nendo.argosy.ui.audio
 
-import android.util.Log
+import com.nendo.argosy.util.PlatformLog as Log
 import com.nendo.argosy.data.local.entity.BgmPlaylistEntity
 import com.nendo.argosy.data.music.BgmPlaylistRepository
 import com.nendo.argosy.data.preferences.UserPreferencesRepository

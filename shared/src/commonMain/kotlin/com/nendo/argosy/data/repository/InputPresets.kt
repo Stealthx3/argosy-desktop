@@ -1,6 +1,7 @@
 package com.nendo.argosy.data.repository
 
-import android.view.KeyEvent
+import com.nendo.argosy.core.input.AndroidKeyCodes as KeyEvent
+import com.nendo.argosy.platform.keyCodeToString
 import com.nendo.argosy.core.input.DetectedLayout
 import com.nendo.argosy.data.platform.PlatformDefinitions
 
@@ -1337,7 +1338,7 @@ object InputPresets {
             KeyEvent.KEYCODE_BUTTON_MODE -> "Mode"
             in KeyEvent.KEYCODE_BUTTON_1..KeyEvent.KEYCODE_BUTTON_16 ->
                 "B${keyCode - KeyEvent.KEYCODE_BUTTON_1 + 1}"
-            else -> KeyEvent.keyCodeToString(keyCode).removePrefix("KEYCODE_")
+            else -> keyCodeToString(keyCode).removePrefix("KEYCODE_")
         }
     }
 }

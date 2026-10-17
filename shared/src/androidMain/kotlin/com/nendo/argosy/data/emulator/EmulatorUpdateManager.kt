@@ -27,15 +27,8 @@ import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
 
-sealed class UpdateCheckState {
-    data object Idle : UpdateCheckState()
-    data object Checking : UpdateCheckState()
-    data class Completed(val updatesFound: Int) : UpdateCheckState()
-    data class Error(val message: String) : UpdateCheckState()
-}
-
 @Singleton
-class EmulatorUpdateManager @Inject constructor(
+actual class EmulatorUpdateManager @Inject constructor(
     private val emulatorUpdateRepository: EmulatorUpdateRepository,
     private val emulatorDetector: EmulatorDetector,
     private val emulatorUpdateDao: EmulatorUpdateDao,
@@ -44,7 +37,7 @@ class EmulatorUpdateManager @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
     private val packageManager: PackageManager = context.packageManager
-    companion object {
+    actual companion object {
         private const val TAG = "EmulatorUpdateManager"
         private val CHECK_INTERVAL = Duration.ofHours(24)
         private val FORCE_CHECK_COOLDOWN = Duration.ofMinutes(5)
@@ -54,14 +47,14 @@ class EmulatorUpdateManager @Inject constructor(
     private val scope = SafeCoroutineScope(Dispatchers.IO, "EmulatorUpdateManager")
 
     private val _checkState = MutableStateFlow<UpdateCheckState>(UpdateCheckState.Idle)
-    val checkState: StateFlow<UpdateCheckState> = _checkState.asStateFlow()
+    actual val checkState: StateFlow<UpdateCheckState> = _checkState.asStateFlow()
 
-    val updateCount: Flow<Int> = emulatorUpdateDao.observeUpdateCount()
+    actual val updateCount: Flow<Int> = emulatorUpdateDao.observeUpdateCount()
 
-    val availableUpdates: Flow<List<EmulatorUpdateEntity>> =
+    actual val availableUpdates: Flow<List<EmulatorUpdateEntity>> =
         emulatorUpdateDao.observeAvailableUpdates()
 
-    val assignedUpdateCount: Flow<Int> = kotlinx.coroutines.flow.combine(
+    actual val assignedUpdateCount: Flow<Int> = kotlinx.coroutines.flow.combine(
         availableUpdates,
         emulatorConfigDao.observeAssignedPackageNames()
     ) { updates, assignedPackages ->
@@ -71,7 +64,7 @@ class EmulatorUpdateManager @Inject constructor(
         updates.count { it.emulatorId in assignedIds }
     }
 
-    val platformUpdateCounts: Flow<Map<String, Int>> = availableUpdates.map { updates ->
+    actual val platformUpdateCounts: Flow<Map<String, Int>> = availableUpdates.map { updates ->
         val platformCounts = mutableMapOf<String, Int>()
         for (update in updates) {
             val emulatorDef = EmulatorRegistry.getById(update.emulatorId) ?: continue
@@ -82,7 +75,7 @@ class EmulatorUpdateManager @Inject constructor(
         platformCounts
     }
 
-    fun checkIfNeeded() {
+    actual fun checkIfNeeded() {
         scope.launch {
             val lastCheck = getLastCheckTime()
             val now = Instant.now()
@@ -96,7 +89,7 @@ class EmulatorUpdateManager @Inject constructor(
         }
     }
 
-    fun forceCheck() {
+    actual fun forceCheck() {
         scope.launch {
             val lastCheck = getLastCheckTime()
             val now = Instant.now()
@@ -112,7 +105,7 @@ class EmulatorUpdateManager @Inject constructor(
         }
     }
 
-    suspend fun checkForUpdates(ignoreCache: Boolean = false): UpdateCheckState = withContext(Dispatchers.IO) {
+    actual suspend fun checkForUpdates(ignoreCache: Boolean): UpdateCheckState = withContext(Dispatchers.IO) {
         if (_checkState.value is UpdateCheckState.Checking) {
             return@withContext _checkState.value
         }
@@ -199,11 +192,11 @@ class EmulatorUpdateManager @Inject constructor(
         }
     }
 
-    suspend fun getUpdateForEmulator(emulatorId: String): EmulatorUpdateEntity? {
+    actual suspend fun getUpdateForEmulator(emulatorId: String): EmulatorUpdateEntity? {
         return emulatorUpdateDao.getByEmulatorId(emulatorId)
     }
 
-    suspend fun getUpdatesForPlatform(platformSlug: String): List<EmulatorUpdateEntity> {
+    actual suspend fun getUpdatesForPlatform(platformSlug: String): List<EmulatorUpdateEntity> {
         val platformEmulators = EmulatorRegistry.getForPlatform(platformSlug)
         val updates = emulatorUpdateDao.getAvailableUpdates()
         return updates.filter { update ->
@@ -211,15 +204,15 @@ class EmulatorUpdateManager @Inject constructor(
         }
     }
 
-    suspend fun hasUpdateForPlatform(platformSlug: String): Boolean {
+    actual suspend fun hasUpdateForPlatform(platformSlug: String): Boolean {
         return getUpdatesForPlatform(platformSlug).isNotEmpty()
     }
 
-    suspend fun markAsInstalled(emulatorId: String, version: String, variant: String?) {
+    actual suspend fun markAsInstalled(emulatorId: String, version: String, variant: String?) {
         emulatorUpdateRepository.markAsInstalled(emulatorId, version, variant)
     }
 
-    fun resetCheckState() {
+    actual fun resetCheckState() {
         _checkState.value = UpdateCheckState.Idle
     }
 

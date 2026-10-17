@@ -17,7 +17,7 @@ import java.net.DatagramSocket
 import java.net.InetSocketAddress
 import java.net.SocketException
 
-class NetplayTransport(
+actual class NetplayTransport(
     private val crypto: PacketCrypto,
     private val socket: DatagramSocket,
     private val localDirection: PacketCrypto.Direction,
@@ -28,7 +28,7 @@ class NetplayTransport(
         replay = 0,
         extraBufferCapacity = 256
     )
-    val incomingPackets: SharedFlow<Incoming> = _incomingPackets.asSharedFlow()
+    actual val incomingPackets: SharedFlow<Incoming> = _incomingPackets.asSharedFlow()
 
     private val replayWindow = ReplayWindow()
     private val peerDirection: PacketCrypto.Direction = when (localDirection) {
@@ -40,9 +40,9 @@ class NetplayTransport(
         receiveLoop()
     }
 
-    data class Incoming(val source: InetSocketAddress, val packet: NetplayPacket)
+    actual data class Incoming(actual val source: InetSocketAddress, actual val packet: NetplayPacket)
 
-    suspend fun send(peer: InetSocketAddress, packet: NetplayPacket) {
+    actual suspend fun send(peer: InetSocketAddress, packet: NetplayPacket) {
         val plaintext = packet.serialize()
         val wire = crypto.encrypt(plaintext, localDirection)
         withContext(Dispatchers.IO) {
@@ -101,7 +101,7 @@ class NetplayTransport(
         crypto.close()
     }
 
-    companion object {
+    actual companion object {
         private const val TAG = "NetplayTransport"
         private const val MAX_DATAGRAM_SIZE = 2048
     }

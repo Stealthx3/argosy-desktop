@@ -7,7 +7,7 @@ import java.io.File
 
 private const val TAG = "ApkArchive"
 
-fun apkArchivePackageName(context: Context, apkFile: File): String? = try {
+actual fun apkArchivePackageName(context: Context, apkFile: File): String? = try {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         context.packageManager.getPackageArchiveInfo(
             apkFile.absolutePath,

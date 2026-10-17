@@ -1,7 +1,18 @@
 package com.nendo.argosy.core.input
 
-import android.annotation.SuppressLint
-import android.view.InputDevice
+import com.nendo.argosy.platform.SuppressLint
+import com.nendo.argosy.platform.PlatformInputDevice as InputDevice
+import com.nendo.argosy.platform.controllerNumber
+import com.nendo.argosy.platform.descriptor
+import com.nendo.argosy.platform.id
+import com.nendo.argosy.platform.isEnabled
+import com.nendo.argosy.platform.isExternal
+import com.nendo.argosy.platform.isVirtual
+import com.nendo.argosy.platform.name
+import com.nendo.argosy.platform.productId
+import com.nendo.argosy.platform.sources
+import com.nendo.argosy.platform.vendorId
+import com.nendo.argosy.platform.PlatformInputDevices
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
@@ -84,7 +95,7 @@ object ControllerDetector {
             process.waitFor()
             value
         } catch (e: Exception) {
-            android.util.Log.e("ControllerDetector", "getGamepadTypeProperty failed", e)
+            com.nendo.argosy.util.PlatformLog.e("ControllerDetector", "getGamepadTypeProperty failed", e)
             null
         }
     }
@@ -145,11 +156,11 @@ object ControllerDetector {
     }
 
     fun isBuiltInPad(device: InputDevice): Boolean =
-        android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q && !device.isExternal
+        com.nendo.argosy.platform.PlatformBuild.VERSION.SDK_INT >= com.nendo.argosy.platform.PlatformBuild.VERSION_CODES.Q && !device.isExternal
 
     /** Built-in pads on handhelds often report generic names (virtual_gamepad) and junk vendor ids; fall back to the device build. */
     private fun detectFromBuildIdentity(): DetectedLayout? {
-        val identity = "${android.os.Build.MANUFACTURER} ${android.os.Build.MODEL}".lowercase()
+        val identity = "${com.nendo.argosy.platform.PlatformBuild.MANUFACTURER} ${com.nendo.argosy.platform.PlatformBuild.MODEL}".lowercase()
         if (XBOX_NAME_PATTERNS.any { identity.contains(it) }) return DetectedLayout.XBOX
         if (NINTENDO_NAME_PATTERNS.any { identity.contains(it) }) return DetectedLayout.NINTENDO
         return null
@@ -160,16 +171,16 @@ object ControllerDetector {
      */
     fun detectFor(device: InputDevice?): DetectionResult {
         if (device != null) return detectFromDevice(device)
-        val firstPad = InputDevice.getDeviceIds()
+        val firstPad = PlatformInputDevices.getDeviceIds()
             .asSequence()
-            .mapNotNull { InputDevice.getDevice(it) }
+            .mapNotNull { PlatformInputDevices.getDevice(it) }
             .firstOrNull { it.isPhysicalGamepad() }
             ?: return DetectionResult(null, null, null, DetectionSource.UNKNOWN)
         return detectFromDevice(firstPad)
     }
 
     fun isAnyGamepadConnected(): Boolean =
-        InputDevice.getDeviceIds().any { InputDevice.getDevice(it)?.isPhysicalGamepad() == true }
+        PlatformInputDevices.getDeviceIds().any { PlatformInputDevices.getDevice(it)?.isPhysicalGamepad() == true }
 
     /**
      * Resolves the pad lettering every surface draws glyphs against. [controllerLayout] is the

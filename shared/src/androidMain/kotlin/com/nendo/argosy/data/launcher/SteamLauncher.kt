@@ -5,14 +5,9 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import com.nendo.argosy.data.storage.AndroidDataAccessor
 
-data class ScannedSteamGame(
-    val appId: Long,
-    val name: String
-)
-
-interface SteamLauncher {
-    val packageName: String
-    val displayName: String
+actual interface SteamLauncher {
+    actual val packageName: String
+    actual val displayName: String
     val supportsScanning: Boolean get() = false
     val scanMayIncludeUninstalled: Boolean get() = false
 

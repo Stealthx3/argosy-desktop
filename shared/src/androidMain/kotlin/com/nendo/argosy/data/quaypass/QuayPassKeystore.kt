@@ -31,15 +31,15 @@ actual class QuayPassKeystore @Inject constructor(
     actual enum class KeyBacking { STRONGBOX, TEE, SOFTWARE, UNKNOWN }
     actual enum class Algorithm { ED25519, EC_P256 }
 
-    data class KeyInfo(
-        val publicKey: PublicKey,
-        val publicKeyEncoded: ByteArray,
-        val backing: KeyBacking,
-        val algorithm: Algorithm
+    actual data class KeyInfo(
+        actual val publicKey: PublicKey,
+        actual val publicKeyEncoded: ByteArray,
+        actual val backing: KeyBacking,
+        actual val algorithm: Algorithm
     )
 
     @Synchronized
-    fun getOrCreateKeyInfo(alias: String): KeyInfo {
+    actual fun getOrCreateKeyInfo(alias: String): KeyInfo {
         val ks = openKeystore()
         if (ks.containsAlias(alias)) {
             val pub = ks.getCertificate(alias).publicKey

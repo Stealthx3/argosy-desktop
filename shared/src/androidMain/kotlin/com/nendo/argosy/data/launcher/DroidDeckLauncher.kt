@@ -3,7 +3,7 @@ package com.nendo.argosy.data.launcher
 import android.content.ComponentName
 import android.content.Intent
 
-object DroidDeckLauncher : SteamLauncher {
+actual object DroidDeckLauncher : SteamLauncher {
     override val packageName = "com.droiddeck.launcher"
     override val displayName = "DroidDeck"
 

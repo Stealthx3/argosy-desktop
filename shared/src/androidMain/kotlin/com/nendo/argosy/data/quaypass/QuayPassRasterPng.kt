@@ -13,14 +13,14 @@ import java.io.ByteArrayOutputStream
  * transmission format and is converted away on receipt. Palette index 0 is blank
  * and maps to transparent.
  */
-object QuayPassRasterPng {
+actual object QuayPassRasterPng {
 
-    fun fromSparseBase64(sparseBase64: String?): String? {
+    actual fun fromSparseBase64(sparseBase64: String?): String? {
         if (sparseBase64.isNullOrEmpty()) return null
         return fromRasterBytes(QuayPassDoodleCodec.encodeFromSparseBase64(sparseBase64))
     }
 
-    fun fromRasterBytes(rasterBytes: ByteArray?): String? {
+    actual fun fromRasterBytes(rasterBytes: ByteArray?): String? {
         if (rasterBytes == null || rasterBytes.isEmpty()) return null
         return runCatching {
             val raster = QuayPassDoodleCodec.decode(rasterBytes) ?: return null

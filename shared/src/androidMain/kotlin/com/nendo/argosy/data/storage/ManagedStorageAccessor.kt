@@ -24,12 +24,12 @@ import javax.inject.Singleton
  * is the legitimate way to access these restricted scopes.
  */
 @Singleton
-class ManagedStorageAccessor @Inject constructor(
+actual class ManagedStorageAccessor @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
     private val contentResolver: ContentResolver = context.contentResolver
 
-    companion object {
+    actual companion object {
         private const val EXTERNAL_STORAGE_AUTHORITY = "com.android.externalstorage.documents"
         private const val PRIMARY_VOLUME_ID = "primary"
 
@@ -43,16 +43,16 @@ class ManagedStorageAccessor @Inject constructor(
         )
     }
 
-    data class DocumentFile(
-        val documentId: String,
-        val displayName: String,
-        val mimeType: String,
-        val lastModified: Long,
-        val size: Long,
-        val flags: Int,
-        val isDirectory: Boolean
+    actual data class DocumentFile(
+        actual val documentId: String,
+        actual val displayName: String,
+        actual val mimeType: String,
+        actual val lastModified: Long,
+        actual val size: Long,
+        actual val flags: Int,
+        actual val isDirectory: Boolean
     ) {
-        val uri: Uri
+        actual val uri: Uri
             get() = DocumentsContract.buildDocumentUri(EXTERNAL_STORAGE_AUTHORITY, documentId)
     }
 
@@ -64,11 +64,10 @@ class ManagedStorageAccessor @Inject constructor(
      * @param volumeId Volume ID (default: "primary" for internal storage)
      * @return List of files, or null if access denied or directory doesn't exist
      */
-    fun listAndroidDataFiles(
+    actual fun listAndroidDataFiles(
         packageName: String,
-        subPath: String? = null,
-        volumeId: String = PRIMARY_VOLUME_ID
-    ): List<DocumentFile>? {
+        subPath: String?,
+        volumeId: String): List<DocumentFile>? {
         val relativePath = buildString {
             append("Android/data/$packageName")
             if (!subPath.isNullOrEmpty()) {
@@ -85,7 +84,7 @@ class ManagedStorageAccessor @Inject constructor(
      * @param relativePath Path relative to volume root (e.g., "Android/data/com.retroarch/files")
      * @return List of files, or null if access denied or directory doesn't exist
      */
-    fun listFiles(volumeId: String, relativePath: String): List<DocumentFile>? {
+    actual fun listFiles(volumeId: String, relativePath: String): List<DocumentFile>? {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
             return listFilesLegacy(volumeId, relativePath)
         }
@@ -120,7 +119,7 @@ class ManagedStorageAccessor @Inject constructor(
      * nothing. [listFiles] answers null for both an empty directory and a refused one; this
      * tells them apart.
      */
-    fun isListableDirectory(volumeId: String, relativePath: String): Boolean {
+    actual fun isListableDirectory(volumeId: String, relativePath: String): Boolean {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
             return File(getVolumeRoot(volumeId), relativePath).list() != null
         }
@@ -156,7 +155,7 @@ class ManagedStorageAccessor @Inject constructor(
     /**
      * Checks if a file or directory exists in Android/data.
      */
-    fun exists(packageName: String, subPath: String? = null, volumeId: String = PRIMARY_VOLUME_ID): Boolean {
+    actual fun exists(packageName: String, subPath: String?, volumeId: String): Boolean {
         val relativePath = buildString {
             append("Android/data/$packageName")
             if (!subPath.isNullOrEmpty()) {
@@ -169,7 +168,7 @@ class ManagedStorageAccessor @Inject constructor(
     /**
      * Checks if a file or directory exists at the given path.
      */
-    fun existsAtPath(volumeId: String, relativePath: String): Boolean {
+    actual fun existsAtPath(volumeId: String, relativePath: String): Boolean {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
             val file = File(getVolumeRoot(volumeId), relativePath)
             return file.exists()
@@ -190,7 +189,7 @@ class ManagedStorageAccessor @Inject constructor(
         }
     }
 
-    fun isDirectoryAtPath(volumeId: String, relativePath: String): Boolean {
+    actual fun isDirectoryAtPath(volumeId: String, relativePath: String): Boolean {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
             return File(getVolumeRoot(volumeId), relativePath).isDirectory
         }
@@ -215,11 +214,10 @@ class ManagedStorageAccessor @Inject constructor(
     /**
      * Opens an input stream for reading a file in Android/data.
      */
-    fun openInputStream(
+    actual fun openInputStream(
         packageName: String,
         filePath: String,
-        volumeId: String = PRIMARY_VOLUME_ID
-    ): InputStream? {
+        volumeId: String): InputStream? {
         val relativePath = "Android/data/$packageName/${filePath.trimStart('/')}"
         return openInputStreamAtPath(volumeId, relativePath)
     }
@@ -263,7 +261,7 @@ class ManagedStorageAccessor @Inject constructor(
             ParcelFileDescriptor.MODE_READ_ONLY
         }
 
-    fun openInputStreamAtPath(volumeId: String, relativePath: String): InputStream? {
+    actual fun openInputStreamAtPath(volumeId: String, relativePath: String): InputStream? {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
             val file = File(getVolumeRoot(volumeId), relativePath)
             return if (file.exists() && file.canRead()) file.inputStream() else null
@@ -285,11 +283,10 @@ class ManagedStorageAccessor @Inject constructor(
      * Opens an output stream for writing to a file in Android/data.
      * Creates the file if it doesn't exist.
      */
-    fun openOutputStream(
+    actual fun openOutputStream(
         packageName: String,
         filePath: String,
-        volumeId: String = PRIMARY_VOLUME_ID
-    ): OutputStream? {
+        volumeId: String): OutputStream? {
         val relativePath = "Android/data/$packageName/${filePath.trimStart('/')}"
         return openOutputStreamAtPath(volumeId, relativePath)
     }
@@ -298,7 +295,7 @@ class ManagedStorageAccessor @Inject constructor(
      * Opens an output stream for writing to a file at the given path.
      * Creates the file if it doesn't exist.
      */
-    fun openOutputStreamAtPath(volumeId: String, relativePath: String): OutputStream? {
+    actual fun openOutputStreamAtPath(volumeId: String, relativePath: String): OutputStream? {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
             val file = File(getVolumeRoot(volumeId), relativePath)
             file.parentFile?.mkdirs()
@@ -365,7 +362,7 @@ class ManagedStorageAccessor @Inject constructor(
     /**
      * Creates a directory at the given path, creating parent directories as needed.
      */
-    fun createDirectoryAtPath(volumeId: String, relativePath: String): Boolean {
+    actual fun createDirectoryAtPath(volumeId: String, relativePath: String): Boolean {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
             val dir = File(getVolumeRoot(volumeId), relativePath)
             return dir.mkdirs()
@@ -410,11 +407,10 @@ class ManagedStorageAccessor @Inject constructor(
     /**
      * Deletes a file in Android/data.
      */
-    fun delete(
+    actual fun delete(
         packageName: String,
         filePath: String,
-        volumeId: String = PRIMARY_VOLUME_ID
-    ): Boolean {
+        volumeId: String): Boolean {
         val relativePath = "Android/data/$packageName/${filePath.trimStart('/')}"
         return deleteAtPath(volumeId, relativePath)
     }
@@ -422,7 +418,7 @@ class ManagedStorageAccessor @Inject constructor(
     /**
      * Deletes a file at the given path.
      */
-    fun deleteAtPath(volumeId: String, relativePath: String): Boolean {
+    actual fun deleteAtPath(volumeId: String, relativePath: String): Boolean {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
             val file = File(getVolumeRoot(volumeId), relativePath)
             return file.delete()
@@ -442,13 +438,12 @@ class ManagedStorageAccessor @Inject constructor(
     /**
      * Copies a file from one location to another within Android/data.
      */
-    fun copyFile(
+    actual fun copyFile(
         sourcePackage: String,
         sourcePath: String,
         destPackage: String,
         destPath: String,
-        volumeId: String = PRIMARY_VOLUME_ID
-    ): Boolean {
+        volumeId: String): Boolean {
         val input = openInputStream(sourcePackage, sourcePath, volumeId) ?: return false
         val output = openOutputStream(destPackage, destPath, volumeId)
         if (output == null) {
@@ -472,11 +467,10 @@ class ManagedStorageAccessor @Inject constructor(
      * Gets the absolute file path for Android/data access (for display purposes).
      * Note: This path may not be directly accessible via File I/O on Android 11+.
      */
-    fun getAbsolutePath(
+    actual fun getAbsolutePath(
         packageName: String,
-        subPath: String? = null,
-        volumeId: String = PRIMARY_VOLUME_ID
-    ): String {
+        subPath: String?,
+        volumeId: String): String {
         val volumeRoot = getVolumeRoot(volumeId)
         return buildString {
             append(volumeRoot)
@@ -492,7 +486,7 @@ class ManagedStorageAccessor @Inject constructor(
     /**
      * Checks if the manage=true approach is supported (Android 11+).
      */
-    fun isManagedAccessSupported(): Boolean {
+    actual fun isManagedAccessSupported(): Boolean {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
     }
 

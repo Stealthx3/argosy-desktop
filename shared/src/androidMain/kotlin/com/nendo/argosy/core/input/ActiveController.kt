@@ -10,11 +10,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlin.math.abs
 
-data class ActiveController(
-    val deviceId: Int,
-    val controllerId: String
-)
-
 fun InputDevice.toActiveController(): ActiveController = ActiveController(id, controllerIdOf(this))
 
 private const val ACTIVATING_DEFLECTION = 0.5f

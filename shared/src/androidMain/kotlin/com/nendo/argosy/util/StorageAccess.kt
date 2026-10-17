@@ -14,14 +14,14 @@ import androidx.core.content.ContextCompat
  * Whether Argosy may read and write shared storage: All files access on Android 11 and later,
  * the legacy read and write runtime permissions before it.
  */
-object StorageAccess {
+actual object StorageAccess {
 
     val LEGACY_PERMISSIONS = arrayOf(
         Manifest.permission.READ_EXTERNAL_STORAGE,
         Manifest.permission.WRITE_EXTERNAL_STORAGE
     )
 
-    fun isGranted(context: Context): Boolean = isGranted(
+    actual fun isGranted(context: Context): Boolean = isGranted(
         sdkInt = Build.VERSION.SDK_INT,
         isExternalStorageManager = {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && Environment.isExternalStorageManager()
@@ -44,7 +44,7 @@ object StorageAccess {
         return Intent(action, Uri.parse("package:${context.packageName}"))
     }
 
-    fun isGranted(
+    actual fun isGranted(
         sdkInt: Int,
         isExternalStorageManager: () -> Boolean,
         isPermissionGranted: (String) -> Boolean

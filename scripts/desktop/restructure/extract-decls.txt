@@ -22,3 +22,10 @@ data/repository/AppsRepository.kt -> common:InstalledApp.kt: InstalledApp
 data/emulator/EmulatorDetector.kt -> common:InstalledEmulator.kt: InstalledEmulator
 libretro/LibretroCoreManager.kt -> common:CoreUpdateTypes.kt: PendingCoreUpdate CoreBulkUpdateResult
 data/platform/InstalledAppResolver.kt -> common:LaunchableApp.kt: LaunchableApp
+data/emulator/EmulatorUpdateManager.kt -> common:UpdateCheckState.kt: UpdateCheckState
+ui/audio/AmbientAudioManager.kt -> common:AmbientOverrideSource.kt: AmbientOverrideSource
+ui/coil/AppIconFetcher.kt -> common:AppIconData.kt: AppIconData
+data/netplay/PacketCrypto.kt -> common:NetplayCryptoException.kt: NetplayCryptoException
+data/launcher/SteamLauncher.kt -> common:ScannedSteamGame.kt: ScannedSteamGame
+core/input/ActiveController.kt -> common:ActiveControllerModel.kt: ActiveController
+core/input/ConnectedControllerTracker.kt -> common:ControllerIds.kt: controllerIdOf

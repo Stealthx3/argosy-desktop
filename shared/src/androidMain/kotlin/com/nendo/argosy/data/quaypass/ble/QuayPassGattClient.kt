@@ -18,7 +18,7 @@ import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
 import kotlin.coroutines.resume
 
-class QuayPassGattClient(private val application: Application) {
+actual class QuayPassGattClient(private val application: Application) {
 
     private var currentGatt: BluetoothGatt? = null
 
@@ -192,7 +192,7 @@ class QuayPassGattClient(private val application: Application) {
         }
     }
 
-    companion object {
+    actual companion object {
         private const val TAG = "QuayPassGattClient"
         private const val MTU_REQUEST = 512
         private const val DEFAULT_MTU = 23

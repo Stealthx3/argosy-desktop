@@ -17,9 +17,6 @@ import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 import javax.inject.Singleton
 
-fun controllerIdOf(device: InputDevice): String =
-    "${device.vendorId}:${device.productId}:${device.descriptor}"
-
 @Singleton
 actual class ConnectedControllerTracker @Inject constructor(
     @ApplicationContext private val context: Context
@@ -32,13 +29,13 @@ actual class ConnectedControllerTracker @Inject constructor(
     private val _connectedControllerIds = MutableStateFlow(readConnectedControllerIds())
     actual val connectedControllerIds: StateFlow<Set<String>> = _connectedControllerIds.asStateFlow()
 
-    val activeController: StateFlow<ActiveController?> = activeState.active
+    actual val activeController: StateFlow<ActiveController?> = activeState.active
 
     /**
      * Layout of [activeController], or of the first connected pad until one has sent input.
      * Re-detected whenever the active pad changes or any input device is added, changed or removed.
      */
-    val activeLayout: StateFlow<DetectedLayout?> =
+    actual val activeLayout: StateFlow<DetectedLayout?> =
         combine(activeController, deviceGeneration) { active, _ -> detectActive(active).layout }
             .flowOn(Dispatchers.IO)
             .stateIn(scope, SharingStarted.Eagerly, detectActive(null).layout)
@@ -60,11 +57,11 @@ actual class ConnectedControllerTracker @Inject constructor(
      */
     fun holdActiveController(held: Boolean) = activeState.setHeld(held)
 
-    fun activeDevice(): InputDevice? = deviceOf(activeController.value)
+    actual fun activeDevice(): InputDevice? = deviceOf(activeController.value)
 
-    fun detectActive(): DetectionResult = detectActive(activeController.value)
+    actual fun detectActive(): DetectionResult = detectActive(activeController.value)
 
-    fun refresh() {
+    actual fun refresh() {
         _connectedControllerIds.value = readConnectedControllerIds()
         activeState.onPadsChanged(connectedPads().map { it.toActiveController() })
         deviceGeneration.value++

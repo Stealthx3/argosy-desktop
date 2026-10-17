@@ -7,7 +7,7 @@ import com.nendo.argosy.domain.usecase.music.GetBgmTrackGameCoversUseCase
 import com.nendo.argosy.ui.audio.BgmPlaylistCoordinator
 import com.nendo.argosy.ui.components.ListReorder
 import com.nendo.argosy.ui.components.ReorderStep
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.nendo.argosy.di.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
