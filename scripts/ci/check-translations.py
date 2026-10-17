@@ -17,7 +17,7 @@ import sys
 import xml.etree.ElementTree as ET
 from collections import defaultdict
 
-BASE_DIR = "app/src/main/res/values"
+BASE_DIR = "shared/src/androidMain/res/values"
 
 # Plural categories each locale must supply, per CLDR. A locale that omits one
 # renders the wrong form for those counts, silently.
@@ -71,7 +71,7 @@ def args_of(text):
 
 def check_locale(locale, base):
     base_strings, base_plurals, base_untranslatable = base
-    loc_dir = f"app/src/main/res/values-{locale}"
+    loc_dir = f"shared/src/androidMain/res/values-{locale}"
     problems = []
     loc_strings, loc_plurals, loc_untranslatable = {}, {}, set()
 
@@ -164,7 +164,7 @@ def main():
     wanted = sys.argv[1:]
     locales = wanted or [
         os.path.basename(d)[len("values-") :]
-        for d in sorted(glob.glob("app/src/main/res/values-*"))
+        for d in sorted(glob.glob("shared/src/androidMain/res/values-*"))
         if glob.glob(f"{d}/strings*.xml")
     ]
     if not locales:

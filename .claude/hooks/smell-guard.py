@@ -45,7 +45,7 @@ PROSE_PATHS = [
     "**/*.conf", "**/*.gradle", "**/*.gradle.kts", "**/*.pro",
     "**/*.properties", "**/*.sh", "**/*.xml", "**/*.json",
 ]
-PROSE_EXCLUDE_PATHS = ["app/src/main/res/values*/strings*.xml"]
+PROSE_EXCLUDE_PATHS = ["app/src/main/res/values*/strings*.xml", "shared/src/androidMain/res/values*/strings*.xml"]
 PROSE_COMMENT_RE = re.compile(r"^\s*(//|#|<!--)")
 MAX_PROSE_COMMENT_LINES = 1
 
