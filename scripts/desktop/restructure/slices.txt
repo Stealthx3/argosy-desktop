@@ -1,0 +1,5 @@
+# Android classes kept in shared androidMain whose portable members commonMain sees through a
+# generated expect class (slices.py). Format:
+#   <file under shared androidMain>: <Class>(<member>: <return type>, ...)
+# The optional list gives return types the generator cannot infer (expression bodies).
+data/cache/ImageCacheManager.kt: ImageCacheManager(clearCache: Unit, migrateLegacyCacheDirs: Unit)

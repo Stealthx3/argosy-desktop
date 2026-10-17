@@ -87,13 +87,17 @@ def extract(source, new_name, names, widen):
     header, items, lines = parse(text)
     wanted = [it for it in items if it[0] in names]
     missing = names - {it[0] for it in wanted}
-    target = path.with_name(new_name)
+    if new_name.startswith("common:"):
+        source_root = next(r for r in [ROOT] + SHARED_ROOTS if path.is_relative_to(r))
+        target = SHARED_ROOTS[0] / path.parent.relative_to(source_root) / new_name[len("common:"):]
+    else:
+        target = path.with_name(new_name)
     if not wanted:
         print(f"skip {source} -> {new_name}: already extracted")
         return
     if missing:
         sys.exit(f"{source}: not found as top-level declarations: {sorted(missing)}")
-    rel_target = target.relative_to(next(r for r in [ROOT] + SHARED_ROOTS if path.is_relative_to(r)))
+    rel_target = target.relative_to(next(r for r in [ROOT] + SHARED_ROOTS if target.is_relative_to(r)))
     existing = [p for p in [ROOT / rel_target] + [r / rel_target for r in SHARED_ROOTS] if p.exists()]
     if existing and not REFRESH:
         sys.exit(f"{existing[0]} exists while {source} still holds {sorted(names)}; rerun with --refresh")
@@ -109,7 +113,7 @@ def extract(source, new_name, names, widen):
     used = imports_used(header, moved)
     if used:
         out += used + [""]
-    target.write_text("\n".join(out) + ("\n" if used else "") + moved + "\n")
+    target.write_text("\n".join(out) + "\n" + moved + "\n")
 
     drop = set()
     for _, start, end, _ in wanted:
@@ -129,8 +133,7 @@ def main():
         line = raw.strip()
         if not line or line.startswith("#"):
             continue
-        spec, names = line.split(":", 1)
-        source, new_name = (s.strip() for s in spec.split("->"))
+        source, new_name, names = re.match(r"(.+?)\s*->\s*(\S+?):\s+(.*)", line).groups()
         tokens = names.split()
         extract(
             source,

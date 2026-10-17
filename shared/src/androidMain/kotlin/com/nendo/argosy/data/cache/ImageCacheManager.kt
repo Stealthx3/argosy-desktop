@@ -77,26 +77,6 @@ internal val ImageType.isBoxFace: Boolean
     get() = this == ImageType.BOX_BACK || this == ImageType.BOX_SPINE ||
         this == ImageType.LOGO || this == ImageType.BOX_3D
 
-data class CachedGameImages(
-    val coverPath: String?,
-    val backgroundPath: String?,
-    val logoPath: String?
-)
-
-data class ImageCacheProgress(
-    val isProcessing: Boolean = false,
-    val currentGameTitle: String = "",
-    val currentType: String = "",
-    val cachedCount: Int = 0,
-    val totalCount: Int = 0
-) {
-    val progressPercent: Int
-        get() = if (totalCount > 0) {
-            val percent = cachedCount * 100 / totalCount
-            if (isProcessing && percent == 100) 99 else percent
-        } else 0
-}
-
 data class ScreenshotCacheRequest(
     val gameId: Long,
     val rommId: Long,
@@ -117,11 +97,6 @@ data class AchievementBadgeCacheRequest(
 data class AppIconCacheRequest(
     val gameId: Long,
     val packageName: String
-)
-
-data class CacheValidationResult(
-    val deletedFiles: Int,
-    val clearedPaths: Int
 )
 
 internal fun artUrlHash(url: String): String {
@@ -151,7 +126,7 @@ internal fun cachedArtDecision(
 
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 @Singleton
-class ImageCacheManager @Inject constructor(
+actual class ImageCacheManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val gameDao: GameDao,
     private val gameArtDao: GameArtDao,
@@ -163,7 +138,7 @@ class ImageCacheManager @Inject constructor(
 ) {
     private val artModelScope = SafeCoroutineScope(Dispatchers.IO, "GameArtModel")
 
-    val gameArt: StateFlow<Map<Long, ResolvedGameArt>> = gameArtDao.observeRowCount()
+    actual val gameArt: StateFlow<Map<Long, ResolvedGameArt>> = gameArtDao.observeRowCount()
         .conflate()
         .transform {
             emit(gameArtDao.getAll().toResolvedArtByGame())
@@ -171,11 +146,11 @@ class ImageCacheManager @Inject constructor(
         }
         .stateIn(artModelScope, SharingStarted.Lazily, emptyMap())
 
-    fun artFor(gameId: Long): ResolvedGameArt? = gameArt.value[gameId]
+    actual fun artFor(gameId: Long): ResolvedGameArt? = gameArt.value[gameId]
 
-    suspend fun loadArt(gameId: Long): ResolvedGameArt = gameArtDao.resolved(gameId)
+    actual suspend fun loadArt(gameId: Long): ResolvedGameArt = gameArtDao.resolved(gameId)
 
-    fun observeArt(gameId: Long): Flow<ResolvedGameArt?> =
+    actual fun observeArt(gameId: Long): Flow<ResolvedGameArt?> =
         gameArt.map { it[gameId] }.distinctUntilChanged()
 
     private val defaultCacheDir: File by lazy {
@@ -201,7 +176,7 @@ class ImageCacheManager @Inject constructor(
             }
         }
 
-    fun setCustomCachePath(path: String?) {
+    actual fun setCustomCachePath(path: String?) {
         customCacheBasePath = path
         if (path != null) {
             File(path, CACHE_SUBFOLDER).also {
@@ -212,11 +187,11 @@ class ImageCacheManager @Inject constructor(
         Log.d(TAG, "Custom cache base path set to: $path")
     }
 
-    fun getCustomCachePath(): String? = customCacheBasePath
+    actual fun getCustomCachePath(): String? = customCacheBasePath
 
-    fun getDefaultCachePath(): String = defaultCacheDir.absolutePath
+    actual fun getDefaultCachePath(): String = defaultCacheDir.absolutePath
 
-    fun getCurrentCachePath(): String = cacheDir.absolutePath
+    actual fun getCurrentCachePath(): String = cacheDir.absolutePath
 
     companion object {
         private const val MAX_IN_MEMORY_IMAGE_BYTES = 8 * 1024 * 1024
@@ -294,27 +269,27 @@ class ImageCacheManager @Inject constructor(
     private var isProcessingCovers = false
 
     private val _progress = kotlinx.coroutines.flow.MutableStateFlow(ImageCacheProgress())
-    val progress: kotlinx.coroutines.flow.StateFlow<ImageCacheProgress> = _progress
+    actual val progress: kotlinx.coroutines.flow.StateFlow<ImageCacheProgress> = _progress
 
     private val _screenshotProgress = kotlinx.coroutines.flow.MutableStateFlow(ImageCacheProgress())
-    val screenshotProgress: kotlinx.coroutines.flow.StateFlow<ImageCacheProgress> = _screenshotProgress
+    actual val screenshotProgress: kotlinx.coroutines.flow.StateFlow<ImageCacheProgress> = _screenshotProgress
 
     private var isPaused = false
 
-    fun pauseBackgroundCaching() {
+    actual fun pauseBackgroundCaching() {
         isPaused = true
         Log.d(TAG, "Background caching paused")
     }
 
-    fun resumeBackgroundCaching() {
+    actual fun resumeBackgroundCaching() {
         isPaused = false
         Log.d(TAG, "Background caching resumed")
     }
 
-    fun queueBackgroundCache(url: String, rommId: Long, gameTitle: String = "") =
+    actual fun queueBackgroundCache(url: String, rommId: Long, gameTitle: String) =
         queueBackgroundCache(listOf(url), rommId, gameTitle)
 
-    fun queueBackgroundCache(urls: List<String>, rommId: Long, gameTitle: String = "") {
+    actual fun queueBackgroundCache(urls: List<String>, rommId: Long, gameTitle: String) {
         if (urls.isEmpty()) return
         scope.launch {
             queue.send(ImageCacheRequest(urls, rommId, ImageType.BACKGROUND, gameTitle, isSteam = false))
@@ -322,14 +297,14 @@ class ImageCacheManager @Inject constructor(
         }
     }
 
-    fun queueSteamBackgroundCache(url: String, steamAppId: Long, gameTitle: String = "") {
+    actual fun queueSteamBackgroundCache(url: String, steamAppId: Long, gameTitle: String) {
         scope.launch {
             queue.send(ImageCacheRequest(url, steamAppId, ImageType.BACKGROUND, gameTitle, isSteam = true))
             startProcessingIfNeeded()
         }
     }
 
-    fun queueBackgroundCacheByGameId(url: String, gameId: Long, gameTitle: String = "") {
+    actual fun queueBackgroundCacheByGameId(url: String, gameId: Long, gameTitle: String) {
         scope.launch {
             queue.send(ImageCacheRequest(url, gameId, ImageType.BACKGROUND, gameTitle, gameId = gameId))
             startProcessingIfNeeded()
@@ -576,7 +551,7 @@ class ImageCacheManager @Inject constructor(
         return options.outWidth > 0 && options.outHeight > 0
     }
 
-    fun isLikelyAppIcon(file: File): Boolean {
+    actual fun isLikelyAppIcon(file: File): Boolean {
         if (!file.exists()) return true
         val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
         BitmapFactory.decodeFile(file.absolutePath, options)
@@ -593,7 +568,7 @@ class ImageCacheManager @Inject constructor(
      * for the pending pass to fetch again. Artwork overrides and their files are kept. Returns the
      * bytes reclaimed.
      */
-    suspend fun clearPlatformCache(platformSlug: String): Long = withContext(Dispatchers.IO) {
+    actual suspend fun clearPlatformCache(platformSlug: String): Long = withContext(Dispatchers.IO) {
         val keep = gameArtDao.getOverridePathsForPlatform(platformSlug).toSet()
         val root = File(cacheDir, platformSlug)
         if (!root.exists()) return@withContext 0L
@@ -618,7 +593,7 @@ class ImageCacheManager @Inject constructor(
     /**
      * Deletes every cached image file except the artwork overrides games still reference.
      */
-    suspend fun clearCache() = withContext(Dispatchers.IO) {
+    actual suspend fun clearCache() = withContext(Dispatchers.IO) {
         val keep = gameArtDao.getAllOverridePaths().toSet()
         cacheDir.walkBottomUp().forEach { entry ->
             when {
@@ -635,13 +610,13 @@ class ImageCacheManager @Inject constructor(
      * Clearing Coil's memory cache evicts every decoded bitmap in the app, so a sync that
      * touches thousands of games must clear once at the end rather than per game.
      */
-    suspend fun clearDecodedImageCache() {
+    actual suspend fun clearDecodedImageCache() {
         withContext(Dispatchers.Main) {
             context.imageLoader.memoryCache?.clear()
         }
     }
 
-    suspend fun deleteGameImages(rommId: Long, clearDecoded: Boolean = true) {
+    actual suspend fun deleteGameImages(rommId: Long, clearDecoded: Boolean) {
         withContext(Dispatchers.IO) {
             val slug = resolveRommPlatformSlug(rommId)
             val prefixes = listOf(
@@ -662,20 +637,20 @@ class ImageCacheManager @Inject constructor(
         if (clearDecoded) clearDecodedImageCache()
     }
 
-    suspend fun forgetCachedArt(gameId: Long) {
+    actual suspend fun forgetCachedArt(gameId: Long) {
         ArtSlot.entries.forEach { forgetCachedArt(gameId, it) }
         gameScreenshotDao.clearCachedForGame(gameId)
     }
 
-    suspend fun forgetCachedArt(gameId: Long, slot: ArtSlot) {
+    actual suspend fun forgetCachedArt(gameId: Long, slot: ArtSlot) {
         gameArtDao.clearCached(gameId, slot)
     }
 
-    fun getCacheSize(): Long {
+    actual fun getCacheSize(): Long {
         return cacheDir.walk().filter { it.isFile && it.name != ".nomedia" }.sumOf { it.length() }
     }
 
-    fun getCacheSizeForBasePath(basePath: String): Long {
+    actual fun getCacheSizeForBasePath(basePath: String): Long {
         val dir = if (basePath == defaultCacheDir.absolutePath) {
             File(basePath)
         } else {
@@ -684,11 +659,11 @@ class ImageCacheManager @Inject constructor(
         return dir.walk().filter { it.isFile && it.name != ".nomedia" }.sumOf { it.length() }
     }
 
-    fun getCacheFileCount(): Int {
+    actual fun getCacheFileCount(): Int {
         return cacheDir.walk().count { it.isFile && it.name != ".nomedia" }
     }
 
-    fun getCacheFileCountForBasePath(basePath: String): Int {
+    actual fun getCacheFileCountForBasePath(basePath: String): Int {
         val dir = if (basePath == defaultCacheDir.absolutePath) {
             File(basePath)
         } else {
@@ -697,11 +672,10 @@ class ImageCacheManager @Inject constructor(
         return dir.walk().count { it.isFile && it.name != ".nomedia" }
     }
 
-    suspend fun migrateCache(
+    actual suspend fun migrateCache(
         fromBasePath: String,
         toBasePath: String,
-        onProgress: (Int, Int) -> Unit = { _, _ -> }
-    ): Boolean = withContext(Dispatchers.IO) {
+        onProgress: (Int, Int) -> Unit): Boolean = withContext(Dispatchers.IO) {
         val sourceDir = if (fromBasePath == defaultCacheDir.absolutePath) {
             File(fromBasePath)
         } else {
@@ -756,13 +730,13 @@ class ImageCacheManager @Inject constructor(
         failed == 0
     }
 
-    fun needsLegacyCacheDirsMigration(): Boolean {
+    actual fun needsLegacyCacheDirsMigration(): Boolean {
         val imagesPending = hasContent(legacyImagesDir) &&
             legacyImagesDir.absolutePath != cacheDir.absolutePath
         return imagesPending || hasContent(legacySteamDir)
     }
 
-    suspend fun migrateLegacyCacheDirs() = withContext(cacheDispatcher) {
+    actual suspend fun migrateLegacyCacheDirs() = withContext(cacheDispatcher) {
         val imagesTarget = cacheDir
         if (hasContent(legacyImagesDir) && legacyImagesDir.absolutePath != imagesTarget.absolutePath) {
             moveLegacyDir(legacyImagesDir, imagesTarget)
@@ -850,7 +824,7 @@ class ImageCacheManager @Inject constructor(
         return updated
     }
 
-    fun getPendingCount(): Int = queue.isEmpty.let { if (it) 0 else -1 }
+    actual fun getPendingCount(): Int = queue.isEmpty.let { if (it) 0 else -1 }
 
     /**
      * Queues every art slot whose cached file does not come from its current source url. Rows
@@ -858,7 +832,7 @@ class ImageCacheManager @Inject constructor(
      * the name does not carry the source url's hash. Known-missing urls are skipped, and so are
      * box spine and back scans unless [includeBoxFaces].
      */
-    fun resumePendingArt(includeBoxFaces: Boolean) {
+    actual fun resumePendingArt(includeBoxFaces: Boolean) {
         scope.launch {
             val pending = gameArtDao.getPending()
                 .filterNot { missingArt.isKnownMissing(it.sourceUrl) }
@@ -889,7 +863,7 @@ class ImageCacheManager @Inject constructor(
      * source is matched by file name before anything is downloaded. A cached file that is
      * genuinely gone from a readable volume is forgotten and downloaded again.
      */
-    suspend fun queueArtIfStale(
+    actual suspend fun queueArtIfStale(
         gameId: Long,
         slot: ArtSlot,
         urls: List<String>,
@@ -915,7 +889,7 @@ class ImageCacheManager @Inject constructor(
      * failed to draw it. A file that is still on disk, or a slot with no recorded source, is left
      * alone.
      */
-    fun repairMissingArt(gameId: Long, slot: ArtSlot) {
+    actual fun repairMissingArt(gameId: Long, slot: ArtSlot) {
         scope.launch {
             val source = gameArtDao.get(gameId, slot.name)?.sourceUrl ?: return@launch
             val game = gameDao.getById(gameId) ?: return@launch
@@ -952,7 +926,7 @@ class ImageCacheManager @Inject constructor(
         }
     }
 
-    fun queueScreenshotCache(gameId: Long, rommId: Long, gameTitle: String) {
+    actual fun queueScreenshotCache(gameId: Long, rommId: Long, gameTitle: String) {
         scope.launch {
             screenshotQueue.send(ScreenshotCacheRequest(gameId, rommId, gameTitle))
             startScreenshotProcessingIfNeeded()
@@ -963,7 +937,7 @@ class ImageCacheManager @Inject constructor(
      * Caches every screenshot row of [gameId] not yet cached from its source url. When the game
      * has no cached background, the second cached screenshot, or the only one, becomes it.
      */
-    fun queueScreenshotCacheByGameId(gameId: Long) {
+    actual fun queueScreenshotCacheByGameId(gameId: Long) {
         scope.launch {
             val cachedPaths = cacheScreenshotRows(gameId, "ss_g$gameId", maxWidth = 960, quality = 80)
             if (cachedPaths.isEmpty()) return@launch
@@ -1023,7 +997,7 @@ class ImageCacheManager @Inject constructor(
         return true
     }
 
-    suspend fun cacheSingleScreenshot(gameId: Long, url: String, index: Int): String? {
+    actual suspend fun cacheSingleScreenshot(gameId: Long, url: String, index: Int): String? {
         val slug = resolveGamePlatformSlug(gameId)
         val fileName = "ss_g${gameId}_${index}_${url.md5Hash()}.jpg"
         val cachedFile = File(platformDir(slug, "screenshots"), fileName)
@@ -1087,12 +1061,12 @@ class ImageCacheManager @Inject constructor(
         cacheScreenshotRows(request.gameId, "ss_${request.rommId}", maxWidth = 480, quality = 75)
     }
 
-    suspend fun userScreenshotTargetFile(rommId: Long, screenshotId: Long, version: String): File {
+    actual suspend fun userScreenshotTargetFile(rommId: Long, screenshotId: Long, version: String): File {
         val slug = resolveRommPlatformSlug(rommId)
         return File(platformDir(slug, "screenshots"), "uss_${rommId}_${screenshotId}_${version.md5Hash()}.png")
     }
 
-    fun pruneStaleUserScreenshots(rommId: Long, screenshotId: Long, keep: File) {
+    actual fun pruneStaleUserScreenshots(rommId: Long, screenshotId: Long, keep: File) {
         keep.parentFile?.listFiles()?.forEach { file ->
             if (file.name.startsWith("uss_${rommId}_${screenshotId}_") && file.name != keep.name) file.delete()
         }
@@ -1103,7 +1077,7 @@ class ImageCacheManager @Inject constructor(
      * url. Rows cached before `cachedFromUrl` existed are matched by file name first and only
      * queued when the name does not carry the source url's hash.
      */
-    fun resumePendingScreenshotCache() {
+    actual fun resumePendingScreenshotCache() {
         scope.launch {
             val (backfill, stale) = gameScreenshotDao.getPending().partition {
                 canBackfillCachedFromUrl(it.cachedPath, it.cachedFromUrl, it.sourceUrl)
@@ -1117,7 +1091,7 @@ class ImageCacheManager @Inject constructor(
             }
         }
     }
-    fun queuePlatformLogoCache(platformId: Long, logoUrl: String) {
+    actual fun queuePlatformLogoCache(platformId: Long, logoUrl: String) {
         scope.launch {
             logoQueue.send(PlatformLogoCacheRequest(platformId, logoUrl))
             startLogoProcessingIfNeeded()
@@ -1228,7 +1202,7 @@ class ImageCacheManager @Inject constructor(
         return result
     }
 
-    fun resumePendingLogoCache() {
+    actual fun resumePendingLogoCache() {
         scope.launch {
             val uncached = platformDao.getPlatformsWithRemoteLogos()
             if (uncached.isEmpty()) return@launch
@@ -1241,12 +1215,12 @@ class ImageCacheManager @Inject constructor(
         }
     }
 
-    enum class BoxFace { BACK, SPINE, LOGO, BOX_3D }
+    actual enum class BoxFace { BACK, SPINE, LOGO, BOX_3D }
 
-    fun queueCoverCache(url: String, rommId: Long, gameTitle: String = "") =
+    actual fun queueCoverCache(url: String, rommId: Long, gameTitle: String) =
         queueCoverCache(listOf(url), rommId, gameTitle)
 
-    fun queueCoverCache(urls: List<String>, rommId: Long, gameTitle: String = "") {
+    actual fun queueCoverCache(urls: List<String>, rommId: Long, gameTitle: String) {
         if (urls.isEmpty()) return
         scope.launch {
             coverQueue.send(ImageCacheRequest(urls, rommId, ImageType.COVER, gameTitle, isSteam = false))
@@ -1258,7 +1232,7 @@ class ImageCacheManager @Inject constructor(
      * Checks whether the server art behind the cached cover at [cachedPath] actually changed
      * before downloading it again. Unchanged art keeps its file, renamed to match [urls].
      */
-    fun queueCoverRevalidation(cachedPath: String, urls: List<String>, rommId: Long, gameTitle: String = "") {
+    actual fun queueCoverRevalidation(cachedPath: String, urls: List<String>, rommId: Long, gameTitle: String) {
         if (urls.isEmpty()) return
         scope.launch {
             coverQueue.send(
@@ -1268,7 +1242,7 @@ class ImageCacheManager @Inject constructor(
         }
     }
 
-    fun queueBackgroundRevalidation(cachedPath: String, urls: List<String>, rommId: Long, gameTitle: String = "") {
+    actual fun queueBackgroundRevalidation(cachedPath: String, urls: List<String>, rommId: Long, gameTitle: String) {
         if (urls.isEmpty()) return
         scope.launch {
             queue.send(
@@ -1278,7 +1252,7 @@ class ImageCacheManager @Inject constructor(
         }
     }
 
-    fun queueBoxFaceCache(urls: List<String>, rommId: Long, gameTitle: String = "", face: BoxFace) {
+    actual fun queueBoxFaceCache(urls: List<String>, rommId: Long, gameTitle: String, face: BoxFace) {
         if (urls.isEmpty()) return
         scope.launch {
             coverQueue.send(ImageCacheRequest(urls, rommId, face.imageType, gameTitle, isSteam = false))
@@ -1302,10 +1276,10 @@ class ImageCacheManager @Inject constructor(
             else -> ArtSlot.BOX_SPINE
         }
 
-    fun queueCoverCacheByGameId(url: String, gameId: Long) =
+    actual fun queueCoverCacheByGameId(url: String, gameId: Long) =
         queueCoverCacheByGameId(listOf(url), gameId)
 
-    fun queueCoverCacheByGameId(urls: List<String>, gameId: Long) {
+    actual fun queueCoverCacheByGameId(urls: List<String>, gameId: Long) {
         if (urls.isEmpty()) return
         scope.launch {
             coverQueue.send(ImageCacheRequest(urls, gameId, ImageType.COVER, gameId = gameId))
@@ -1605,16 +1579,15 @@ class ImageCacheManager @Inject constructor(
      * refresh has to finish its own image work before it reports itself done, or the row is
      * written pointing at a remote url that nothing has fetched yet.
      */
-    suspend fun cacheGameImagesNow(
+    actual suspend fun cacheGameImagesNow(
         rommId: Long,
         gameTitle: String,
         coverUrls: List<String>,
         backgroundUrls: List<String>,
-        boxBackUrls: List<String> = emptyList(),
-        boxSpineUrls: List<String> = emptyList(),
-        logoUrls: List<String> = emptyList(),
-        box3dUrls: List<String> = emptyList()
-    ): CachedGameImages = withContext(Dispatchers.IO) {
+        boxBackUrls: List<String>,
+        boxSpineUrls: List<String>,
+        logoUrls: List<String>,
+        box3dUrls: List<String>): CachedGameImages = withContext(Dispatchers.IO) {
         if (coverUrls.isNotEmpty()) {
             processCoverRequest(ImageCacheRequest(coverUrls, rommId, ImageType.COVER, gameTitle, isSteam = false))
         }
@@ -1652,7 +1625,7 @@ class ImageCacheManager @Inject constructor(
         return null
     }
 
-    suspend fun applyArtOverride(gameId: Long, slot: ArtSlot, url: String): Boolean =
+    actual suspend fun applyArtOverride(gameId: Long, slot: ArtSlot, url: String): Boolean =
         withContext(Dispatchers.IO) {
             val bitmap = downloadAndResize(url, slot.maxWidth) ?: return@withContext false
             storeArtOverride(gameId, slot, url.md5Hash(), bitmap)
@@ -1662,7 +1635,7 @@ class ImageCacheManager @Inject constructor(
      * Copies a picture the user already has into the cache as [slot]'s override, read through
      * [FileAccessLayer] so restricted storage paths resolve.
      */
-    suspend fun applyArtOverrideFromFile(gameId: Long, slot: ArtSlot, path: String): Boolean =
+    actual suspend fun applyArtOverrideFromFile(gameId: Long, slot: ArtSlot, path: String): Boolean =
         withContext(Dispatchers.IO) {
             val bytes = fileAccessLayer.readBytes(path) ?: return@withContext false
             val bitmap = runCatching {
@@ -1673,7 +1646,7 @@ class ImageCacheManager @Inject constructor(
             storeArtOverride(gameId, slot, path.md5Hash(), bitmap)
         }
 
-    suspend fun clearArtOverride(gameId: Long, slot: ArtSlot): Unit = withContext(Dispatchers.IO) {
+    actual suspend fun clearArtOverride(gameId: Long, slot: ArtSlot): Unit = withContext(Dispatchers.IO) {
         val previous = gameArtDao.get(gameId, slot.name)?.overridePath ?: return@withContext
         gameArtDao.clearOverride(gameId, slot)
         deleteOverrideFile(previous)
@@ -1787,7 +1760,7 @@ class ImageCacheManager @Inject constructor(
     private val badgeQueue = Channel<AchievementBadgeCacheRequest>(256)
     private var isProcessingBadges = false
 
-    fun queueBadgeCache(achievementId: Long, badgeUrl: String, badgeUrlLock: String?) {
+    actual fun queueBadgeCache(achievementId: Long, badgeUrl: String, badgeUrlLock: String?) {
         scope.launch {
             badgeQueue.send(AchievementBadgeCacheRequest(achievementId, badgeUrl, badgeUrlLock))
             startBadgeProcessingIfNeeded()
@@ -1884,7 +1857,7 @@ class ImageCacheManager @Inject constructor(
         }
     }
 
-    fun resumePendingBadgeCache() {
+    actual fun resumePendingBadgeCache() {
         scope.launch {
             val uncached = achievementDao.getWithUncachedBadges()
             if (uncached.isEmpty()) return@launch
@@ -1897,7 +1870,7 @@ class ImageCacheManager @Inject constructor(
         }
     }
 
-    suspend fun setScreenshotAsBackground(gameId: Long, screenshotPath: String): Boolean =
+    actual suspend fun setScreenshotAsBackground(gameId: Long, screenshotPath: String): Boolean =
         if (screenshotPath.startsWith("/")) {
             applyArtOverrideFromFile(gameId, ArtSlot.BACKGROUND, screenshotPath)
         } else {
@@ -1908,7 +1881,7 @@ class ImageCacheManager @Inject constructor(
     private var isProcessingAppIcons = false
     private val packageManager: PackageManager by lazy { context.packageManager }
 
-    fun queueAppIconCache(gameId: Long, packageName: String) {
+    actual fun queueAppIconCache(gameId: Long, packageName: String) {
         scope.launch {
             appIconQueue.send(AppIconCacheRequest(gameId, packageName))
             startAppIconProcessingIfNeeded()
@@ -1997,7 +1970,7 @@ class ImageCacheManager @Inject constructor(
         return bitmap
     }
 
-    suspend fun cacheAppIconSync(packageName: String): String? {
+    actual suspend fun cacheAppIconSync(packageName: String): String? {
         return withContext(Dispatchers.IO) {
             val iconDir = platformDir("android", "icons")
             val fileName = "appicon_${packageName.hashCode()}.png"
@@ -2049,10 +2022,9 @@ class ImageCacheManager @Inject constructor(
      * pass are checked, because a file that gets rewritten carries a newer timestamp. Pass
      * [force] to sweep everything regardless, which is what the settings action does.
      */
-    suspend fun validateAndCleanCache(
-        force: Boolean = false,
-        onProgress: (suspend (phase: String, current: Int, total: Int) -> Unit)? = null
-    ): CacheValidationResult {
+    actual suspend fun validateAndCleanCache(
+        force: Boolean,
+        onProgress: (suspend (phase: String, current: Int, total: Int) -> Unit)?): CacheValidationResult {
         var deleted = 0
         var cleared = 0
 
@@ -2172,14 +2144,13 @@ class ImageCacheManager @Inject constructor(
         }
     }
 
-    fun needsFlatToShardedMigration(): Boolean {
+    actual fun needsFlatToShardedMigration(): Boolean {
         val files = cacheDir.listFiles() ?: return false
         return files.any { it.isFile && it.name != ".nomedia" && !it.name.endsWith(".tmp") }
     }
 
-    suspend fun migrateFlatToSharded(
-        onProgress: (suspend (current: Int, total: Int) -> Unit)? = null
-    ) {
+    actual suspend fun migrateFlatToSharded(
+        onProgress: (suspend (current: Int, total: Int) -> Unit)?) {
         withContext(cacheDispatcher) {
             val rootFiles = cacheDir.listFiles()
                 ?.filter { it.isFile && it.name != ".nomedia" && !it.name.endsWith(".tmp") }

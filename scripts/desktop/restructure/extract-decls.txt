@@ -2,6 +2,7 @@
 # move to their own file in the same package. Format:
 #   <source file> -> <new file name>: <top-level declarations, in any order>
 # ^NAME marks a private declaration the source file still uses; it moves as internal.
+# A new file name written common:<name> goes to shared commonMain, in the source's package directory.
 # Paths are relative to app/src/main/kotlin/com/nendo/argosy. Run extract_decls.py from the repo root.
 data/preferences/UserPreferencesRepository.kt -> UserPreferences.kt: BuiltinEmulatorSettings UserPreferences
 data/preferences/UserPreferencesRepository.kt -> PreferenceEnums.kt: GripReserveMode ThemeMode GridDensity LibraryLayout BoxArtCornerRadius BoxArtBorderThickness BoxArtBorderStyle GlassBorderTint BoxArtGlowStrength SystemIconPosition PlatformIndicatorStyle PlatformIndicatorContent SystemIconPadding DefaultView BoxArtInnerEffect BoxArtInnerEffectThickness BoxArtOuterEffect BoxArtOuterEffectThickness GlowColorMode BoxArtShape AmbientLedColorMode DisplayRoleOverride DualScreenInputFocus EmulatorDisplayTarget
@@ -15,3 +16,4 @@ ui/input/HapticFeedback.kt -> HapticPatterns.kt: HapticPattern
 ui/input/SoundFeedback.kt -> SoundPresets.kt: SoundPreset
 ui/theme/backdrop/BackdropStamps.kt -> BackdropStampLocals.kt: LocalBackdropStamps
 ui/theme/backdrop/SurfaceBackdrop.kt -> SurfaceBackdropLocals.kt: BackdropRole LocalSurfaceBackdrop
+data/cache/ImageCacheManager.kt -> common:ImageCacheTypes.kt: CachedGameImages ImageCacheProgress CacheValidationResult

@@ -24,6 +24,7 @@ python3 -I "$HERE/move_companion_functions.py"
 python3 -I "$HERE/apply_moves.py"
 python3 -I "$HERE/move_members.py"
 python3 -I "$HERE/actualize.py"
+python3 -I "$HERE/slices.py"
 python3 -I "$HERE/rewrite_imports.py"
 git add -A app/src/main/kotlin shared/src
 python3 -I "$HERE/movable.py" --check || true

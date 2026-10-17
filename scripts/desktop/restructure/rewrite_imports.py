@@ -96,6 +96,14 @@ RULES = [
         re.compile(r"\bandroid\.text\.format\.DateFormat\.getBestDateTimePattern\b"),
         "com.nendo.argosy.platform.PlatformDateFormat.getBestDateTimePattern",
     ),
+    (re.compile(r"(?<!import )\bandroid\.graphics\.Bitmap\.Config\b"), "com.nendo.argosy.platform.PlatformBitmapConfig"),
+    (re.compile(r"^import android\.graphics\.Bitmap$", re.M), "import com.nendo.argosy.platform.PlatformBitmap as Bitmap"),
+    (re.compile(r"(?<!import )\bandroid\.graphics\.Bitmap\b(?!Factory)"), "com.nendo.argosy.platform.PlatformBitmap"),
+    (re.compile(r"^import android\.graphics\.BitmapFactory$", re.M), "import com.nendo.argosy.platform.PlatformBitmapFactory as BitmapFactory"),
+    (re.compile(r"(?<!import )\bandroid\.graphics\.BitmapFactory\b"), "com.nendo.argosy.platform.PlatformBitmapFactory"),
+    (re.compile(r"^import androidx\.compose\.ui\.graphics\.asImageBitmap$", re.M), "import com.nendo.argosy.platform.asImageBitmap"),
+    (re.compile(r"^import android\.util\.Base64$", re.M), "import com.nendo.argosy.platform.PlatformBase64 as Base64"),
+    (re.compile(r"\bandroid\.util\.Base64\."), "com.nendo.argosy.platform.PlatformBase64."),
     (re.compile(r"^import android\.view\.KeyEvent$", re.M), "import com.nendo.argosy.core.input.AndroidKeyCodes as KeyEvent"),
     (
         re.compile(r"^import com\.nendo\.argosy\.util\.DisplayAffinityHelper$", re.M),
@@ -118,11 +126,36 @@ COMPANION_IMPORTS = {
         "com.nendo.argosy.platform.resources",
     ],
     "com.nendo.argosy.platform.LocalPlatformView": ["com.nendo.argosy.platform.getLocationOnScreen"],
+    "com.nendo.argosy.platform.PlatformBitmap": [
+        "com.nendo.argosy.platform.asImageBitmap", "com.nendo.argosy.platform.config", "com.nendo.argosy.platform.copy",
+        "com.nendo.argosy.platform.getPixel", "com.nendo.argosy.platform.height", "com.nendo.argosy.platform.recycle",
+        "com.nendo.argosy.platform.width",
+    ],
     "com.nendo.argosy.platform.LocalPlatformConfiguration": [
         "com.nendo.argosy.platform.orientation", "com.nendo.argosy.platform.screenHeightDp",
         "com.nendo.argosy.platform.screenWidthDp",
     ],
 }
+
+
+BITMAP_CONFIG = re.compile(r"(?<![\w.])Bitmap\.Config\b")
+
+
+def rewrite_bitmap_config(text):
+    if not re.search(r"^import com\.nendo\.argosy\.platform\.PlatformBitmap as Bitmap$", text, re.M):
+        return text
+    if not BITMAP_CONFIG.search(text):
+        return text
+    text = BITMAP_CONFIG.sub("PlatformBitmapConfig", text)
+    if not re.search(r"^import com\.nendo\.argosy\.platform\.PlatformBitmapConfig$", text, re.M):
+        text = re.sub(
+            r"^(import com\.nendo\.argosy\.platform\.PlatformBitmap as Bitmap)$",
+            r"\1\nimport com.nendo.argosy.platform.PlatformBitmapConfig",
+            text,
+            count=1,
+            flags=re.M,
+        )
+    return text
 
 
 def ensure_companions(text):
@@ -145,6 +178,7 @@ def main():
         new = text
         for pattern, replacement in RULES:
             new = pattern.sub(replacement, new)
+        new = rewrite_bitmap_config(new)
         new = ensure_companions(new)
         if new != text:
             path.write_text(new)

@@ -133,8 +133,24 @@ GUARDED_REWRITES = {
         r"\b(?:availableBlocks\w*|freeBlocks\w*|blockCount\w*|blockSize\w*|freeBytes|totalBytes|restat)\b"
     ),
     "android.text.format.DateFormat": re.compile(r"\bDateFormat\.(?!getBestDateTimePattern\b)\w+"),
+    "android.graphics.Bitmap": re.compile(
+        r"\bBitmap\.(?!Config\.(?:ARGB_8888|HARDWARE)\b)\w+"
+        r"|\.(?:compress|eraseColor|setPixels?|getPixels|copyPixels\w*|isRecycled|byteCount|allocationByteCount"
+        r"|density|hasAlpha|setHasAlpha|prepareToDraw|extractAlpha|reconfigure|rowBytes|generationId|isMutable"
+        r"|colorSpace|asShared|hardwareBuffer|getHardwareBuffer|scale)\b"
+    ),
+    "android.graphics.BitmapFactory": re.compile(
+        r"\bBitmapFactory\.(?!decodeFile\b|Options\b)\w+"
+        r"|\b(?:inSampleSize|inPreferredConfig|inMutable|inScaled|inDensity|inTargetDensity|outMimeType|outConfig|inBitmap)\b"
+    ),
+    "android.util.Base64": re.compile(
+        r"\bBase64\.(?!decode\b|encode\b|encodeToString\b|DEFAULT\b|NO_PADDING\b|NO_WRAP\b|CRLF\b|URL_SAFE\b)\w+"
+    ),
 }
-FQ_GUARDED = ("android.content.Context", "android.os.SystemClock", "dagger.hilt.android.qualifiers.ApplicationContext")
+FQ_GUARDED = (
+    "android.content.Context", "android.os.SystemClock", "dagger.hilt.android.qualifiers.ApplicationContext",
+    "android.graphics.Bitmap", "android.graphics.BitmapFactory", "android.util.Base64",
+)
 STRINGS = re.compile(r'"(?:[^"\\\n]|\\.)*"')
 STAND_IN_GUARDS = {
     "com.nendo.argosy.platform.PlatformContext": "android.content.Context",
@@ -154,6 +170,9 @@ STAND_IN_GUARDS = {
     "com.nendo.argosy.platform.PlatformEnvironment": "android.os.Environment",
     "com.nendo.argosy.platform.PlatformStatFs": "android.os.StatFs",
     "com.nendo.argosy.platform.PlatformDateFormat": "android.text.format.DateFormat",
+    "com.nendo.argosy.platform.PlatformBitmap": "android.graphics.Bitmap",
+    "com.nendo.argosy.platform.PlatformBitmapFactory": "android.graphics.BitmapFactory",
+    "com.nendo.argosy.platform.PlatformBase64": "android.util.Base64",
 }
 COMMENTS = re.compile(r"/\*.*?\*/|^\s*//[^\n]*", re.S | re.M)
 ANDROID_FQ = re.compile(r"(?<![\w.])(?:android|androidx|com|org|io|net|dagger|coil|in|okhttp3|retrofit2)\.[a-z]\w*(?:\.\w+)+")
@@ -247,7 +266,7 @@ def analyse(u, index, packages):
             if GUARDED_REWRITES[guarded].search(u.body):
                 common.append(f"reference {fq} beyond its portable stand-in")
             continue
-        if not fq.startswith(REWRITTEN) and not fq.startswith("com.nendo.argosy."):
+        if not fq.startswith(REWRITTEN) and not fq.startswith("com.nendo.argosy.") and fq != "com.nendo.argosy":
             external(fq, "reference")
     if FORBIDDEN_WORDS.search(u.body):
         common.append("R type with no shared resources")
