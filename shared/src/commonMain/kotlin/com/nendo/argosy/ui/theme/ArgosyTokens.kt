@@ -69,8 +69,8 @@ val LocalActiveGamePalette = compositionLocalOf<List<Color>> { emptyList() }
 /** Gradient end for track fills: value shifted by [ratio] (up in dark, down in light), saturation dropped by [ratio]. */
 fun trackGradientEnd(base: Color, isDark: Boolean, ratio: Float): Color {
     val hsv = FloatArray(3)
-    android.graphics.Color.colorToHSV(
-        android.graphics.Color.argb(
+    com.nendo.argosy.platform.PlatformColor.colorToHSV(
+        com.nendo.argosy.platform.PlatformColor.argb(
             (base.alpha * 255).toInt(),
             (base.red * 255).toInt(),
             (base.green * 255).toInt(),
@@ -80,5 +80,5 @@ fun trackGradientEnd(base: Color, isDark: Boolean, ratio: Float): Color {
     )
     hsv[1] = (hsv[1] * (1f - ratio)).coerceIn(0f, 1f)
     hsv[2] = (hsv[2] * if (isDark) 1f + ratio else 1f - ratio).coerceIn(0f, 1f)
-    return Color(android.graphics.Color.HSVToColor((base.alpha * 255).toInt(), hsv))
+    return Color(com.nendo.argosy.platform.PlatformColor.HSVToColor((base.alpha * 255).toInt(), hsv))
 }

@@ -6,8 +6,8 @@ import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.RemoveCircleOutline
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.stringResource
-import com.nendo.argosy.R
+import com.nendo.argosy.res.stringResource
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.ui.components.Modal
 import com.nendo.argosy.ui.screens.gamedetail.components.OptionItem
 

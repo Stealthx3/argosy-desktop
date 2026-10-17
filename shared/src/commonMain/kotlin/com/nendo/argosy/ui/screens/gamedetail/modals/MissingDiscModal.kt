@@ -9,11 +9,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.pluralStringResource
-import androidx.compose.ui.res.stringResource
+import com.nendo.argosy.res.pluralStringResource
+import com.nendo.argosy.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.nendo.argosy.R
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.ui.components.CenteredModal
 import com.nendo.argosy.ui.theme.Dimens
 import com.nendo.argosy.ui.components.InputButton

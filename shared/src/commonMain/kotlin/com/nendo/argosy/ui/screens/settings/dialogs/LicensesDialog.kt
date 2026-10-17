@@ -23,9 +23,9 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.stringResource
+import com.nendo.argosy.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import com.nendo.argosy.R
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.core.input.SoundType
 import com.nendo.argosy.ui.input.InputHandler
 import com.nendo.argosy.ui.input.InputResult

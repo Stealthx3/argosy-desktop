@@ -34,11 +34,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.compositeOver
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
+import com.nendo.argosy.res.painterResource
+import com.nendo.argosy.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.nendo.argosy.R
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.ui.components.InputButton
 import com.nendo.argosy.ui.primitives.ArgosyProgressBar
 import com.nendo.argosy.ui.primitives.InputGlyph

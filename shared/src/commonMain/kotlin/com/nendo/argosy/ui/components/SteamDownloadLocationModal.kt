@@ -14,9 +14,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
-import androidx.compose.ui.res.stringResource
+import com.nendo.argosy.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.nendo.argosy.R
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.ui.theme.Dimens
 import com.nendo.argosy.ui.theme.LocalArgosyTheme
 import com.nendo.argosy.ui.util.clickableNoFocus

@@ -53,7 +53,7 @@ data class AmbientLedState(
 )
 
 @Singleton
-class AmbientLedManager @Inject constructor(
+actual class AmbientLedManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val ledController: LEDController,
     private val preferencesRepository: UserPreferencesRepository
@@ -178,7 +178,7 @@ class AmbientLedManager @Inject constructor(
         }
     }
 
-    fun setUiColors(primary: Color, secondary: Color?) {
+    actual fun setUiColors(primary: Color, secondary: Color?) {
         _state.value = _state.value.copy(
             uiLeftColor = primary,
             uiRightColor = secondary ?: primary

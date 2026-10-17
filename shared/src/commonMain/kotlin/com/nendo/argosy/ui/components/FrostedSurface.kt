@@ -1,6 +1,6 @@
 package com.nendo.argosy.ui.components
 
-import android.os.Build
+import com.nendo.argosy.platform.PlatformBuild as Build
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -35,7 +35,8 @@ import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalView
+import com.nendo.argosy.platform.LocalPlatformView as LocalView
+import com.nendo.argosy.platform.getLocationOnScreen
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp

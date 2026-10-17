@@ -21,7 +21,7 @@ fun controllerIdOf(device: InputDevice): String =
     "${device.vendorId}:${device.productId}:${device.descriptor}"
 
 @Singleton
-class ConnectedControllerTracker @Inject constructor(
+actual class ConnectedControllerTracker @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
     private val inputManager = context.getSystemService(Context.INPUT_SERVICE) as InputManager
@@ -30,7 +30,7 @@ class ConnectedControllerTracker @Inject constructor(
     private val deviceGeneration = MutableStateFlow(0)
 
     private val _connectedControllerIds = MutableStateFlow(readConnectedControllerIds())
-    val connectedControllerIds: StateFlow<Set<String>> = _connectedControllerIds.asStateFlow()
+    actual val connectedControllerIds: StateFlow<Set<String>> = _connectedControllerIds.asStateFlow()
 
     val activeController: StateFlow<ActiveController?> = activeState.active
 

@@ -30,7 +30,15 @@ import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
+import com.nendo.argosy.platform.LocalPlatformContext as LocalContext
+import com.nendo.argosy.platform.assets
+import com.nendo.argosy.platform.list
+import com.nendo.argosy.platform.open
+import com.nendo.argosy.platform.cacheDir
+import com.nendo.argosy.platform.filesDir
+import com.nendo.argosy.platform.getQuantityString
+import com.nendo.argosy.platform.getString
+import com.nendo.argosy.platform.resources
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Density
@@ -38,7 +46,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
+import com.nendo.argosy.platform.image.AsyncImage
 import com.nendo.argosy.data.preferences.BoxArtBorderStyle
 import com.nendo.argosy.data.preferences.PlatformIndicatorContent
 import com.nendo.argosy.data.preferences.SystemIconPosition

@@ -39,7 +39,10 @@ import com.nendo.argosy.ui.icons.InputIcons
 import com.nendo.argosy.ui.input.LocalABIconsSwapped
 import com.nendo.argosy.ui.input.LocalXYIconsSwapped
 import com.nendo.argosy.ui.input.LocalSwapStartSelect
-import androidx.compose.ui.platform.LocalConfiguration
+import com.nendo.argosy.platform.LocalPlatformConfiguration as LocalConfiguration
+import com.nendo.argosy.platform.orientation
+import com.nendo.argosy.platform.screenHeightDp
+import com.nendo.argosy.platform.screenWidthDp
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextOverflow

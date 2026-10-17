@@ -35,12 +35,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.res.pluralStringResource
-import androidx.compose.ui.res.stringResource
+import com.nendo.argosy.res.pluralStringResource
+import com.nendo.argosy.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
-import com.nendo.argosy.R
+import com.nendo.argosy.platform.image.AsyncImage
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.ui.components.FooterHints
 import com.nendo.argosy.ui.components.FooterSpacer
 import com.nendo.argosy.ui.components.InputButton

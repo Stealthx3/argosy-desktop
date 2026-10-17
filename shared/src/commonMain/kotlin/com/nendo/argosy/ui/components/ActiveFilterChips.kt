@@ -1,6 +1,14 @@
 package com.nendo.argosy.ui.components
 
-import android.content.Context
+import com.nendo.argosy.platform.PlatformContext as Context
+import com.nendo.argosy.platform.assets
+import com.nendo.argosy.platform.list
+import com.nendo.argosy.platform.open
+import com.nendo.argosy.platform.cacheDir
+import com.nendo.argosy.platform.filesDir
+import com.nendo.argosy.platform.getQuantityString
+import com.nendo.argosy.platform.getString
+import com.nendo.argosy.platform.resources
 import androidx.annotation.PluralsRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
@@ -25,7 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.stringResource
+import com.nendo.argosy.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import com.nendo.argosy.ui.theme.Dimens
 import com.nendo.argosy.ui.theme.LocalArgosyTheme

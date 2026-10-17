@@ -37,7 +37,7 @@ interface BackdropStampEntryPoint {
     fun backdropStampProvider(): BackdropStampProvider
 }
 
-fun backdropStampProvider(context: Context): BackdropStampProvider =
+actual fun backdropStampProvider(context: Context): BackdropStampProvider =
     EntryPointAccessors.fromApplication(context.applicationContext, BackdropStampEntryPoint::class.java)
         .backdropStampProvider()
 
@@ -48,7 +48,7 @@ private data class StampKey(val uris: List<String>, val sizePx: Int, val tint: I
 
 /** Decodes the user's platform SVG logos into tinted monochrome mask bitmaps for the PLATFORMS backdrop preset. */
 @Singleton
-class BackdropStampProvider @Inject constructor(
+actual class BackdropStampProvider @Inject constructor(
     @ApplicationContext private val context: Context,
     platformRepository: PlatformRepository
 ) {

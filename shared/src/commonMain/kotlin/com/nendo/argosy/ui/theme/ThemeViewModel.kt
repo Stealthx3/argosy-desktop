@@ -3,7 +3,7 @@ package com.nendo.argosy.ui.theme
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nendo.argosy.BuildConfig
+import com.nendo.argosy.config.AppBuildConfig as BuildConfig
 import com.nendo.argosy.data.preferences.GripReserveMode
 import androidx.compose.ui.text.font.FontFamily
 import com.nendo.argosy.data.preferences.FontSlot
@@ -12,7 +12,7 @@ import com.nendo.argosy.data.preferences.UserPreferences
 import com.nendo.argosy.data.preferences.UserPreferencesRepository
 import com.nendo.argosy.hardware.AmbientLedManager
 import com.nendo.argosy.ui.theme.backdrop.BackdropConfig
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.nendo.argosy.di.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import com.nendo.argosy.core.input.ConnectedControllerTracker
 import kotlinx.coroutines.flow.SharingStarted
@@ -25,7 +25,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import androidx.core.graphics.ColorUtils
+import com.nendo.argosy.platform.PlatformColorUtils as ColorUtils
 import javax.inject.Inject
 
 private const val LED_HUE_SATURATION = 0.7f

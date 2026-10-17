@@ -45,13 +45,13 @@ import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.res.pluralStringResource
-import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.nendo.argosy.res.pluralStringResource
+import com.nendo.argosy.res.stringResource
+import com.nendo.argosy.di.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import com.nendo.argosy.R
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.domain.model.PinnedCollection
 import com.nendo.argosy.domain.usecase.collection.CategoryType
 import com.nendo.argosy.ui.components.FooterHints

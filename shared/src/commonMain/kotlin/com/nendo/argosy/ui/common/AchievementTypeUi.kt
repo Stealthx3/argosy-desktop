@@ -4,7 +4,7 @@ import androidx.annotation.StringRes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import com.nendo.argosy.R
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.core.game.AchievementType
 import com.nendo.argosy.ui.theme.LocalLauncherTheme
 import com.nendo.argosy.ui.theme.generated.ColorTokens

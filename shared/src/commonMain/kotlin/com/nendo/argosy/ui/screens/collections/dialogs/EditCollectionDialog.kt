@@ -1,8 +1,8 @@
 package com.nendo.argosy.ui.screens.collections.dialogs
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.stringResource
-import com.nendo.argosy.R
+import com.nendo.argosy.res.stringResource
+import com.nendo.argosy.res.ArgosyR as R
 
 @Composable
 fun EditCollectionDialog(

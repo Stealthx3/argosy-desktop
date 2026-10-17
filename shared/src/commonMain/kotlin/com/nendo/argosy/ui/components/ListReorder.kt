@@ -2,8 +2,8 @@ package com.nendo.argosy.ui.components
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.ui.res.stringResource
-import com.nendo.argosy.R
+import com.nendo.argosy.res.stringResource
+import com.nendo.argosy.res.ArgosyR as R
 
 /**
  * Lift/move/drop/cancel session over a flat list. [heldIndex] follows the lifted item as it

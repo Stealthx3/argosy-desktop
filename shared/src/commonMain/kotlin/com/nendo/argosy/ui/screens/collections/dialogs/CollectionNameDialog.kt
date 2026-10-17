@@ -6,8 +6,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.res.stringResource
-import com.nendo.argosy.R
+import com.nendo.argosy.res.stringResource
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.core.input.SoundType
 import com.nendo.argosy.ui.components.TEXT_ENTRY_CANCEL_BUTTON
 import com.nendo.argosy.ui.components.TEXT_ENTRY_CONFIRM_BUTTON

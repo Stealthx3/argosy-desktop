@@ -11,7 +11,7 @@ import com.nendo.argosy.ui.components.ListReorder
 import com.nendo.argosy.ui.components.ReorderStep
 import com.nendo.argosy.ui.input.InputHandler
 import com.nendo.argosy.ui.input.InputResult
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.nendo.argosy.di.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

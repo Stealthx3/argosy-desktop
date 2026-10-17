@@ -33,7 +33,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
+import com.nendo.argosy.platform.image.AsyncImage
 import com.nendo.argosy.data.preferences.BoxArtBorderStyle
 import com.nendo.argosy.data.preferences.BoxArtInnerEffect
 import com.nendo.argosy.data.preferences.SystemIconPosition

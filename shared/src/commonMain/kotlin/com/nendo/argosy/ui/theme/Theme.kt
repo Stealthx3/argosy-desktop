@@ -1,7 +1,7 @@
 package com.nendo.argosy.ui.theme
 
-import android.content.res.Configuration
-import android.graphics.Color as AndroidColor
+import com.nendo.argosy.platform.PlatformConfiguration as Configuration
+import com.nendo.argosy.platform.PlatformColor as AndroidColor
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -13,12 +13,23 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
+import com.nendo.argosy.platform.LocalPlatformConfiguration as LocalConfiguration
+import com.nendo.argosy.platform.orientation
+import com.nendo.argosy.platform.screenHeightDp
+import com.nendo.argosy.platform.screenWidthDp
+import com.nendo.argosy.platform.LocalPlatformContext as LocalContext
+import com.nendo.argosy.platform.assets
+import com.nendo.argosy.platform.list
+import com.nendo.argosy.platform.open
+import com.nendo.argosy.platform.cacheDir
+import com.nendo.argosy.platform.filesDir
+import com.nendo.argosy.platform.getQuantityString
+import com.nendo.argosy.platform.getString
+import com.nendo.argosy.platform.resources
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.nendo.argosy.BuildConfig
+import com.nendo.argosy.di.hiltViewModel
+import com.nendo.argosy.config.AppBuildConfig as BuildConfig
 import com.nendo.argosy.data.preferences.BoxArtBorderStyle
 import com.nendo.argosy.data.preferences.BoxArtGlowStrength
 import com.nendo.argosy.data.preferences.BoxArtInnerEffect

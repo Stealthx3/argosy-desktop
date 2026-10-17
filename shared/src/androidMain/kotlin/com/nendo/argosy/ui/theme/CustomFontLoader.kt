@@ -6,11 +6,11 @@ import android.os.Build
 import androidx.compose.ui.text.font.FontFamily
 import java.io.File
 
-object CustomFontLoader {
+actual object CustomFontLoader {
 
     fun fontsDir(context: Context): File = File(context.filesDir, "fonts")
 
-    fun loadFamily(path: String): FontFamily? {
+    actual fun loadFamily(path: String): FontFamily? {
         val file = File(path)
         if (!file.isFile) return null
         return try {

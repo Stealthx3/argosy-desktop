@@ -7,9 +7,9 @@ import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import com.nendo.argosy.res.stringResource
 import androidx.compose.ui.unit.Dp
-import com.nendo.argosy.R
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.data.media.MediaAvailability
 import com.nendo.argosy.ui.theme.LocalArgosyTheme
 

@@ -21,9 +21,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
+import com.nendo.argosy.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import com.nendo.argosy.R
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.ui.input.ModalPresenceEffect
 import com.nendo.argosy.ui.primitives.ActionButton
 import com.nendo.argosy.ui.theme.Dimens
