@@ -94,7 +94,7 @@ Project rules (set by the project owner, 2026-10-16):
 
 ## Phase 1 · Kotlin Multiplatform restructure
 
-**Status:** plan approved by the owner (2026-10-16); steps 1–8, the data-layer catch-up and save-sync stage 1 done; step 9 (Android-free UI) in progress.
+**Status:** plan approved by the owner (2026-10-16); steps 1–9, the data-layer catch-up and save-sync stage 1 done; step 10 (tooling sweep, re-apply rehearsal) and the phase gate next.
 
 ### 2026-10-16 — Session 3 (Claude Code on the owner's computer)
 
@@ -321,3 +321,16 @@ Declarations, KDoc and annotations move byte for byte; each file keeps only the 
 - Gate on JDK 21 → BUILD SUCCESSFUL; app 4,359 tests, 0 failures; desktop 8 tests, 0 failures, including `AndroidResourceIdsTest`: strings resolved through the ids in English, German and Simplified Chinese (mapped folder), plural quantities, `%1$d` placeholders, and a vector drawable.
 - Android `debugRuntimeClasspath`: no existing artifact changed version; added are JetBrains' Compose Multiplatform wrapper artifacts (lifecycle 2.8.4, compose 1.7.3 ui/foundation/animation), which resolve to the androidx versions already present, and `components-resources` 1.7.3.
 - A/B on the check AVD from snapshot `saves-baseline` (arm64 install, `ab-check.sh` now takes `INSTALL_ARGS`): Home, Game Detail, side menu, both Library views **pixel-identical**; database and DataStore identical; no `FATAL EXCEPTION`. Repeated with the per-app language set to German (`cmd locale set-app-locales … de-DE`): all identical, and the screens are in German.
+
+**Action:** Step 9 (Android-free UI) done.
+- `shared` `commonMain` now has Compose ui, foundation, animation, material3 and extended icons (CMP 1.7.3, mapping to Android's Compose 1.7.6 / Material3 1.3.1) and JetBrains' multiplatform lifecycle/viewmodel compose 2.8.4.
+- **Resource functions as expect/actual.** commonMain code cannot call desktop-only shims (the K2 rule again), and on desktop `painterResource(R.drawable.x)` bound to CMP's `painterResource(String)`. So `com.nendo.argosy.res` declares `stringResource`, `pluralStringResource` and `painterResource(Int)`: the Android actuals call the androidx functions directly, the desktop actuals resolve through CMP. `rewrite_imports.py` points those three imports at them; call sites are unchanged. The step 8 desktop-only shims in `androidx.compose.ui.res` were removed.
+- `movable.py` accepts Compose UI/foundation/material3/icons/animation and lifecycle ViewModel/compose, and blocks the Android-only Compose APIs (`LocalContext`, `LocalView`, `LocalConfiguration`, `LocalLifecycleOwner`, previews, view interop, the other `ui.res` functions, Android graphics bridges). New `keep-in-app.txt` lets a file stay in `app` with a stated reason when the desktop compiler rejects what the rules accept (empty so far).
+- **Moved 92 files** (pure renames, then the scripted rewrite in 29 of them): UI helpers and label extensions in `ui/common`, components, theme pieces, screen models, navigation and audio types, and the few data/hardware files they need. Both targets compiled on the first try after the resource-function fix.
+**What still holds the UI in `app`** (sizes Phase 2): 636 `ui/` files remain, 307 with direct blockers: `Context` 114, `LocalContext` 99, Coil 2 `AsyncImage` 68 (+ `ImageRequest` 8), Hilt Android (`@AndroidEntryPoint`, `@ApplicationContext`) 57, Android `Lifecycle` observers 41/36, `hiltViewModel()` 29, `LocalLifecycleOwner` 28, Media3 26, `Bitmap` 25, `Uri` 23, `LocalConfiguration` 22, `android.graphics.Color` 17, `KeyEvent` beyond key codes 13, `Build` 11. Matches the plan: Coil 3, a shared `hiltViewModel` accessor, a context-free resources/config layer, media and image seams are Phase 2 work.
+**Verification:**
+- `movable.py --check`: 0 problems. Gate on JDK 21 → BUILD SUCCESSFUL; app 4,359 tests, 0 failures; desktop 8 tests, 0 failures.
+- Android `debugRuntimeClasspath` versus pre-Phase-1: no androidx or Google artifact changed version. Added are JetBrains' multiplatform wrappers (material3/icons/ripple 1.7.3, lifecycle viewmodel-compose/savedstate 2.8.4, savedstate 1.2.2, core-bundle 1.0.1), which resolve onto the androidx versions already present; `kotlin-stdlib-common` (an empty metadata artifact in Kotlin 2.x) no longer appears separately.
+- A/B from snapshot `saves-baseline`, English and German per-app language: all five screens pixel-identical, database and DataStore identical, no `FATAL EXCEPTION`.
+- Save-sync live proof on the step 9 build (it moved save-sync UI labels): every normalized capture identical to the pre-Phase-1 baseline; `no_op=3` twice; `NO_CHANGE` and `UPLOADED` doors unchanged.
+**State of the move:** `shared` holds 560 Kotlin files in `commonMain` and 10 in `androidMain`; `app` keeps 1,140 (of the original 1,695), plus 219 resource files moved.
