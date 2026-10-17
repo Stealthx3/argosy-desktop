@@ -337,7 +337,6 @@ kotlin {
             getByName(name).kotlin.srcDir(generateSharedR.map { it.outputs.files.singleFile.resolve(name) })
         }
         getByName("desktopMain").resources.srcDir(prepareDesktopAssets.map { it.outputs.files.singleFile })
-        getByName("desktopMain").kotlin.srcDir(rootProject.file("sigil/bindings/android/src/main/kotlin"))
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.ui)
@@ -377,6 +376,7 @@ kotlin {
             implementation(libs.media3.datasource.okhttp)
         }
         getByName("desktopMain").dependencies {
+            implementation(project(":sigil-jvm"))
             implementation(libs.sqlite.bundled)
             implementation(libs.zstd.jni)
             implementation(libs.org.json)

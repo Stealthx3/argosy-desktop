@@ -1,7 +1,7 @@
 package com.nendo.argosy.data.steam
 
-import android.util.Log
-import com.nendo.argosy.R
+import com.nendo.argosy.util.PlatformLog as Log
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.data.local.dao.SteamAccountDao
 import com.nendo.argosy.core.notification.NotificationManager
 import com.nendo.argosy.core.notification.NotificationText
@@ -34,6 +34,18 @@ import kotlinx.coroutines.launch
 import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
+import com.nendo.argosy.platform.applicationContext
+import com.nendo.argosy.platform.packageName
+import com.nendo.argosy.platform.assets
+import com.nendo.argosy.platform.contentResolver
+import com.nendo.argosy.platform.cacheDir
+import com.nendo.argosy.platform.filesDir
+import com.nendo.argosy.platform.getSharedPreferences
+import com.nendo.argosy.platform.list
+import com.nendo.argosy.platform.open
+import com.nendo.argosy.platform.getQuantityString
+import com.nendo.argosy.platform.getString
+import com.nendo.argosy.platform.resources
 
 private const val TAG = "SteamAuthManager"
 
@@ -56,18 +68,18 @@ sealed class SteamAuthEvent {
 class SteamAuthManager @Inject constructor(
     private val steamAccountDao: SteamAccountDao,
     private val notificationManager: NotificationManager,
-    @dagger.hilt.android.qualifiers.ApplicationContext private val context: android.content.Context
+    @com.nendo.argosy.di.ApplicationContext private val context: com.nendo.argosy.platform.PlatformContext
 ) {
     private val loginID: Int by lazy {
-        val androidId = android.provider.Settings.Secure.getString(
+        val androidId = com.nendo.argosy.platform.PlatformSettings.Secure.getString(
             context.contentResolver,
-            android.provider.Settings.Secure.ANDROID_ID
+            com.nendo.argosy.platform.PlatformSettings.Secure.ANDROID_ID
         ).orEmpty()
-        "${android.os.Build.MANUFACTURER}_${android.os.Build.MODEL}_${androidId}_argosy".hashCode() and 0x7FFFFFFF
+        "${com.nendo.argosy.platform.PlatformBuild.MANUFACTURER}_${com.nendo.argosy.platform.PlatformBuild.MODEL}_${androidId}_argosy".hashCode() and 0x7FFFFFFF
     }
 
     private val machineName: String by lazy {
-        "${android.os.Build.MANUFACTURER} ${android.os.Build.MODEL}"
+        "${com.nendo.argosy.platform.PlatformBuild.MANUFACTURER} ${com.nendo.argosy.platform.PlatformBuild.MODEL}"
     }
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 

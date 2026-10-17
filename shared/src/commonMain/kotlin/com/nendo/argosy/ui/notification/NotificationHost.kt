@@ -57,6 +57,10 @@ import kotlinx.coroutines.delay
 import com.nendo.argosy.platform.assets
 import com.nendo.argosy.platform.list
 import com.nendo.argosy.platform.open
+import com.nendo.argosy.platform.applicationContext
+import com.nendo.argosy.platform.packageName
+import com.nendo.argosy.platform.contentResolver
+import com.nendo.argosy.platform.getSharedPreferences
 
 private val PERSISTENT_BAR_HEIGHT = 52.dp  // Static: matches specific UI design spec
 private val FOOTER_CLEARANCE = 56.dp  // Static: matches specific UI design spec

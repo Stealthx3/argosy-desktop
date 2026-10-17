@@ -5,8 +5,8 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import com.nendo.argosy.R
+import com.nendo.argosy.res.stringResource
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.data.emulator.RetroArchCore
 import com.nendo.argosy.ui.components.FocusedScroll
 import com.nendo.argosy.ui.components.Modal

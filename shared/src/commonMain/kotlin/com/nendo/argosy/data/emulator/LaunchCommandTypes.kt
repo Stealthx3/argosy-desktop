@@ -1,7 +1,16 @@
 package com.nendo.argosy.data.emulator
 
-import android.content.Intent
-import android.net.Uri
+import com.nendo.argosy.platform.PlatformIntent as Intent
+import com.nendo.argosy.platform.PlatformUri as Uri
+import com.nendo.argosy.platform.authority
+import com.nendo.argosy.platform.encodedPath
+import com.nendo.argosy.platform.getQueryParameter
+import com.nendo.argosy.platform.host
+import com.nendo.argosy.platform.lastPathSegment
+import com.nendo.argosy.platform.path
+import com.nendo.argosy.platform.pathSegments
+import com.nendo.argosy.platform.queryParameterNames
+import com.nendo.argosy.platform.scheme
 
 enum class LaunchMethod { INTENT, SHELL }
 
@@ -54,6 +63,9 @@ data class EffectiveLaunchCommand(
     val clipDataUri: Uri? = null,
     val launchMethod: LaunchMethod = LaunchMethod.INTENT
 )
+
+internal fun shellEscape(value: String): String =
+    "'" + value.replace("'", "'\\''") + "'"
 
 fun EffectiveLaunchCommand.toShellArgv(): Array<String> {
     val cmd = StringBuilder("/system/bin/am start")

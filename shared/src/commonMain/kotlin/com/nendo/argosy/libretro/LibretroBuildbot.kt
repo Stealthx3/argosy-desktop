@@ -1,8 +1,8 @@
 package com.nendo.argosy.libretro
 
-import android.os.Build
-import android.os.Process
-import android.util.Log
+import com.nendo.argosy.platform.PlatformBuild as Build
+import com.nendo.argosy.platform.PlatformProcess as Process
+import com.nendo.argosy.util.PlatformLog as Log
 
 private const val TAG = "LibretroBuildbot"
 

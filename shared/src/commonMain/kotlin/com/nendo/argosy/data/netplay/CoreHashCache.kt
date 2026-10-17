@@ -1,9 +1,22 @@
 package com.nendo.argosy.data.netplay
 
-import android.content.Context
-import android.content.SharedPreferences
-import com.nendo.argosy.BuildConfig
-import dagger.hilt.android.qualifiers.ApplicationContext
+import com.nendo.argosy.platform.PlatformContext as Context
+import com.nendo.argosy.platform.applicationContext
+import com.nendo.argosy.platform.packageName
+import com.nendo.argosy.platform.assets
+import com.nendo.argosy.platform.contentResolver
+import com.nendo.argosy.platform.getSharedPreferences
+import com.nendo.argosy.platform.list
+import com.nendo.argosy.platform.open
+import com.nendo.argosy.platform.MODE_PRIVATE
+import com.nendo.argosy.platform.cacheDir
+import com.nendo.argosy.platform.filesDir
+import com.nendo.argosy.platform.getQuantityString
+import com.nendo.argosy.platform.getString
+import com.nendo.argosy.platform.resources
+import com.nendo.argosy.platform.PlatformSharedPreferences as SharedPreferences
+import com.nendo.argosy.config.AppBuildConfig as BuildConfig
+import com.nendo.argosy.di.ApplicationContext
 import java.io.File
 import java.security.MessageDigest
 import java.util.concurrent.ConcurrentHashMap
@@ -17,7 +30,7 @@ class CoreHashCache @Inject constructor(
 
     private val prefs: SharedPreferences = context.getSharedPreferences(
         PREFS_NAME,
-        Context.MODE_PRIVATE
+        MODE_PRIVATE
     )
 
     private val memoryCache = ConcurrentHashMap<String, String>()

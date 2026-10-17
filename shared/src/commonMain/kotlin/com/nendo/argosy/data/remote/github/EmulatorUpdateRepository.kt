@@ -1,6 +1,6 @@
 package com.nendo.argosy.data.remote.github
 
-import android.util.Log
+import com.nendo.argosy.util.PlatformLog as Log
 import com.nendo.argosy.data.emulator.ApkAssetMatcher
 import com.nendo.argosy.data.emulator.ApkMatchResult
 import com.nendo.argosy.data.emulator.EmulatorDef

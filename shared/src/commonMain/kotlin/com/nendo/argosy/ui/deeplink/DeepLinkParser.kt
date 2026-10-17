@@ -1,6 +1,16 @@
 package com.nendo.argosy.ui.deeplink
 
-import android.net.Uri
+import com.nendo.argosy.platform.PlatformUri as Uri
+import com.nendo.argosy.platform.authority
+import com.nendo.argosy.platform.encodedPath
+import com.nendo.argosy.platform.getQueryParameter
+import com.nendo.argosy.platform.host
+import com.nendo.argosy.platform.lastPathSegment
+import com.nendo.argosy.platform.path
+import com.nendo.argosy.platform.pathSegments
+import com.nendo.argosy.platform.queryParameterNames
+import com.nendo.argosy.platform.scheme
+import com.nendo.argosy.platform.PlatformUris
 import com.nendo.argosy.domain.model.DeepLinkRequest
 
 /**
@@ -39,6 +49,6 @@ object DeepLinkParser {
         val trimmed = raw.trim()
         if (trimmed.isEmpty()) return null
         if (!trimmed.startsWith("file://")) return trimmed
-        return Uri.parse(trimmed).path?.takeIf { it.isNotBlank() }
+        return PlatformUris.parse(trimmed).path?.takeIf { it.isNotBlank() }
     }
 }

@@ -1,6 +1,6 @@
 package com.nendo.argosy.data.emulator
 
-import android.content.Intent
+import com.nendo.argosy.platform.PlatformIntent as Intent
 import com.nendo.argosy.data.platform.PlatformDefinitions
 import com.nendo.argosy.libretro.LibretroCoreRegistry
 

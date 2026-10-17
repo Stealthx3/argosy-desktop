@@ -2,8 +2,8 @@ package com.nendo.argosy.ui.common
 
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.stringResource
-import com.nendo.argosy.R
+import com.nendo.argosy.res.stringResource
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.data.emulator.ApkAssetMatcher
 
 data class VariantLabel(@StringRes val labelRes: Int?, val abi: String?)

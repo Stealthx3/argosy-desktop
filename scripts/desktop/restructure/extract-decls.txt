@@ -17,4 +17,4 @@ ui/input/SoundFeedback.kt -> SoundPresets.kt: SoundPreset
 ui/theme/backdrop/BackdropStamps.kt -> BackdropStampLocals.kt: LocalBackdropStamps
 ui/theme/backdrop/SurfaceBackdrop.kt -> SurfaceBackdropLocals.kt: BackdropRole LocalSurfaceBackdrop
 data/cache/ImageCacheManager.kt -> common:ImageCacheTypes.kt: CachedGameImages ImageCacheProgress CacheValidationResult
-data/emulator/LaunchCommand.kt -> LaunchCommandTypes.kt: LaunchMethod RomPathFormat RomBindingFormat ResolvedExtra EffectiveLaunchCommand toShellArgv
+data/emulator/LaunchCommand.kt -> LaunchCommandTypes.kt: LaunchMethod RomPathFormat RomBindingFormat ResolvedExtra EffectiveLaunchCommand toShellArgv ^shellEscape

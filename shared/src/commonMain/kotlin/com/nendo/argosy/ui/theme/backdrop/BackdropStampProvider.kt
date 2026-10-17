@@ -1,6 +1,10 @@
 package com.nendo.argosy.ui.theme.backdrop
 
 import com.nendo.argosy.platform.PlatformContext
+import com.nendo.argosy.platform.applicationContext
+import com.nendo.argosy.platform.packageName
+import com.nendo.argosy.platform.contentResolver
+import com.nendo.argosy.platform.getSharedPreferences
 import com.nendo.argosy.platform.assets
 import com.nendo.argosy.platform.cacheDir
 import com.nendo.argosy.platform.filesDir

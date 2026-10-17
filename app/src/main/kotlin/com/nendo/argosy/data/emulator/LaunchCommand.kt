@@ -71,6 +71,3 @@ fun EffectiveLaunchCommand.toIntent(context: Context): Intent {
     }
     return intent
 }
-
-private fun shellEscape(value: String): String =
-    "'" + value.replace("'", "'\\''") + "'"
