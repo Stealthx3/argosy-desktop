@@ -43,5 +43,6 @@ for _ in $(seq 60); do
 done
 curl -sf "$BASE_URL/api/heartbeat" >/dev/null || { echo "RomM did not answer at $BASE_URL" >&2; exit 1; }
 
-"$STATE/venv/bin/python" -I "$ROOT/scripts/desktop/testbed/romm-setup.py" "$BASE_URL" "$CREDS" "$@"
+"$STATE/venv/bin/python" -I "$ROOT/scripts/desktop/testbed/romm-setup.py" "$BASE_URL" "$CREDS" "$STATE/library" "$@"
+"$STATE/venv/bin/python" -I "$ROOT/scripts/desktop/testbed/seed-saves.py" "$BASE_URL" "$CREDS"
 echo "RomM 5.1 testbed ready at $BASE_URL (emulator: http://10.0.2.2:8093); credentials in $CREDS"

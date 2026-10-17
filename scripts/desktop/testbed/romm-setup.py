@@ -2,7 +2,10 @@
 
 Reads and updates a credentials env file (git-ignored). Run with the testbed venv's python.
 
-usage: romm-setup.py <base-url> <credentials-file> [--rescan]
+usage: romm-setup.py <base-url> <credentials-file> <library-dir> [--rescan] [--hashes]
+
+Scans when the server has fewer roms than the library has files, or on --rescan. --hashes runs a
+"hashes" scan, which recomputes file hashes after a ROM's bytes changed in place.
 """
 import pathlib
 import secrets
@@ -58,7 +61,7 @@ def ensure_admin(base, creds):
     return session
 
 
-def scan(base, session):
+def scan(base, session, scan_type):
     client = socketio.Client()
     result = {}
 
@@ -77,7 +80,7 @@ def scan(base, session):
     cookie = "; ".join(f"{c.name}={c.value}" for c in session.cookies)
     client.connect(base, socketio_path="/ws/socket.io/", headers={"Cookie": cookie}, wait_timeout=15)
     client.emit("scan", {
-        "platforms": [], "platform_fs_slugs": [], "type": "quick",
+        "platforms": [], "platform_fs_slugs": [], "type": scan_type,
         "apis": [], "launchbox_remote_enabled": False, "playmatch_enabled": False,
     })
     deadline = time.time() + 600
@@ -114,10 +117,13 @@ def main():
     session = ensure_admin(base, creds)
     roms = session.get(f"{base}/api/roms", params={"limit": 1}).json()
     total = roms.get("total", 0) if isinstance(roms, dict) else len(roms)
-    if total == 0 or "--rescan" in sys.argv:
-        scan(base, session)
+    files = sum(1 for f in pathlib.Path(sys.argv[3]).rglob("*") if f.is_file())
+    if "--hashes" in sys.argv:
+        scan(base, session, "hashes")
+    elif total < files or "--rescan" in sys.argv:
+        scan(base, session, "quick")
     else:
-        print(f"library already scanned ({total} roms)")
+        print(f"library already scanned ({total} roms, {files} files)")
     ensure_token(base, session, creds)
     save(path, creds)
 
