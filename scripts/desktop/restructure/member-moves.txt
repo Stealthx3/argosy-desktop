@@ -1,0 +1,4 @@
+# Members that leave a shared class because their type is Android-only; each becomes an extension
+# property in app, body unchanged. Format:
+#   <file under shared commonMain> <Class>.<property> -> <file under app> <package>
+data/preferences/UserPreferences.kt BuiltinEmulatorSettings.shaderConfig -> libretro/BuiltinShaderConfig.kt com.nendo.argosy.libretro

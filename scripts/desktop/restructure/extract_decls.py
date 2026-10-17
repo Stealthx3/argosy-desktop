@@ -4,14 +4,19 @@ Moves named top-level declarations out of a Kotlin file into a new file in the s
 
 Driven by extract-decls.txt next to this script. Each moved declaration keeps its KDoc and
 annotations byte for byte; each file keeps only the imports its remaining text names. Idempotent:
-a declaration already absent from its source file is skipped. A name written as ^NAME is
+a declaration already absent from its source file is skipped. With --refresh, a source that holds
+its declarations again (an upstream release changed them) replaces the earlier extraction, wherever
+apply_moves.py has since moved it. A name written as ^NAME is
 also used by the file it leaves, so its top-level `private` becomes `internal`.
 """
 import re
+import subprocess
 import sys
 from pathlib import Path
 
 ROOT = Path("app/src/main/kotlin/com/nendo/argosy")
+SHARED_ROOTS = [Path(f"shared/src/{s}/kotlin/com/nendo/argosy") for s in ("commonMain", "androidMain")]
+REFRESH = "--refresh" in sys.argv
 MANIFEST = Path(__file__).with_name("extract-decls.txt")
 DECL = re.compile(
     r"^(?:(?:private|internal|public|data|enum|sealed|abstract|open|inline|value|const|annotation|fun|suspend|operator|infix)\s+)*"
@@ -79,8 +84,13 @@ def extract(source, new_name, names, widen):
         return
     if missing:
         sys.exit(f"{source}: not found as top-level declarations: {sorted(missing)}")
-    if target.exists():
-        sys.exit(f"{target} exists while {source} still holds {sorted(names)}")
+    rel_target = target.relative_to(ROOT)
+    existing = [p for p in [target] + [r / rel_target for r in SHARED_ROOTS] if p.exists()]
+    if existing and not REFRESH:
+        sys.exit(f"{existing[0]} exists while {source} still holds {sorted(names)}; rerun with --refresh")
+    for stale in existing:
+        subprocess.run(["git", "rm", "-q", "-f", str(stale)], check=True)
+        print(f"refresh: removed {stale}, regenerating from {source}")
     package = next(l for l in header if l.startswith("package "))
     moved = "\n\n".join(
         re.sub(r"^private ", "internal ", it[3], count=1) if it[0] in widen else it[3]

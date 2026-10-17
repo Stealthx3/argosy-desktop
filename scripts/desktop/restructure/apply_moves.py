@@ -54,7 +54,14 @@ def main():
             if dest.exists():
                 sys.exit(f"{rel} exists in both app and {section}; resolve by hand")
             dest.parent.mkdir(parents=True, exist_ok=True)
-            subprocess.run(["git", "mv", str(APP / rel), str(dest)], check=True)
+            tracked = subprocess.run(
+                ["git", "ls-files", "--error-unmatch", str(APP / rel)], capture_output=True
+            ).returncode == 0
+            if tracked:
+                subprocess.run(["git", "mv", str(APP / rel), str(dest)], check=True)
+            else:
+                (APP / rel).rename(dest)
+                subprocess.run(["git", "add", str(dest)], check=True)
             moved += 1
     print(f"moved {moved} files")
 
