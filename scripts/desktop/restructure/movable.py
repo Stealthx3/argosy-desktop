@@ -67,9 +67,9 @@ REWRITTEN = (
 )
 GENERATED = ("com.nendo.argosy.config.AppBuildConfig", "com.nendo.argosy.res.ArgosyR")
 CONTEXT_BEYOND_STRINGS = (
-    r"\b(?:[a-z]\w*[cC]ontext|ctx)\??\.(?!getString\b|resources\b)[a-zA-Z_]\w*"
+    r"\b(?:\w*[cC]ontext|ctx)\??\.(?!getString\b|resources\b|filesDir\b|cacheDir\b|current\b)[a-zA-Z_]\w*"
     r"|\.resources\.(?!getQuantityString\b|getString\b)\w+"
-    r"|LocalContext\.current\.(?!getString\b|resources\b)\w+"
+    r"|LocalContext\.current\.(?!getString\b|resources\b|filesDir\b|cacheDir\b)\w+"
 )
 GUARDED_REWRITES = {
     "android.content.Context": re.compile(CONTEXT_BEYOND_STRINGS),
@@ -93,6 +93,18 @@ GUARDED_REWRITES = {
     ),
 }
 STRINGS = re.compile(r'"(?:[^"\\\n]|\\.)*"')
+STAND_IN_GUARDS = {
+    "com.nendo.argosy.platform.PlatformContext": "android.content.Context",
+    "com.nendo.argosy.platform.LocalPlatformContext": "androidx.compose.ui.platform.LocalContext",
+    "com.nendo.argosy.platform.LocalPlatformConfiguration": "androidx.compose.ui.platform.LocalConfiguration",
+    "com.nendo.argosy.platform.PlatformConfiguration": "android.content.res.Configuration",
+    "com.nendo.argosy.platform.PlatformColor": "android.graphics.Color",
+    "com.nendo.argosy.platform.PlatformColorUtils": "androidx.core.graphics.ColorUtils",
+    "com.nendo.argosy.di.hiltViewModel": "androidx.hilt.navigation.compose.hiltViewModel",
+    "com.nendo.argosy.platform.BackHandler": "androidx.activity.compose.BackHandler",
+    "com.nendo.argosy.core.input.AndroidKeyCodes": "android.view.KeyEvent",
+    "com.nendo.argosy.util.DualScreenDeviceInfo": "com.nendo.argosy.util.DisplayAffinityHelper",
+}
 COMMENTS = re.compile(r"/\*.*?\*/|^\s*//[^\n]*", re.S | re.M)
 ANDROID_FQ = re.compile(r"(?<![\w.])(?:android|androidx|com|org|io|net|dagger|coil|in|okhttp3|retrofit2)\.[a-z]\w*(?:\.\w+)+")
 ANDROID_MAIN_ALLOWED = ALLOWED + ("android.", "androidx.", "dagger.hilt.")
@@ -158,6 +170,8 @@ def analyse(u, index, packages):
             continue
         if imp in REWRITTEN or imp in GENERATED:
             continue
+        if imp in STAND_IN_GUARDS and GUARDED_REWRITES[STAND_IN_GUARDS[imp]].search(u.body):
+            common.append(f"uses {imp} beyond what it offers")
         if imp.startswith("com.nendo.argosy."):
             if imp.endswith(".*"):
                 for w in set(WORD.findall(u.body)):

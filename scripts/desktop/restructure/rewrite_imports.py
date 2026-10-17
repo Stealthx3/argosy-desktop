@@ -22,11 +22,11 @@ RULES = [
     ),
     (
         re.compile(r"^import android\.content\.Context$", re.M),
-        "import com.nendo.argosy.platform.PlatformContext as Context\nimport com.nendo.argosy.platform.getQuantityString\nimport com.nendo.argosy.platform.getString\nimport com.nendo.argosy.platform.resources",
+        "import com.nendo.argosy.platform.PlatformContext as Context\nimport com.nendo.argosy.platform.cacheDir\nimport com.nendo.argosy.platform.filesDir\nimport com.nendo.argosy.platform.getQuantityString\nimport com.nendo.argosy.platform.getString\nimport com.nendo.argosy.platform.resources",
     ),
     (
         re.compile(r"^import androidx\.compose\.ui\.platform\.LocalContext$", re.M),
-        "import com.nendo.argosy.platform.LocalPlatformContext as LocalContext\nimport com.nendo.argosy.platform.getQuantityString\nimport com.nendo.argosy.platform.getString\nimport com.nendo.argosy.platform.resources",
+        "import com.nendo.argosy.platform.LocalPlatformContext as LocalContext\nimport com.nendo.argosy.platform.cacheDir\nimport com.nendo.argosy.platform.filesDir\nimport com.nendo.argosy.platform.getQuantityString\nimport com.nendo.argosy.platform.getString\nimport com.nendo.argosy.platform.resources",
     ),
     (
         re.compile(r"^import androidx\.hilt\.navigation\.compose\.hiltViewModel$", re.M),
@@ -73,6 +73,35 @@ RULES = [
 ]
 
 
+COMPANION_IMPORTS = {
+    "com.nendo.argosy.platform.PlatformContext": [
+        "com.nendo.argosy.platform.cacheDir", "com.nendo.argosy.platform.filesDir",
+        "com.nendo.argosy.platform.getQuantityString", "com.nendo.argosy.platform.getString",
+        "com.nendo.argosy.platform.resources",
+    ],
+    "com.nendo.argosy.platform.LocalPlatformContext": [
+        "com.nendo.argosy.platform.cacheDir", "com.nendo.argosy.platform.filesDir",
+        "com.nendo.argosy.platform.getQuantityString", "com.nendo.argosy.platform.getString",
+        "com.nendo.argosy.platform.resources",
+    ],
+    "com.nendo.argosy.platform.LocalPlatformConfiguration": [
+        "com.nendo.argosy.platform.orientation", "com.nendo.argosy.platform.screenHeightDp",
+        "com.nendo.argosy.platform.screenWidthDp",
+    ],
+}
+
+
+def ensure_companions(text):
+    for stand_in, companions in COMPANION_IMPORTS.items():
+        anchor = re.search(rf"^import {re.escape(stand_in)}( as \w+)?$", text, re.M)
+        if not anchor:
+            continue
+        missing = [c for c in companions if not re.search(rf"^import {re.escape(c)}$", text, re.M)]
+        if missing:
+            text = text[:anchor.end()] + "".join(f"\nimport {c}" for c in missing) + text[anchor.end():]
+    return text
+
+
 def main():
     changed = 0
     for path in sorted(COMMON.rglob("*.kt")):
@@ -80,6 +109,7 @@ def main():
         new = text
         for pattern, replacement in RULES:
             new = pattern.sub(replacement, new)
+        new = ensure_companions(new)
         if new != text:
             path.write_text(new)
             changed += 1

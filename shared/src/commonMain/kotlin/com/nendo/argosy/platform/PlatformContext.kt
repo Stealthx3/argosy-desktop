@@ -21,3 +21,7 @@ expect fun PlatformResources.getQuantityString(id: Int, quantity: Int): String
 expect fun PlatformResources.getQuantityString(id: Int, quantity: Int, vararg formatArgs: Any?): String
 
 expect val LocalPlatformContext: ProvidableCompositionLocal<PlatformContext>
+
+expect val PlatformContext.filesDir: java.io.File
+
+expect val PlatformContext.cacheDir: java.io.File

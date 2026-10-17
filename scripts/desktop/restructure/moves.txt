@@ -458,7 +458,6 @@
 + ui/common/UnifiedStateEntryUi.kt
 + ui/components/EpisodePicker.kt
 + ui/components/NewBadge.kt
-+ ui/components/PlatformIconAssets.kt
 + ui/screens/gamedetail/components/DocumentSections.kt
 + ui/theme/Color.kt
 + ui/theme/GripReserve.kt

@@ -25,3 +25,7 @@ actual fun PlatformResources.getQuantityString(id: Int, quantity: Int, vararg fo
     getQuantityString(id, quantity, *formatArgs)
 
 actual val LocalPlatformContext: ProvidableCompositionLocal<PlatformContext> = LocalContext
+
+actual val PlatformContext.filesDir: java.io.File get() = filesDir
+
+actual val PlatformContext.cacheDir: java.io.File get() = cacheDir
