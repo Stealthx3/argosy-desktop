@@ -637,3 +637,43 @@
 + ui/theme/backdrop/SurfaceBackdrop.kt
 [commonMain]
 + ui/theme/backdrop/BackdropTile.kt
+
+# Phase 2: classes that inject Context (generated Java now names android.content.Context) and what they free.
+[commonMain]
++ data/download/ArchiveExpansion.kt
++ data/download/ZipExtractor.kt
++ data/emulator/ArchiveRomNaming.kt
++ data/emulator/CoreSystemDataManager.kt
++ data/emulator/GameCubeHeaderParser.kt
++ data/emulator/LaunchProgressTracker.kt
++ data/emulator/LibretroSavePathResolver.kt
++ data/emulator/LibretroStatePathResolver.kt
++ data/emulator/M3uManager.kt
++ data/emulator/SwitchProfileParser.kt
++ data/emulator/VariantFileCleanup.kt
++ data/launcher/FrontendSyncMarkers.kt
++ data/remote/romm/RomMSyncFilter.kt
++ data/remote/romm/RomMVisibilityService.kt
++ data/remote/romm/SiblingConfigCarryOver.kt
++ data/repository/DocumentHighlightStore.kt
++ data/repository/HardResetRecorder.kt
++ data/repository/RAPatchCacheStore.kt
++ data/scanner/VariantScanner.kt
++ data/steam/DrmHazardManager.kt
++ data/steam/LicenseSerializer.kt
++ data/steam/SteamProgressTracker.kt
++ data/sync/SaveOwnershipTracker.kt
++ data/sync/StateOwnershipTracker.kt
++ data/sync/SyncConflictNotifier.kt
++ data/sync/SyncNotificationCopyResources.kt
++ domain/usecase/game/ResolveDeepLinkGameUseCase.kt
++ libretro/CompatCoreCache.kt
++ ui/components/LaunchOverlayViewModel.kt
++ ui/screens/gamedetail/components/DocumentSections.kt
++ ui/screens/gamedetail/delegates/SpeedrunSplitsDelegate.kt
++ ui/screens/gamedetail/modals/SpeedrunSplitsModal.kt
++ ui/screens/media/MediaModels.kt
++ ui/screens/media/components/MediaLibraryTabs.kt
++ ui/screens/media/components/MediaSeasonTabs.kt
++ ui/screens/media/modals/MediaDetailMenuModal.kt
++ ui/screens/media/modals/MediaDownloadModal.kt

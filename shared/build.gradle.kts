@@ -179,6 +179,21 @@ val generateAndroidViewModelModules by tasks.registering {
     }
 }
 
+tasks.matching { it.name.matches(Regex("ksp(Debug|Release)KotlinAndroid")) }.configureEach {
+    doLast {
+        outputs.files.asFileTree.matching { include("**/*.java") }.forEach { file ->
+            val source = file.readText()
+            if ("com.nendo.argosy.platform.PlatformContext" !in source) return@forEach
+            file.writeText(
+                source
+                    .replace("import com.nendo.argosy.platform.PlatformContext;", "import android.content.Context;")
+                    .replace(Regex("""\bcom\.nendo\.argosy\.platform\.PlatformContext\b"""), "android.content.Context")
+                    .replace(Regex("""\bPlatformContext\b"""), "Context")
+            )
+        }
+    }
+}
+
 val androidResources = layout.projectDirectory.dir("src/androidMain/res")
 
 val prepareDesktopComposeResources by tasks.registering(Sync::class) {

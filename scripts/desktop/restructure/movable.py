@@ -200,12 +200,6 @@ def analyse(u, index, packages):
                 deps |= target
         else:
             external(imp, "import")
-    injects_context = re.search(r"@Inject\s+constructor\s*\((?:[^()]|\([^()]*\))*\bContext\b", u.body)
-    context_imported = any(
-        i in ("android.content.Context", "com.nendo.argosy.platform.PlatformContext") for i in u.imports
-    )
-    if injects_context and context_imported:
-        common.append("injects Context (Dagger's generated Java cannot see the PlatformContext typealias)")
     for fq in FQ.findall(u.body):
         deps |= resolve(fq) or set()
     for fq in ANDROID_FQ.findall(STRINGS.sub('""', u.body)):
