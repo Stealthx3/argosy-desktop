@@ -631,3 +631,9 @@
 + ui/theme/ThemeViewModel.kt
 + ui/theme/backdrop/BackdropStampLocals.kt
 + ui/theme/backdrop/SurfaceBackdropLocals.kt
+
+# Phase 2: the surface backdrop modifier as an actual function; its tile renderer is portable.
+[androidMain]
++ ui/theme/backdrop/SurfaceBackdrop.kt
+[commonMain]
++ ui/theme/backdrop/BackdropTile.kt
