@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-Rewrites Android imports in shared commonMain to their portable stand-ins.
+Rewrites Android imports in shared commonMain to their portable stand-ins, and app's BuildConfig
+and R in shared androidMain to their shared equivalents.
 
 Import lines change, with an alias that keeps call sites as upstream wrote them; a fully qualified
 android.util.Log call becomes a fully qualified PlatformLog call.
@@ -10,6 +11,13 @@ import re
 from pathlib import Path
 
 COMMON = Path("shared/src/commonMain/kotlin")
+ANDROID = Path("shared/src/androidMain/kotlin")
+ANDROID_RULES = [
+    (re.compile(r"^import com\.nendo\.argosy\.BuildConfig$", re.M), "import com.nendo.argosy.config.AppBuildConfig as BuildConfig"),
+    (re.compile(r"\bcom\.nendo\.argosy\.BuildConfig\."), "com.nendo.argosy.config.AppBuildConfig."),
+    (re.compile(r"^import com\.nendo\.argosy\.R$", re.M), "import com.nendo.argosy.shared.R"),
+    (re.compile(r"\bcom\.nendo\.argosy\.R\."), "com.nendo.argosy.shared.R."),
+]
 RULES = [
     (re.compile(r"^import android\.util\.Log$", re.M), "import com.nendo.argosy.util.PlatformLog as Log"),
     (re.compile(r"^import android\.util\.Log as (\w+)$", re.M), r"import com.nendo.argosy.util.PlatformLog as \1"),
@@ -120,6 +128,14 @@ def main():
         for pattern, replacement in RULES:
             new = pattern.sub(replacement, new)
         new = ensure_companions(new)
+        if new != text:
+            path.write_text(new)
+            changed += 1
+    for path in sorted(ANDROID.rglob("*.kt")):
+        text = path.read_text()
+        new = text
+        for pattern, replacement in ANDROID_RULES:
+            new = pattern.sub(replacement, new)
         if new != text:
             path.write_text(new)
             changed += 1

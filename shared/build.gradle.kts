@@ -285,6 +285,10 @@ kotlin {
             implementation(libs.androidx.core.ktx)
             implementation(libs.coil.compose)
             implementation(libs.coil.svg)
+            implementation(libs.media3.exoplayer)
+            implementation(libs.media3.exoplayer.hls)
+            implementation(libs.media3.ui)
+            implementation(libs.media3.datasource.okhttp)
         }
         getByName("desktopMain").dependencies {
             implementation(libs.sqlite.bundled)

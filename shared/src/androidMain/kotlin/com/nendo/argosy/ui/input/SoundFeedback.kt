@@ -24,7 +24,7 @@ import kotlinx.coroutines.withContext
 private const val TAG = "SoundFeedback"
 
 @Singleton
-class SoundFeedbackManager @Inject constructor(
+actual class SoundFeedbackManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val attributionRepository: StorageAttributionRepository,
     private val hapticManager: HapticFeedbackManager
@@ -257,7 +257,7 @@ class SoundFeedbackManager @Inject constructor(
         playSound(type)
     }
 
-    fun playSound(type: SoundType) {
+    actual fun playSound(type: SoundType) {
         if (!shouldPlaySound(type)) return
         if (type == SoundType.BOUNDARY) {
             val now = SystemClock.elapsedRealtime()
