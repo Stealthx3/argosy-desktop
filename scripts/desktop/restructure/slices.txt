@@ -72,10 +72,10 @@ util/ImmersiveMode.kt: *
 util/ImmersiveMode.kt: LauncherSystemBars
 core/locale/LocaleHelper.kt: LocaleHelper
 data/download/DownloadNotificationChannel.kt: DownloadNotificationChannel
-data/emulator/EmulatorDownloadManager.kt: EmulatorDownloadManager
+data/emulator/EmulatorDownloadManager.kt: EmulatorDownloadManager(openInstallPermissionSettings: Unit)
 data/emulator/LaunchCommand.kt: *
 data/emulator/ScreenshotCaptureMonitor.kt: ScreenshotCaptureMonitor
-data/installer/ManagedInstallerManager.kt: ManagedInstallerManager
+data/installer/ManagedInstallerManager.kt: ManagedInstallerManager(openInstallPermissionSettings: Unit)
 libretro/LibretroActivity.kt: LibretroActivity
 DualScreenManager.kt: DualScreenManager(targetDockReorder: Unit, moveDockReorder: Unit, cancelDockReorder: Unit, saveDockReorder: Unit)
 data/quaypass/QuayPassService.kt: QuayPassService
@@ -100,3 +100,5 @@ data/steam/SteamContentManager.kt: SteamContentManager
 data/steam/SteamService.kt: SteamService
 data/update/ApkInstallManager.kt: ApkInstallManager
 hardware/CompanionPanel.kt: CompanionSessionTimer
+ArgosyActivity.kt: ArgosyActivity
+data/wallpaper/LockScreenScenes.kt: LockScreenScenes

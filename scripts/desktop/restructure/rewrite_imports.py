@@ -25,6 +25,26 @@ RULES = [
     (re.compile(r"^import com\.nendo\.argosy\.R$", re.M), "import com.nendo.argosy.res.ArgosyR as R"),
     (re.compile(r"\bcom\.nendo\.argosy\.R\."), "com.nendo.argosy.res.ArgosyR."),
     (re.compile(r"(?<!import )\bandroidx\.compose\.ui\.platform\.LocalConfiguration\b"), "com.nendo.argosy.platform.LocalPlatformConfiguration"),
+    (re.compile(r"\bUri::(encode|decode)\b"), r"com.nendo.argosy.platform.PlatformUris::\1"),
+    (re.compile(r"(?<!import )\bandroidx\.compose\.ui\.platform\.LocalContext\b"), "com.nendo.argosy.platform.LocalPlatformContext"),
+    (re.compile(r"(?<!import )\bandroid\.content\.Intent\b(?!\s*\(|\.)"), "com.nendo.argosy.platform.PlatformIntentType"),
+    (
+        re.compile(r"\bandroid\.content\.Intent\((?!\s*(?:this|context|ctx|\w*[cC]ontext|applicationContext)\b)"),
+        "com.nendo.argosy.platform.PlatformIntentType(",
+    ),
+    (re.compile(r"^import android\.os\.Looper$", re.M), "import com.nendo.argosy.platform.PlatformLooper as Looper"),
+    (re.compile(r"^import android\.os\.Handler$", re.M), "import com.nendo.argosy.platform.PlatformHandler as Handler"),
+    (
+        re.compile(r"^import android\.database\.ContentObserver$", re.M),
+        "import com.nendo.argosy.platform.PlatformContentObserver as ContentObserver",
+    ),
+    (re.compile(r"^import android\.widget\.Toast$", re.M), "import com.nendo.argosy.platform.PlatformToasts as Toast"),
+    (re.compile(r"\bandroid\.widget\.Toast\."), "com.nendo.argosy.platform.PlatformToasts."),
+    (
+        re.compile(r"\b(\w+)\.getSystemService\(\s*(?:android\.view\.inputmethod\.)?InputMethodManager::class\.java\s*\)"),
+        r"com.nendo.argosy.platform.PlatformInputMethod.manager(\1)",
+    ),
+    (re.compile(r"\b(?:android\.view\.inputmethod\.)?InputMethodManager\.SHOW_FORCED\b"), "com.nendo.argosy.platform.PlatformInputMethod.SHOW_FORCED"),
     (re.compile(r"^import com\.nendo\.argosy\.shared\.R$", re.M), "import com.nendo.argosy.res.ArgosyR as R"),
     (re.compile(r"\bcom\.nendo\.argosy\.shared\.R\."), "com.nendo.argosy.res.ArgosyR."),
     (
@@ -46,6 +66,8 @@ RULES = [
     (
         re.compile(r"^import androidx\.compose\.ui\.platform\.LocalConfiguration$", re.M),
         "import com.nendo.argosy.platform.LocalPlatformConfiguration as LocalConfiguration\n"
+        "import com.nendo.argosy.platform.get\n"
+        "import com.nendo.argosy.platform.locales\n"
         "import com.nendo.argosy.platform.orientation\n"
         "import com.nendo.argosy.platform.screenHeightDp\n"
         "import com.nendo.argosy.platform.screenWidthDp",
@@ -227,8 +249,13 @@ COMPANION_IMPORTS = {
         "com.nendo.argosy.platform.image.bitmap", "com.nendo.argosy.platform.image.intrinsicHeight",
         "com.nendo.argosy.platform.image.intrinsicWidth",
     ],
+    "com.nendo.argosy.platform.PlatformToasts": ["com.nendo.argosy.platform.show"],
+    "com.nendo.argosy.platform.PlatformContentObserver": [
+        "com.nendo.argosy.platform.registerContentObserver", "com.nendo.argosy.platform.unregisterContentObserver",
+    ],
+    "com.nendo.argosy.platform.PlatformInputMethod": ["com.nendo.argosy.platform.toggleSoftInput"],
     "com.nendo.argosy.platform.LocalPlatformConfiguration": [
-        "com.nendo.argosy.platform.orientation", "com.nendo.argosy.platform.screenHeightDp",
+        "com.nendo.argosy.platform.get", "com.nendo.argosy.platform.locales", "com.nendo.argosy.platform.orientation", "com.nendo.argosy.platform.screenHeightDp",
         "com.nendo.argosy.platform.screenWidthDp",
     ],
     "com.nendo.argosy.platform.PlatformIntentType": [
@@ -295,6 +322,7 @@ def rewrite_bitmap_config(text):
 
 STATIC_STAND_INS = [
     ("PlatformKeyEvent as KeyEvent", r"KeyEvent\.(?=(?:KEYCODE_|ACTION_|META_|FLAG_)\w+)", r"AndroidKeyCodes."),
+    ("PlatformLooper as Looper", r"Looper\.(getMainLooper)\(", r"PlatformLoopers.\1("),
     ("PlatformKeyEvent as KeyEvent", r"KeyEvent\.(keyCodeToString)\b", r"\1"),
     ("PlatformMotionEvent as MotionEvent", r"MotionEvent\.(?=(?:AXIS_|ACTION_)\w+)", r"AndroidMotionAxes."),
     ("PlatformIntentType as Intent", r"Intent\.(?=[A-Z][A-Z0-9_]+\b)", r"PlatformIntent."),

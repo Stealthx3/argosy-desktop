@@ -12,6 +12,8 @@ expect class ManagedInstallerManager {
 
     fun canInstallPackages(): Boolean
 
+    fun openInstallPermissionSettings()
+
     fun openImeSettings()
 
     fun showImePicker()

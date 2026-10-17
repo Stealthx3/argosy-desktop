@@ -28,4 +28,6 @@ actual object PlatformUris {
     actual fun fromFile(file: File): PlatformUri = Uri.fromFile(file)
     actual fun encode(s: String?): String? = Uri.encode(s)
     actual fun decode(s: String?): String? = Uri.decode(s)
+    actual fun encode(s: String): String = Uri.encode(s)
+    actual fun decode(s: String): String = Uri.decode(s)
 }

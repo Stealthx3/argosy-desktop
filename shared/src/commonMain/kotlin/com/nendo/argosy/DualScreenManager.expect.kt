@@ -24,6 +24,7 @@ import com.nendo.argosy.platform.resources
 import com.nendo.argosy.data.preferences.DisplayRoleOverride
 import com.nendo.argosy.ui.input.InputSignature
 import com.nendo.argosy.core.game.AchievementUi
+import com.nendo.argosy.ui.dualscreen.CompanionDetail
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -40,6 +41,8 @@ expect class DualScreenManager {
 
         val MEDIA_DIM_LOG_TAG: String
     }
+
+    fun startGame(request: com.nendo.argosy.ui.screens.common.GameLaunchRequest): Result<Unit>
 
     val dockReorder: StateFlow<com.nendo.argosy.ui.components.DockReorderSession?>
 
@@ -129,6 +132,8 @@ expect class DualScreenManager {
 
     fun updateSessionControls(controls: com.nendo.argosy.ui.dualscreen.dashboard.SessionControls)
 
+    fun openDashboardDocument(document: com.nendo.argosy.ui.screens.gamedetail.GameDocument)
+
     fun updateCompanionSaveDirty(isDirty: Boolean)
 
     var sessionRefocus: (() -> Unit)?
@@ -153,6 +158,8 @@ expect class DualScreenManager {
 
     var onRoleSwapped: ((Boolean) -> Unit)?
 
+    fun setCompanionDetail(owner: com.nendo.argosy.ui.dualscreen.SlotOwner, detail: CompanionDetail?)
+
     val isCompanionActive: StateFlow<Boolean>
 
     val companionHoldsPrimary: StateFlow<Boolean>
@@ -164,6 +171,10 @@ expect class DualScreenManager {
     val presentationBackgroundBlur: StateFlow<Int>
 
     val selectSwapMode: StateFlow<com.nendo.argosy.data.preferences.SelectSwapMode>
+
+    fun presentSlot(owner: com.nendo.argosy.ui.dualscreen.SlotOwner, slot: com.nendo.argosy.ui.dualscreen.PresentationSlot)
+
+    fun releaseSlot(owner: com.nendo.argosy.ui.dualscreen.SlotOwner)
 
     val primaryOnHome: StateFlow<Boolean>
 
@@ -213,7 +224,11 @@ expect class DualScreenManager {
 
     val swappedIsGameActive: StateFlow<Boolean>
 
+    val swappedCompanionState: StateFlow<com.nendo.argosy.hardware.CompanionInGameState>
+
     fun primaryShowsDashboard(primaryDisplayId: Int?, gameDisplayId: Int? = emulatorDisplayId): Boolean
+
+    val presentationSlot: StateFlow<com.nendo.argosy.ui.dualscreen.PresentationSlot>
 
     val isMovingGame: Boolean
 

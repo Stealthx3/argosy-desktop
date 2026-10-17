@@ -11,6 +11,12 @@ expect val PlatformConfiguration.screenHeightDp: Int
 
 expect val PlatformConfiguration.orientation: Int
 
+expect class PlatformLocaleList
+
+expect val PlatformConfiguration.locales: PlatformLocaleList
+
+expect operator fun PlatformLocaleList.get(index: Int): java.util.Locale
+
 expect val LocalPlatformConfiguration: ProvidableCompositionLocal<PlatformConfiguration>
 
 @Composable

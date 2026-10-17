@@ -20,6 +20,7 @@ Usage: movable.py --check           audits files already in shared against the s
        movable.py --android <file>  prints what placing <file> in androidMain also needs.
        movable.py --rank [n]        lists the n held app files whose commonMain slice would free the most others.
        movable.py --rank-android [n] lists the n shared androidMain files whose slice would let the most others rehome.
+       movable.py --path <file> <prefix> prints the shortest dependency chain from <file> to a file under <prefix>, with the names used.
        movable.py --roots <file>... lists the files with reasons of their own in the closure of <file>s.
        movable.py --plan <n> <file>... picks n roots to slice, greedily shrinking the closure of <file>s
                                     (--services-only: never a ui/ file or a view model).
@@ -41,7 +42,7 @@ SHARED = Path("shared/src/commonMain/kotlin")
 SHARED_ANDROID = Path("shared/src/androidMain/kotlin")
 ALLOWED = (
     "kotlin.", "kotlinx.coroutines.", "java.", "javax.",
-    "androidx.room.", "androidx.sqlite.", "androidx.compose.runtime.", "in.dragonbra.javasteam.",
+    "androidx.room.", "androidx.sqlite.", "androidx.compose.runtime.", "in.dragonbra.javasteam.", "androidx.navigation.",
     "retrofit2.", "okhttp3.", "okio.", "com.squareup.moshi.", "io.socket.", "org.json.",
     "org.apache.commons.compress.", "org.tukaani.xz.", "com.github.luben.zstd.",
     "`in`.dragonbra.", "org.bouncycastle.", "com.upokecenter.cbor.", "com.google.protobuf.",
@@ -77,6 +78,7 @@ REWRITTEN = (
     "android.os.Environment.MEDIA_MOUNTED", "android.os.Environment.DIRECTORY_DOWNLOADS",
     "android.os.Environment.getExternalStorage", "android.os.Environment.isExternalStorageManager",
     "android.text.format.DateFormat.getBestDateTimePattern",
+    "android.widget.Toast", "android.view.inputmethod.InputMethodManager",
 )
 GENERATED = (
     "com.nendo.argosy.config.AppBuildConfig", "com.nendo.argosy.res.ArgosyR", "com.nendo.argosy.shared.R",
@@ -128,8 +130,8 @@ GUARDED_REWRITES = {
     "dagger.hilt.android.qualifiers.ApplicationContext": re.compile(r"(?!)"),
     "androidx.hilt.navigation.compose.hiltViewModel": re.compile(r"hiltViewModel(?:<[^>]*>)?\((?!\))"),
     "androidx.compose.ui.platform.LocalConfiguration": re.compile(
-        r"LocalConfiguration\.current\.(?!screenWidthDp\b|screenHeightDp\b|orientation\b)\w+"
-        r"|\bconfiguration\.(?!screenWidthDp\b|screenHeightDp\b|orientation\b)\w+"
+        r"LocalConfiguration\.current\.(?!screenWidthDp\b|screenHeightDp\b|orientation\b|locales\[)\w+"
+        r"|\bconfiguration\.(?!screenWidthDp\b|screenHeightDp\b|orientation\b|locales\[)\w+"
     ),
     "androidx.activity.compose.BackHandler": re.compile(r"BackHandler\((?!enabled = true\)|\))[^)]"),
     "android.graphics.Color": re.compile(
@@ -175,6 +177,12 @@ GUARDED_REWRITES = {
         r"\b(?:availableBlocks\w*|freeBlocks\w*|blockCount\w*|blockSize\w*|freeBytes|totalBytes|restat)\b"
     ),
     "android.text.format.DateFormat": re.compile(r"\bDateFormat\.(?!getBestDateTimePattern\b)\w+"),
+    "android.os.Looper": re.compile(r"\bLooper\.(?!getMainLooper\(\))\w+|\.looper\b|\bLooper\(\)"),
+    "android.os.Handler": re.compile(
+        r"\.(?:post|postDelayed|postAtTime|postAtFrontOfQueue|removeCallbacks|removeCallbacksAndMessages|sendMessage\w*"
+        r"|sendEmptyMessage\w*|obtainMessage|hasMessages|hasCallbacks)\b|\bHandler\((?!Looper\.getMainLooper\(\)\))"
+    ),
+    "android.database.ContentObserver": re.compile(r"\.(?:dispatchChange|deliverSelfNotifications)\b|onChange\(\s*\w+\s*:\s*Boolean\s*,"),
     "android.graphics.Bitmap": re.compile(
         r"\bBitmap\.(?!Config\.(?:ARGB_8888|HARDWARE)\b|createBitmap\(\w+, \w+, Bitmap\.Config)\w+"
         r"|\.(?:compress|eraseColor|setPixel|getPixels|copyPixels\w*|isRecycled|byteCount|allocationByteCount"
@@ -190,7 +198,7 @@ GUARDED_REWRITES = {
         r"|unregisterOnSharedPreferenceChangeListener|OnSharedPreferenceChangeListener)\b"
     ),
     "android.provider.Settings": re.compile(
-        r"\bSettings\.(?!Secure\.(?:getString|ANDROID_ID)\b|(?:ACTION_APPLICATION_DETAILS_SETTINGS|ACTION_APP_NOTIFICATION_SETTINGS"
+        r"(?<!\.)\bSettings\.(?!Secure\.(?:getString|ANDROID_ID)\b|System\.CONTENT_URI\b|(?:ACTION_APPLICATION_DETAILS_SETTINGS|ACTION_APP_NOTIFICATION_SETTINGS"
         r"|ACTION_MANAGE_OVERLAY_PERMISSION|ACTION_MANAGE_WRITE_SETTINGS|ACTION_SETTINGS|ACTION_USAGE_ACCESS_SETTINGS"
         r"|EXTRA_APP_PACKAGE)\b)\w+(?:\.\w+)?"
     ),
@@ -239,7 +247,7 @@ GUARDED_REWRITES = {
     ),
 }
 FQ_GUARDED = (
-    "android.content.Context", "android.os.SystemClock", "dagger.hilt.android.qualifiers.ApplicationContext",
+    "android.content.Context", "android.content.Intent", "android.os.SystemClock", "dagger.hilt.android.qualifiers.ApplicationContext",
     "android.graphics.Bitmap", "android.graphics.BitmapFactory", "android.util.Base64",
     "android.provider.Settings", "android.net.Uri", "android.os.Process", "android.graphics.Paint", "android.os.Bundle",
     "coil.compose.AsyncImage",
@@ -263,6 +271,9 @@ STAND_IN_GUARDS = {
     "com.nendo.argosy.platform.PlatformEnvironment": "android.os.Environment",
     "com.nendo.argosy.platform.PlatformStatFs": "android.os.StatFs",
     "com.nendo.argosy.platform.PlatformDateFormat": "android.text.format.DateFormat",
+    "com.nendo.argosy.platform.PlatformLooper": "android.os.Looper",
+    "com.nendo.argosy.platform.PlatformHandler": "android.os.Handler",
+    "com.nendo.argosy.platform.PlatformContentObserver": "android.database.ContentObserver",
     "com.nendo.argosy.platform.PlatformBitmap": "android.graphics.Bitmap",
     "com.nendo.argosy.platform.PlatformBitmapFactory": "android.graphics.BitmapFactory",
     "com.nendo.argosy.platform.PlatformBase64": "android.util.Base64",
@@ -564,6 +575,29 @@ def main():
             print(f"slice {best[1].rel}: closure {len(after)}, roots {sum(1 for u in after if common_reasons[u])}")
         for u in sorted((u for u in closure() if common_reasons[u]), key=lambda x: x.rel):
             print(f"left {u.rel}: {'; '.join(common_reasons[u])[:220]}")
+        return
+
+    if args[:1] == ["--path"]:
+        by_any = {u.rel: u for u in app + android_shared}
+        start = by_any[args[1]]
+        parents, queue = {start: None}, [start]
+        while queue:
+            current = queue.pop(0)
+            if current.rel.startswith(args[2]):
+                path = []
+                while current is not None:
+                    path.append(current)
+                    current = parents[current]
+                path.reverse()
+                for a, b in zip(path, path[1:]):
+                    names = [n for n in sorted(b.names) if re.search(rf"\b{re.escape(n)}\b", a.body)]
+                    print(f"{a.rel} -> {b.rel}  {' '.join(names[:4])}")
+                return
+            for dep in sorted(deps[current], key=lambda x: x.rel):
+                if dep not in in_common and dep not in movable and dep not in parents:
+                    parents[dep] = current
+                    queue.append(dep)
+        print(f"no path from {args[1]} to {args[2]}")
         return
 
     if args[:1] == ["--roots"]:

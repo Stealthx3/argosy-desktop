@@ -3,7 +3,6 @@ package com.nendo.argosy.platform
 import java.io.File
 import java.net.URI
 import java.net.URLDecoder
-import java.net.URLEncoder
 
 actual abstract class PlatformUri {
     internal abstract val raw: String
@@ -51,6 +50,17 @@ actual fun PlatformUri.getQueryParameter(key: String): String? = queryPairs.firs
 actual object PlatformUris {
     actual fun parse(uriString: String): PlatformUri = DesktopUri(uriString)
     actual fun fromFile(file: File): PlatformUri = DesktopUri(file.toURI().toString().replaceFirst("file:/", "file:///").replace("file:////", "file:///"))
-    actual fun encode(s: String?): String? = s?.let { URLEncoder.encode(it, Charsets.UTF_8).replace("+", "%20") }
-    actual fun decode(s: String?): String? = s?.let { URLDecoder.decode(it.replace("+", "%2B"), Charsets.UTF_8) }
+    actual fun encode(s: String?): String? = s?.let { encode(it) }
+    actual fun decode(s: String?): String? = s?.let { decode(it) }
+    actual fun encode(s: String): String = buildString {
+        for (byte in s.toByteArray(Charsets.UTF_8)) {
+            val c = byte.toInt().toChar()
+            if (byte >= 0 && (c.isLetterOrDigit() || c in UNRESERVED)) append(c)
+            else append('%').append(HEX[(byte.toInt() shr 4) and 0xF]).append(HEX[byte.toInt() and 0xF])
+        }
+    }
+    actual fun decode(s: String): String = URLDecoder.decode(s.replace("+", "%2B"), Charsets.UTF_8)
+
+    private const val UNRESERVED = "_-!.~'()*"
+    private const val HEX = "0123456789ABCDEF"
 }

@@ -3,7 +3,6 @@ package com.nendo.argosy.ui.screens.gamedetail.components
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -70,17 +69,6 @@ import com.nendo.argosy.ui.screens.gamedetail.GameDownloadStatus
 import com.nendo.argosy.ui.screens.settings.menu.SettingsLayout
 import com.nendo.argosy.ui.theme.Dimens
 import com.nendo.argosy.ui.util.clickableNoFocus
-
-data class MenuLayoutState(
-    val hasDescription: Boolean = false,
-    val hasScreenshots: Boolean = false,
-    val hasAchievements: Boolean = false,
-    val hasSocialAccount: Boolean = false,
-    val hasSaveSync: Boolean = false,
-    val hasRelated: Boolean = false,
-    val hasPerGameSettings: Boolean = false,
-    val hasDocuments: Boolean = false
-)
 
 sealed class MenuItem(
     val key: String,
@@ -919,4 +907,3 @@ private fun buildEndWeightedLines(words: List<String>): List<String> {
 
     return listOf(firstPart, lastPart)
 }
-

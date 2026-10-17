@@ -15,4 +15,6 @@ expect class EmulatorDownloadManager {
     suspend fun clearApkCache(): Boolean
 
     fun canInstallPackages(): Boolean
+
+    fun openInstallPermissionSettings()
 }

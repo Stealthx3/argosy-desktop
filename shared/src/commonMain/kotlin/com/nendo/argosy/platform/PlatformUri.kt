@@ -29,4 +29,6 @@ expect object PlatformUris {
     fun fromFile(file: File): PlatformUri
     fun encode(s: String?): String?
     fun decode(s: String?): String?
+    fun encode(s: String): String
+    fun decode(s: String): String
 }

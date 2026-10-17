@@ -51,14 +51,8 @@ import com.nendo.argosy.ui.screens.settings.components.LocalSettingsTouchFocus
 import com.nendo.argosy.ui.screens.settings.menu.SettingsLayout
 import com.nendo.argosy.ui.theme.Dimens
 import com.nendo.argosy.ui.theme.LocalArgosyTheme
-import com.nendo.argosy.ui.theme.generated.ColorTokens
 import com.nendo.argosy.ui.util.clickableNoFocus
 import java.time.ZoneId
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
-import java.time.format.FormatStyle
-import java.util.Locale
 
 internal sealed class CoreManagementItem(val key: String) {
     val isFocusable: Boolean get() = this !is Header
@@ -325,18 +319,6 @@ private fun UpdateAllCoresRow(
         onClick = onClick
     )
 }
-
-internal fun formatCoreBuildStamp(raw: String, zone: ZoneId, locale: Locale): String =
-    try {
-        ZonedDateTime.parse(raw, DateTimeFormatter.RFC_1123_DATE_TIME)
-            .withZoneSameInstant(zone)
-            .format(
-                DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT)
-                    .withLocale(locale)
-            )
-    } catch (_: DateTimeParseException) {
-        raw
-    }
 
 @Composable
 private fun CoreChip(

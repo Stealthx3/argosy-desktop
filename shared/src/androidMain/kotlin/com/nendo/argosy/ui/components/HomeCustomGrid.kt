@@ -1,6 +1,5 @@
 package com.nendo.argosy.ui.components
 
-import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.ui.graphics.Brush
@@ -169,61 +168,6 @@ fun customGridMetrics(
         offsetXPx = ((width - gridWidth) / 2f).coerceAtLeast(0f),
         offsetYPx = ((height - gridHeight) / 2f).coerceAtLeast(0f)
     )
-}
-
-/**
- * What a tile shows once resolved. The grid does not know how to load a cover, so the host supplies
- * one of these per tile and an unresolvable target is simply absent from the map.
- */
-data class CustomGridTileContent(
-    val game: com.nendo.argosy.ui.screens.home.HomeGameUi?,
-    val label: String,
-    val media: com.nendo.argosy.ui.screens.home.HomeMediaUi? = null,
-    val isMissing: Boolean = false,
-    val packageName: String? = null,
-    val coverPath: String? = null,
-    val posterUrl: String? = null,
-    val subtitle: String? = null,
-    val stats: List<TileStat> = emptyList(),
-    /**
-     * Marks a tile that plays one game out of a collection, so a queue is distinguishable from the
-     * plain game tile it otherwise looks exactly like.
-     */
-    val isCollectionQueue: Boolean = false,
-    /**
-     * Marks a random game tile, which otherwise looks exactly like the game it happens to be
-     * showing. The die badge and the re-roll animation hang off this.
-     */
-    val isRandom: Boolean = false,
-    /**
-     * Marks the continue tile, which likewise looks exactly like the game it last showed.
-     */
-    val isContinue: Boolean = false,
-    val isLibraryLink: Boolean = false,
-    /**
-     * What a RetroAchievements tile draws, in place of every other field here. Present only on
-     * that tile, which owns its own layout in each cell shape rather than borrowing one.
-     */
-    val ra: RaTileUi? = null
-)
-
-/**
- * One fact worth reading at a glance on a tile with room for it. Kept as a label and value pair so
- * the tile decides how many fit rather than each caller guessing.
- */
-data class TileStat(val label: String, val value: String)
-
-
-/**
- * A collection a tile points at, resolved for drawing: the name it shows and one cover from inside
- * it, since a collection has no art of its own.
- */
-data class TileCollectionUi(
-    val name: String,
-    val coverPaths: List<String> = emptyList(),
-    val gameCount: Int = 0
-) {
-    val coverPath: String? get() = coverPaths.firstOrNull()
 }
 
 /**
@@ -1272,37 +1216,6 @@ private fun WideTileBox(
 }
 
 private const val WIDE_TILE_COVER_ASPECT = 0.7f
-
-/**
- * What a wide game tile says beside its cover. Only facts that exist are offered: a game with no
- * achievements and no play time shows nothing rather than a row of zeroes, which reads as broken.
- */
-fun tileStatsFor(game: com.nendo.argosy.ui.screens.home.HomeGameUi, context: Context): List<TileStat> = buildList {
-    if (game.playTimeMinutes > 0) {
-        add(TileStat(context.getString(R.string.home_grid_tile_stat_played), formatPlayTime(context, game.playTimeMinutes)))
-    }
-    if (game.achievementCount > 0) {
-        add(
-            TileStat(
-                context.getString(R.string.home_grid_tile_stat_achievements),
-                "${game.earnedAchievementCount}/${game.achievementCount}"
-            )
-        )
-    }
-    if (game.releaseYear != null) {
-        add(TileStat(context.getString(R.string.home_grid_tile_stat_released), game.releaseYear.toString()))
-    }
-}
-
-private fun formatPlayTime(context: Context, minutes: Int): String {
-    val hours = minutes / 60
-    val remainder = minutes % 60
-    return if (hours > 0) {
-        context.getString(R.string.common_homegrid_playtime_hours_minutes, hours, remainder)
-    } else {
-        context.getString(R.string.common_homegrid_playtime_minutes, remainder)
-    }
-}
 
 @Composable
 internal fun BoxScope.TileDragSurface(

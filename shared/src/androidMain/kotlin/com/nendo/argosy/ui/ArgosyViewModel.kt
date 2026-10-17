@@ -6,7 +6,6 @@ import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
 import android.util.Log
-import android.view.WindowManager
 import androidx.annotation.StringRes
 import com.nendo.argosy.shared.R
 import androidx.lifecycle.ViewModel
@@ -41,7 +40,6 @@ import com.nendo.argosy.hardware.DevicePerformanceResolver
 import com.nendo.argosy.hardware.VolumeController
 import com.nendo.argosy.ui.components.QuickSettingsController
 import com.nendo.argosy.ui.components.friends.QuickFriendsController
-import com.nendo.argosy.ui.components.InputButton
 import com.nendo.argosy.data.repository.GameRepository
 import com.nendo.argosy.ui.input.InputDispatcher.Companion.computeWrappedIndex
 import com.nendo.argosy.ui.input.GamepadInputHandler
@@ -126,11 +124,6 @@ fun UserPreferences.toScreenDimmerPreferences() = ScreenDimmerPreferences(
     enabled = screenDimmerEnabled,
     timeoutMinutes = screenDimmerTimeoutMinutes,
     level = screenDimmerLevel
-)
-
-data class DrawerItem(
-    val route: String,
-    @StringRes val labelRes: Int
 )
 
 data class NavRingState(

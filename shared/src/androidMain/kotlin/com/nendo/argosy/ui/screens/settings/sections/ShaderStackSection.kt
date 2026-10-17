@@ -38,9 +38,9 @@ import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.res.stringResource
+import com.nendo.argosy.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.nendo.argosy.shared.R
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.ui.components.FocusedScroll
 import com.nendo.argosy.libretro.shader.ShaderChainManager
 import com.nendo.argosy.ui.screens.settings.ShaderParamDef

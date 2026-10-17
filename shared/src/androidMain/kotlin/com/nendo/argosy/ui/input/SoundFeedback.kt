@@ -194,7 +194,7 @@ actual class SoundFeedbackManager @Inject constructor(
         return true
     }
 
-    fun setVolume(volume: Int) {
+    actual fun setVolume(volume: Int) {
         val linear = (volume / 100f).coerceIn(0f, 1f)
         this.volume = linear * linear
     }
@@ -204,12 +204,12 @@ actual class SoundFeedbackManager @Inject constructor(
         refreshCustomSounds()
     }
 
-    fun setSoundConfig(type: SoundType, config: SoundConfig) {
+    actual fun setSoundConfig(type: SoundType, config: SoundConfig) {
         soundConfigs = soundConfigs + (type to config)
         refreshCustomSounds()
     }
 
-    fun clearSoundConfig(type: SoundType) {
+    actual fun clearSoundConfig(type: SoundType) {
         soundConfigs = soundConfigs - type
         refreshCustomSounds()
     }

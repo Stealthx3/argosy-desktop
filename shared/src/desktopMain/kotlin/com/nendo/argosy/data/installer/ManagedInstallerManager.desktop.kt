@@ -36,4 +36,7 @@ actual class ManagedInstallerManager @Inject constructor() {
 
     actual fun install(row: ManagedInstallerEntity, chosenAsset: GitHubAsset?) {
     }
+
+    actual fun openInstallPermissionSettings() {
+    }
 }

@@ -20,4 +20,7 @@ actual class EmulatorDownloadManager @Inject constructor() {
     actual suspend fun clearApkCache(): Boolean = false
 
     actual fun canInstallPackages(): Boolean = false
+
+    actual fun openInstallPermissionSettings() {
+    }
 }

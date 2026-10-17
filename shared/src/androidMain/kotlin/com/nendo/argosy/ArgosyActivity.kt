@@ -82,7 +82,7 @@ internal fun nonDefaultDisplayLaunch(
 }
 
 @AndroidEntryPoint
-class ArgosyActivity : ComponentActivity() {
+actual class ArgosyActivity : ComponentActivity() {
 
     private var languageTag: String = com.nendo.argosy.core.locale.LocaleHelper.SYSTEM_LANGUAGE_TAG
 
@@ -200,7 +200,7 @@ class ArgosyActivity : ComponentActivity() {
 
     var isOnHomeScreen = false
 
-    var isOverlayFocused: Boolean
+    actual var isOverlayFocused: Boolean
         get() = dualScreenManager.isOverlayFocused
         set(value) {
             dualScreenManager.isOverlayFocused = value
@@ -216,7 +216,7 @@ class ArgosyActivity : ComponentActivity() {
         }
     }
 
-    fun requestScreenCapturePermission() {
+    actual fun requestScreenCapturePermission() {
         screenCaptureManager.requestPermission(this, screenCaptureLauncher)
     }
 

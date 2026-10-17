@@ -293,7 +293,7 @@ actual class EmulatorDownloadManager @Inject constructor(
 
     actual fun canInstallPackages(): Boolean = appInstaller.canInstallPackages(context)
 
-    fun openInstallPermissionSettings() = appInstaller.openInstallPermissionSettings(context)
+    actual fun openInstallPermissionSettings() = appInstaller.openInstallPermissionSettings(context)
 }
 
 private data class PendingEmulatorInstall(

@@ -29,7 +29,7 @@ internal fun liveWallpaperSlots(homeIsOurs: Boolean, lockIsOurs: Boolean?): Int 
 class MosaicRow(val strip: Bitmap, val top: Float, val period: Float, val pixelsPerSecond: Float)
 
 @Singleton
-class LockScreenScenes @Inject constructor() {
+actual class LockScreenScenes @Inject constructor() {
     private val _scene = MutableStateFlow<LockScreenScene?>(null)
     val scene: StateFlow<LockScreenScene?> = _scene.asStateFlow()
 
@@ -37,17 +37,17 @@ class LockScreenScenes @Inject constructor() {
         _scene.value = scene
     }
 
-    fun clear() {
+    actual fun clear() {
         _scene.value = null
     }
 
-    companion object {
+    actual companion object {
         fun component(context: Context): ComponentName =
             ComponentName(context, LockScreenWallpaperService::class.java)
 
-        fun isLiveActive(context: Context): Boolean = liveSlots(context) != 0
+        actual fun isLiveActive(context: Context): Boolean = liveSlots(context) != 0
 
-        fun liveSlots(context: Context): Int {
+        actual fun liveSlots(context: Context): Int {
             val manager = WallpaperManager.getInstance(context)
             val ours = component(context)
             return runCatching {
@@ -64,16 +64,16 @@ class LockScreenScenes @Inject constructor() {
                 .getOrDefault(0)
         }
 
-        fun canOffer(context: Context, lockScreenArt: Boolean): Boolean =
+        actual fun canOffer(context: Context, lockScreenArt: Boolean): Boolean =
             lockScreenArt && SecondaryHomeComponent.isDefaultHome(context) && isSupported(context)
 
-        fun isSupported(context: Context): Boolean {
+        actual fun isSupported(context: Context): Boolean {
             val manager = WallpaperManager.getInstance(context)
             return manager.isWallpaperSupported && manager.isSetWallpaperAllowed &&
                 pickerIntent(context).resolveActivity(context.packageManager) != null
         }
 
-        fun pickerIntent(context: Context): Intent =
+        actual fun pickerIntent(context: Context): Intent =
             Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER)
                 .putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT, component(context))
     }

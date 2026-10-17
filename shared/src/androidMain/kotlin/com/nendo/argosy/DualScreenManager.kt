@@ -169,7 +169,7 @@ actual class DualScreenManager(
     /**
      * Starts a resolved game request from the activity this manager is bound to.
      */
-    fun startGame(request: com.nendo.argosy.ui.screens.common.GameLaunchRequest): Result<Unit> =
+    actual fun startGame(request: com.nendo.argosy.ui.screens.common.GameLaunchRequest): Result<Unit> =
         gameActivityStarter.start(request)
 
     private val dockCoordinator = com.nendo.argosy.ui.dualscreen.DockReorderCoordinator(
@@ -883,7 +883,7 @@ actual class DualScreenManager(
         }
     }
 
-    fun openDashboardDocument(document: com.nendo.argosy.ui.screens.gamedetail.GameDocument) {
+    actual fun openDashboardDocument(document: com.nendo.argosy.ui.screens.gamedetail.GameDocument) {
         val gameId = companionSessionGameId
         scope.launch {
             val romId = gameDao.getById(gameId)?.rommId
@@ -1012,7 +1012,7 @@ actual class DualScreenManager(
      * Describes [owner]'s selection on the presentation screen, above every other owner's. Null
      * withdraws only [owner]'s description, uncovering the one beneath it.
      */
-    fun setCompanionDetail(owner: com.nendo.argosy.ui.dualscreen.SlotOwner, detail: CompanionDetail?) {
+    actual fun setCompanionDetail(owner: com.nendo.argosy.ui.dualscreen.SlotOwner, detail: CompanionDetail?) {
         _companionDetails.update { entries ->
             entries.filterNot { it.first == owner } + listOfNotNull(detail?.let { owner to it })
         }
@@ -1064,7 +1064,7 @@ actual class DualScreenManager(
      * fallback once every publisher has released. Screens publish while they are on screen and
      * release when they leave, so the surface follows navigation without either side tracking it.
      */
-    fun presentSlot(
+    actual fun presentSlot(
         owner: com.nendo.argosy.ui.dualscreen.SlotOwner,
         slot: com.nendo.argosy.ui.dualscreen.PresentationSlot
     ) {
@@ -1073,7 +1073,7 @@ actual class DualScreenManager(
         }
     }
 
-    fun releaseSlot(owner: com.nendo.argosy.ui.dualscreen.SlotOwner) {
+    actual fun releaseSlot(owner: com.nendo.argosy.ui.dualscreen.SlotOwner) {
         _presentationSlots.update { entries -> entries.filterNot { it.first == owner } }
     }
 
@@ -1451,7 +1451,7 @@ actual class DualScreenManager(
     private val _swappedCompanionState = MutableStateFlow(
         com.nendo.argosy.hardware.CompanionInGameState()
     )
-    val swappedCompanionState: StateFlow<com.nendo.argosy.hardware.CompanionInGameState> =
+    actual val swappedCompanionState: StateFlow<com.nendo.argosy.hardware.CompanionInGameState> =
         _swappedCompanionState
     var swappedSessionTimer: com.nendo.argosy.hardware.CompanionSessionTimer? = null
         private set
@@ -1472,7 +1472,7 @@ actual class DualScreenManager(
         return gameDisplay == showcase
     }
 
-    val presentationSlot: StateFlow<com.nendo.argosy.ui.dualscreen.PresentationSlot> =
+    actual val presentationSlot: StateFlow<com.nendo.argosy.ui.dualscreen.PresentationSlot> =
         kotlinx.coroutines.flow.combine(
             _presentationSlots,
             _companionDetails,

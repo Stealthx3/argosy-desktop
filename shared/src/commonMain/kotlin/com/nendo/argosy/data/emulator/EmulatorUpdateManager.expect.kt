@@ -2,6 +2,7 @@ package com.nendo.argosy.data.emulator
 
 import com.nendo.argosy.data.local.entity.EmulatorUpdateEntity
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 expect class EmulatorUpdateManager {

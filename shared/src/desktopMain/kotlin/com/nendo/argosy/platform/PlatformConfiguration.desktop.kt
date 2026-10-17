@@ -26,6 +26,12 @@ actual val PlatformConfiguration.screenHeightDp: Int get() = heightDp
 
 actual val PlatformConfiguration.orientation: Int get() = orientationValue
 
+actual class PlatformLocaleList(internal val items: List<java.util.Locale>)
+
+actual val PlatformConfiguration.locales: PlatformLocaleList get() = PlatformLocaleList(listOf(java.util.Locale.getDefault()))
+
+actual operator fun PlatformLocaleList.get(index: Int): java.util.Locale = items[index]
+
 actual val LocalPlatformConfiguration: ProvidableCompositionLocal<PlatformConfiguration> =
     staticCompositionLocalOf { PlatformConfiguration(widthDp = 960, heightDp = 540) }
 

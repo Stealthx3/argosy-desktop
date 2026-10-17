@@ -93,7 +93,7 @@ actual class ManagedInstallerManager @Inject constructor(
 
     actual fun canInstallPackages(): Boolean = appInstaller.canInstallPackages(context)
 
-    fun openInstallPermissionSettings() = appInstaller.openInstallPermissionSettings(context)
+    actual fun openInstallPermissionSettings() = appInstaller.openInstallPermissionSettings(context)
 
     actual fun openImeSettings() {
         context.startActivity(

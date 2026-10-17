@@ -13,6 +13,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.isActive
+import com.nendo.argosy.ui.dualscreen.CompanionDetail
 
 actual class DualScreenManager @Inject constructor() {
     actual companion object {
@@ -358,4 +359,22 @@ actual class DualScreenManager @Inject constructor() {
 
     actual fun saveDockReorder(token: Long) {
     }
+
+    actual val swappedCompanionState: StateFlow<com.nendo.argosy.hardware.CompanionInGameState> = TODO("desktop: swappedCompanionState")
+
+    actual fun startGame(request: com.nendo.argosy.ui.screens.common.GameLaunchRequest): Result<Unit> = kotlin.Result.failure(UnsupportedOperationException("not available on desktop"))
+
+    actual fun openDashboardDocument(document: com.nendo.argosy.ui.screens.gamedetail.GameDocument) {
+    }
+
+    actual fun setCompanionDetail(owner: com.nendo.argosy.ui.dualscreen.SlotOwner, detail: CompanionDetail?) {
+    }
+
+    actual fun presentSlot(owner: com.nendo.argosy.ui.dualscreen.SlotOwner, slot: com.nendo.argosy.ui.dualscreen.PresentationSlot) {
+    }
+
+    actual fun releaseSlot(owner: com.nendo.argosy.ui.dualscreen.SlotOwner) {
+    }
+
+    actual val presentationSlot: StateFlow<com.nendo.argosy.ui.dualscreen.PresentationSlot> = TODO("desktop: presentationSlot")
 }

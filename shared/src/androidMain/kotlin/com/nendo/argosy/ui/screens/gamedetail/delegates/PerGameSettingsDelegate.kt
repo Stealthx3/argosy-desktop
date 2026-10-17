@@ -12,19 +12,14 @@ import com.nendo.argosy.core.notification.NotificationManager
 import com.nendo.argosy.core.notification.NotificationText
 import com.nendo.argosy.core.notification.NotificationType
 import com.nendo.argosy.data.emulator.VulkanDriverRepository
-import com.nendo.argosy.ui.common.GpuDriverBlock
 import com.nendo.argosy.ui.common.GpuDriverPickerEntry
-import com.nendo.argosy.ui.common.GraphicsBackendOptionUi
-import com.nendo.argosy.ui.common.VulkanDriverOption
 import com.nendo.argosy.ui.common.gpuDriverBlock
-import com.nendo.argosy.ui.common.gpuDriverPickerEntries
 import com.nendo.argosy.ui.common.optionsUi
 import com.nendo.argosy.ui.common.toOption
 import com.nendo.argosy.data.emulator.EmulatorDetector
 import com.nendo.argosy.data.emulator.EmulatorRegistry
 import com.nendo.argosy.data.emulator.EmulatorResolver
 import com.nendo.argosy.data.emulator.EmulatorSettingScope
-import com.nendo.argosy.data.emulator.ExtensionOption
 import com.nendo.argosy.data.emulator.LaunchConfig
 import com.nendo.argosy.data.emulator.RetroArchPathResolver
 import com.nendo.argosy.data.emulator.SavePathRegistry
@@ -34,105 +29,21 @@ import com.nendo.argosy.data.repository.EmulatorSaveConfigRepository
 import com.nendo.argosy.data.preferences.EmulatorDisplayTarget
 import com.nendo.argosy.data.preferences.MenuWrapMode
 import com.nendo.argosy.data.preferences.UserPreferencesRepository
-import com.nendo.argosy.data.platform.PlatformDefinitions
 import com.nendo.argosy.data.repository.GameRepository
-import com.nendo.argosy.data.sync.platform.MemcardInfo
 import com.nendo.argosy.data.sync.platform.PlatformSaveHandlerRegistry
 import com.nendo.argosy.domain.usecase.game.ConfigureEmulatorUseCase
 import com.nendo.argosy.ui.input.InputDispatcher.Companion.computeWrappedIndex
 import com.nendo.argosy.ui.input.SoundFeedbackManager
 import com.nendo.argosy.util.DisplayAffinityHelper
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import com.nendo.argosy.ui.screens.common.EmulatorLaunchTargetResolver
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.withContext
 import java.io.File
 import javax.inject.Inject
-
-enum class PerGameSettingsRow { EMULATOR, CORE, SAVE_PATH, SAVE_BASE_PATH, MEMCARD, DISPLAY_TARGET, EXTENSION, BACKEND, GPU_DRIVER, PLATFORM_SETTINGS }
-
-data class PerGameSettingsState(
-    val visible: Boolean = false,
-    val focusIndex: Int = 0,
-    val pathButtonIndex: Int = 0,
-    val showPathBrowser: Boolean = false,
-    val emulatorName: String? = null,
-    val isEmulatorOverride: Boolean = false,
-    val showCoreRow: Boolean = false,
-    val coreName: String? = null,
-    val isCoreOverride: Boolean = false,
-    val showSavePathRow: Boolean = false,
-    val showSaveBasePathRow: Boolean = false,
-    val saveBasePath: String? = null,
-    val saveBasePathIsInherited: Boolean = false,
-    val savePath: String? = null,
-    val isSavePathOverride: Boolean = false,
-    val showDisplayTargetRow: Boolean = false,
-    val displayTarget: EmulatorDisplayTarget? = null,
-    val inheritedDisplayTarget: EmulatorDisplayTarget = EmulatorDisplayTarget.PRESENTATION,
-    val extensionOptions: List<ExtensionOption> = emptyList(),
-    val preferredExtension: String? = null,
-    val inheritedExtension: String? = null,
-    val showMemcardRow: Boolean = false,
-    val memcardCards: List<MemcardInfo> = emptyList(),
-    val selectedMemcardPath: String? = null,
-    val inheritedMemcardName: String? = null,
-    val showMemcardPicker: Boolean = false,
-    val memcardPickerFocusIndex: Int = 0,
-    val showGpuDriverRow: Boolean = false,
-    val gpuDriver: String? = null,
-    val inheritedGpuDriver: String = GpuDriverToken.SYSTEM,
-    val gpuDrivers: List<VulkanDriverOption> = emptyList(),
-    val gpuDriverBlock: GpuDriverBlock? = null,
-    val graphicsCoreName: String? = null,
-    val gpuDriverInstallable: List<String> = emptyList(),
-    val installingGpuDriver: String? = null,
-    val showGpuDriverPicker: Boolean = false,
-    val backendOptions: List<GraphicsBackendOptionUi> = emptyList(),
-    val gameBackend: String? = null,
-    val inheritedBackend: String? = null
-) {
-    val rows: List<PerGameSettingsRow>
-        get() = buildList {
-            add(PerGameSettingsRow.EMULATOR)
-            if (showCoreRow) add(PerGameSettingsRow.CORE)
-            if (showSavePathRow) add(PerGameSettingsRow.SAVE_PATH)
-            if (showSaveBasePathRow) add(PerGameSettingsRow.SAVE_BASE_PATH)
-            if (showMemcardRow) add(PerGameSettingsRow.MEMCARD)
-            if (showDisplayTargetRow) add(PerGameSettingsRow.DISPLAY_TARGET)
-            if (extensionOptions.isNotEmpty()) add(PerGameSettingsRow.EXTENSION)
-            if (backendOptions.isNotEmpty()) add(PerGameSettingsRow.BACKEND)
-            if (showGpuDriverRow) add(PerGameSettingsRow.GPU_DRIVER)
-            add(PerGameSettingsRow.PLATFORM_SETTINGS)
-        }
-
-    val gpuDriverCycle: List<String?>
-        get() = listOf(null, GpuDriverToken.SYSTEM) + gpuDrivers.map { GpuDriverToken.custom(it.id) }
-
-    val gpuDriverPicker: List<GpuDriverPickerEntry>
-        get() = gpuDriverPickerEntries(gpuDriverCycle, gpuDriverInstallable)
-
-    val backendCycle: List<String?>
-        get() = listOf<String?>(null) + backendOptions.map { it.token }
-
-    val focusedRow: PerGameSettingsRow? get() = rows.getOrNull(focusIndex)
-
-    val memcardPickerCards: List<MemcardInfo>
-        get() = listOf(
-            MemcardInfo(
-                name = inheritedMemcardName ?: "",
-                path = "",
-                gameFolderCount = 0,
-                lastModified = 0L,
-                isDefault = true
-            )
-        ) + memcardCards
-}
 
 class PerGameSettingsDelegate @Inject constructor(
     @ApplicationContext private val context: Context,

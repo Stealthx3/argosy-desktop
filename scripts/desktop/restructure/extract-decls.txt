@@ -51,3 +51,14 @@ data/download/RomStagingManager.kt -> common:StagingTypes.kt: StagingPhase Stagi
 data/steam/SteamContentManager.kt -> common:SteamDownloadTypes.kt: SteamDownloadState DepotInfo SteamDownloadProgress QueuedSteamDownload
 data/download/MediaDownloadManager.kt -> common:MediaDownloadTypes.kt: MediaDownloadState isInFlight MediaDownloadProgress MediaSizeEstimate MediaSubtitleOutlook QueuedMediaDownload MediaRemovalResult
 data/steam/SteamService.kt -> common:SteamServiceState.kt: SteamConnectionState SteamServiceState
+data/emulator/GameLauncher.kt -> common:LaunchExtras.kt: EXTRA_ALREADY_LAUNCHED
+ui/screens/gamedetail/delegates/PerGameSettingsDelegate.kt -> common:PerGameSettingsState.kt: PerGameSettingsState
+ui/screens/gamedetail/components/GameDetailMenu.kt -> common:MenuLayoutState.kt: MenuLayoutState
+ui/components/HomeCustomGrid.kt -> common:HomeCustomGridModels.kt: CustomGridTileContent TileCollectionUi tileStatsFor TileStat
+hardware/CompanionPanel.kt -> common:CompanionInGameState.kt: CompanionPanel CompanionInGameState withLiveQuickActionState
+ui/screens/gamedetail/delegates/PerGameSettingsDelegate.kt -> common:PerGameSettingsRow.kt: PerGameSettingsRow
+ui/screens/settings/sections/CoreManagementSection.kt -> common:CoreBuildStamp.kt: formatCoreBuildStamp
+ui/ArgosyViewModel.kt -> common:DrawerItem.kt: DrawerItem
+ui/components/SystemStatusBar.kt -> common:BatteryIcon.kt: BATTERY_LOW_PERCENT BatteryIcon
+ui/screens/common/EmulatorLaunchTargetResolver.kt -> common:GameLaunchRequest.kt: GameLaunchRequest
+ui/components/HomeCustomGrid.kt -> common:HomeTilePlayTime.kt: ^formatPlayTime

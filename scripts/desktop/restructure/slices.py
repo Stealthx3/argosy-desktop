@@ -655,6 +655,8 @@ def main():
                         inferred = ("String" if const_literal.startswith('"') else "Long" if const_literal.endswith("L")
                                     else "Boolean" if const_literal in ("true", "false") else "Int")
                         tm = re.match(r"(.+)", inferred)
+                if not tm and name in overrides:
+                    tm = re.match(r"(.+)", overrides[name])
                 if not tm:
                     skipped.append(f"{name}: no declared type")
                     continue

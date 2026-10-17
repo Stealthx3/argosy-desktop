@@ -35,6 +35,14 @@ class PlatformUriTest {
     }
 
     @Test
+    fun encodeKeepsAndroidsUnreservedSetAndEscapesTheRest() {
+        assertEquals("a_b-c!d.e~f'g(h)i*j", PlatformUris.encode("a_b-c!d.e~f'g(h)i*j"))
+        assertEquals("a%2Fb%3Fc%3Dd%26e", PlatformUris.encode("a/b?c=d&e"))
+        assertEquals("%C3%A9t%C3%A9", PlatformUris.encode("été"))
+        assertEquals("été", PlatformUris.decode("%C3%A9t%C3%A9"))
+    }
+
+    @Test
     fun opaqueSchemesKeepTheirScheme() {
         assertEquals("steam", PlatformUris.parse("steam://run/570").scheme)
         assertEquals("mailto", PlatformUris.parse("mailto:a@b.c").scheme)
