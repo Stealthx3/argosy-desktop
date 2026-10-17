@@ -1,6 +1,6 @@
 package com.nendo.argosy.data.steam
 
-import android.util.Log
+import com.nendo.argosy.util.PlatformLog as Log
 import com.nendo.argosy.data.local.dao.GameDao
 import com.nendo.argosy.data.model.GameSource
 import javax.inject.Inject

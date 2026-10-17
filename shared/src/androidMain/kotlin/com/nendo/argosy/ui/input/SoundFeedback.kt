@@ -252,7 +252,7 @@ actual class SoundFeedbackManager @Inject constructor(
      * Plays the feedback for an app event: the event's haptic cue ([hapticCue]) and its sound.
      * Use [playSound] where the caller plays its own haptic cue or previews a sound.
      */
-    fun play(type: SoundType) {
+    actual fun play(type: SoundType) {
         type.hapticCue?.let(hapticManager::vibrate)
         playSound(type)
     }

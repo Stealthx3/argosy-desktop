@@ -2,7 +2,7 @@
 # actualize.py adds the `actual` modifier to the class and to the listed members. Format:
 #   <file under shared androidMain>: <Class>(<member>, ::<top-level function>, ...)
 ui/input/HapticFeedback.kt: HapticFeedbackManager(vibrate)
-ui/input/SoundFeedback.kt: SoundFeedbackManager(playSound)
+ui/input/SoundFeedback.kt: SoundFeedbackManager(playSound, play)
 ui/theme/backdrop/BackdropStamps.kt: BackdropStampProvider(::backdropStampProvider)
 hardware/AmbientLedManager.kt: AmbientLedManager(setUiColors)
 core/input/ConnectedControllerTracker.kt: ConnectedControllerTracker(connectedControllerIds)

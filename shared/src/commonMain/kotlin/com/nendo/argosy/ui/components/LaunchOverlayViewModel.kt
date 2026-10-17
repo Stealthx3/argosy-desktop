@@ -12,7 +12,7 @@ import com.nendo.argosy.ui.components.recap.LaunchRecapCursor
 import com.nendo.argosy.ui.components.recap.RecapCursor
 import com.nendo.argosy.ui.input.InputHandler
 import com.nendo.argosy.ui.input.InputResult
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.nendo.argosy.di.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

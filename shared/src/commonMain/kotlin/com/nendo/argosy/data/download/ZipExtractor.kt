@@ -1,6 +1,6 @@
 package com.nendo.argosy.data.download
 
-import android.util.Log
+import com.nendo.argosy.util.PlatformLog as Log
 import com.nendo.argosy.data.emulator.M3uManager
 import com.nendo.argosy.data.platform.PlatformDefinitions
 import com.nendo.argosy.util.FileNames

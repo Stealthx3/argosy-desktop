@@ -8,4 +8,7 @@ import javax.inject.Singleton
 actual class SoundFeedbackManager @Inject constructor() {
     actual fun playSound(type: SoundType) {
     }
+
+    actual fun play(type: SoundType) {
+    }
 }

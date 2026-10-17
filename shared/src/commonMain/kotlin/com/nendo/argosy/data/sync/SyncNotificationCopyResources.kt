@@ -1,6 +1,6 @@
 package com.nendo.argosy.data.sync
 
-import com.nendo.argosy.R
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.core.notification.NotificationText
 import com.nendo.argosy.domain.usecase.sync.SyncNotificationCopy
 import javax.inject.Inject

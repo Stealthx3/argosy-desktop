@@ -1,6 +1,6 @@
 package com.nendo.argosy.data.steam
 
-import android.util.Log
+import com.nendo.argosy.util.PlatformLog as Log
 import `in`.dragonbra.javasteam.enums.ELicenseFlags
 import `in`.dragonbra.javasteam.enums.ELicenseType
 import `in`.dragonbra.javasteam.enums.EPaymentMethod

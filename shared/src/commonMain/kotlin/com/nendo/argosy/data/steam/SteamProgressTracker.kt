@@ -1,6 +1,6 @@
 package com.nendo.argosy.data.steam
 
-import android.util.Log
+import com.nendo.argosy.util.PlatformLog as Log
 import java.io.File
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
