@@ -116,6 +116,20 @@ RULES = [
     (re.compile(r"(?<!import )\bandroid\.net\.Uri\b"), "com.nendo.argosy.platform.PlatformUri"),
     (re.compile(r"^import android\.os\.Process$", re.M), "import com.nendo.argosy.platform.PlatformProcess as Process"),
     (re.compile(r"\bandroid\.os\.Process\.(is64Bit|myUid)\b"), r"com.nendo.argosy.platform.PlatformProcess.\1"),
+    (
+        re.compile(r"^import android\.net\.ConnectivityManager$", re.M),
+        "import com.nendo.argosy.platform.PlatformConnectivityManager as ConnectivityManager",
+    ),
+    (re.compile(r"^import android\.net\.Network$", re.M), "import com.nendo.argosy.platform.PlatformNetwork as Network"),
+    (
+        re.compile(r"^import android\.net\.NetworkCapabilities$", re.M),
+        "import com.nendo.argosy.platform.PlatformNetworkCapabilities as NetworkCapabilities",
+    ),
+    (re.compile(r"^import android\.os\.UserManager$", re.M), "import com.nendo.argosy.platform.PlatformUserManager as UserManager"),
+    (re.compile(r"^import android\.annotation\.SuppressLint$", re.M), "import com.nendo.argosy.platform.SuppressLint"),
+    (re.compile(r"^import android\.view\.MotionEvent$", re.M), "import com.nendo.argosy.core.input.AndroidMotionAxes as MotionEvent"),
+    (re.compile(r"^import coil\.request\.ImageRequest$", re.M), "import com.nendo.argosy.platform.image.ImageRequest"),
+    (re.compile(r"^import coil\.request\.CachePolicy$", re.M), "import com.nendo.argosy.platform.image.CachePolicy"),
     (re.compile(r"^import android\.view\.KeyEvent$", re.M), "import com.nendo.argosy.core.input.AndroidKeyCodes as KeyEvent"),
     (
         re.compile(r"^import com\.nendo\.argosy\.util\.DisplayAffinityHelper$", re.M),
@@ -127,6 +141,9 @@ RULES = [
 COMPANION_IMPORTS = {
     "com.nendo.argosy.platform.PlatformContext": [
         "com.nendo.argosy.platform.applicationContext", "com.nendo.argosy.platform.packageName",
+        "com.nendo.argosy.platform.getSystemService", "com.nendo.argosy.platform.getExternalFilesDir",
+        "com.nendo.argosy.platform.packageManager", "com.nendo.argosy.platform.getPackageInfo",
+        "com.nendo.argosy.platform.versionName",
         "com.nendo.argosy.platform.assets", "com.nendo.argosy.platform.contentResolver", "com.nendo.argosy.platform.cacheDir", "com.nendo.argosy.platform.filesDir",
         "com.nendo.argosy.platform.getSharedPreferences",
         "com.nendo.argosy.platform.list", "com.nendo.argosy.platform.open",
@@ -135,6 +152,9 @@ COMPANION_IMPORTS = {
     ],
     "com.nendo.argosy.platform.LocalPlatformContext": [
         "com.nendo.argosy.platform.applicationContext", "com.nendo.argosy.platform.packageName",
+        "com.nendo.argosy.platform.getSystemService", "com.nendo.argosy.platform.getExternalFilesDir",
+        "com.nendo.argosy.platform.packageManager", "com.nendo.argosy.platform.getPackageInfo",
+        "com.nendo.argosy.platform.versionName",
         "com.nendo.argosy.platform.assets", "com.nendo.argosy.platform.contentResolver", "com.nendo.argosy.platform.cacheDir", "com.nendo.argosy.platform.filesDir",
         "com.nendo.argosy.platform.getSharedPreferences",
         "com.nendo.argosy.platform.list", "com.nendo.argosy.platform.open",
@@ -142,6 +162,13 @@ COMPANION_IMPORTS = {
         "com.nendo.argosy.platform.resources",
     ],
     "com.nendo.argosy.platform.LocalPlatformView": ["com.nendo.argosy.platform.getLocationOnScreen"],
+    "com.nendo.argosy.platform.PlatformConnectivityManager": [
+        "com.nendo.argosy.platform.activeNetwork", "com.nendo.argosy.platform.getNetworkCapabilities",
+        "com.nendo.argosy.platform.registerDefaultNetworkCallback", "com.nendo.argosy.platform.unregisterNetworkCallback",
+        "com.nendo.argosy.platform.hasCapability",
+    ],
+    "com.nendo.argosy.platform.PlatformNetworkCapabilities": ["com.nendo.argosy.platform.hasCapability"],
+    "com.nendo.argosy.platform.PlatformUserManager": ["com.nendo.argosy.platform.isUserUnlocked"],
     "com.nendo.argosy.platform.PlatformUri": [
         "com.nendo.argosy.platform.authority", "com.nendo.argosy.platform.encodedPath",
         "com.nendo.argosy.platform.getQueryParameter", "com.nendo.argosy.platform.host",
@@ -181,23 +208,33 @@ def rewrite_bitmap_config(text):
     return text
 
 
-MODE_PRIVATE = re.compile(r"(?<![\w.])Context\.MODE_PRIVATE\b")
+STATIC_STAND_INS = [
+    ("core.input.AndroidKeyCodes as KeyEvent", r"KeyEvent\.(keyCodeToString)\b", r"\1"),
+    ("PlatformContext as Context", r"Context\.(MODE_PRIVATE|CONNECTIVITY_SERVICE|USER_SERVICE)\b", r"\1"),
+    ("PlatformNetworkCapabilities as NetworkCapabilities", r"NetworkCapabilities\.(NET_CAPABILITY_INTERNET)\b", r"\1"),
+    ("PlatformConnectivityManager as ConnectivityManager", r"ConnectivityManager\.(NetworkCallback)\b", r"Platform\1"),
+]
 
 
-def rewrite_mode_private(text):
-    if not re.search(r"^import com\.nendo\.argosy\.platform\.PlatformContext as Context$", text, re.M):
-        return text
-    if not MODE_PRIVATE.search(text):
-        return text
-    text = MODE_PRIVATE.sub("MODE_PRIVATE", text)
-    if not re.search(r"^import com\.nendo\.argosy\.platform\.MODE_PRIVATE$", text, re.M):
-        text = re.sub(
-            r"^(import com\.nendo\.argosy\.platform\.PlatformContext as Context)$",
-            r"\1\nimport com.nendo.argosy.platform.MODE_PRIVATE",
-            text,
-            count=1,
-            flags=re.M,
-        )
+def rewrite_static_stand_ins(text):
+    for anchor, pattern, replacement in STATIC_STAND_INS:
+        anchor_import = anchor if anchor.startswith("core.") else f"platform.{anchor}"
+        if not re.search(rf"^import com\.nendo\.argosy\.{re.escape(anchor_import)}$", text, re.M):
+            continue
+        regex = re.compile(r"(?<![\w.])" + pattern)
+        names = {regex.sub(replacement, m.group(0)) for m in regex.finditer(text)}
+        if not names:
+            continue
+        text = regex.sub(replacement, text)
+        missing = [n for n in sorted(names) if not re.search(rf"^import com\.nendo\.argosy\.platform\.{n}$", text, re.M)]
+        if missing:
+            text = re.sub(
+                rf"^(import com\.nendo\.argosy\.{re.escape(anchor_import)})$",
+                lambda m: m.group(1) + "".join(f"\nimport com.nendo.argosy.platform.{n}" for n in missing),
+                text,
+                count=1,
+                flags=re.M,
+            )
     return text
 
 
@@ -242,7 +279,7 @@ def main():
         for pattern, replacement in RULES:
             new = pattern.sub(replacement, new)
         new = rewrite_bitmap_config(new)
-        new = rewrite_mode_private(new)
+        new = rewrite_static_stand_ins(new)
         new = rewrite_uri_statics(new)
         new = ensure_companions(new)
         if new != text:

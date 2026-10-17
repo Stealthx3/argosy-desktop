@@ -329,8 +329,47 @@ def main():
                 edits.append((start + m.start(1), start + m.start(1), "" if "actual" in mods else "actual "))
                 continue
             if kind == "object" and re.search(r"\bcompanion\b", mods):
-                expect_lines.append("    companion object {}")
-                desktop_lines.append("    actual companion object {}")
+                inner_expect, inner_desktop = [], []
+                brace = text.find("{", start + m.end(2))
+                newline = text.find("\n", start + m.end(2))
+                if brace != -1 and (newline == -1 or brace < newline):
+                    comp_end = find_close(text, brace)
+                    for cstart, cm in list(members(text, brace, comp_end)):
+                        cmods, ckind = cm.group(1), cm.group(2)
+                        if ckind != "fun" or re.search(r"\b(private|protected|internal|override)\b", cmods):
+                            continue
+                        cdecl = cstart + cm.start(2)
+                        cend = signature_end(text, cdecl, ckind)
+                        csig = " ".join(text[cdecl:cend].split())
+                        cname = re.match(r"fun\s+(?:<[^>]*>\s*)?(\w+)", csig).group(1)
+                        po = csig.index("(")
+                        pc = find_close(csig, po)
+                        cparams, crt = csig[po + 1:pc], csig[pc + 1:].strip()
+                        crt = crt[1:].strip() if crt.startswith(":") else ("Unit" if text[cend] == "{" else "")
+                        cwords = set(re.findall(r"\b[A-Z]\w*", csig))
+                        cblocked = sorted(w for w in cwords if (w in imported and not portable_import(imported[w])) or w in nested)
+                        if not crt or cblocked:
+                            skipped.append(f"Companion.{cname}: {', '.join(cblocked) or 'no declared return type'}")
+                            continue
+                        csusp = "suspend " if re.search(r"\bsuspend\b", cmods) else ""
+                        creturns = "" if crt == "Unit" else f": {crt}"
+                        cline = f"        {csusp}fun {cname}({cparams.strip()}){creturns}"
+                        if "actual" in cmods and member_key(cline) in previous:
+                            cline = previous[member_key(cline)]
+                            cparams = cline[cline.index("(") + 1:find_close(cline, cline.index("("))]
+                        inner_expect.append(cline)
+                        cvalue = neutral(crt) if crt != "Unit" else None
+                        cbody = " {\n        }" if crt == "Unit" else f" = {cvalue or 'TODO(\"desktop: ' + cname + '\")'}"
+                        inner_desktop.append(f"        actual {csusp}fun {cname}({strip_defaults(cparams).strip()}){creturns}{cbody}")
+                        cpo = text.index("(", cdecl)
+                        edits.append((cpo + 1, find_close(text, cpo), strip_defaults(text[cpo + 1:find_close(text, cpo)])))
+                        edits.append((cstart + cm.start(1), cstart + cm.start(1), "" if "actual" in cmods else "actual "))
+                if inner_expect:
+                    expect_lines.append("    companion object {\n" + "\n\n".join(inner_expect) + "\n    }")
+                    desktop_lines.append("    actual companion object {\n" + "\n\n".join(inner_desktop) + "\n    }")
+                else:
+                    expect_lines.append("    companion object {}")
+                    desktop_lines.append("    actual companion object {}")
                 edits.append((start + m.start(1), start + m.start(1), "" if "actual" in mods else "actual "))
                 continue
             if kind == "class" and re.search(r"\bdata\b", mods):
@@ -467,6 +506,24 @@ def main():
         desktop_path = (DESKTOP / ROOT / rel).parent / f"{cls}.desktop.kt"
         if desktop_path.exists():
             existing = desktop_path.read_text()
+            for d in desktop_lines:
+                if not d.strip().startswith("actual companion object {\n"):
+                    continue
+                body = re.search(r"^    actual companion object(?: \{\})?", existing, re.M)
+                if not body:
+                    continue
+                inner = [l for l in d.split("\n")[1:-1] if l.strip()]
+                wanted_inner = [l for l in "\n".join(inner).split("\n\n") if l.strip()]
+                block_end = existing.find("\n    }", body.end()) if "{}" not in body.group(0) and existing[body.end():body.end() + 2].strip().startswith("{") else -1
+                present_text = existing[body.start():block_end] if block_end != -1 else ""
+                missing_inner = [w for w in d.split("\n")[1:-1] if w.strip() and member_key(w) and not any(member_key(l) == member_key(w) for l in present_text.splitlines())]
+                if not missing_inner:
+                    continue
+                if block_end == -1:
+                    existing = existing[:body.start()] + "    actual companion object {\n" + "\n".join(missing_inner) + "\n    }" + existing[body.end():]
+                else:
+                    existing = existing[:block_end] + "\n" + "\n".join(missing_inner) + existing[block_end:]
+                desktop_path.write_text(existing)
             missing = [d for d in desktop_lines if not present(d, existing)]
             if missing:
                 cut = existing.rstrip().rfind("}")

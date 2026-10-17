@@ -45,7 +45,7 @@ ALLOWED = (
     "androidx.compose.ui.", "androidx.compose.foundation.", "androidx.compose.animation.",
     "androidx.compose.material3.", "androidx.compose.material.icons.", "androidx.compose.material.ripple.",
     "androidx.lifecycle.",
-    "com.nendo.sigil.", "com.google.zxing.", "org.bitlet.weupnp.",
+    "com.nendo.sigil.", "com.google.zxing.", "org.bitlet.weupnp.", "com.swordfish.libretrodroid.Variable", "com.swordfish.libretrodroid.ShaderConfig",
 )
 NOT_ALLOWED = (
     "androidx.sqlite.db.",
@@ -60,6 +60,7 @@ NOT_ALLOWED = (
     "androidx.compose.ui.input.pointer.RequestDisallowInterceptTouchEvent",
 )
 REWRITTEN = (
+    "android.annotation.SuppressLint",
     "android.util.Log", "android.graphics.Color.", "android.os.Build.", "com.nendo.argosy.BuildConfig", "dagger.hilt.android.lifecycle.HiltViewModel",
     "com.nendo.argosy.R",
     "androidx.compose.ui.res.stringResource", "androidx.compose.ui.res.pluralStringResource",
@@ -70,13 +71,18 @@ REWRITTEN = (
     "android.text.format.DateFormat.getBestDateTimePattern",
 )
 GENERATED = ("com.nendo.argosy.config.AppBuildConfig", "com.nendo.argosy.res.ArgosyR")
-CONTEXT_MEMBERS = r"(?!getString\b|resources\b|filesDir\b|cacheDir\b|assets\b|getSharedPreferences\b|contentResolver\b|packageName\b|applicationContext\b)[a-zA-Z_]\w*"
+CONTEXT_MEMBERS = (
+    r"(?!getString\b|resources\b|filesDir\b|cacheDir\b|assets\b|getSharedPreferences\b|contentResolver\b"
+    r"|packageName\b|applicationContext\b|getSystemService\b|getExternalFilesDir\b|packageManager\b)[a-zA-Z_]\w*"
+)
 CONTEXT_REST = (
     r"\.resources\.(?!getQuantityString\b|getString\b)\w+"
     r"|LocalContext\.current\." + CONTEXT_MEMBERS
     + r"|\.assets\.(?!list\b|open\b)\w+"
     r"|\bcontentResolver\.\w+"
-    r"|(?<![\w.])Context\.(?!MODE_PRIVATE\b)[A-Z]\w*"
+    r"|(?<![\w.])Context\.(?!MODE_PRIVATE\b|CONNECTIVITY_SERVICE\b|USER_SERVICE\b)[A-Z]\w*"
+    r"|\bpackageManager\.(?!getPackageInfo\b)\w+|\bpm\.(?!getPackageInfo\b)\w+"
+    r"|\.getPackageInfo\([^)]*\)\.(?!versionName\b)\w+"
 )
 CONTEXT_BEYOND_STRINGS = (
     r"\b(?:context|ctx|appContext|applicationContext|baseContext)\??\." + CONTEXT_MEMBERS + "|" + CONTEXT_REST
@@ -130,7 +136,8 @@ GUARDED_REWRITES = {
     "android.os.Process": re.compile(r"\bProcess\.(?!is64Bit\b|myUid\b)\w+"),
     "android.content.res.Configuration": re.compile(r"\bConfiguration\.[A-Za-z_]"),
     "androidx.core.graphics.ColorUtils": re.compile(r"\bColorUtils\.(?!colorToHSL\b|HSLToColor\b)\w+"),
-    "android.view.KeyEvent": re.compile(r"\bKeyEvent\b(?!\.KEYCODE_\w)"),
+    "android.view.KeyEvent": re.compile(r"\bKeyEvent\b(?!\.KEYCODE_\w|\.keyCodeToString\b)"),
+    "android.view.MotionEvent": re.compile(r"\bMotionEvent\b(?!\.AXIS_\w)"),
     "com.nendo.argosy.util.DisplayAffinityHelper": re.compile(
         r"\bDisplayAffinityHelper\b(?!\.isKnownDualScreenDevice\(\))"
     ),
@@ -165,6 +172,25 @@ GUARDED_REWRITES = {
         r"|encodedFragment|port|userInfo|schemeSpecificPart|encodedSchemeSpecificPart|encodedAuthority"
         r"|getQueryParameters|getBooleanQueryParameter|encodedPathSegments|encodedUserInfo)\b"
     ),
+    "android.net.ConnectivityManager": re.compile(
+        r"\b(?:cm|connectivityManager|connectivity)\.(?!activeNetwork\b|getNetworkCapabilities\b"
+        r"|registerDefaultNetworkCallback\b|unregisterNetworkCallback\b)\w+"
+        r"|\bConnectivityManager\.(?!NetworkCallback\b)\w+|override fun on(?!Available\b|Lost\b)\w+\("
+    ),
+    "android.net.NetworkCapabilities": re.compile(
+        r"\bNetworkCapabilities\.(?!NET_CAPABILITY_INTERNET\b)\w+"
+        r"|\b(?:hasTransport|transportTypes|linkDownstreamBandwidthKbps|linkUpstreamBandwidthKbps|signalStrength)\b"
+    ),
+    "android.net.Network": re.compile(r"\b(?:bindSocket|socketFactory|openConnection|networkHandle|getAllByName)\b"),
+    "android.os.UserManager": re.compile(r"\b(?:userManager|um)\.(?!isUserUnlocked\b)\w+|\bUserManager\.\w+"),
+    "coil.request.ImageRequest": re.compile(
+        r"\.(?:listener|target|placeholder|error|fallback|transformations|precision|scale|decoderFactory|fetcherFactory"
+        r"|bitmapConfig|colorSpace|networkCachePolicy|lifecycle|parameters|tag|headers|setHeader|placeholderMemoryCacheKey"
+        r"|allowConversionToBitmap|allowRgb565|premultipliedAlpha|dispatcher|interceptorDispatcher|fetcherDispatcher"
+        r"|decoderDispatcher|transformationDispatcher|sizeResolver|newBuilder|defaults)\("
+        r"|\bImageRequest\.(?!Builder\b)\w+"
+    ),
+    "coil.request.CachePolicy": re.compile(r"\bCachePolicy\.(?!ENABLED\b|READ_ONLY\b|WRITE_ONLY\b|DISABLED\b)\w+"),
     "android.util.Base64": re.compile(
         r"\bBase64\.(?!decode\b|encode\b|encodeToString\b|DEFAULT\b|NO_PADDING\b|NO_WRAP\b|CRLF\b|URL_SAFE\b)\w+"
     ),
@@ -201,6 +227,13 @@ STAND_IN_GUARDS = {
     "com.nendo.argosy.platform.PlatformIntent": "android.content.Intent",
     "com.nendo.argosy.platform.PlatformUri": "android.net.Uri",
     "com.nendo.argosy.platform.PlatformProcess": "android.os.Process",
+    "com.nendo.argosy.platform.PlatformConnectivityManager": "android.net.ConnectivityManager",
+    "com.nendo.argosy.platform.PlatformNetworkCapabilities": "android.net.NetworkCapabilities",
+    "com.nendo.argosy.platform.PlatformNetwork": "android.net.Network",
+    "com.nendo.argosy.platform.PlatformUserManager": "android.os.UserManager",
+    "com.nendo.argosy.core.input.AndroidMotionAxes": "android.view.MotionEvent",
+    "com.nendo.argosy.platform.image.ImageRequest": "coil.request.ImageRequest",
+    "com.nendo.argosy.platform.image.CachePolicy": "coil.request.CachePolicy",
 }
 COMMENTS = re.compile(r"/\*.*?\*/|^\s*//[^\n]*", re.S | re.M)
 ANDROID_FQ = re.compile(r"(?<![\w.])(?:android|androidx|com|org|io|net|dagger|coil|in|okhttp3|retrofit2)\.[a-z]\w*(?:\.\w+)+")
