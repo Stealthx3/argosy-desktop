@@ -383,6 +383,13 @@ kotlin {
             implementation(libs.media3.exoplayer.hls)
             implementation(libs.media3.ui)
             implementation(libs.media3.datasource.okhttp)
+            implementation(libs.bundles.lifecycle)
+            implementation(libs.kotlinx.coroutines.android)
+            implementation(libs.androidx.navigation.compose)
+            implementation(libs.androidx.tv.foundation)
+            implementation(libs.androidx.tv.material)
+            implementation(libs.bundles.camerax)
+            implementation(libs.androidx.palette)
         }
         getByName("desktopMain").dependencies {
             implementation(project(":sigil-jvm"))
