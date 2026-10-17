@@ -11,3 +11,5 @@ ui/screens/common/GameLaunchDelegate.kt -> LaunchStates.kt: HardcoreConflictChoi
 ui/theme/CustomFonts.kt -> CustomFontLoader.kt: CustomFontLoader
 ui/input/GamepadInputHandler.kt -> GamepadEvents.kt: GamepadInput GamepadEvent mapKeycodeToGamepadEvent gamepadEventToKeyCode
 ui/input/InputDispatcher.kt -> GamepadInputLocals.kt: LocalGamepadInputHandler
+ui/input/HapticFeedback.kt -> HapticPatterns.kt: HapticPattern
+ui/input/SoundFeedback.kt -> SoundPresets.kt: SoundPreset

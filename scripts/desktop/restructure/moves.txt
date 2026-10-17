@@ -470,3 +470,30 @@
 # Phase 2 assets seam.
 [commonMain]
 + ui/components/PlatformIconAssets.kt
+
+# Phase 2: haptics as an actual class (actuals.txt).
+[androidMain]
++ ui/input/HapticFeedback.kt
+
+# Phase 2: inlined launcher constants free UserPreferencesRepository; input types.
+[commonMain]
++ data/launcher/GameNativeSyncFolder.kt
++ data/preferences/StoragePreferencesRepository.kt
++ data/preferences/UserPreferencesRepository.kt
++ data/remote/github/UpdateRepository.kt
++ data/remote/ra/RAApiProvider.kt
++ data/repository/RAWebApiKeyRepository.kt
++ domain/usecase/recommendation/GenerateRecommendationsUseCase.kt
++ libretro/ui/AutoRestorePrompt.kt
++ libretro/ui/NetplayOverlays.kt
++ ui/components/DockReorderInputHandler.kt
++ ui/input/BackgroundConflictInputHandler.kt
++ ui/input/CapturingInputHandler.kt
++ ui/input/HapticCues.kt
++ ui/input/HapticPatterns.kt
++ ui/input/HapticWaveform.kt
++ ui/input/InputHandler.kt
++ ui/input/OptionStep.kt
++ ui/input/SoundPresets.kt
++ ui/input/VariantPickerInputHandler.kt
++ ui/screens/settings/sections/input/ToggleInput.kt

@@ -14,21 +14,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
-enum class HapticPattern {
-    FOCUS_CHANGE,
-    SELECTION,
-    BACK,
-    OPEN,
-    TOGGLE_ON,
-    TOGGLE_OFF,
-    BOUNDARY_HIT,
-    DOWNLOAD_START,
-    DOWNLOAD_COMPLETE,
-    LAUNCH_GAME,
-    ERROR,
-    STRENGTH_PREVIEW
-}
-
 @Singleton
 class HapticFeedbackManager @Inject constructor(
     @ApplicationContext private val context: Context
