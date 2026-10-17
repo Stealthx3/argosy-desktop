@@ -7,6 +7,7 @@ import com.nendo.argosy.core.input.SoundType
 import com.nendo.argosy.domain.model.ScreenLayouts
 import com.nendo.argosy.util.LogLevel
 import java.time.Instant
+
 data class BuiltinEmulatorSettings(
     val shader: String = "None",
     val shaderChainJson: String = "",

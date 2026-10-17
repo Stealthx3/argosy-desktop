@@ -100,7 +100,7 @@ def extract(source, new_name, names, widen):
     used = imports_used(header, moved)
     if used:
         out += used + [""]
-    target.write_text("\n".join(out) + moved + "\n")
+    target.write_text("\n".join(out) + ("\n" if used else "") + moved + "\n")
 
     drop = set()
     for _, start, end, _ in wanted:

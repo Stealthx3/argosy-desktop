@@ -8,3 +8,4 @@ data/preferences/UserPreferencesRepository.kt -> PreferenceEnums.kt: GripReserve
 ui/screens/library/LibraryViewModel.kt -> LibraryUiState.kt: FilterCategory ActiveFilterEntry PlatformRef ActiveFilters FilterOptions LibraryFilter FocusMove LibraryView LibraryGridItem FocusCellBounds LibraryGameUi LibraryUiState ^MIN_SECTION_RAIL_LABELS
 ui/theme/ThemeViewModel.kt -> ThemeState.kt: ThemeState
 ui/screens/common/GameLaunchDelegate.kt -> LaunchStates.kt: HardcoreConflictChoice LocalModifiedChoice LaunchResultCallbacks SyncOverlayState DiscPickerState VariantPickerState MemcardPickerState
+ui/theme/CustomFonts.kt -> CustomFontLoader.kt: CustomFontLoader
