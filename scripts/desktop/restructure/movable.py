@@ -46,7 +46,7 @@ REWRITTEN = (
     "android.util.Log", "com.nendo.argosy.BuildConfig", "dagger.hilt.android.lifecycle.HiltViewModel",
     "com.nendo.argosy.R",
 )
-GENERATED = ("com.nendo.argosy.config.AppBuildConfig", "com.nendo.argosy.shared.R")
+GENERATED = ("com.nendo.argosy.config.AppBuildConfig", "com.nendo.argosy.res.ArgosyR")
 GUARDED_REWRITES = {
     "android.view.KeyEvent": re.compile(r"\bKeyEvent\b(?!\.KEYCODE_\w)"),
     "com.nendo.argosy.util.DisplayAffinityHelper": re.compile(

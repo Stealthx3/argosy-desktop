@@ -5,7 +5,7 @@
 # the same app data, launched, and walked through the same gamepad sequence; screenshots and a
 # database and DataStore summary are compared with both clocks masked. Never clears app data.
 #
-# usage: scripts/desktop/check/ab-check.sh [candidate.apk] [out-dir]
+# usage: [INSTALL_ARGS="--abi arm64-v8a"] scripts/desktop/check/ab-check.sh [candidate.apk] [out-dir]
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
@@ -30,7 +30,7 @@ shot() { $ADB exec-out screencap -p > "$OUT/$1-$2.png"; }
 
 run() {
     local tag=$1 apk=$2
-    $ADB install -r "$apk" >/dev/null
+    $ADB install -r ${INSTALL_ARGS:-} "$apk" >/dev/null
     $ADB shell am start -a android.intent.action.MAIN -n "$PKG/com.nendo.argosy.ArgosyActivity" >/dev/null
     sleep 45
     shot "$tag" home

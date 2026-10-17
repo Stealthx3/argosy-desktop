@@ -1,6 +1,6 @@
 package com.nendo.argosy.shared.resources
 
-import com.nendo.argosy.shared.R
+import com.nendo.argosy.res.ArgosyR as R
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.getDrawableResourceBytes

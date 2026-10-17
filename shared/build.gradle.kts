@@ -131,11 +131,11 @@ val prepareDesktopComposeResources by tasks.registering(Sync::class) {
     into(layout.buildDirectory.dir("generated/desktopComposeResources"))
 }
 
-val generateDesktopR by tasks.registering {
+val generateSharedR by tasks.registering {
     val baseStrings = androidResources.dir("values").asFileTree.matching { include("strings*.xml") }
     val drawables = androidResources.dir("drawable").asFileTree
     val raws = androidResources.dir("raw").asFileTree
-    val outDir = layout.buildDirectory.dir("generated/desktopR")
+    val outDir = layout.buildDirectory.dir("generated/sharedR")
     inputs.files(baseStrings, drawables, raws)
     outputs.dir(outDir)
     doLast {
@@ -152,20 +152,27 @@ val generateDesktopR by tasks.registering {
         )
         val root = outDir.get().asFile
         root.deleteRecursively()
-        val rDir = root.resolve("com/nendo/argosy/shared").apply { mkdirs() }
-        rDir.resolve("R.kt").writeText(buildString {
-            appendLine("package com.nendo.argosy.shared")
-            appendLine()
-            appendLine("object R {")
-            groups.forEach { (type, base, names) ->
-                appendLine("    object $type {")
-                names.forEachIndexed { i, name -> appendLine("        const val `$name`: Int = ${base + i}") }
-                appendLine("    }")
-            }
-            appendLine("}")
-        })
+        fun rFile(sourceSet: String, header: String, property: (String, Int, String) -> String) {
+            val dir = root.resolve("$sourceSet/com/nendo/argosy/res").apply { mkdirs() }
+            dir.resolve("ArgosyR.$sourceSet.kt").writeText(buildString {
+                appendLine("package com.nendo.argosy.res")
+                appendLine()
+                appendLine("${header}object ArgosyR {")
+                groups.forEach { (type, base, names) ->
+                    appendLine("    ${header.replace("expect ", "")}object $type {")
+                    names.forEachIndexed { i, name -> appendLine("        ${property(type, base + i, name)}") }
+                    appendLine("    }")
+                }
+                appendLine("}")
+            })
+        }
+        rFile("commonMain", "expect ") { _, _, name -> "val `$name`: Int" }
+        rFile("androidMain", "actual ") { type, _, name ->
+            "actual val `$name`: Int get() = com.nendo.argosy.shared.R.$type.`$name`"
+        }
+        rFile("desktopMain", "actual ") { _, id, name -> "actual val `$name`: Int get() = $id" }
         val chunk = 400
-        val lookupDir = root.resolve("com/nendo/argosy/shared/resources").apply { mkdirs() }
+        val lookupDir = root.resolve("desktopMain/com/nendo/argosy/shared/resources").apply { mkdirs() }
         lookupDir.resolve("AndroidResourceIds.kt").writeText(buildString {
             appendLine("package com.nendo.argosy.shared.resources")
             appendLine()
@@ -230,7 +237,9 @@ kotlin {
         getByName("desktopMain").kotlin.srcDir(
             generateDesktopDaoModule.map { it.outputs.files.singleFile.resolve("desktopMain") }
         )
-        getByName("desktopMain").kotlin.srcDir(generateDesktopR.map { it.outputs.files.singleFile })
+        listOf("commonMain", "androidMain", "desktopMain").forEach { name ->
+            getByName(name).kotlin.srcDir(generateSharedR.map { it.outputs.files.singleFile.resolve(name) })
+        }
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(libs.room.runtime)
@@ -245,6 +254,7 @@ kotlin {
             implementation(libs.upokecenter.cbor)
             implementation(libs.datastore.preferences)
             implementation(libs.androidx.annotation)
+            implementation(compose.components.resources)
         }
         androidMain.dependencies {
             implementation(libs.hilt.android)
@@ -253,7 +263,6 @@ kotlin {
             implementation(libs.sqlite.bundled)
             implementation(libs.zstd.jni)
             implementation(libs.org.json)
-            implementation(compose.components.resources)
             implementation(compose.ui)
         }
         getByName("desktopTest").dependencies {
