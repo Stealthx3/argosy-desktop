@@ -16,6 +16,7 @@ sqliteBundled = "2.5.1"
 datastore = "1.1.1"
 navigation = "2.8.5"
 coil = "2.7.0"
+coil3 = "3.0.4"
 retrofit = "2.9.0"
 okhttp = "4.12.0"
 moshi = "1.15.2"
@@ -107,6 +108,9 @@ media3-datasource-okhttp = { group = "androidx.media3", name = "media3-datasourc
 # Image loading
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 coil-svg = { group = "io.coil-kt", name = "coil-svg", version.ref = "coil" }
+coil3-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil3" }
+coil3-network-okhttp = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coil3" }
+coil3-svg = { group = "io.coil-kt.coil3", name = "coil-svg", version.ref = "coil3" }
 
 # CameraX
 camerax-core = { group = "androidx.camera", name = "camera-core", version.ref = "camerax" }

@@ -268,11 +268,16 @@ kotlin {
             implementation(libs.hilt.navigation.compose)
             implementation(libs.androidx.activity.compose)
             implementation(libs.androidx.core.ktx)
+            implementation(libs.coil.compose)
+            implementation(libs.coil.svg)
         }
         getByName("desktopMain").dependencies {
             implementation(libs.sqlite.bundled)
             implementation(libs.zstd.jni)
             implementation(libs.org.json)
+            implementation(libs.coil3.compose)
+            implementation(libs.coil3.network.okhttp)
+            implementation(libs.coil3.svg)
         }
         getByName("desktopTest").dependencies {
             implementation(libs.kotlin.test)

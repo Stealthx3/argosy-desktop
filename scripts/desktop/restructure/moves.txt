@@ -456,3 +456,13 @@
 + ui/theme/Color.kt
 + ui/theme/GripReserve.kt
 + ui/theme/ThemeState.kt
+
+# Phase 2 seams 5-7 (Build, View, images) and the font split.
+[commonMain]
++ data/quaypass/QuayPassLedController.kt
++ libretro/ui/AchievementPopup.kt
++ libretro/ui/RAConnectionNotification.kt
++ ui/common/StateScreenshotViewer.kt
++ ui/components/AchievementBadge.kt
++ ui/components/DownloadProgressCover.kt
++ ui/theme/CustomFonts.kt

@@ -87,6 +87,10 @@ GUARDED_REWRITES = {
     "androidx.compose.ui.platform.LocalView": re.compile(
         r"LocalView\.current\.(?!getLocationOnScreen\b)\w+|\bview\.(?!getLocationOnScreen\b)\w+"
     ),
+    "coil.compose.AsyncImage": re.compile(
+        r"\b(?:onSuccess|onLoading|onState|transform|clipToBounds|imageLoader|modelEqualityDelegate)\s*="
+        r"|onError\s*=\s*\{\s*\w+\s*->|\bAsyncImagePainter\b"
+    ),
     "android.os.Build": re.compile(
         r"\bBuild\.(?!MODEL\b|MANUFACTURER\b|VERSION\.SDK_INT\b|VERSION_CODES\.(?:Q|R|S|TIRAMISU)\b)\w+(?:\.\w+)?"
     ),
@@ -110,11 +114,12 @@ STAND_IN_GUARDS = {
     "com.nendo.argosy.core.input.AndroidKeyCodes": "android.view.KeyEvent",
     "com.nendo.argosy.util.DualScreenDeviceInfo": "com.nendo.argosy.util.DisplayAffinityHelper",
     "com.nendo.argosy.platform.PlatformBuild": "android.os.Build",
+    "com.nendo.argosy.platform.image.AsyncImage": "coil.compose.AsyncImage",
     "com.nendo.argosy.platform.LocalPlatformView": "androidx.compose.ui.platform.LocalView",
 }
 COMMENTS = re.compile(r"/\*.*?\*/|^\s*//[^\n]*", re.S | re.M)
 ANDROID_FQ = re.compile(r"(?<![\w.])(?:android|androidx|com|org|io|net|dagger|coil|in|okhttp3|retrofit2)\.[a-z]\w*(?:\.\w+)+")
-ANDROID_MAIN_ALLOWED = ALLOWED + ("android.", "androidx.", "dagger.hilt.")
+ANDROID_MAIN_ALLOWED = ALLOWED + ("android.", "androidx.", "dagger.hilt.", "coil.")
 FORBIDDEN_WORDS = re.compile(r"\bR\.(color|dimen|font|xml|array|mipmap|id|style|attr|layout|menu|bool|integer)\b")
 DECL = re.compile(
     r"^(?:@\S+\s+)*(?:(?:private|internal|public|data|enum|sealed|abstract|open|inline|value|const|"
