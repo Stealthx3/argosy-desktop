@@ -466,3 +466,7 @@
 + ui/components/AchievementBadge.kt
 + ui/components/DownloadProgressCover.kt
 + ui/theme/CustomFonts.kt
+
+# Phase 2 assets seam.
+[commonMain]
++ ui/components/PlatformIconAssets.kt
