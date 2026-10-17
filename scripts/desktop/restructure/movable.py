@@ -147,8 +147,16 @@ GUARDED_REWRITES = {
         r"\bConfiguration\.(?!ORIENTATION_(?:UNDEFINED|PORTRAIT|LANDSCAPE|SQUARE)\b|UI_MODE_NIGHT_(?:NO|YES|MASK)\b)[A-Za-z_]"
     ),
     "androidx.core.graphics.ColorUtils": re.compile(r"\bColorUtils\.(?!colorToHSL\b|HSLToColor\b)\w+"),
-    "android.view.KeyEvent": re.compile(r"\bKeyEvent\b(?!\.KEYCODE_\w|\.keyCodeToString\b)"),
-    "android.view.MotionEvent": re.compile(r"\bMotionEvent\b(?!\.AXIS_\w)"),
+    "android.view.KeyEvent": re.compile(
+        r"\bKeyEvent\s*\(|\bKeyEvent\.(?!(?:KEYCODE_|ACTION_|META_|FLAG_)\w|keyCodeToString\b)\w+"
+        r"|\.(?:getUnicodeChar|unicodeChar|characters|isCtrlPressed|isShiftPressed|isAltPressed|keyCharacterMap|isCanceled"
+        r"|isTracking|isLongPress|hasModifiers|hasNoModifiers|isSystem|displayLabel|startTracking)\b"
+    ),
+    "android.view.InputEvent": re.compile(r"(?<!fun )\bInputEvent\.\w+|\.(?:sequenceNumber|copy)\(\)"),
+    "android.view.MotionEvent": re.compile(
+        r"\bMotionEvent\.(?!(?:AXIS_|ACTION_)\w)\w+"
+        r"|\.(?:getHistorical\w*|historySize|pointerCount|getPointerId|getToolType|buttonState|getRawX|getRawY|rawX|rawY)\b"
+    ),
     "com.nendo.argosy.util.DisplayAffinityHelper": re.compile(
         r"\bDisplayAffinityHelper\b(?!\.isKnownDualScreenDevice\(\))"
     ),
@@ -175,8 +183,12 @@ GUARDED_REWRITES = {
         r"\b(?:getStringSet|putStringSet|getFloat|putFloat|getAll|registerOnSharedPreferenceChangeListener"
         r"|unregisterOnSharedPreferenceChangeListener|OnSharedPreferenceChangeListener)\b"
     ),
-    "android.provider.Settings": re.compile(r"\bSettings\.(?!Secure\.(?:getString|ANDROID_ID)\b)\w+(?:\.\w+)?"),
-    "android.content.Intent": re.compile(r"\bIntent\s*\(|\bIntent\.(?!(?:ACTION_BATTERY_CHANGED|ACTION_BOOT_COMPLETED|ACTION_DELETE|ACTION_MAIN|ACTION_MY_PACKAGE_REPLACED|ACTION_PACKAGE_ADDED|ACTION_PACKAGE_REMOVED|ACTION_PACKAGE_REPLACED|ACTION_SCREEN_OFF|ACTION_SCREEN_ON|ACTION_USER_PRESENT|ACTION_VIEW|CATEGORY_DEFAULT|CATEGORY_HOME|CATEGORY_LAUNCHER|FLAG_ACTIVITY_CLEAR_TASK|FLAG_ACTIVITY_CLEAR_TOP|FLAG_ACTIVITY_MULTIPLE_TASK|FLAG_ACTIVITY_NEW_TASK|FLAG_ACTIVITY_NO_ANIMATION|FLAG_ACTIVITY_NO_HISTORY|FLAG_ACTIVITY_REORDER_TO_FRONT|FLAG_ACTIVITY_SINGLE_TOP|FLAG_GRANT_READ_URI_PERMISSION)\b)\w+"),
+    "android.provider.Settings": re.compile(
+        r"\bSettings\.(?!Secure\.(?:getString|ANDROID_ID)\b|(?:ACTION_APPLICATION_DETAILS_SETTINGS|ACTION_APP_NOTIFICATION_SETTINGS"
+        r"|ACTION_MANAGE_OVERLAY_PERMISSION|ACTION_MANAGE_WRITE_SETTINGS|ACTION_SETTINGS|ACTION_USAGE_ACCESS_SETTINGS"
+        r"|EXTRA_APP_PACKAGE)\b)\w+(?:\.\w+)?"
+    ),
+    "android.content.Intent": re.compile(r"\bIntent\s*\(\s*(?:this|context|ctx|\w*[cC]ontext|applicationContext)\b|\bIntent\s*\(\s*\w+\s*,\s*\w+::class|\bIntent\.(?!(?:ACTION_BATTERY_CHANGED|ACTION_BOOT_COMPLETED|ACTION_DELETE|ACTION_MAIN|ACTION_MY_PACKAGE_REPLACED|ACTION_PACKAGE_ADDED|ACTION_PACKAGE_REMOVED|ACTION_PACKAGE_REPLACED|ACTION_SCREEN_OFF|ACTION_SCREEN_ON|ACTION_USER_PRESENT|ACTION_VIEW|CATEGORY_DEFAULT|CATEGORY_HOME|CATEGORY_LAUNCHER|FLAG_ACTIVITY_CLEAR_TASK|FLAG_ACTIVITY_CLEAR_TOP|FLAG_ACTIVITY_MULTIPLE_TASK|FLAG_ACTIVITY_NEW_TASK|FLAG_ACTIVITY_NO_ANIMATION|FLAG_ACTIVITY_NO_HISTORY|FLAG_ACTIVITY_REORDER_TO_FRONT|FLAG_ACTIVITY_SINGLE_TOP|FLAG_GRANT_READ_URI_PERMISSION)\b)\w+"),
     "android.net.Uri": re.compile(
         r"\bUri\.(?!parse\b|fromFile\b|encode\b|decode\b)\w+"
         r"|\.(?:buildUpon|normalizeScheme|isHierarchical|isOpaque|isRelative|isAbsolute|fragment|encodedQuery"
@@ -258,6 +270,9 @@ STAND_IN_GUARDS = {
     "com.nendo.argosy.platform.PlatformNetwork": "android.net.Network",
     "com.nendo.argosy.platform.PlatformUserManager": "android.os.UserManager",
     "com.nendo.argosy.core.input.AndroidMotionAxes": "android.view.MotionEvent",
+    "com.nendo.argosy.platform.PlatformKeyEvent": "android.view.KeyEvent",
+    "com.nendo.argosy.platform.PlatformInputEvent": "android.view.InputEvent",
+    "com.nendo.argosy.platform.PlatformMotionEvent": "android.view.MotionEvent",
     "com.nendo.argosy.platform.image.ImageRequest": "coil.request.ImageRequest",
     "com.nendo.argosy.platform.image.CachePolicy": "coil.request.CachePolicy",
     "com.nendo.argosy.platform.PlatformInputDevice": "android.view.InputDevice",
@@ -392,10 +407,8 @@ def analyse(u, index, packages):
         android.append("R type with no shared resources")
     if u.pkg == "com.nendo.argosy" and re.search(r"\bR\.\w", u.body):
         common.append("R without an import")
-        android.append("R without an import")
     if u.pkg == "com.nendo.argosy" and re.search(r"\bBuildConfig\b", u.body):
         common.append("BuildConfig without an import")
-        android.append("BuildConfig without an import")
     words = set(WORD.findall(u.body))
     for w in words:
         deps |= {t for t in index.get((u.pkg, w), set()) if t.receivers.get(w, w) == w or t.receivers[w] in words}

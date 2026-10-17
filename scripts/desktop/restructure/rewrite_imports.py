@@ -131,7 +131,10 @@ RULES = [
     ),
     (re.compile(r"^import android\.os\.UserManager$", re.M), "import com.nendo.argosy.platform.PlatformUserManager as UserManager"),
     (re.compile(r"^import android\.annotation\.SuppressLint$", re.M), "import com.nendo.argosy.platform.SuppressLint"),
-    (re.compile(r"^import android\.view\.MotionEvent$", re.M), "import com.nendo.argosy.core.input.AndroidMotionAxes as MotionEvent"),
+    (
+        re.compile(r"^import android\.view\.MotionEvent$", re.M),
+        "import com.nendo.argosy.platform.PlatformMotionEvent as MotionEvent\nimport com.nendo.argosy.core.input.AndroidMotionAxes",
+    ),
     (re.compile(r"^import coil\.request\.ImageRequest$", re.M), "import com.nendo.argosy.platform.image.ImageRequest"),
     (re.compile(r"^import coil\.request\.CachePolicy$", re.M), "import com.nendo.argosy.platform.image.CachePolicy"),
     (re.compile(r"^import android\.view\.InputDevice$", re.M), "import com.nendo.argosy.platform.PlatformInputDevice as InputDevice"),
@@ -159,7 +162,11 @@ RULES = [
     (re.compile(r"\bandroid\.graphics\.drawable\.BitmapDrawable\b"), "com.nendo.argosy.platform.image.PlatformBitmapDrawable"),
     (re.compile(r"^import android\.os\.Bundle$", re.M), "import com.nendo.argosy.platform.PlatformBundle as Bundle"),
     (re.compile(r"\bandroid\.os\.Bundle\b"), "com.nendo.argosy.platform.PlatformBundle"),
-    (re.compile(r"^import android\.view\.KeyEvent$", re.M), "import com.nendo.argosy.core.input.AndroidKeyCodes as KeyEvent"),
+    (re.compile(r"^import android\.view\.InputEvent$", re.M), "import com.nendo.argosy.platform.PlatformInputEvent as InputEvent"),
+    (
+        re.compile(r"^import android\.view\.KeyEvent$", re.M),
+        "import com.nendo.argosy.platform.PlatformKeyEvent as KeyEvent\nimport com.nendo.argosy.core.input.AndroidKeyCodes",
+    ),
     (
         re.compile(r"^import com\.nendo\.argosy\.util\.DisplayAffinityHelper$", re.M),
         "import com.nendo.argosy.util.DualScreenDeviceInfo as DisplayAffinityHelper",
@@ -217,6 +224,25 @@ COMPANION_IMPORTS = {
         "com.nendo.argosy.platform.image.bitmap", "com.nendo.argosy.platform.image.intrinsicHeight",
         "com.nendo.argosy.platform.image.intrinsicWidth",
     ],
+    "com.nendo.argosy.platform.PlatformIntentType": [
+        "com.nendo.argosy.platform.action", "com.nendo.argosy.platform.addFlags", "com.nendo.argosy.platform.data",
+        "com.nendo.argosy.platform.flags", "com.nendo.argosy.platform.putExtra",
+    ],
+    "com.nendo.argosy.platform.PlatformInputEvent": [
+        "com.nendo.argosy.platform.device", "com.nendo.argosy.platform.deviceId", "com.nendo.argosy.platform.eventTime",
+        "com.nendo.argosy.platform.isFromSource", "com.nendo.argosy.platform.source",
+    ],
+    "com.nendo.argosy.platform.PlatformKeyEvent": [
+        "com.nendo.argosy.platform.action", "com.nendo.argosy.platform.device", "com.nendo.argosy.platform.deviceId",
+        "com.nendo.argosy.platform.downTime", "com.nendo.argosy.platform.eventTime", "com.nendo.argosy.platform.isFromSource",
+        "com.nendo.argosy.platform.keyCode", "com.nendo.argosy.platform.metaState", "com.nendo.argosy.platform.repeatCount",
+        "com.nendo.argosy.platform.scanCode", "com.nendo.argosy.platform.source",
+    ],
+    "com.nendo.argosy.platform.PlatformMotionEvent": [
+        "com.nendo.argosy.platform.action", "com.nendo.argosy.platform.actionMasked", "com.nendo.argosy.platform.device",
+        "com.nendo.argosy.platform.deviceId", "com.nendo.argosy.platform.eventTime", "com.nendo.argosy.platform.getAxisValue",
+        "com.nendo.argosy.platform.isFromSource", "com.nendo.argosy.platform.source",
+    ],
     "com.nendo.argosy.platform.PlatformUri": [
         "com.nendo.argosy.platform.authority", "com.nendo.argosy.platform.encodedPath",
         "com.nendo.argosy.platform.getQueryParameter", "com.nendo.argosy.platform.host",
@@ -258,6 +284,9 @@ def rewrite_bitmap_config(text):
 
 
 STATIC_STAND_INS = [
+    ("PlatformKeyEvent as KeyEvent", r"KeyEvent\.(?=(?:KEYCODE_|ACTION_|META_|FLAG_)\w+)", r"AndroidKeyCodes."),
+    ("PlatformKeyEvent as KeyEvent", r"KeyEvent\.(keyCodeToString)\b", r"\1"),
+    ("PlatformMotionEvent as MotionEvent", r"MotionEvent\.(?=(?:AXIS_|ACTION_)\w+)", r"AndroidMotionAxes."),
     ("PlatformIntentType as Intent", r"Intent\.(?=[A-Z][A-Z0-9_]+\b)", r"PlatformIntent."),
     ("PlatformConfiguration as Configuration", r"Configuration\.(ORIENTATION_\w+|UI_MODE_NIGHT_\w+)\b", r"\1"),
     ("PlatformBitmap as Bitmap", r"Bitmap\.(createBitmap)\(", r"PlatformBitmaps.\1("),
@@ -276,12 +305,12 @@ def rewrite_static_stand_ins(text):
         anchor_import = anchor if anchor.startswith("core.") else f"platform.{anchor}"
         if not re.search(rf"^import com\.nendo\.argosy\.{re.escape(anchor_import)}$", text, re.M):
             continue
-        regex = re.compile(r"(?<![\w.])" + pattern)
-        names = {re.match(r"\w+", regex.sub(replacement, m.group(0))).group(0) for m in regex.finditer(text)}
+        regex = re.compile(r"(?<!\w)(?<!\w\.)" + pattern)
+        names = {re.match(r"\w+", m.expand(replacement)).group(0) for m in regex.finditer(text)}
         if not names:
             continue
         text = regex.sub(replacement, text)
-        missing = [n for n in sorted(names) if not re.search(rf"^import com\.nendo\.argosy\.platform\.{n}$", text, re.M)]
+        missing = [n for n in sorted(names) if not re.search(rf"^import [\w.]+\.{n}(?: as \w+)?$", text, re.M)]
         if missing:
             text = re.sub(
                 rf"^(import com\.nendo\.argosy\.{re.escape(anchor_import)})$",
@@ -357,6 +386,15 @@ def main():
         new = text
         for pattern, replacement in ANDROID_RULES:
             new = pattern.sub(replacement, new)
+        if re.search(r"^package com\.nendo\.argosy$", new, re.M):
+            body = re.sub(r"^import .*$", "", new, flags=re.M)
+            additions = []
+            if re.search(r"(?<![\w.])R\.\w", body) and not re.search(r"^import [\w.]+\.R$", new, re.M):
+                additions.append("import com.nendo.argosy.shared.R")
+            if re.search(r"(?<![\w.])BuildConfig\.\w", body) and not re.search(r"^import [\w.]+ as BuildConfig$|^import [\w.]+\.BuildConfig$", new, re.M):
+                additions.append("import com.nendo.argosy.config.AppBuildConfig as BuildConfig")
+            if additions:
+                new = re.sub(r"^(package com\.nendo\.argosy)$", r"\1\n\n" + "\n".join(additions), new, count=1, flags=re.M)
         if new != text:
             path.write_text(new)
             changed += 1

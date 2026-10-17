@@ -526,7 +526,6 @@
 [androidMain]
 + core/input/ActiveController.kt
 + core/input/ConnectedControllerTracker.kt
-+ core/input/GamepadDevices.kt
 + hardware/AmbientLedManager.kt
 + hardware/FocusDirectorActivity.kt
 + hardware/ThorTaskMover.kt
@@ -1222,3 +1221,18 @@
 + libretro/ui/InGameNetplaySection.kt
 + libretro/ui/InGameStateManager.kt
 + libretro/ui/QuickLoadHistoryStrip.kt
+
+# Phase 2: files freed by Intent construction and the Settings action constants.
+[commonMain]
++ ui/screens/common/AppShortcutActions.kt
++ ui/screens/gamedetail/components/DocumentReaderOverlay.kt
+
+
+# Phase 2: portable since the input-event stand-ins (was androidMain).
+[commonMain]
++ core/input/GamepadDevices.kt
+# Phase 2: files freed by the input-event stand-ins and Intent construction.
+[commonMain]
++ data/netplay/NetplayInputShadow.kt
++ ui/input/InputSignatureEvents.kt
++ ui/input/SelectModifier.kt

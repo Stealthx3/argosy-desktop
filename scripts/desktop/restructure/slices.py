@@ -27,7 +27,7 @@ PORTABLE_IMPORTS = (
     "androidx.compose.ui.graphics.", "com.nendo.argosy.", "androidx.datastore.core.", "androidx.datastore.preferences.core.",
     "androidx.room.", "com.swordfish.libretrodroid.Variable", "com.swordfish.libretrodroid.ShaderConfig",
 )
-NOT_A_TYPE_STAND_IN = ("android.view.KeyEvent", "android.view.MotionEvent")
+NOT_A_TYPE_STAND_IN = ()
 
 
 def portable_import(name):
