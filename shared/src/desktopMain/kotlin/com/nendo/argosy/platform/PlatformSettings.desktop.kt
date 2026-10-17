@@ -28,7 +28,7 @@ actual object PlatformSettings {
                 ?.readText()
                 ?.trim()
                 .orEmpty()
-                .ifEmpty { System.getProperty("user.name") + "@" + java.net.InetAddress.getLocalHost().hostName }
+                .ifEmpty { java.lang.System.getProperty("user.name") + "@" + java.net.InetAddress.getLocalHost().hostName }
             MessageDigest.getInstance("SHA-256")
                 .digest("argosy-desktop:$machineId".toByteArray())
                 .take(ANDROID_ID_BYTES)
@@ -39,5 +39,9 @@ actual object PlatformSettings {
             if (name == ANDROID_ID) deviceId else null
 
         private const val ANDROID_ID_BYTES = 8
+    }
+
+    actual object System {
+        actual val CONTENT_URI: PlatformUri = PlatformUris.parse("content://settings/system")
     }
 }

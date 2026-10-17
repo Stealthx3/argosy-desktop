@@ -52,6 +52,7 @@ actual object PlatformUris {
     actual fun fromFile(file: File): PlatformUri = DesktopUri(file.toURI().toString().replaceFirst("file:/", "file:///").replace("file:////", "file:///"))
     actual fun encode(s: String?): String? = s?.let { encode(it) }
     actual fun decode(s: String?): String? = s?.let { decode(it) }
+    @JvmName("encodeNonNull")
     actual fun encode(s: String): String = buildString {
         for (byte in s.toByteArray(Charsets.UTF_8)) {
             val c = byte.toInt().toChar()
@@ -59,6 +60,7 @@ actual object PlatformUris {
             else append('%').append(HEX[(byte.toInt() shr 4) and 0xF]).append(HEX[byte.toInt() and 0xF])
         }
     }
+    @JvmName("decodeNonNull")
     actual fun decode(s: String): String = URLDecoder.decode(s.replace("+", "%2B"), Charsets.UTF_8)
 
     private const val UNRESERVED = "_-!.~'()*"

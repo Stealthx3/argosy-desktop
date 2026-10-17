@@ -22,4 +22,8 @@ actual object PlatformSettings {
         actual fun getString(resolver: PlatformContentResolver, name: String): String? =
             Settings.Secure.getString(resolver, name)
     }
+
+    actual object System {
+        actual val CONTENT_URI: PlatformUri get() = Settings.System.CONTENT_URI
+    }
 }

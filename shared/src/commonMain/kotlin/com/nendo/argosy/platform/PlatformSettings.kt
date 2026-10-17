@@ -18,4 +18,8 @@ expect object PlatformSettings {
 
         fun getString(resolver: PlatformContentResolver, name: String): String?
     }
+
+    object System {
+        val CONTENT_URI: PlatformUri
+    }
 }

@@ -349,6 +349,7 @@ kotlin {
             implementation(compose.materialIconsExtended)
             implementation(libs.jetbrains.lifecycle.viewmodel.compose)
             implementation(libs.jetbrains.lifecycle.runtime.compose)
+            implementation(libs.jetbrains.navigation.compose)
             implementation(libs.room.runtime)
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.javax.inject)
