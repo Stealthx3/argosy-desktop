@@ -2,7 +2,7 @@ package com.nendo.argosy.ui.theme
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
-import androidx.core.graphics.ColorUtils
+import com.nendo.argosy.platform.PlatformColorUtils as ColorUtils
 import com.nendo.argosy.ui.theme.generated.ColorTokens
 
 object ALauncherColors {

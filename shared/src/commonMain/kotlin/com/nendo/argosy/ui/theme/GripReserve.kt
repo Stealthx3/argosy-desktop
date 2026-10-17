@@ -3,7 +3,10 @@ package com.nendo.argosy.ui.theme
 import androidx.compose.runtime.Composable
 import com.nendo.argosy.data.preferences.GripReserveMode
 import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalConfiguration
+import com.nendo.argosy.platform.LocalPlatformConfiguration as LocalConfiguration
+import com.nendo.argosy.platform.orientation
+import com.nendo.argosy.platform.screenHeightDp
+import com.nendo.argosy.platform.screenWidthDp
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 

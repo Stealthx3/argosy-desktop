@@ -18,11 +18,11 @@ import com.nendo.argosy.ui.theme.ALauncherColors
 @get:androidx.annotation.StringRes
 val CompletionStatus.labelRes: Int
     get() = when (this) {
-        CompletionStatus.INCOMPLETE -> com.nendo.argosy.R.string.completion_status_incomplete
-        CompletionStatus.FINISHED -> com.nendo.argosy.R.string.completion_status_finished
-        CompletionStatus.COMPLETED_100 -> com.nendo.argosy.R.string.completion_status_completed_100
-        CompletionStatus.RETIRED -> com.nendo.argosy.R.string.completion_status_retired
-        CompletionStatus.NEVER_PLAYING -> com.nendo.argosy.R.string.completion_status_never_playing
+        CompletionStatus.INCOMPLETE -> com.nendo.argosy.res.ArgosyR.string.completion_status_incomplete
+        CompletionStatus.FINISHED -> com.nendo.argosy.res.ArgosyR.string.completion_status_finished
+        CompletionStatus.COMPLETED_100 -> com.nendo.argosy.res.ArgosyR.string.completion_status_completed_100
+        CompletionStatus.RETIRED -> com.nendo.argosy.res.ArgosyR.string.completion_status_retired
+        CompletionStatus.NEVER_PLAYING -> com.nendo.argosy.res.ArgosyR.string.completion_status_never_playing
     }
 
 val CompletionStatus.icon: ImageVector
