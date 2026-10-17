@@ -1,8 +1,5 @@
 package com.nendo.argosy.ui.input
 
-import android.view.KeyEvent
-import android.view.MotionEvent
-
 /**
  * Identity of a single raw Android input event. Two copies of the same physical event
  * (e.g. delivered through both the primary and companion activity dispatch paths)
@@ -18,19 +15,5 @@ data class InputSignature(
     val keyCode: Int,
     val action: Int
 ) {
-    companion object {
-        fun of(event: KeyEvent): InputSignature = InputSignature(
-            eventTime = event.eventTime,
-            deviceId = event.deviceId,
-            keyCode = event.keyCode,
-            action = event.action
-        )
-
-        fun of(event: MotionEvent): InputSignature = InputSignature(
-            eventTime = event.eventTime,
-            deviceId = event.deviceId,
-            keyCode = 0,
-            action = event.actionMasked
-        )
-    }
+    companion object
 }

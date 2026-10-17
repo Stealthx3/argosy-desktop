@@ -1,0 +1,4 @@
+# Companion functions whose parameters are Android types leave the class as Class.Companion
+# extensions in app, bodies unchanged. Format:
+#   <file> <Class>.<function> -> <file under app> [import-in: <file> ...]
+ui/input/InputSignature.kt InputSignature.of -> ui/input/InputSignatureEvents.kt import-in: DualScreenManager.kt

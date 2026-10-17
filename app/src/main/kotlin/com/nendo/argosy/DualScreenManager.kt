@@ -63,6 +63,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import com.nendo.argosy.ui.input.of
 
 private const val TAG = "DualScreenManager"
 

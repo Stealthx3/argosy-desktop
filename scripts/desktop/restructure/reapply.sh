@@ -20,6 +20,7 @@ done
 
 python3 -I "$HERE/extract_decls.py" --refresh
 python3 -I "$HERE/inline_constants.py"
+python3 -I "$HERE/move_companion_functions.py"
 python3 -I "$HERE/apply_moves.py"
 python3 -I "$HERE/move_members.py"
 python3 -I "$HERE/actualize.py"

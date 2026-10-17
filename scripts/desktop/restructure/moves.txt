@@ -521,3 +521,15 @@
 + data/storage/StorageVolumeHealth.kt
 + ui/input/SoundFeedback.kt
 + util/PermissionHelper.kt
+
+# Phase 2: the input dispatcher and its types (InputSignature's Android factories moved out).
+[commonMain]
++ libretro/ui/LibretroMenuInputHandler.kt
++ ui/input/AxisDirectionTracker.kt
++ ui/input/GamepadEvents.kt
++ ui/input/InputDedupBuffer.kt
++ ui/input/InputDispatcher.kt
++ ui/input/InputFeedbackPlayer.kt
++ ui/input/InputSignature.kt
++ ui/input/ModalInputEffect.kt
++ ui/input/RightStickStepper.kt
