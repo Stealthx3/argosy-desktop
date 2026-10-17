@@ -340,3 +340,11 @@
 + data/sync/xbox/XboxDiskImageProvisioner.kt
 + data/sync/xbox/XboxHddImage.kt
 + libretro/LibretroStateSlots.kt
+
+# Step 8: non-UI files that only needed R (zone held back as above).
+[commonMain]
++ core/emulator/LibretroSettingDef.kt
++ core/notification/NotificationExtensions.kt
++ data/platform/PlatformWeightRegistry.kt
++ hardware/AmbientLedContext.kt
++ hardware/FanController.kt

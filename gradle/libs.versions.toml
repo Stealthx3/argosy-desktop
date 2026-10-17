@@ -72,6 +72,8 @@ hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-com
 # Dependency injection annotations (plain JVM)
 javax-inject = { module = "javax.inject:javax.inject", version = "1" }
 
+androidx-annotation = { group = "androidx.annotation", name = "annotation", version = "1.9.1" }
+
 # Room
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }

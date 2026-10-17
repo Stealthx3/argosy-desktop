@@ -115,6 +115,102 @@ val generateDesktopDaoModule by tasks.registering {
     }
 }
 
+val androidResources = layout.projectDirectory.dir("src/androidMain/res")
+
+val prepareDesktopComposeResources by tasks.registering(Sync::class) {
+    from(androidResources) {
+        include("values*/strings*.xml", "drawable/*.xml", "raw/*")
+        eachFile {
+            path = path
+                .replace(Regex("^values-b\\+zh\\+Hans/"), "values-zh/")
+                .replace(Regex("^values-b\\+zh\\+Hant/"), "values-zh-rTW/")
+                .replace(Regex("^raw/"), "files/raw/")
+        }
+    }
+    includeEmptyDirs = false
+    into(layout.buildDirectory.dir("generated/desktopComposeResources"))
+}
+
+val generateDesktopR by tasks.registering {
+    val baseStrings = androidResources.dir("values").asFileTree.matching { include("strings*.xml") }
+    val drawables = androidResources.dir("drawable").asFileTree
+    val raws = androidResources.dir("raw").asFileTree
+    val outDir = layout.buildDirectory.dir("generated/desktopR")
+    inputs.files(baseStrings, drawables, raws)
+    outputs.dir(outDir)
+    doLast {
+        val xml = baseStrings.files.sortedBy { it.name }.joinToString("\n") { it.readText() }
+        val strings = Regex("""<string\s+name="(\w+)"""").findAll(xml).map { it.groupValues[1] }.distinct().toList()
+        val plurals = Regex("""<plurals\s+name="(\w+)"""").findAll(xml).map { it.groupValues[1] }.distinct().toList()
+        val drawableNames = drawables.files.map { it.nameWithoutExtension }.sorted()
+        val rawFiles = raws.files.map { it.name }.sorted()
+        val groups = listOf(
+            Triple("string", 0x7f010000, strings),
+            Triple("plurals", 0x7f020000, plurals),
+            Triple("drawable", 0x7f030000, drawableNames),
+            Triple("raw", 0x7f040000, rawFiles.map { it.substringBeforeLast('.') }),
+        )
+        val root = outDir.get().asFile
+        root.deleteRecursively()
+        val rDir = root.resolve("com/nendo/argosy/shared").apply { mkdirs() }
+        rDir.resolve("R.kt").writeText(buildString {
+            appendLine("package com.nendo.argosy.shared")
+            appendLine()
+            appendLine("object R {")
+            groups.forEach { (type, base, names) ->
+                appendLine("    object $type {")
+                names.forEachIndexed { i, name -> appendLine("        const val `$name`: Int = ${base + i}") }
+                appendLine("    }")
+            }
+            appendLine("}")
+        })
+        val chunk = 400
+        val lookupDir = root.resolve("com/nendo/argosy/shared/resources").apply { mkdirs() }
+        lookupDir.resolve("AndroidResourceIds.kt").writeText(buildString {
+            appendLine("package com.nendo.argosy.shared.resources")
+            appendLine()
+            appendLine("import org.jetbrains.compose.resources.DrawableResource")
+            appendLine("import org.jetbrains.compose.resources.PluralStringResource")
+            appendLine("import org.jetbrains.compose.resources.StringResource")
+            appendLine()
+            appendLine("internal object AndroidResourceIds {")
+            listOf(
+                Triple("string", "StringResource", groups[0]),
+                Triple("plurals", "PluralStringResource", groups[1]),
+                Triple("drawable", "DrawableResource", groups[2]),
+            ).forEach { (type, kind, group) ->
+                val (_, base, names) = group
+                val chunks = names.chunked(chunk)
+                appendLine("    fun $type(id: Int): $kind = when ((id - $base) / $chunk) {")
+                chunks.indices.forEach { c -> appendLine("        $c -> ${type}Chunk$c(id - $base)") }
+                appendLine("        else -> throw IllegalArgumentException(\"no $type resource \${'$'}id\")")
+                appendLine("    }")
+                chunks.forEachIndexed { c, names ->
+                    appendLine("    private fun ${type}Chunk$c(index: Int): $kind = when (index) {")
+                    names.forEachIndexed { i, name -> appendLine("        ${c * chunk + i} -> Res.$type.`$name`") }
+                    appendLine("        else -> throw IllegalArgumentException(\"no $type resource \${'$'}index\")")
+                    appendLine("    }")
+                }
+            }
+            appendLine("    fun rawPath(id: Int): String = when (id - ${groups[3].second}) {")
+            rawFiles.forEachIndexed { i, file -> appendLine("        $i -> \"files/raw/$file\"") }
+            appendLine("        else -> throw IllegalArgumentException(\"no raw resource \${'$'}id\")")
+            appendLine("    }")
+            appendLine("}")
+        })
+    }
+}
+
+compose.resources {
+    packageOfResClass = "com.nendo.argosy.shared.resources"
+    publicResClass = false
+    generateResClass = always
+    customDirectory(
+        sourceSetName = "desktopMain",
+        directoryProvider = layout.dir(prepareDesktopComposeResources.map { it.destinationDir })
+    )
+}
+
 kotlin {
     androidTarget {
         compilerOptions {
@@ -134,6 +230,7 @@ kotlin {
         getByName("desktopMain").kotlin.srcDir(
             generateDesktopDaoModule.map { it.outputs.files.singleFile.resolve("desktopMain") }
         )
+        getByName("desktopMain").kotlin.srcDir(generateDesktopR.map { it.outputs.files.singleFile })
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(libs.room.runtime)
@@ -147,6 +244,7 @@ kotlin {
             implementation(libs.bouncycastle)
             implementation(libs.upokecenter.cbor)
             implementation(libs.datastore.preferences)
+            implementation(libs.androidx.annotation)
         }
         androidMain.dependencies {
             implementation(libs.hilt.android)
@@ -155,9 +253,12 @@ kotlin {
             implementation(libs.sqlite.bundled)
             implementation(libs.zstd.jni)
             implementation(libs.org.json)
+            implementation(compose.components.resources)
+            implementation(compose.ui)
         }
         getByName("desktopTest").dependencies {
             implementation(libs.kotlin.test)
+            implementation(compose.desktop.currentOs)
         }
     }
 }

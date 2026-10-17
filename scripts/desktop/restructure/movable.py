@@ -38,9 +38,14 @@ ALLOWED = (
     "androidx.datastore.core.", "androidx.datastore.preferences.core.",
     "dagger.Lazy", "dagger.assisted.", "dagger.Module", "dagger.Provides", "dagger.Binds",
     "dagger.multibindings.",
+    "androidx.annotation.StringRes", "androidx.annotation.PluralsRes", "androidx.annotation.DrawableRes",
+    "androidx.annotation.RawRes",
 )
 NOT_ALLOWED = ("androidx.sqlite.db.",)
-REWRITTEN = ("android.util.Log", "com.nendo.argosy.BuildConfig", "dagger.hilt.android.lifecycle.HiltViewModel")
+REWRITTEN = (
+    "android.util.Log", "com.nendo.argosy.BuildConfig", "dagger.hilt.android.lifecycle.HiltViewModel",
+    "com.nendo.argosy.R",
+)
 GENERATED = ("com.nendo.argosy.config.AppBuildConfig",)
 GUARDED_REWRITES = {
     "android.view.KeyEvent": re.compile(r"\bKeyEvent\b(?!\.KEYCODE_\w)"),
@@ -54,7 +59,7 @@ ANDROID_FQ = re.compile(r"(?<![\w.])(?:android|androidx|com|org|io|net|dagger|co
 ANDROID_MAIN_ALLOWED = ALLOWED + (
     "android.", "androidx.annotation.", "androidx.datastore.", "dagger.hilt.android.qualifiers.",
 )
-FORBIDDEN_WORDS = re.compile(r"\bR\.(string|plurals|drawable|raw|color|dimen|font|xml|array|mipmap|id)\b")
+FORBIDDEN_WORDS = re.compile(r"\bR\.(color|dimen|font|xml|array|mipmap|id|style|attr|layout|menu|bool|integer)\b")
 DECL = re.compile(
     r"^(?:@\S+\s+)*(?:(?:private|internal|public|data|enum|sealed|abstract|open|inline|value|const|"
     r"annotation|suspend|operator|infix|tailrec|external|fun|expect|actual)\s+)*"
@@ -135,8 +140,11 @@ def analyse(u, index, packages):
         if not fq.startswith(REWRITTEN) and not fq.startswith("com.nendo.argosy."):
             external(fq, "reference")
     if FORBIDDEN_WORDS.search(u.body):
-        common.append("R")
-        android.append("R")
+        common.append("R type with no shared resources")
+        android.append("R type with no shared resources")
+    if u.pkg == "com.nendo.argosy" and re.search(r"\bR\.\w", u.body):
+        common.append("R without an import")
+        android.append("R without an import")
     if u.pkg == "com.nendo.argosy" and re.search(r"\bBuildConfig\b", u.body):
         common.append("BuildConfig without an import")
         android.append("BuildConfig without an import")
