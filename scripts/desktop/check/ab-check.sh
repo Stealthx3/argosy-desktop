@@ -1,17 +1,18 @@
 #!/usr/bin/env bash
 # A/B screen and database check of the Android debug app against the pre-Phase-1 baseline APK.
+# With SNAPSHOT, both runs start from that testbed snapshot (scripts/desktop/testbed/snapshot.sh).
 # Runs on AVD argosy_handheld_check (emulator-5556), which must already be signed in to the RomM
 # testbed (scripts/desktop/testbed/seed-emulator.sh emulator-5556). Each build is installed over
 # the same app data, launched, and walked through the same gamepad sequence; screenshots and a
 # database and DataStore summary are compared with both clocks masked. Never clears app data.
 #
-# usage: [INSTALL_ARGS="--abi arm64-v8a"] scripts/desktop/check/ab-check.sh [candidate.apk] [out-dir]
+# usage: [INSTALL_ARGS="--abi arm64-v8a"] [BASELINE=<apk>] [SNAPSHOT=<name>] scripts/desktop/check/ab-check.sh [candidate.apk] [out-dir]
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
 CANDIDATE="${1:-$ROOT/app/build/outputs/apk/debug/app-debug.apk}"
 OUT="${2:-$ROOT/build/desktop-check/$(date +%Y%m%d-%H%M%S)}"
-BASELINE="$ROOT/build/desktop-baseline/app-debug-3ad8281f6.apk"
+BASELINE="${BASELINE:-$ROOT/build/desktop-baseline/app-debug-3ad8281f6.apk}"
 SERIAL=emulator-5556
 PKG=com.nendo.argosy.debug
 SDK="$HOME/Android/Sdk"
@@ -30,6 +31,9 @@ shot() { $ADB exec-out screencap -p > "$OUT/$1-$2.png"; }
 
 run() {
     local tag=$1 apk=$2
+    if [ -n "${SNAPSHOT:-}" ]; then
+        "$ROOT/scripts/desktop/testbed/snapshot.sh" restore "$SNAPSHOT" >/dev/null
+    fi
     $ADB install -r ${INSTALL_ARGS:-} "$apk" >/dev/null
     $ADB shell am start -a android.intent.action.MAIN -n "$PKG/com.nendo.argosy.ArgosyActivity" >/dev/null
     sleep 45

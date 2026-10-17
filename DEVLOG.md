@@ -355,3 +355,41 @@ Declarations, KDoc and annotations move byte for byte; each file keeps only the 
 **Action:** Rebuilt `README.md` (intro, Phase 1 status, full `PORT_PLAN.md`, upstream link) and added a Phase 1 results note to `PORT_PLAN.md`; committed and pushed `main` to `origin`.
 
 **Post-close fix (same day):** the pushed-file review showed that step 9 had moved all six generated token files (`ui/theme/generated/*.kt`) to `shared`, while `scripts/gen-tokens.mjs` still wrote five of them to `app` (step 6 had redirected only `ComponentDefaults.kt`); the next token regeneration would have produced duplicate classes. The generator's output directory now points at `shared` as a whole (net change against upstream: one line). Not executed: Node is not installed here. A sweep of upstream's agent and contributor docs for exact paths to moved files fixed three more references (`coupling-map.md`, `ra-compliance`, `design-tokens`). Lesson recorded for Phase 2: when a move takes a generated file, update its generator in the same step and run the generator when the toolchain allows.
+
+---
+
+## Phase 2 · Desktop UI
+
+**Status:** started 2026-10-16 (owner: "Start Phase 2 now"). Exit criterion (`PORT_PLAN.md`): every screen opens on the desktop and is fully navigable by gamepad; screenshots match an Android handheld at the same resolution.
+
+### 2026-10-16 — Session 3 continued
+
+**Action:** Merged upstream release **v2.24.0** into `main` (merge commit `4508ad68d`), as the owner asked, with `scripts/desktop/restructure/reapply.sh`: the same two extraction conflicts as in the rehearsal, resolved and re-extracted; audit 0 problems; gate green (assembleDebug, 4,426 app tests, desktop build and tests). From here the "Android unchanged" baseline is **plain upstream v2.24.0** (built from the tag in a scratch worktree), not the pre-Phase-1 APK, so checks compare the restructured release with the same release unmodified.
+**Note:** `origin/upstream` still points at v2.23.0: the release-sync workflow has not run on the fork (GitHub Actions are probably disabled for it). Left untouched; the owner can enable Actions or run the workflow once to move it to v2.24.0.
+
+**Verification of the merge against plain upstream v2.24.0** (APK built from the tag; kept as `build/desktop-baseline/app-debug-upstream-v2.24.0.apk`):
+- First A/B run showed one difference on Game Detail ("Auto-save" with a download icon vs "autosave" with a check). Cause: run order, not the merge. The baseline runs first from the snapshot and is the first v2.24.0 launch after 2.23 (v2.24.0 adds startup work: pruning RomM-deleted games, re-deriving screen roles), so the candidate started from already-changed state. `ab-check.sh` now takes `SNAPSHOT=<name>` and restores it before each run, and `BASELINE=<apk>`. With both runs from the snapshot: all five screens **pixel-identical**.
+- `compare.py` now inspects differing database tables row by row and reports, without failing, columns that are times (`…At`, `…Time`) or paths that differ only by a date stamp; everything else still fails. Result: database identical apart from the sync times each run writes (`save_cache.cachedAt`/`cachePath`, `save_ownership.updatedAt`, `save_sync.lastSyncedAt`); DataStore identical apart from re-written timestamps.
+- Save-sync live proof, plain v2.24.0 vs restructured `main`, both from snapshot `saves-baseline`: every normalized capture identical; `no_op=3` twice; pre-launch, `NO_CHANGE` and `UPLOADED` doors the same. No `FATAL EXCEPTION`.
+- Upstream's new string resources (e.g. `library_quickmenu_remove_from_library`) landed in `shared/src/androidMain/res` through rename detection.
+- Size: the restructured debug APK is about 3 MB larger than plain upstream's (72.3 vs 69.1 MB), from the Compose Multiplatform wrapper libraries and the CMP resources runtime. Worth measuring on a release build later.
+
+### Phase 2 plan
+
+The same rules as Phase 1 hold for anything that touches Android: scripted, re-runnable transforms; renames separate from edits; Android unchanged (A/B against plain upstream, save-sync proof for the zone). New in Phase 2 is desktop behaviour, checked by running the desktop app and comparing its screens with Android's at 1920×1080.
+
+**Seams, in order of what they unblock** (after step 9: 636 UI files in `app`, 307 with direct blockers):
+
+1. **`PlatformContext` (Context, 114 + LocalContext 99).** 439 of the UI's `Context` uses are `context.getString(...)`, 30 `context.resources`. An `expect class PlatformContext` with `actual typealias PlatformContext = android.content.Context` on Android (bytecode identical) and a desktop class backed by CMP resources; `LocalPlatformContext` is `LocalContext` itself on Android. A guarded import rewrite applies only where a file uses nothing on `Context` beyond what the expect class declares.
+2. **Images (Coil 2, 76 uses).** An expect `AsyncImage` with the subset of Coil 2's signature upstream uses: Coil 2 unchanged on Android, Coil 3 (or Skia decoding) on desktop. Upgrading Android to Coil 3 is a separate, upstream-shaped decision.
+3. **View models (`hiltViewModel()` 29, `@HiltViewModel` 33).** An expect `hiltViewModel()`: Android calls Hilt's; desktop takes view models from the Dagger graph through a generated `@IntoMap` module (from the `@HiltViewModel` classes, like the generated DAO module). Proves the step 7 `HiltViewModel` alias on Android.
+4. **Lifecycle (`Lifecycle`, observers, `LocalLifecycleOwner`).** JetBrains' multiplatform lifecycle has the same classes; the closure rules accept them, and the Android-only `ui.platform.LocalLifecycleOwner` import is rewritten to the lifecycle one where they are the same object.
+5. **Feature seams** for the rest (`Intent`/launch, Media3, `Bitmap`/`BitmapFactory`, `Uri`, `Build`, `KeyEvent` beyond key codes): one small interface per feature, with a desktop stand-in that shows the feature's empty or unsupported state until Phase 3/4 implements it.
+
+**Desktop app:**
+
+6. **Shell:** `desktopApp` builds the Dagger graph (data directory under XDG, `~/.local/share/argosy-desktop` until the Flatpak), provides `LocalPlatformContext`, applies `ALauncherTheme`, and hosts upstream's navigation (`ArgosyApp`) once it moves. Window: undecorated fullscreen by default, windowed mode for development (per the plan).
+7. **Input:** SDL3 gamepad through JNA (hotplug, the SDL controller database), emitting Android key codes (`AndroidKeyCodes`) into upstream's `mapKeycodeToGamepadEvent`, so swap, repeat and focus logic are upstream's; keyboard mapped to the same actions.
+8. **Screens:** bring them up in the order a user meets them: first run, Home, Library, Game Detail, Downloads, Settings, then the rest. For each: opens, navigable by gamepad, screenshot compared with Android at 1920×1080 (fonts render through Skia, so the comparison is structural plus side-by-side review, not pixel equality).
+
+**Per-step verification:** `movable.py --check`; Android gate (assembleDebug, unit tests); desktop build and tests; A/B against plain v2.24.0 where Android code moved; save-sync proof if the zone is touched; the desktop app launched and screenshotted for UI steps.
