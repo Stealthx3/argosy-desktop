@@ -1180,3 +1180,45 @@
 + ui/screens/social/ProfileContent.kt
 + ui/screens/social/ProfileTabContent.kt
 + ui/startup/StartupMaintenanceCoordinator.kt
+
+# Phase 2: in-app emulator parts and more Android services behind slices.
+[androidMain]
++ libretro/SaveStateManager.kt
++ data/netplay/LibretroNetplayOps.kt
++ libretro/VideoSettingsManager.kt
++ libretro/ControllerInputMapper.kt
++ data/emulator/VulkanDriverRepository.kt
++ data/quaypass/ble/QuayPassScanReceiver.kt
++ ui/common/StorageAccessRequest.kt
++ ui/input/TriggerAxisKeyEmitter.kt
++ util/ImmersiveMode.kt
++ core/locale/LocaleHelper.kt
++ data/download/DownloadNotificationChannel.kt
++ data/emulator/EmulatorDownloadManager.kt
++ data/emulator/LaunchCommand.kt
++ data/emulator/ScreenshotCaptureMonitor.kt
++ data/installer/ManagedInstallerManager.kt
+
+# Phase 2: files freed by the in-app emulator and service slices.
+[commonMain]
++ data/emulator/BuiltinGraphicsResolver.kt
++ ui/filebrowser/FileBrowserScreen.kt
+
+# Phase 2: files freed by the AsyncImage onSuccess and drawable seam.
+[commonMain]
++ ui/screens/media/components/MediaEpisodeRow.kt
++ ui/screens/media/components/MediaPosterCard.kt
++ ui/screens/media/components/MediaPosterGrid.kt
++ ui/screens/media/components/MediaSimilarRail.kt
+
+
+# Phase 2: the in-app emulator UI (used only by LibretroActivity).
+[androidMain]
++ libretro/InputConfigCoordinator.kt
++ libretro/KeyPressGate.kt
++ libretro/ui/InGameMenu.kt
++ libretro/ui/InGameMenuActions.kt
++ libretro/ui/InGameMenuShell.kt
++ libretro/ui/InGameNetplaySection.kt
++ libretro/ui/InGameStateManager.kt
++ libretro/ui/QuickLoadHistoryStrip.kt

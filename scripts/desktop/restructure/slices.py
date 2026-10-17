@@ -25,9 +25,9 @@ MANIFEST = Path(__file__).with_name("slices.txt")
 PORTABLE_IMPORTS = (
     "kotlin.", "kotlinx.coroutines.", "java.io.", "java.util.", "java.time.", "java.net.", "java.security.",
     "androidx.compose.ui.graphics.", "com.nendo.argosy.", "androidx.datastore.core.", "androidx.datastore.preferences.core.",
-    "androidx.room.",
+    "androidx.room.", "com.swordfish.libretrodroid.Variable", "com.swordfish.libretrodroid.ShaderConfig",
 )
-NOT_A_TYPE_STAND_IN = ("android.content.Intent",)
+NOT_A_TYPE_STAND_IN = ("android.view.KeyEvent", "android.view.MotionEvent")
 
 
 def portable_import(name):
@@ -149,14 +149,21 @@ def members(text, body_start, body_end):
 def signature_end(text, start, kind):
     i = start
     depth = 0
+    params_closed = False
     while i < len(text):
         ch = text[i]
+        if kind == "fun" and params_closed and depth == 0 and ch == "\n":
+            following = text[i + 1:].lstrip(" \t")
+            if not following.startswith((":", "=", "{", ".", "where")):
+                return i
         if ch == ">" and text[i - 1] == "-":
             pass
         elif ch in "(<[":
             depth += 1
         elif ch in ")>]":
             depth -= 1
+            if ch == ")" and depth == 0:
+                params_closed = True
         elif depth == 0 and (ch in "{=" or (kind != "fun" and ch == "\n")):
             if ch == "=" and text[i + 1] == ">":
                 i += 2
@@ -321,17 +328,18 @@ def slice_top_level(rel):
         if "actual" in mods and member_key(line_text) in previous:
             line_text = re.sub(r"^expect\s+", "", previous[member_key(line_text)])
             params = line_text[line_text.index("(") + 1:find_close(line_text, line_text.index("("))]
-        expect_lines.append("expect " + line_text)
+        composable = "@Composable\n" if "@Composable" in m.group(1) else ""
+        expect_lines.append(composable + "expect " + re.sub(r"^@Composable\n", "", line_text))
         value = neutral(rtype) if rtype != "Unit" else None
         body = " {\n}" if rtype == "Unit" else f" = {value or 'TODO(\"desktop: ' + name + '\")'}"
-        desktop_lines.append(f"actual {suspend}fun {receiver}{name}({' '.join(strip_defaults(params).split())}){returns}{body}")
+        desktop_lines.append(f"{composable}actual {suspend}fun {receiver}{name}({' '.join(strip_defaults(params).split())}){returns}{body}")
         edits.append((open_paren + 1, close, strip_defaults(text[open_paren + 1:close])))
         edits.append((m.start(2), m.start(2), "" if "actual" in mods else "actual "))
     for a, b, rep in sorted(edits, key=lambda e: e[0], reverse=True):
         text = text[:a] + rep + text[b:]
     path.write_text(text)
     body_text = "\n".join(expect_lines)
-    needed = []
+    needed = ["import androidx.compose.runtime.Composable"] if "@Composable" in body_text else []
     for name, alias in imports:
         short = alias or name.rsplit(".", 1)[1]
         if re.search(rf"\b{short}\b", body_text) and portable_import(name):
@@ -342,6 +350,17 @@ def slice_top_level(rel):
     expect_path.parent.mkdir(parents=True, exist_ok=True)
     expect_path.write_text(f"package {pkg}\n\n" + (header + "\n\n" if header else "") + "\n\n".join(expect_lines) + "\n")
     desktop_path = (DESKTOP / ROOT / rel).parent / f"{stem}.functions.desktop.kt"
+    if desktop_path.exists():
+        existing = desktop_path.read_text()
+        missing = [d for d in desktop_lines if not present(d.split("\n")[-1] if d.startswith("@") else d, existing)]
+        if missing:
+            existing = existing.rstrip() + "\n\n" + "\n\n".join(missing) + "\n"
+            add = [l for l in header.splitlines() if l and not re.search(rf"^{re.escape(l)}$", existing, re.M)]
+            if add:
+                last = list(re.finditer(r"^(?:import|package) .*$", existing, re.M))[-1]
+                existing = existing[:last.end()] + "\n" + "\n".join(add) + existing[last.end():]
+            desktop_path.write_text(existing)
+            print(f"  {len(missing)} functions added to {desktop_path.name}")
     if not desktop_path.exists():
         desktop_path.parent.mkdir(parents=True, exist_ok=True)
         desktop_path.write_text(f"package {pkg}\n\n" + (header + "\n\n" if header else "") + "\n\n".join(desktop_lines) + "\n")
@@ -391,6 +410,7 @@ def main():
         supertypes = []
         ctor_params = None
         ctor_edit = None
+        ctor_defaults_edit = None
         ctor_m = re.match(r"\s*(?:actual\s+constructor\s*)?\(", text[cls_match.end():])
         if ctor_m and "@Inject" not in text[cls_match.end():cls_match.end() + 40] and kind_word_guess(text, cls_match, cls) == "class":
             open_at = cls_match.end() + ctor_m.end() - 1
@@ -399,8 +419,14 @@ def main():
             ctor_words = set(re.findall(r"\b[A-Z]\w*", plain))
             if not any((w in imported and not portable_import(imported[w])) or (w in top_level and w != cls) for w in ctor_words):
                 ctor_params = " ".join(plain.split()).rstrip(",")
+                prev_path = (COMMON / ROOT / rel).parent / f"{cls}.expect.kt"
+                if "actual constructor" in text[cls_match.end():open_at + 1] and prev_path.exists():
+                    prev_m = re.search(rf"expect class {cls}\((.*?)\)(?: :| \{{)", prev_path.read_text())
+                    if prev_m:
+                        ctor_params = prev_m.group(1)
                 if "actual constructor" not in text[cls_match.end():open_at]:
                     ctor_edit = (open_at, open_at, " actual constructor")
+                    ctor_defaults_edit = (open_at + 1, find_close(text, open_at), strip_defaults(raw_params))
         header_text = text[cls_match.end():body_start]
         while re.search(r"\([^()]*\)", header_text):
             header_text = re.sub(r"\([^()]*\)", "", header_text)
@@ -419,6 +445,8 @@ def main():
         expect_lines, desktop_lines, edits, skipped = [], [], [], []
         if ctor_edit:
             edits.append(ctor_edit)
+        if ctor_defaults_edit and ctor_params is not None:
+            edits.append(ctor_defaults_edit)
         found = list(members(text, body_start, body_end))
         found.sort(key=lambda sm: 0 if sm[1].group(2) in ("class", "object") else 1)
         for start, m in found:
@@ -558,13 +586,23 @@ def main():
                         rtype = "Unit"
             else:
                 tm = re.match(r"(?:val|var)\s+\w+\s*:\s*(.+)", sig)
+                const_literal = None
+                if not tm and re.search(r"\bconst\b", mods):
+                    lm = re.match(r'\s*=\s*("[^"]*"|-?\d+L?|true|false)\s*$', text[end:].split("\n", 1)[0])
+                    if lm:
+                        const_literal = lm.group(1)
+                        inferred = ("String" if const_literal.startswith('"') else "Long" if const_literal.endswith("L")
+                                    else "Boolean" if const_literal in ("true", "false") else "Int")
+                        tm = re.match(r"(.+)", inferred)
                 if not tm:
                     skipped.append(f"{name}: no declared type")
                     continue
                 rtype, params = re.sub(r"\s+get\(\).*$", "", tm.group(1).strip()), ""
-                following = "\n".join(text[end:].split("\n")[1:4])
-                if kind == "var" and re.search(r"^\s*(?:private|internal|protected) set\b", following, re.M):
-                    kind = "val"
+                next_lines = text[end:].split("\n")[1:3]
+                own_setter = next((l for l in next_lines if re.match(r"\s{8,}(?:private|internal|protected)\s+set\b", l)), None)
+                if kind == "var" and own_setter is not None:
+                    skipped.append(f"{name}: a var with a restricted setter cannot actualize an expect val")
+                    continue
             words = set(re.findall(r"\b[A-Z]\w*", sig.split("=")[0] if kind != "fun" else sig))
             blocked = sorted(
                 w for w in words
@@ -603,8 +641,11 @@ def main():
                 edits.append((pm_abs + 1, close_abs, strip_defaults(text[pm_abs + 1:close_abs])))
             else:
                 expect_lines.append(f"    {kind} {name}: {rtype}")
-                value = neutral(rtype) or f"TODO(\"desktop: {name}\")"
-                desktop_lines.append(f"    actual {kind} {name}: {rtype} = {value}")
+                if const_literal is not None:
+                    desktop_lines.append(f"    actual const val {name}: {rtype} = {const_literal}")
+                else:
+                    value = neutral(rtype) or f"TODO(\"desktop: {name}\")"
+                    desktop_lines.append(f"    actual {kind} {name}: {rtype} = {value}")
             edits.append((start + m.start(1), start + m.start(1), "" if "actual" in mods else "actual "))
         cls_decl = text[cls_match.start():cls_match.end()]
         kind_word = next(w for w in ("object", "interface", "class") if re.search(rf"\b{w} {cls}\b", cls_decl))
@@ -649,7 +690,13 @@ def main():
             for st_name in [st for st in supertypes if st not in STDLIB_SUPERTYPES]:
                 st_text = (COMMON / ROOT / rel).parent.joinpath(f"{st_name}.expect.kt").read_text()
                 st_android = (ANDROID / ROOT / rel).parent.joinpath(f"{st_name}.kt").read_text()
-                abstract = re.findall(r"^    (?:actual )?val (\w+): (\S+)\s*$", st_android, re.M)
+                abstract = re.findall(r"^    val (\w+): (\S+)\s*$", st_text, re.M)
+                for fm in re.finditer(r"^    ((?:suspend )?)fun (\w+)\((.*)\)(?::\s*(.+))?$", st_text, re.M):
+                    f_type = (fm.group(4) or "Unit").strip()
+                    f_value = neutral(f_type) if f_type != "Unit" else None
+                    f_body = " {\n    }" if f_type == "Unit" else f" = {f_value or 'TODO(\"desktop\")'}"
+                    f_ret = "" if f_type == "Unit" else f": {f_type}"
+                    desktop_lines.append(f"    override {fm.group(1)}fun {fm.group(2)}({strip_defaults(fm.group(3))}){f_ret}{f_body}")
                 for member_name, member_type in abstract:
                     literal = re.search(rf"^    (?:actual )?override val {member_name}\s*(?::\s*\S+)?\s*=\s*(\"[^\"]*\"|\d+L?|true|false)\s*$", text, re.M)
                     value = literal.group(1) if literal else (neutral(member_type) or f'TODO("desktop: {member_name}")')

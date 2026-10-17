@@ -60,6 +60,7 @@ RULES = [
         "import com.nendo.argosy.platform.LocalPlatformView as LocalView\nimport com.nendo.argosy.platform.getLocationOnScreen",
     ),
     (re.compile(r"^import coil\.compose\.AsyncImage$", re.M), "import com.nendo.argosy.platform.image.AsyncImage"),
+    (re.compile(r"\bcoil\.compose\.AsyncImage\("), "com.nendo.argosy.platform.image.AsyncImage("),
     (re.compile(r"^import android\.os\.Build$", re.M), "import com.nendo.argosy.platform.PlatformBuild as Build"),
     (re.compile(r"\bandroid\.os\.Build\."), "com.nendo.argosy.platform.PlatformBuild."),
     (re.compile(r"^import android\.graphics\.Color$", re.M), "import com.nendo.argosy.platform.PlatformColor as Color"),
@@ -151,6 +152,13 @@ RULES = [
         re.compile(r"^import androidx\.datastore\.preferences\.preferencesDataStoreFile$", re.M),
         "import com.nendo.argosy.platform.preferencesDataStoreFile",
     ),
+    (
+        re.compile(r"^import android\.graphics\.drawable\.BitmapDrawable$", re.M),
+        "import com.nendo.argosy.platform.image.PlatformBitmapDrawable as BitmapDrawable\nimport com.nendo.argosy.platform.image.bitmap",
+    ),
+    (re.compile(r"\bandroid\.graphics\.drawable\.BitmapDrawable\b"), "com.nendo.argosy.platform.image.PlatformBitmapDrawable"),
+    (re.compile(r"^import android\.os\.Bundle$", re.M), "import com.nendo.argosy.platform.PlatformBundle as Bundle"),
+    (re.compile(r"\bandroid\.os\.Bundle\b"), "com.nendo.argosy.platform.PlatformBundle"),
     (re.compile(r"^import android\.view\.KeyEvent$", re.M), "import com.nendo.argosy.core.input.AndroidKeyCodes as KeyEvent"),
     (
         re.compile(r"^import com\.nendo\.argosy\.util\.DisplayAffinityHelper$", re.M),
@@ -161,7 +169,7 @@ RULES = [
 
 COMPANION_IMPORTS = {
     "com.nendo.argosy.platform.PlatformContext": [
-        "com.nendo.argosy.platform.getApplicationInfo", "com.nendo.argosy.platform.getApplicationLabel",
+        "com.nendo.argosy.platform.startActivity", "com.nendo.argosy.platform.getApplicationInfo", "com.nendo.argosy.platform.getApplicationLabel",
         "com.nendo.argosy.platform.applicationContext", "com.nendo.argosy.platform.packageName",
         "com.nendo.argosy.platform.getSystemService", "com.nendo.argosy.platform.getExternalFilesDir",
         "com.nendo.argosy.platform.packageManager", "com.nendo.argosy.platform.getPackageInfo",
@@ -173,7 +181,7 @@ COMPANION_IMPORTS = {
         "com.nendo.argosy.platform.resources",
     ],
     "com.nendo.argosy.platform.LocalPlatformContext": [
-        "com.nendo.argosy.platform.getApplicationInfo", "com.nendo.argosy.platform.getApplicationLabel",
+        "com.nendo.argosy.platform.startActivity", "com.nendo.argosy.platform.getApplicationInfo", "com.nendo.argosy.platform.getApplicationLabel",
         "com.nendo.argosy.platform.applicationContext", "com.nendo.argosy.platform.packageName",
         "com.nendo.argosy.platform.getSystemService", "com.nendo.argosy.platform.getExternalFilesDir",
         "com.nendo.argosy.platform.packageManager", "com.nendo.argosy.platform.getPackageInfo",
@@ -204,6 +212,10 @@ COMPANION_IMPORTS = {
         "com.nendo.argosy.platform.contentResolver", "com.nendo.argosy.platform.filesDir",
         "com.nendo.argosy.platform.getSharedPreferences", "com.nendo.argosy.platform.getString",
         "com.nendo.argosy.platform.packageName", "com.nendo.argosy.platform.resources",
+    ],
+    "com.nendo.argosy.platform.image.AsyncImage": [
+        "com.nendo.argosy.platform.image.bitmap", "com.nendo.argosy.platform.image.intrinsicHeight",
+        "com.nendo.argosy.platform.image.intrinsicWidth",
     ],
     "com.nendo.argosy.platform.PlatformUri": [
         "com.nendo.argosy.platform.authority", "com.nendo.argosy.platform.encodedPath",
@@ -314,11 +326,23 @@ def ensure_companions(text):
     return text
 
 
+UNUSED_ANDROID_IMPORT = re.compile(r"^import ((?:android|coil)\.[\w.]+|androidx\.(?:core|media3|activity)\.[\w.]+)$", re.M)
+
+
+def drop_unused_android_imports(text):
+    body = UNUSED_ANDROID_IMPORT.sub("", text)
+    for m in UNUSED_ANDROID_IMPORT.finditer(text):
+        name = m.group(1).rsplit(".", 1)[1]
+        if not re.search(rf"\b{re.escape(name)}\b", body):
+            text = re.sub(rf"^import {re.escape(m.group(1))}\n", "", text, count=1, flags=re.M)
+    return text
+
+
 def main():
     changed = 0
     for path in sorted(COMMON.rglob("*.kt")):
         text = path.read_text()
-        new = text
+        new = drop_unused_android_imports(text)
         for pattern, replacement in RULES:
             new = pattern.sub(replacement, new)
         new = rewrite_bitmap_config(new)

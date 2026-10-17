@@ -37,3 +37,6 @@ ui/screens/player/PlayerEngine.kt -> common:SideloadedSubtitles.kt: sideloadedSu
 data/emulator/GameLauncher.kt -> LaunchResult.kt: LaunchResult DiscOption
 util/ScreenCatalog.kt -> common:AttachedScreen.kt: AttachedScreen
 data/media/MediaSubtitleSidecars.kt -> common:MediaSubtitleTypes.kt: MediaSubtitleDelivery MediaSubtitleSidecar
+libretro/ControllerInputMapper.kt -> common:SyntheticKeyEvent.kt: SyntheticKeyEvent
+data/emulator/EmulatorDownloadManager.kt -> common:EmulatorDownloadProgress.kt: EmulatorDownloadProgress
+data/installer/ManagedInstallerManager.kt -> common:InstallerJobs.kt: InstallerJobState InstallerFailure InstallerJob

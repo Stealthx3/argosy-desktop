@@ -61,7 +61,7 @@ NOT_ALLOWED = (
     "androidx.compose.ui.input.pointer.RequestDisallowInterceptTouchEvent",
 )
 REWRITTEN = (
-    "android.annotation.SuppressLint", "androidx.datastore.preferences.preferencesDataStoreFile", "androidx.room.withTransaction", "androidx.core.graphics.toColorInt", "android.graphics.BlurMaskFilter", "android.graphics.LinearGradient",
+    "android.annotation.SuppressLint", "android.graphics.drawable.BitmapDrawable", "androidx.datastore.preferences.preferencesDataStoreFile", "androidx.room.withTransaction", "androidx.core.graphics.toColorInt", "android.graphics.BlurMaskFilter", "android.graphics.LinearGradient",
     "android.graphics.Shader.TileMode",
     "android.util.Log", "android.graphics.Color.", "android.os.Build.", "com.nendo.argosy.BuildConfig", "dagger.hilt.android.lifecycle.HiltViewModel",
     "com.nendo.argosy.R",
@@ -80,7 +80,8 @@ GENERATED = (
 )
 CONTEXT_MEMBERS = (
     r"(?!getString\b|resources\b|filesDir\b|cacheDir\b|assets\b|getSharedPreferences\b|contentResolver\b"
-    r"|packageName\b|applicationContext\b|getSystemService\b|getExternalFilesDir\b|packageManager\b|preferencesDataStoreFile\b)[a-zA-Z_]\w*"
+    r"|packageName\b|applicationContext\b|getSystemService\b|getExternalFilesDir\b|packageManager\b|preferencesDataStoreFile\b"
+    r"|startActivity\b)[a-zA-Z_]\w*"
 )
 CONTEXT_REST = (
     r"\.resources\.(?!getQuantityString\b|getString\b)\w+"
@@ -133,7 +134,7 @@ GUARDED_REWRITES = {
         r"LocalView\.current\.(?!getLocationOnScreen\b)\w+|\bview\.(?!getLocationOnScreen\b)\w+"
     ),
     "coil.compose.AsyncImage": re.compile(
-        r"\b(?:onSuccess|onLoading|onState|transform|clipToBounds|imageLoader|modelEqualityDelegate)\s*="
+        r"\b(?:onLoading|onState|transform|clipToBounds|imageLoader|modelEqualityDelegate)\s*="
         r"|onError\s*=\s*\{\s*\w+\s*->|\bAsyncImagePainter\b"
     ),
     "android.os.Build": re.compile(
@@ -164,7 +165,7 @@ GUARDED_REWRITES = {
         r"\bBitmap\.(?!Config\.(?:ARGB_8888|HARDWARE)\b|createBitmap\(\w+, \w+, Bitmap\.Config)\w+"
         r"|\.(?:compress|eraseColor|setPixel|getPixels|copyPixels\w*|isRecycled|byteCount|allocationByteCount"
         r"|density|hasAlpha|setHasAlpha|prepareToDraw|extractAlpha|reconfigure|rowBytes|generationId|isMutable"
-        r"|colorSpace|asShared|hardwareBuffer|getHardwareBuffer|scale)\b"
+        r"|colorSpace|asShared|hardwareBuffer|getHardwareBuffer)\b"
     ),
     "android.graphics.BitmapFactory": re.compile(
         r"\bBitmapFactory\.(?!decodeFile\b|decodeByteArray\b|Options\b)\w+"
@@ -214,6 +215,7 @@ GUARDED_REWRITES = {
         r"|\bApplication\.\w+"
     ),
     "android.text.Html": re.compile(r"\bHtml\.(?!fromHtml\b|FROM_HTML_MODE_LEGACY\b)\w+"),
+    "android.os.Bundle": re.compile(r"\bBundle\s*\(|\b(?:bundle|options|extras)\??\.(?:put|get)\w+"),
     "android.util.Base64": re.compile(
         r"\bBase64\.(?!decode\b|encode\b|encodeToString\b|DEFAULT\b|NO_PADDING\b|NO_WRAP\b|CRLF\b|URL_SAFE\b)\w+"
     ),
@@ -221,7 +223,8 @@ GUARDED_REWRITES = {
 FQ_GUARDED = (
     "android.content.Context", "android.os.SystemClock", "dagger.hilt.android.qualifiers.ApplicationContext",
     "android.graphics.Bitmap", "android.graphics.BitmapFactory", "android.util.Base64",
-    "android.provider.Settings", "android.net.Uri", "android.os.Process", "android.graphics.Paint",
+    "android.provider.Settings", "android.net.Uri", "android.os.Process", "android.graphics.Paint", "android.os.Bundle",
+    "coil.compose.AsyncImage",
 )
 STRINGS = re.compile(r'"(?:[^"\\\n]|\\.)*"')
 STAND_IN_GUARDS = {
@@ -260,6 +263,7 @@ STAND_IN_GUARDS = {
     "com.nendo.argosy.platform.PlatformInputDevice": "android.view.InputDevice",
     "com.nendo.argosy.platform.PlatformApplication": "android.app.Application",
     "com.nendo.argosy.platform.PlatformHtml": "android.text.Html",
+    "com.nendo.argosy.platform.PlatformBundle": "android.os.Bundle",
 }
 COMMENTS = re.compile(r"/\*.*?\*/|^\s*//[^\n]*", re.S | re.M)
 ANDROID_FQ = re.compile(r"(?<![\w.])(?:android|androidx|com|org|io|net|dagger|coil|in|okhttp3|retrofit2)\.[a-z]\w*(?:\.\w+)+")
@@ -336,6 +340,10 @@ def analyse(u, index, packages):
             android.append(f"{kind} {name}")
 
     for imp in u.imports:
+        short = imp.rsplit(".", 1)[-1]
+        alias_m = re.search(rf"^import {re.escape(imp)} as (\w+)$", u.text, re.M)
+        if imp.startswith(("android.", "coil.")) and not re.search(rf"\b{re.escape(alias_m.group(1) if alias_m else short)}\b", u.body):
+            continue
         if imp in ("android.graphics.Color", "com.nendo.argosy.platform.PlatformColor"):
             alias_m = re.search(rf"^import {re.escape(imp)}(?: as (\w+))?$", u.text, re.M)
             alias = alias_m.group(1) if alias_m and alias_m.group(1) else imp.rsplit(".", 1)[1]
