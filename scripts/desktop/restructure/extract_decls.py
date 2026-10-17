@@ -3,7 +3,8 @@
 Moves named top-level declarations out of a Kotlin file into a new file in the same package.
 
 Driven by extract-decls.txt next to this script. Each moved declaration keeps its KDoc and
-annotations byte for byte; each file keeps only the imports its remaining text names. Idempotent:
+annotations byte for byte; each file keeps only the imports its remaining text names, plus operator-convention imports
+(getValue, plus, invoke, componentN, ...), which code uses without naming them. Idempotent:
 a declaration already absent from its source file is skipped. With --refresh, a source that holds
 its declarations again (an upstream release changed them) replaces the earlier extraction, wherever
 apply_moves.py has since moved it. A name written as ^NAME is
@@ -59,8 +60,16 @@ def parse(text):
     return header, items, lines
 
 
+OPERATOR_CONVENTIONS = {
+    "getValue", "setValue", "provideDelegate", "plus", "minus", "times", "div", "rem", "rangeTo",
+    "rangeUntil", "contains", "get", "set", "invoke", "iterator", "next", "hasNext", "compareTo",
+    "unaryMinus", "unaryPlus", "not", "inc", "dec", "plusAssign", "minusAssign", "timesAssign",
+    "divAssign", "remAssign",
+}
+
+
 def imports_used(header, text):
-    words = set(re.findall(r"\w+", text))
+    words = set(re.findall(r"\w+", text)) | OPERATOR_CONVENTIONS | {f"component{i}" for i in range(1, 17)}
     kept = []
     for line in header:
         if not line.startswith("import "):
