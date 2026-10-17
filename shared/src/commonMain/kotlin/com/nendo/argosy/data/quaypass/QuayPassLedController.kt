@@ -1,7 +1,7 @@
 package com.nendo.argosy.data.quaypass
 
-import android.os.Build
-import android.util.Log
+import com.nendo.argosy.platform.PlatformBuild as Build
+import com.nendo.argosy.util.PlatformLog as Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
