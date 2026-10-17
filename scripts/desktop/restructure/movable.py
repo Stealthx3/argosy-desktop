@@ -54,13 +54,14 @@ NOT_ALLOWED = (
     "androidx.lifecycle.ViewModelProvider", "androidx.lifecycle.findViewTree",
     "androidx.compose.ui.platform.ComposeView", "androidx.compose.ui.tooling.", "androidx.compose.ui.viewinterop.",
     "androidx.compose.ui.res.",
-    "androidx.compose.ui.graphics.asAndroid", "androidx.compose.ui.graphics.nativeCanvas",
-    "androidx.compose.ui.graphics.NativePaint", "androidx.compose.ui.text.font.Typeface",
+    "androidx.compose.ui.graphics.asAndroid",
+    "androidx.compose.ui.text.font.Typeface",
     "androidx.compose.ui.text.android", "androidx.compose.ui.input.pointer.pointerInteropFilter",
     "androidx.compose.ui.input.pointer.RequestDisallowInterceptTouchEvent",
 )
 REWRITTEN = (
-    "android.annotation.SuppressLint",
+    "android.annotation.SuppressLint", "android.graphics.BlurMaskFilter", "android.graphics.LinearGradient",
+    "android.graphics.Shader.TileMode",
     "android.util.Log", "android.graphics.Color.", "android.os.Build.", "com.nendo.argosy.BuildConfig", "dagger.hilt.android.lifecycle.HiltViewModel",
     "com.nendo.argosy.R",
     "androidx.compose.ui.res.stringResource", "androidx.compose.ui.res.pluralStringResource",
@@ -70,7 +71,12 @@ REWRITTEN = (
     "android.os.Environment.getExternalStorage", "android.os.Environment.isExternalStorageManager",
     "android.text.format.DateFormat.getBestDateTimePattern",
 )
-GENERATED = ("com.nendo.argosy.config.AppBuildConfig", "com.nendo.argosy.res.ArgosyR")
+GENERATED = (
+    "com.nendo.argosy.config.AppBuildConfig", "com.nendo.argosy.res.ArgosyR",
+    "com.nendo.argosy.platform.drawRoundRect", "com.nendo.argosy.platform.PlatformBlur",
+    "com.nendo.argosy.platform.PlatformBlurMaskFilter", "com.nendo.argosy.platform.PlatformTileMode",
+    "com.nendo.argosy.platform.PlatformLinearGradient", "com.nendo.argosy.platform.PlatformNativePaint",
+)
 CONTEXT_MEMBERS = (
     r"(?!getString\b|resources\b|filesDir\b|cacheDir\b|assets\b|getSharedPreferences\b|contentResolver\b"
     r"|packageName\b|applicationContext\b|getSystemService\b|getExternalFilesDir\b|packageManager\b)[a-zA-Z_]\w*"
@@ -196,6 +202,13 @@ GUARDED_REWRITES = {
         r"|\.(?:motionRanges|getMotionRange|hasKeys|supportsSource|keyboardType|vibrator|vibratorManager|batteryState"
         r"|lightsManager|sensorManager|keyCharacterMap|getKeyCodeForKeyLocation)\b"
     ),
+    "androidx.compose.ui.graphics.nativeCanvas": re.compile(r"\bnativeCanvas\.(?!drawRoundRect\b|drawCircle\b)\w+"),
+    "android.graphics.Paint": re.compile(r"\bandroid\.graphics\.Paint\b(?!\(\))|\bPaint\.\w+"),
+    "android.app.Application": re.compile(
+        r"\b(?:application|app)\??\.(?!contentResolver\b|filesDir\b|cacheDir\b|getString\b|resources\b|packageName\b"
+        r"|applicationContext\b|getSharedPreferences\b|getSystemService\b|getExternalFilesDir\b|packageManager\b|assets\b)\w+"
+        r"|\bApplication\.\w+"
+    ),
     "android.util.Base64": re.compile(
         r"\bBase64\.(?!decode\b|encode\b|encodeToString\b|DEFAULT\b|NO_PADDING\b|NO_WRAP\b|CRLF\b|URL_SAFE\b)\w+"
     ),
@@ -203,7 +216,7 @@ GUARDED_REWRITES = {
 FQ_GUARDED = (
     "android.content.Context", "android.os.SystemClock", "dagger.hilt.android.qualifiers.ApplicationContext",
     "android.graphics.Bitmap", "android.graphics.BitmapFactory", "android.util.Base64",
-    "android.provider.Settings", "android.net.Uri", "android.os.Process",
+    "android.provider.Settings", "android.net.Uri", "android.os.Process", "android.graphics.Paint",
 )
 STRINGS = re.compile(r'"(?:[^"\\\n]|\\.)*"')
 STAND_IN_GUARDS = {
@@ -240,6 +253,7 @@ STAND_IN_GUARDS = {
     "com.nendo.argosy.platform.image.ImageRequest": "coil.request.ImageRequest",
     "com.nendo.argosy.platform.image.CachePolicy": "coil.request.CachePolicy",
     "com.nendo.argosy.platform.PlatformInputDevice": "android.view.InputDevice",
+    "com.nendo.argosy.platform.PlatformApplication": "android.app.Application",
 }
 COMMENTS = re.compile(r"/\*.*?\*/|^\s*//[^\n]*", re.S | re.M)
 ANDROID_FQ = re.compile(r"(?<![\w.])(?:android|androidx|com|org|io|net|dagger|coil|in|okhttp3|retrofit2)\.[a-z]\w*(?:\.\w+)+")

@@ -236,6 +236,14 @@ def neutral(type_text):
     return None
 
 
+STDLIB_SUPERTYPES = ("AutoCloseable", "Closeable", "java.io.Closeable", "Runnable")
+
+
+def kind_word_guess(text, cls_match, cls):
+    decl = text[cls_match.start():cls_match.end()]
+    return next(w for w in ("object", "interface", "class") if re.search(rf"\b{w} {cls}\b", decl))
+
+
 def present(declaration, existing):
     first = declaration.strip().split("\n")[0]
     key = member_key(first)
@@ -375,6 +383,18 @@ def main():
         interface_class = re.search(rf"\binterface {cls}\b", text[cls_match.start():cls_match.end()]) is not None
         interface_defaults = set(re.findall(r"^    (?:val|var|fun|suspend fun)\s+(\w+)[^\n]*(?:get\(\)|\)\s*(?::[^\n{=]+)?[{=])", text[body_start:body_end], re.M))
         supertypes = []
+        ctor_params = None
+        ctor_edit = None
+        ctor_m = re.match(r"\s*(?:actual\s+constructor\s*)?\(", text[cls_match.end():])
+        if ctor_m and "@Inject" not in text[cls_match.end():cls_match.end() + 40] and kind_word_guess(text, cls_match, cls) == "class":
+            open_at = cls_match.end() + ctor_m.end() - 1
+            raw_params = text[open_at + 1:find_close(text, open_at)]
+            plain = re.sub(r"\b(?:private|internal|protected|public)?\s*(?:val|var)\s+", "", raw_params)
+            ctor_words = set(re.findall(r"\b[A-Z]\w*", plain))
+            if not any((w in imported and not portable_import(imported[w])) or (w in top_level and w != cls) for w in ctor_words):
+                ctor_params = " ".join(plain.split()).rstrip(",")
+                if "actual constructor" not in text[cls_match.end():open_at]:
+                    ctor_edit = (open_at, open_at, " actual constructor")
         header_text = text[cls_match.end():body_start]
         while re.search(r"\([^()]*\)", header_text):
             header_text = re.sub(r"\([^()]*\)", "", header_text)
@@ -385,12 +405,14 @@ def main():
                 if not st_m:
                     continue
                 st_name = st_m.group(1)
-                if (COMMON / ROOT / rel).parent.joinpath(f"{st_name}.expect.kt").exists():
+                if (COMMON / ROOT / rel).parent.joinpath(f"{st_name}.expect.kt").exists() or st_name in STDLIB_SUPERTYPES:
                     supertypes.append(st_name)
         nested = set(re.findall(r"^    (?:@\w+\s+)*(?:(?:data|sealed|abstract|open|inner|value)\s+)*(?:class|interface|object)\s+(\w+)", text[body_start:body_end], re.M))
         nested -= set(re.findall(r"^    (?:\w+\s+)*enum\s+class\s+(\w+)", text[body_start:body_end], re.M))
         constants = dict(re.findall(r"\bconst\s+val\s+(\w+)\s*(?::\s*\w+)?\s*=\s*([^\n]+)", text))
         expect_lines, desktop_lines, edits, skipped = [], [], [], []
+        if ctor_edit:
+            edits.append(ctor_edit)
         found = list(members(text, body_start, body_end))
         found.sort(key=lambda sm: 0 if sm[1].group(2) in ("class", "object") else 1)
         for start, m in found:
@@ -603,7 +625,7 @@ def main():
                     return f"{gm.group(1)}get() = {neutral(gm.group(2).strip()) or 'TODO(\"desktop\")'}"
                 copied = re.sub(r"(actual val \w+: ([^\n=]+?)\s*\n?\s*)get\(\)\s*=\s*([^\n]+)", neutral_getter, copied)
                 desktop_lines[k] = copied
-        body_text = "\n".join(expect_lines + desktop_lines)
+        body_text = "\n".join(expect_lines + desktop_lines + [ctor_params or ""] + supertypes)
         needed = []
         for name, alias in imports:
             short = alias or name.rsplit(".", 1)[1]
@@ -614,8 +636,11 @@ def main():
             header = pattern.sub(replacement, header)
         out_dir = (COMMON / ROOT / rel).parent
         supers = f" : {', '.join(supertypes)}" if supertypes else ""
+        if any(st in ("AutoCloseable", "Closeable", "java.io.Closeable") for st in supertypes):
+            if not any(re.match(r"\s*(?:actual |override )*fun close\(", l) for l in desktop_lines):
+                desktop_lines.append("    override fun close() {\n    }")
         if supertypes:
-            for st_name in supertypes:
+            for st_name in [st for st in supertypes if st not in STDLIB_SUPERTYPES]:
                 st_text = (COMMON / ROOT / rel).parent.joinpath(f"{st_name}.expect.kt").read_text()
                 st_android = (ANDROID / ROOT / rel).parent.joinpath(f"{st_name}.kt").read_text()
                 abstract = re.findall(r"^    (?:actual )?val (\w+): (\S+)\s*$", st_android, re.M)
@@ -623,7 +648,8 @@ def main():
                     literal = re.search(rf"^    (?:actual )?override val {member_name}\s*(?::\s*\S+)?\s*=\s*(\"[^\"]*\"|\d+L?|true|false)\s*$", text, re.M)
                     value = literal.group(1) if literal else (neutral(member_type) or f'TODO("desktop: {member_name}")')
                     desktop_lines.append(f"    override val {member_name}: {member_type} = {value}")
-        expect_text = f"package {pkg}\n\n" + (header + "\n\n" if header else "") + f"expect {kind_word} {cls}{supers} {{\n" + "\n\n".join(expect_lines) + "\n}\n"
+        ctor_expect = f"({ctor_params})" if ctor_params is not None else ""
+        expect_text = f"package {pkg}\n\n" + (header + "\n\n" if header else "") + f"expect {kind_word} {cls}{ctor_expect}{supers} {{\n" + "\n\n".join(expect_lines) + "\n}\n"
         out_dir.mkdir(parents=True, exist_ok=True)
         (out_dir / f"{cls}.expect.kt").write_text(expect_text)
         desktop_path = (DESKTOP / ROOT / rel).parent / f"{cls}.desktop.kt"
@@ -667,6 +693,8 @@ def main():
             for pattern, replacement in rewrite_imports.RULES:
                 desktop_header = pattern.sub(replacement, desktop_header)
             constructor = " @Inject constructor()" if kind_word == "class" else ""
+            if ctor_params is not None:
+                constructor = f" actual constructor({strip_defaults(ctor_params)})"
             if kind_word == "interface":
                 cleaned = []
                 for l in desktop_lines:

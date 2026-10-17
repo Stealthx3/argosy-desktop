@@ -131,6 +131,16 @@ RULES = [
     (re.compile(r"^import coil\.request\.ImageRequest$", re.M), "import com.nendo.argosy.platform.image.ImageRequest"),
     (re.compile(r"^import coil\.request\.CachePolicy$", re.M), "import com.nendo.argosy.platform.image.CachePolicy"),
     (re.compile(r"^import android\.view\.InputDevice$", re.M), "import com.nendo.argosy.platform.PlatformInputDevice as InputDevice"),
+    (re.compile(r"\bandroid\.graphics\.BlurMaskFilter\.Blur\."), "com.nendo.argosy.platform.PlatformBlur."),
+    (re.compile(r"\bandroid\.graphics\.BlurMaskFilter\("), "com.nendo.argosy.platform.PlatformBlurMaskFilter("),
+    (re.compile(r"\bandroid\.graphics\.LinearGradient\("), "com.nendo.argosy.platform.PlatformLinearGradient("),
+    (re.compile(r"\bandroid\.graphics\.Shader\.TileMode\."), "com.nendo.argosy.platform.PlatformTileMode."),
+    (re.compile(r"\bandroid\.graphics\.Paint\(\)"), "com.nendo.argosy.platform.PlatformNativePaint()"),
+    (
+        re.compile(r"^import android\.graphics\.BlurMaskFilter$", re.M),
+        "import com.nendo.argosy.platform.PlatformBlurMaskFilter as BlurMaskFilter\nimport com.nendo.argosy.platform.PlatformBlur",
+    ),
+    (re.compile(r"^import android\.app\.Application$", re.M), "import com.nendo.argosy.platform.PlatformApplication as Application"),
     (re.compile(r"^import android\.view\.KeyEvent$", re.M), "import com.nendo.argosy.core.input.AndroidKeyCodes as KeyEvent"),
     (
         re.compile(r"^import com\.nendo\.argosy\.util\.DisplayAffinityHelper$", re.M),
@@ -176,6 +186,13 @@ COMPANION_IMPORTS = {
         "com.nendo.argosy.platform.isVirtual", "com.nendo.argosy.platform.name", "com.nendo.argosy.platform.productId",
         "com.nendo.argosy.platform.sources", "com.nendo.argosy.platform.vendorId",
     ],
+    "androidx.compose.ui.graphics.nativeCanvas": ["com.nendo.argosy.platform.drawRoundRect"],
+    "com.nendo.argosy.platform.PlatformApplication": [
+        "com.nendo.argosy.platform.applicationContext", "com.nendo.argosy.platform.cacheDir",
+        "com.nendo.argosy.platform.contentResolver", "com.nendo.argosy.platform.filesDir",
+        "com.nendo.argosy.platform.getSharedPreferences", "com.nendo.argosy.platform.getString",
+        "com.nendo.argosy.platform.packageName", "com.nendo.argosy.platform.resources",
+    ],
     "com.nendo.argosy.platform.PlatformUri": [
         "com.nendo.argosy.platform.authority", "com.nendo.argosy.platform.encodedPath",
         "com.nendo.argosy.platform.getQueryParameter", "com.nendo.argosy.platform.host",
@@ -216,6 +233,7 @@ def rewrite_bitmap_config(text):
 
 
 STATIC_STAND_INS = [
+    ("PlatformBlurMaskFilter as BlurMaskFilter", r"BlurMaskFilter\.Blur\.", r"PlatformBlur."),
     ("PlatformInputDevice as InputDevice", r"InputDevice\.(getDevice|getDeviceIds)\(", r"PlatformInputDevices.\1("),
     ("PlatformInputDevice as InputDevice", r"InputDevice\.(SOURCE_\w+)\b", r"\1"),
     ("core.input.AndroidKeyCodes as KeyEvent", r"KeyEvent\.(keyCodeToString)\b", r"\1"),
