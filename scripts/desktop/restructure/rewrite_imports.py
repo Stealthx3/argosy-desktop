@@ -130,6 +130,7 @@ RULES = [
     (re.compile(r"^import android\.view\.MotionEvent$", re.M), "import com.nendo.argosy.core.input.AndroidMotionAxes as MotionEvent"),
     (re.compile(r"^import coil\.request\.ImageRequest$", re.M), "import com.nendo.argosy.platform.image.ImageRequest"),
     (re.compile(r"^import coil\.request\.CachePolicy$", re.M), "import com.nendo.argosy.platform.image.CachePolicy"),
+    (re.compile(r"^import android\.view\.InputDevice$", re.M), "import com.nendo.argosy.platform.PlatformInputDevice as InputDevice"),
     (re.compile(r"^import android\.view\.KeyEvent$", re.M), "import com.nendo.argosy.core.input.AndroidKeyCodes as KeyEvent"),
     (
         re.compile(r"^import com\.nendo\.argosy\.util\.DisplayAffinityHelper$", re.M),
@@ -169,6 +170,12 @@ COMPANION_IMPORTS = {
     ],
     "com.nendo.argosy.platform.PlatformNetworkCapabilities": ["com.nendo.argosy.platform.hasCapability"],
     "com.nendo.argosy.platform.PlatformUserManager": ["com.nendo.argosy.platform.isUserUnlocked"],
+    "com.nendo.argosy.platform.PlatformInputDevice": [
+        "com.nendo.argosy.platform.controllerNumber", "com.nendo.argosy.platform.descriptor",
+        "com.nendo.argosy.platform.id", "com.nendo.argosy.platform.isEnabled", "com.nendo.argosy.platform.isExternal",
+        "com.nendo.argosy.platform.isVirtual", "com.nendo.argosy.platform.name", "com.nendo.argosy.platform.productId",
+        "com.nendo.argosy.platform.sources", "com.nendo.argosy.platform.vendorId",
+    ],
     "com.nendo.argosy.platform.PlatformUri": [
         "com.nendo.argosy.platform.authority", "com.nendo.argosy.platform.encodedPath",
         "com.nendo.argosy.platform.getQueryParameter", "com.nendo.argosy.platform.host",
@@ -209,6 +216,8 @@ def rewrite_bitmap_config(text):
 
 
 STATIC_STAND_INS = [
+    ("PlatformInputDevice as InputDevice", r"InputDevice\.(getDevice|getDeviceIds)\(", r"PlatformInputDevices.\1("),
+    ("PlatformInputDevice as InputDevice", r"InputDevice\.(SOURCE_\w+)\b", r"\1"),
     ("core.input.AndroidKeyCodes as KeyEvent", r"KeyEvent\.(keyCodeToString)\b", r"\1"),
     ("PlatformContext as Context", r"Context\.(MODE_PRIVATE|CONNECTIVITY_SERVICE|USER_SERVICE)\b", r"\1"),
     ("PlatformNetworkCapabilities as NetworkCapabilities", r"NetworkCapabilities\.(NET_CAPABILITY_INTERNET)\b", r"\1"),
@@ -222,7 +231,7 @@ def rewrite_static_stand_ins(text):
         if not re.search(rf"^import com\.nendo\.argosy\.{re.escape(anchor_import)}$", text, re.M):
             continue
         regex = re.compile(r"(?<![\w.])" + pattern)
-        names = {regex.sub(replacement, m.group(0)) for m in regex.finditer(text)}
+        names = {re.match(r"\w+", regex.sub(replacement, m.group(0))).group(0) for m in regex.finditer(text)}
         if not names:
             continue
         text = regex.sub(replacement, text)

@@ -191,6 +191,11 @@ GUARDED_REWRITES = {
         r"|\bImageRequest\.(?!Builder\b)\w+"
     ),
     "coil.request.CachePolicy": re.compile(r"\bCachePolicy\.(?!ENABLED\b|READ_ONLY\b|WRITE_ONLY\b|DISABLED\b)\w+"),
+    "android.view.InputDevice": re.compile(
+        r"(?<!fun )\bInputDevice\.(?!getDevice\b|getDeviceIds\b|SOURCE_(?:CLASS_BUTTON|CLASS_JOYSTICK|DPAD|GAMEPAD|JOYSTICK|KEYBOARD)\b)\w+"
+        r"|\.(?:motionRanges|getMotionRange|hasKeys|supportsSource|keyboardType|vibrator|vibratorManager|batteryState"
+        r"|lightsManager|sensorManager|keyCharacterMap|getKeyCodeForKeyLocation)\b"
+    ),
     "android.util.Base64": re.compile(
         r"\bBase64\.(?!decode\b|encode\b|encodeToString\b|DEFAULT\b|NO_PADDING\b|NO_WRAP\b|CRLF\b|URL_SAFE\b)\w+"
     ),
@@ -234,10 +239,14 @@ STAND_IN_GUARDS = {
     "com.nendo.argosy.core.input.AndroidMotionAxes": "android.view.MotionEvent",
     "com.nendo.argosy.platform.image.ImageRequest": "coil.request.ImageRequest",
     "com.nendo.argosy.platform.image.CachePolicy": "coil.request.CachePolicy",
+    "com.nendo.argosy.platform.PlatformInputDevice": "android.view.InputDevice",
 }
 COMMENTS = re.compile(r"/\*.*?\*/|^\s*//[^\n]*", re.S | re.M)
 ANDROID_FQ = re.compile(r"(?<![\w.])(?:android|androidx|com|org|io|net|dagger|coil|in|okhttp3|retrofit2)\.[a-z]\w*(?:\.\w+)+")
-ANDROID_MAIN_ALLOWED = ALLOWED + ("android.", "androidx.", "dagger.hilt.", "coil.")
+ANDROID_MAIN_ALLOWED = ALLOWED + (
+    "android.", "androidx.", "dagger.hilt.", "coil.", "org.xmlpull.", "com.swordfish.libretrodroid.",
+    "com.goterl.lazysodium.", "com.sun.jna.",
+)
 FORBIDDEN_WORDS = re.compile(r"\bR\.(color|dimen|font|xml|array|mipmap|id|style|attr|layout|menu|bool|integer)\b")
 DECL = re.compile(
     r"^(?:@\S+\s+)*(?:(?:private|internal|public|data|enum|sealed|abstract|open|inline|value|const|"

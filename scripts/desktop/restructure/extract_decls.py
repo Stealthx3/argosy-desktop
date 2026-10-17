@@ -20,7 +20,8 @@ SHARED_ROOTS = [Path(f"shared/src/{s}/kotlin/com/nendo/argosy") for s in ("commo
 REFRESH = "--refresh" in sys.argv
 MANIFEST = Path(__file__).with_name("extract-decls.txt")
 DECL = re.compile(
-    r"^(?:(?:private|internal|public|data|enum|sealed|abstract|open|inline|value|const|annotation|fun|suspend|operator|infix)\s+)*"
+    r"^(?:(?:private|internal|public|data|enum|sealed|abstract|open|inline|value|const|annotation|fun|suspend|operator|infix"
+    r"|actual|expect|tailrec|external)\s+)*"
     r"(?:class|interface|object|fun|val|var|typealias)\s+(?:<[^>]*>\s*)?(?:[\w.]+\.)?(\w+)"
 )
 
@@ -113,6 +114,7 @@ def extract(source, new_name, names, widen):
     used = imports_used(header, moved)
     if used:
         out += used + [""]
+    target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text("\n".join(out) + "\n" + moved + "\n")
 
     drop = set()
