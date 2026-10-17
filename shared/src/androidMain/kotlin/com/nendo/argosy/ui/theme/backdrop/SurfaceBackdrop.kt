@@ -50,7 +50,7 @@ private class BackdropLayer(val shader: Shader, val brush: ShaderBrush, val tile
 
 /** Paints colorScheme.background then the tiled lattice above it, tinted with focusAccent so the pattern tracks the accent hue family; disabled is byte-identical to a plain background. */
 @Composable
-fun Modifier.surfaceBackdrop(role: BackdropRole): Modifier {
+actual fun Modifier.surfaceBackdrop(role: BackdropRole): Modifier {
     val base = MaterialTheme.colorScheme.background
     val config = LocalSurfaceBackdrop.current
     if (!config.enabled) return background(base)
