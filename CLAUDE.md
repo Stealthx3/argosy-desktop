@@ -20,6 +20,7 @@ Read these first, in order:
 - **Keep `DEVLOG.md` current:** for every meaningful step, record the action and the reasoning, under the current phase's heading. Each phase gets its own clearly separated section.
 - Never post to upstream (issues, PRs, Discord) without the owner's explicit go-ahead. `docs/desktop/upstream-proposal.md` is a draft for the owner.
 - Commit messages end with the attribution lines your harness specifies.
+- **Usage pacing:** use at most half of each 5-hour usage window. Before each new step or batch, and before any long build or verification run, check usage (`mcp__ccd_session_mgmt__get_usage`); continue only while the 5-hour window is below 50% and the weekly all-models window below 90%. At a threshold, finish or park the step in hand (commit it if verified, otherwise note in `DEVLOG.md` where it stopped), set the state file to `paused-usage` and stop; a pacer task sends "Pacer: continue" once there is room, and usage is re-checked before resuming. State file (not in git): `.git/argosy-pacer.json`, `{"status": "working" | "paused-usage" | "phase-gate" | "waiting-owner", "phase": n, "note": "...", "updated": "<ISO time>"}`. Phase gates take priority: at a phase end, push, set `phase-gate` and ask the owner; the pacer never resumes from `phase-gate` or `waiting-owner`.
 
 ## One-time setup (this folder is not yet a git checkout)
 
