@@ -242,6 +242,13 @@ kotlin {
         }
         commonMain.dependencies {
             implementation(compose.runtime)
+            implementation(compose.ui)
+            implementation(compose.foundation)
+            implementation(compose.animation)
+            implementation(compose.material3)
+            implementation(compose.materialIconsExtended)
+            implementation(libs.jetbrains.lifecycle.viewmodel.compose)
+            implementation(libs.jetbrains.lifecycle.runtime.compose)
             implementation(libs.room.runtime)
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.javax.inject)
@@ -263,7 +270,6 @@ kotlin {
             implementation(libs.sqlite.bundled)
             implementation(libs.zstd.jni)
             implementation(libs.org.json)
-            implementation(compose.ui)
         }
         getByName("desktopTest").dependencies {
             implementation(libs.kotlin.test)

@@ -6,6 +6,7 @@ ksp = "2.3.7"
 detekt = "1.23.7"
 coreKtx = "1.15.0"
 lifecycleRuntimeKtx = "2.8.7"
+jetbrainsLifecycle = "2.8.4"
 activityCompose = "1.9.3"
 composeBom = "2024.12.01"
 hilt = "2.57.2"
@@ -58,6 +59,9 @@ androidx-material-icons = { group = "androidx.compose.material", name = "materia
 # TV Compose
 androidx-tv-foundation = { group = "androidx.tv", name = "tv-foundation", version.ref = "tvFoundation" }
 androidx-tv-material = { group = "androidx.tv", name = "tv-material", version.ref = "tvMaterial" }
+
+jetbrains-lifecycle-viewmodel-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "jetbrainsLifecycle" }
+jetbrains-lifecycle-runtime-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "jetbrainsLifecycle" }
 
 # Navigation
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation" }

@@ -12,6 +12,9 @@ never under-reports them. The compiler remains the final check.
 Files placed in shared androidMain may use Android APIs but not R, BuildConfig or modules shared
 does not depend on; commonMain files may not depend on them.
 
+keep-in-app.txt lists globs that stay in app whatever this script concludes (with the reason,
+usually a desktop compile error the import rules cannot see).
+
 Usage: movable.py --check           audits files already in shared against the same rules.
        movable.py --why <file>      prints the chain of dependencies that keeps <file> in app.
        movable.py --android <file>  prints what placing <file> in androidMain also needs.
@@ -38,13 +41,28 @@ ALLOWED = (
     "androidx.datastore.core.", "androidx.datastore.preferences.core.",
     "dagger.Lazy", "dagger.assisted.", "dagger.Module", "dagger.Provides", "dagger.Binds",
     "dagger.multibindings.",
-    "androidx.annotation.StringRes", "androidx.annotation.PluralsRes", "androidx.annotation.DrawableRes",
-    "androidx.annotation.RawRes",
+    "androidx.annotation.",
+    "androidx.compose.ui.", "androidx.compose.foundation.", "androidx.compose.animation.",
+    "androidx.compose.material3.", "androidx.compose.material.icons.", "androidx.compose.material.ripple.",
+    "androidx.lifecycle.ViewModel", "androidx.lifecycle.viewModelScope",
+    "androidx.lifecycle.compose.", "androidx.lifecycle.viewmodel.compose.viewModel",
 )
-NOT_ALLOWED = ("androidx.sqlite.db.",)
+NOT_ALLOWED = (
+    "androidx.sqlite.db.",
+    "androidx.compose.ui.platform.LocalContext", "androidx.compose.ui.platform.LocalView",
+    "androidx.compose.ui.platform.LocalConfiguration", "androidx.compose.ui.platform.LocalLifecycleOwner",
+    "androidx.compose.ui.platform.ComposeView", "androidx.compose.ui.tooling.", "androidx.compose.ui.viewinterop.",
+    "androidx.compose.ui.res.",
+    "androidx.compose.ui.graphics.asAndroid", "androidx.compose.ui.graphics.nativeCanvas",
+    "androidx.compose.ui.graphics.NativePaint", "androidx.compose.ui.text.font.Typeface",
+    "androidx.compose.ui.text.android", "androidx.compose.ui.input.pointer.pointerInteropFilter",
+    "androidx.compose.ui.input.pointer.RequestDisallowInterceptTouchEvent",
+)
 REWRITTEN = (
     "android.util.Log", "com.nendo.argosy.BuildConfig", "dagger.hilt.android.lifecycle.HiltViewModel",
     "com.nendo.argosy.R",
+    "androidx.compose.ui.res.stringResource", "androidx.compose.ui.res.pluralStringResource",
+    "androidx.compose.ui.res.painterResource",
 )
 GENERATED = ("com.nendo.argosy.config.AppBuildConfig", "com.nendo.argosy.res.ArgosyR")
 GUARDED_REWRITES = {
@@ -155,9 +173,16 @@ def analyse(u, index, packages):
     return deps, common, android
 
 
+KEEP_IN_APP = Path(__file__).with_name("keep-in-app.txt")
+
+
 def main():
     args = sys.argv[1:]
-    excluded = []
+    excluded = [
+        line.split("#")[0].strip()
+        for line in (KEEP_IN_APP.read_text().splitlines() if KEEP_IN_APP.exists() else [])
+        if line.split("#")[0].strip()
+    ]
     while "--exclude" in args:
         i = args.index("--exclude")
         excluded.append(args[i + 1])

@@ -1,0 +1,2 @@
+# Files that stay in app although movable.py's import rules accept them, with the reason.
+# One glob per line, relative to com/nendo/argosy; "#" starts the reason.
