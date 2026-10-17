@@ -35,20 +35,28 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.pluralStringResource
-import androidx.compose.ui.res.stringResource
+import com.nendo.argosy.platform.LocalPlatformContext as LocalContext
+import com.nendo.argosy.platform.cacheDir
+import com.nendo.argosy.platform.filesDir
+import com.nendo.argosy.platform.getQuantityString
+import com.nendo.argosy.platform.getString
+import com.nendo.argosy.platform.resources
+import com.nendo.argosy.res.painterResource
+import com.nendo.argosy.res.pluralStringResource
+import com.nendo.argosy.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
-import com.nendo.argosy.R
+import com.nendo.argosy.platform.image.AsyncImage
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.ui.components.PlatformIconAssets
 import com.nendo.argosy.ui.primitives.ArgosyProgressBar
 import com.nendo.argosy.ui.theme.Dimens
 import com.nendo.argosy.ui.theme.LocalLauncherTheme
 import kotlinx.coroutines.delay
+import com.nendo.argosy.platform.assets
+import com.nendo.argosy.platform.list
+import com.nendo.argosy.platform.open
 
 private val PERSISTENT_BAR_HEIGHT = 52.dp  // Static: matches specific UI design spec
 private val FOOTER_CLEARANCE = 56.dp  // Static: matches specific UI design spec
@@ -60,7 +68,7 @@ fun NotificationText.resolve(): String = when (this) {
     is NotificationText.Plural -> pluralStringResource(id, count, *args.toTypedArray())
 }
 
-fun NotificationText.resolve(context: android.content.Context): String = when (this) {
+fun NotificationText.resolve(context: com.nendo.argosy.platform.PlatformContext): String = when (this) {
     is NotificationText.Raw -> value
     is NotificationText.Res -> context.getString(id, *args.toTypedArray())
     is NotificationText.Plural -> context.resources.getQuantityString(id, count, *args.toTypedArray())

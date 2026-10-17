@@ -8,7 +8,7 @@ actual object PlatformDateFormat {
     private const val FIELD_ORDER = "GyQMwEdBhHjCmsvz"
 
     actual fun getBestDateTimePattern(locale: Locale, skeleton: String): String {
-        val template = skeleton.toList()
+        val template = skeleton.replace(Regex("y+"), "y").toList()
             .sortedBy { FIELD_ORDER.indexOf(it).takeIf { index -> index >= 0 } ?: FIELD_ORDER.length }
             .joinToString("")
         return DateTimeFormatterBuilder.getLocalizedDateTimePattern(template, IsoChronology.INSTANCE, locale)

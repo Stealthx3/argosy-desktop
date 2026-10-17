@@ -1,6 +1,6 @@
 package com.nendo.argosy.libretro.speedrun
 
-import android.os.SystemClock
+import com.nendo.argosy.platform.PlatformSystemClock as SystemClock
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

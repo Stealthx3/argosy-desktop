@@ -1,6 +1,6 @@
 package com.nendo.argosy.ui.components
 
-import android.os.SystemClock
+import com.nendo.argosy.platform.PlatformSystemClock as SystemClock
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn

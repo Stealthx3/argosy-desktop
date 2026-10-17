@@ -1,6 +1,6 @@
 package com.nendo.argosy.libretro.ui
 
-import android.os.SystemClock
+import com.nendo.argosy.platform.PlatformSystemClock as SystemClock
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -21,12 +21,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.withFrameMillis
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import com.nendo.argosy.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.nendo.argosy.R
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.libretro.speedrun.SpeedrunPhase
 import com.nendo.argosy.libretro.speedrun.SpeedrunRunState
 import com.nendo.argosy.ui.theme.LocalLauncherTheme
