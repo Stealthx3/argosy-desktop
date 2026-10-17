@@ -702,3 +702,29 @@
 + ui/components/playtime/PlayCoverMosaic.kt
 + ui/screens/gamedetail/components/ReviewEditorContent.kt
 + ui/screens/gamedetail/delegates/ArtworkDelegate.kt
+
+# Phase 2: files freed by the preferences, device id, Intent, Uri, Build and Process stand-ins.
+[commonMain]
++ data/emulator/ApkAssetMatcher.kt
++ data/emulator/EmulatorRegistry.kt
++ data/emulator/LaunchCommandTypes.kt
++ data/emulator/StatePathRegistry.kt
++ data/netplay/CandidateGatherer.kt
++ data/netplay/CoreHashCache.kt
++ data/netplay/RomHashComputer.kt
++ data/netplay/UpnpProbe.kt
++ data/preferences/AccountSwitchMarkerStore.kt
++ data/preferences/SessionStateStore.kt
++ data/remote/github/EmulatorUpdateRepository.kt
++ data/repository/GameActivityRepository.kt
++ data/repository/PlayStatsRepository.kt
++ data/steam/SteamAuthManager.kt
++ data/sync/FalSigilFileAccess.kt
++ libretro/ControllerTypeSelection.kt
++ libretro/CoreDownloadErrorFormatter.kt
++ libretro/LibretroBuildbot.kt
++ libretro/LibretroCoreRegistry.kt
++ libretro/coreoptions/CoreOptionManifestRegistry.kt
++ ui/common/InstallerVariantUi.kt
++ ui/deeplink/DeepLinkParser.kt
++ ui/screens/gamedetail/modals/CorePickerModal.kt
