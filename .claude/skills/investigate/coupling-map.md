@@ -219,7 +219,7 @@ Lockstep set:
 - Settings UI: `SoundSettingsDelegate.kt`, `SoundPickerPopup.kt`,
   `ui/screens/settings/sections/ThemeSoundsSection.kt` +
   `sections/input/ThemeSoundsSectionInput.kt` (sound rows moved out of InterfaceSection).
-- Samples: `app/src/main/res/raw/*.ogg` (15, mono post-2026-07 re-encode; loudness
+- Samples: `shared/src/androidMain/res/raw/*.ogg` (15, mono post-2026-07 re-encode; loudness
   hierarchy nav -12dB / interaction -8dB / event -5dB peak).
 
 NOT coupled: AmbientAudioManager (separate MediaPlayer engine, USAGE_MEDIA),

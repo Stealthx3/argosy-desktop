@@ -93,7 +93,7 @@ in `BuiltinEmulatorPreferencesRepository.kt`) holds `"ask" | "casual" |
   (the user is warned they are giving up hardcore).
 
 ```bash
-grep -n "BUILTIN_DEFAULT_TO_HARDCORE_MODE" app/src/main/kotlin/com/nendo/argosy/data/preferences/BuiltinEmulatorPreferencesRepository.kt
+grep -n "BUILTIN_DEFAULT_TO_HARDCORE_MODE" shared/src/commonMain/kotlin/com/nendo/argosy/data/preferences/BuiltinEmulatorPreferencesRepository.kt
 grep -n "tokenOptions" app/src/main/kotlin/com/nendo/argosy/ui/screens/settings/sections/RASettingsSection.kt
 ```
 

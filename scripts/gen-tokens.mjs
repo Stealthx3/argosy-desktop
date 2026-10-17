@@ -9,8 +9,7 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO = path.resolve(__dirname, "..");
 const TOKENS_PATH = path.join(REPO, "design-system-docs/tokens.json");
-const KOTLIN_OUT = path.join(REPO, "app/src/main/kotlin/com/nendo/argosy/ui/theme/generated");
-const SHARED_KOTLIN_OUT = path.join(REPO, "shared/src/commonMain/kotlin/com/nendo/argosy/ui/theme/generated");
+const KOTLIN_OUT = path.join(REPO, "shared/src/commonMain/kotlin/com/nendo/argosy/ui/theme/generated");
 
 const HEADER_KT = `// AUTO-GENERATED. DO NOT EDIT.
 // Source: design-system-docs/tokens.json
@@ -458,7 +457,6 @@ async function main() {
   const tokens = JSON.parse(raw);
 
   await fs.mkdir(KOTLIN_OUT, { recursive: true });
-  await fs.mkdir(SHARED_KOTLIN_OUT, { recursive: true });
 
   const writes = [
     [path.join(KOTLIN_OUT, "ColorTokens.kt"),       emitColorTokens(tokens.color)],
@@ -466,7 +464,7 @@ async function main() {
     [path.join(KOTLIN_OUT, "TypographyTokens.kt"),  emitTypographyTokens(tokens.typography)],
     [path.join(KOTLIN_OUT, "MotionTokens.kt"),      emitMotionTokens(tokens.motion)],
     [path.join(KOTLIN_OUT, "InputTokens.kt"),       emitInputTokens(tokens.input)],
-    [path.join(SHARED_KOTLIN_OUT, "ComponentDefaults.kt"), emitComponentDefaults(tokens.components, tokens.enums)],
+    [path.join(KOTLIN_OUT, "ComponentDefaults.kt"), emitComponentDefaults(tokens.components, tokens.enums)],
   ];
 
   for (const [outPath, content] of writes) {

@@ -28,7 +28,7 @@ The system exists because we caught the same bug class repeatedly: a default in 
 | `design-system-docs/tokens.json` | Source of truth - edit this |
 | `design-system-docs/tokens.schema.json` | JSON Schema for IDE autocomplete |
 | `scripts/gen-tokens.mjs` | Generator - Node, zero deps |
-| `app/src/main/kotlin/com/nendo/argosy/ui/theme/generated/*.kt` | Generated Kotlin (6 files) - never hand-edit |
+| `shared/src/commonMain/kotlin/com/nendo/argosy/ui/theme/generated/*.kt` | Generated Kotlin (6 files) - never hand-edit |
 | `app/src/main/kotlin/com/nendo/argosy/ui/theme/ArgosyTokens.kt` | `ArgosyThemeTokens` / `argosyThemeTokens` - the surface + text ramp every V2 primitive reads via `LocalArgosyTheme` |
 | `scripts/ci/smell-rules.json` | `raw-dp-literal` - the enforced half of hard rule 2 |
 
