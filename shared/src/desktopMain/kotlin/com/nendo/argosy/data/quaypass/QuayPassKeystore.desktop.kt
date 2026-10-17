@@ -15,4 +15,6 @@ actual class QuayPassKeystore @Inject constructor() {
 
     actual fun clear(alias: String) {
     }
+
+    actual companion object {}
 }

@@ -54,4 +54,6 @@ actual class LibretroCoreManager @Inject constructor() {
     actual suspend fun getPendingCoreUpdates(): List<PendingCoreUpdate> = emptyList()
 
     actual suspend fun updateInstalledCores(onCoreStarted: (core: LibretroCoreRegistry.CoreInfo, position: Int, total: Int) -> Unit): CoreBulkUpdateResult = CoreBulkUpdateResult(updated = emptyList(), failed = emptyList())
+
+    actual companion object {}
 }

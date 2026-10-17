@@ -19,7 +19,7 @@ actual class AndroidDataAccessor @Inject constructor(
     private val mirror: AndroidDataMirror,
     private val volumeDetector: StorageVolumeDetector
 ) {
-    companion object {
+    actual companion object {
         private const val TAG = "AndroidDataAccessor"
         private const val ANDROID_PATH = "/Android/"
         private val ALT_PATH = BuildConfig.UCDATA_PATH.takeIf { it.isNotEmpty() }

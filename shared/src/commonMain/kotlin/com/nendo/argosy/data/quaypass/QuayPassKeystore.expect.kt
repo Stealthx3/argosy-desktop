@@ -5,6 +5,8 @@ expect class QuayPassKeystore {
 
     enum class Algorithm { ED25519, EC_P256 }
 
+    companion object {}
+
     fun sign(data: ByteArray, alias: String): ByteArray
 
     fun signServerVerifiable(data: ByteArray, alias: String): ByteArray

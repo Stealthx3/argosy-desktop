@@ -33,6 +33,7 @@ def balanced_end(lines, start):
 
 
 def main():
+    outputs = {}
     for raw in MANIFEST.read_text().splitlines():
         line = raw.strip()
         if not line or line.startswith("#"):
@@ -51,6 +52,11 @@ def main():
         blocks, drop = [], set()
         for s in starts:
             e = balanced_end(lines, s)
+            while s > 0 and (lines[s - 1].strip().startswith("@") or lines[s - 1].strip().endswith("*/")):
+                if lines[s - 1].strip().endswith("*/"):
+                    while not lines[s - 1].strip().startswith("/*"):
+                        s -= 1
+                s -= 1
             blocks.append(lines[s:e + 1])
             drop.update(range(s, e + 1))
             if e + 1 < len(lines) and not lines[e + 1].strip():
@@ -72,10 +78,11 @@ def main():
         path.write_text(text)
         functions = []
         for b in blocks:
-            head = re.sub(rf"^        fun {re.escape(fn)}\(", f"fun {cls}.Companion.{fn}(", b[0])
-            functions.append("\n".join([head] + [l[8:] if l.startswith("        ") else l for l in b[1:]]))
-        out = f"package {package}\n\n" + "\n".join(used) + ("\n\n" if used else "") + "\n\n".join(functions) + "\n"
-        (APP / target_rel).write_text(out)
+            body = [re.sub(rf"^        fun {re.escape(fn)}\(", f"fun {cls}.Companion.{fn}(", l) for l in b]
+            functions.append("\n".join(l[8:] if l.startswith("        ") else l for l in body))
+        entry = outputs.setdefault(target_rel, {"package": package, "imports": [], "functions": []})
+        entry["imports"] += [l for l in used if l not in entry["imports"]]
+        entry["functions"] += functions
         for caller in callers:
             cpath = find(caller)
             ctext = cpath.read_text()
@@ -85,6 +92,10 @@ def main():
             last = list(re.finditer(r"^import .*$", ctext, re.M))[-1]
             cpath.write_text(ctext[:last.end()] + "\n" + imp + ctext[last.end():])
         print(f"{member} -> app {target_rel}")
+    for target_rel, entry in outputs.items():
+        used = sorted(entry["imports"])
+        out = f"package {entry['package']}\n\n" + "\n".join(used) + ("\n\n" if used else "") + "\n\n".join(entry["functions"]) + "\n"
+        (APP / target_rel).write_text(out)
 
 
 if __name__ == "__main__":

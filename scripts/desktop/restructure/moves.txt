@@ -771,3 +771,7 @@
 + ui/components/QuickSettingsInputRouter.kt
 + ui/components/QuickSettingsModels.kt
 + ui/dualscreen/DockReorderCoordinator.kt
+
+# Phase 2: LibretroCoreManager's pure update rules, moved out of its companion.
+[commonMain]
++ libretro/LibretroCoreUpdateRules.kt

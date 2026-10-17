@@ -14,4 +14,8 @@ actual class AndroidDataMirror @Inject constructor() {
     actual fun mirrorPathFor(path: String): String? = null
 
     actual fun sync(paths: Collection<String>): Boolean = false
+
+    actual data class Entry(actual val isDirectory: Boolean, actual val size: Long, actual val mtimeSec: Long)
+
+    actual companion object {}
 }

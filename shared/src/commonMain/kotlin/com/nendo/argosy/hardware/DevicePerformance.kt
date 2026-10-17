@@ -1,6 +1,6 @@
 package com.nendo.argosy.hardware
 
-import android.os.Build
+import com.nendo.argosy.platform.PlatformBuild as Build
 import com.nendo.argosy.util.PServerExecutor
 import com.nendo.argosy.util.XsuExecutor
 import java.io.File

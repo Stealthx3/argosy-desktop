@@ -1,10 +1,22 @@
 package com.nendo.argosy.data.steam
 
-import android.content.Context
-import android.os.Environment
+import com.nendo.argosy.platform.PlatformContext as Context
+import com.nendo.argosy.platform.applicationContext
+import com.nendo.argosy.platform.packageName
+import com.nendo.argosy.platform.assets
+import com.nendo.argosy.platform.contentResolver
+import com.nendo.argosy.platform.getSharedPreferences
+import com.nendo.argosy.platform.list
+import com.nendo.argosy.platform.open
+import com.nendo.argosy.platform.cacheDir
+import com.nendo.argosy.platform.filesDir
+import com.nendo.argosy.platform.getQuantityString
+import com.nendo.argosy.platform.getString
+import com.nendo.argosy.platform.resources
+import com.nendo.argosy.platform.PlatformEnvironment as Environment
 import com.nendo.argosy.data.storage.AndroidDataAccessor
 import com.nendo.argosy.util.Logger
-import dagger.hilt.android.qualifiers.ApplicationContext
+import com.nendo.argosy.di.ApplicationContext
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton

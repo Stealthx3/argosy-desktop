@@ -5,6 +5,8 @@ import java.io.InputStream
 import java.io.OutputStream
 
 expect class AndroidDataAccessor {
+    companion object {}
+
     fun resetAltAccessCache()
 
     fun isAltAccessSupported(): Boolean

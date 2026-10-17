@@ -219,7 +219,7 @@ actual class QuayPassKeystore @Inject constructor(
             else -> Algorithm.EC_P256
         }
 
-    companion object {
+    actual companion object {
         private const val TAG = "QuayPassKeystore"
         private const val ANDROID_KEYSTORE = "AndroidKeyStore"
         private const val LEGACY_KEY_ALIAS = "quaypass_install_v1"

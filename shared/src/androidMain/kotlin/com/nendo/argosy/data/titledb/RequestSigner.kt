@@ -17,14 +17,14 @@ actual class RequestSigner @Inject constructor(
 ) {
     private val secret: String = BuildConfig.TITLEDB_API_SECRET
 
-    data class SignedRequest(
-        val deviceToken: String,
-        val timestamp: Long,
-        val signature: String,
-        val fpHash: String
+    actual data class SignedRequest(
+        actual val deviceToken: String,
+        actual val timestamp: Long,
+        actual val signature: String,
+        actual val fpHash: String
     )
 
-    fun sign(deviceToken: String, query: String): SignedRequest? {
+    actual fun sign(deviceToken: String, query: String): SignedRequest? {
         if (secret.isBlank()) return null
 
         val timestamp = System.currentTimeMillis() / 1000

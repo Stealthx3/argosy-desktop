@@ -62,4 +62,6 @@ actual class AndroidDataAccessor @Inject constructor() {
     actual fun copyDirectory(sourcePath: String, destPath: String): Boolean = false
 
     actual fun moveDirectory(sourcePath: String, destPath: String): Boolean = false
+
+    actual companion object {}
 }

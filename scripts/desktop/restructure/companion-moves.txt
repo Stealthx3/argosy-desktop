@@ -2,3 +2,5 @@
 # extensions in app, bodies unchanged. Format:
 #   <file> <Class>.<function> -> <file under app> [import-in: <file> ...]
 ui/input/InputSignature.kt InputSignature.of -> ui/input/InputSignatureEvents.kt import-in: DualScreenManager.kt
+libretro/LibretroCoreManager.kt LibretroCoreManager.isUpdateAvailable -> libretro/LibretroCoreUpdateRules.kt
+libretro/LibretroCoreManager.kt LibretroCoreManager.pendingUpdateOf -> libretro/LibretroCoreUpdateRules.kt import-in: data/repository/CoreVersionRepository.kt

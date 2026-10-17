@@ -171,4 +171,6 @@ actual class ImageCacheManager @Inject constructor() {
 
     actual suspend fun migrateFlatToSharded(onProgress: (suspend (current: Int, total: Int) -> Unit)?) {
     }
+
+    actual companion object {}
 }

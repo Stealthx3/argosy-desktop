@@ -1,6 +1,6 @@
 package com.nendo.argosy.data.emulator
 
-import android.os.Environment
+import com.nendo.argosy.platform.PlatformEnvironment as Environment
 import com.nendo.argosy.data.platform.PlatformDefinitions
 import com.nendo.argosy.util.AppPaths
 import com.nendo.argosy.util.RootShell

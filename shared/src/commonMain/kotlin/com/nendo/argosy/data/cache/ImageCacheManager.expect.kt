@@ -7,6 +7,10 @@ import kotlinx.coroutines.flow.StateFlow
 import java.io.File
 
 expect class ImageCacheManager {
+    companion object {}
+
+    enum class BoxFace { BACK, SPINE, LOGO, BOX_3D }
+
     val gameArt: StateFlow<Map<Long, ResolvedGameArt>>
 
     fun artFor(gameId: Long): ResolvedGameArt?
@@ -90,8 +94,6 @@ expect class ImageCacheManager {
     fun queuePlatformLogoCache(platformId: Long, logoUrl: String)
 
     fun resumePendingLogoCache()
-
-    enum class BoxFace { BACK, SPINE, LOGO, BOX_3D }
 
     fun queueCoverCache(url: String, rommId: Long, gameTitle: String = "")
 

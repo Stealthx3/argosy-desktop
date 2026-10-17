@@ -1,6 +1,6 @@
 package com.nendo.argosy.domain.usecase.libretro
 
-import android.util.Log
+import com.nendo.argosy.util.PlatformLog as Log
 import com.nendo.argosy.data.emulator.EmulatorDetector
 import com.nendo.argosy.data.emulator.EmulatorRegistry
 import com.nendo.argosy.data.local.dao.EmulatorConfigDao

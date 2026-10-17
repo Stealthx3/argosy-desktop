@@ -23,7 +23,7 @@ import javax.inject.Singleton
 actual class AndroidDataMirror @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
-    data class Entry(val isDirectory: Boolean, val size: Long, val mtimeSec: Long)
+    actual data class Entry(actual val isDirectory: Boolean, actual val size: Long, actual val mtimeSec: Long)
 
     sealed interface Action {
         val key: String
@@ -243,7 +243,7 @@ actual class AndroidDataMirror @Inject constructor(
     private fun keyOfMirror(file: File): String =
         LOWER_PREFIX + file.absolutePath.removePrefix(root.absolutePath + "/")
 
-    companion object {
+    actual companion object {
         private const val TAG = "AndroidDataMirror"
         private const val MIRROR_DIR = "android-data-mirror"
         private const val LOWER_PREFIX = "/data/media/"

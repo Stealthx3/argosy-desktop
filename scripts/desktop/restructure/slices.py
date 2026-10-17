@@ -232,16 +232,31 @@ def neutral(type_text):
         if built:
             return built
     if base == "Result":
-        return "Result.failure(UnsupportedOperationException(\"not available on desktop\"))"
+        return "kotlin.Result.failure(UnsupportedOperationException(\"not available on desktop\"))"
     return None
 
 
+def present(declaration, existing):
+    first = declaration.strip().split("\n")[0]
+    key = member_key(first)
+    if key:
+        return any(member_key(line) == key for line in existing.splitlines())
+    m = re.search(r"\b(class|object|val|var)\s+(\w+)", first)
+    if "companion object" in first:
+        return re.search(r"\bcompanion object\b", existing) is not None
+    return bool(m) and re.search(rf"\b{m.group(1)}\s+{m.group(2)}\b", existing) is not None
+
+
 def member_key(line):
-    m = re.match(r"\s*(?:actual\s+)?(?:suspend\s+)?fun\s+(?:<[^>]*>\s*)?(?:[\w.<>?, ]+\.)?(\w+)\((.*)\)", line)
+    m = re.match(r"\s*(?:actual\s+)?(?:suspend\s+)?fun\s+(?:<[^>]*>\s*)?(?:[\w.<>?, ]+\.)?(\w+)\(", line)
     if not m:
         return None
+    try:
+        close = find_close(line, m.end() - 1)
+    except ValueError:
+        return None
     params = []
-    for p in split_depth0(strip_defaults(m.group(2))):
+    for p in split_depth0(strip_defaults(line[m.end():close])):
         pm = re.match(r"\s*(?:vararg\s+)?(\w+)\s*:\s*(.+)", p.strip(), re.S)
         if pm:
             params.append((pm.group(1), re.sub(r"\s+", "", pm.group(2)).split(".")[-1]))
@@ -294,7 +309,9 @@ def main():
         nested -= set(re.findall(r"^    (?:\w+\s+)*enum\s+class\s+(\w+)", text[body_start:body_end], re.M))
         constants = dict(re.findall(r"\bconst\s+val\s+(\w+)\s*(?::\s*\w+)?\s*=\s*([^\n]+)", text))
         expect_lines, desktop_lines, edits, skipped = [], [], [], []
-        for start, m in list(members(text, body_start, body_end)):
+        found = list(members(text, body_start, body_end))
+        found.sort(key=lambda sm: 0 if sm[1].group(2) in ("class", "object") else 1)
+        for start, m in found:
             mods, kind = m.group(1), m.group(2)
             if re.search(r"\b(private|protected|internal|override)\b", mods):
                 continue
@@ -310,6 +327,49 @@ def main():
                 expect_lines.append(f"    enum {head} {{ {listed} }}")
                 desktop_lines.append(f"    actual enum {head} {{ {listed} }}")
                 edits.append((start + m.start(1), start + m.start(1), "" if "actual" in mods else "actual "))
+                continue
+            if kind == "object" and re.search(r"\bcompanion\b", mods):
+                expect_lines.append("    companion object {}")
+                desktop_lines.append("    actual companion object {}")
+                edits.append((start + m.start(1), start + m.start(1), "" if "actual" in mods else "actual "))
+                continue
+            if kind == "class" and re.search(r"\bdata\b", mods):
+                decl_start = start + m.start(2)
+                open_paren = text.index("(", decl_start)
+                close_paren = find_close(text, open_paren)
+                head = " ".join(text[decl_start:open_paren].split())
+                nested_name = head.split()[-1]
+                after = text[close_paren + 1:close_paren + 3]
+                body_open = close_paren + 1 + (len(after) - len(after.lstrip())) if after.lstrip().startswith("{") else None
+                body_close = find_close(text, body_open) if body_open is not None else close_paren
+                props, prop_edits = [], []
+                offset = open_paren + 1
+                for param in split_depth0(text[open_paren + 1:close_paren]):
+                    pm = re.match(r"\s*((?:@\w+\s+)*)(private\s+|internal\s+)?(actual\s+)?(val|var)\s+(\w+)\s*:\s*(.+?)\s*(?:=.*)?$", param, re.S)
+                    if pm and not pm.group(2):
+                        props.append((pm.group(4), pm.group(5), " ".join(pm.group(6).split())))
+                        if not pm.group(3):
+                            prop_edits.append(offset + pm.start(4))
+                    offset += len(param) + 1
+                if body_open is not None:
+                    for bm in re.finditer(r"(?m)^        (actual\s+)?(val)\s+(\w+)\s*:\s*(\S[^=\n]*?)\s*(?:get\(\)|=|$)", text[body_open:body_close]):
+                        props.append(("val", bm.group(3), bm.group(4).strip()))
+                        if not bm.group(1):
+                            prop_edits.append(body_open + bm.start(2))
+                words = set(re.findall(r"\b[A-Z]\w*", " ".join(t for _, _, t in props)))
+                blocked = sorted(
+                    w for w in words
+                    if (w in imported and not portable_import(imported[w])) or (w in top_level and w != cls)
+                    or (w in nested and w != nested_name)
+                )
+                if blocked:
+                    skipped.append(f"{nested_name}: {', '.join(blocked)} not portable or declared in this file")
+                    continue
+                nested.discard(nested_name)
+                expect_lines.append(f"    class {nested_name} {{\n" + "\n".join(f"        val {n}: {t}" for _, n, t in props) + "\n    }")
+                desktop_lines.append(f"__NESTED__:{nested_name}")
+                edits.append((start + m.start(1), start + m.start(1), "" if "actual" in mods else "actual "))
+                edits += [(pos, pos, "actual ") for pos in prop_edits]
                 continue
             if kind in ("class", "object", "interface"):
                 continue
@@ -384,6 +444,14 @@ def main():
         for a, b, rep in sorted(edits, key=lambda e: e[0], reverse=True):
             text = text[:a] + rep + text[b:]
         path.write_text(text)
+        for k, line_text in enumerate(desktop_lines):
+            if line_text.startswith("__NESTED__:"):
+                nested_name = line_text.split(":", 1)[1]
+                nm = re.search(rf"^    actual data class {nested_name}\(", text, re.M)
+                close_paren = find_close(text, nm.end() - 1)
+                after = text[close_paren + 1:close_paren + 3]
+                end = find_close(text, close_paren + 1 + (len(after) - len(after.lstrip()))) if after.lstrip().startswith("{") else close_paren
+                desktop_lines[k] = text[nm.start():end + 1]
         body_text = "\n".join(expect_lines + desktop_lines)
         needed = []
         for name, alias in imports:
@@ -397,7 +465,22 @@ def main():
         expect_text = f"package {pkg}\n\n" + (header + "\n\n" if header else "") + f"expect {kind_word} {cls} {{\n" + "\n\n".join(expect_lines) + "\n}\n"
         (out_dir / f"{cls}.expect.kt").write_text(expect_text)
         desktop_path = (DESKTOP / ROOT / rel).parent / f"{cls}.desktop.kt"
-        if not desktop_path.exists():
+        if desktop_path.exists():
+            existing = desktop_path.read_text()
+            missing = [d for d in desktop_lines if not present(d, existing)]
+            if missing:
+                cut = existing.rstrip().rfind("}")
+                existing = existing[:cut].rstrip() + "\n\n" + "\n\n".join(missing) + "\n}\n"
+                wanted = "\n".join(needed)
+                for pattern, replacement in rewrite_imports.RULES:
+                    wanted = pattern.sub(replacement, wanted)
+                add = [l for l in wanted.splitlines() if l and not re.search(rf"^{re.escape(l)}$", existing, re.M)]
+                if add:
+                    last = list(re.finditer(r"^(?:import|package) .*$", existing, re.M))[-1]
+                    existing = existing[:last.end()] + "\n" + "\n".join(add) + existing[last.end():]
+                desktop_path.write_text(existing)
+                print(f"  {len(missing)} members added to {desktop_path.name}")
+        else:
             desktop_path.parent.mkdir(parents=True, exist_ok=True)
             singleton = "@Singleton\n" if re.search(r"@Singleton", text[max(0, cls_match.start() - 200):cls_match.end()]) else ""
             desktop_header = "\n".join(sorted(set(needed + ["import javax.inject.Inject"] + (["import javax.inject.Singleton"] if singleton else []))))

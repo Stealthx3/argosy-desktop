@@ -1,6 +1,6 @@
 package com.nendo.argosy.data.titledb
 
-import com.nendo.argosy.BuildConfig
+import com.nendo.argosy.config.AppBuildConfig as BuildConfig
 import com.nendo.argosy.util.Logger
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.Dispatchers

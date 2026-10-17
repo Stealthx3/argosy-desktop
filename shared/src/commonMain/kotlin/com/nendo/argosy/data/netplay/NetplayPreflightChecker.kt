@@ -76,55 +76,55 @@ class NetplayPreflightChecker(
     )
 
     suspend fun check(session: NetplaySession): NetplayPreflightResult {
-        android.util.Log.d("NetplayPreflight", "check: coreId=${session.coreId} igdbId=${session.gameIgdbId} romHash=${session.romHashPrefix} coreHash=${session.coreHash}")
+        com.nendo.argosy.util.PlatformLog.d("NetplayPreflight", "check: coreId=${session.coreId} igdbId=${session.gameIgdbId} romHash=${session.romHashPrefix} coreHash=${session.coreHash}")
         val coreInfo = coreRegistry.findCore(session.coreId)
-            ?: run { android.util.Log.d("NetplayPreflight", "FAIL: core not found"); return NetplayPreflightResult.CoreNotSupported }
+            ?: run { com.nendo.argosy.util.PlatformLog.d("NetplayPreflight", "FAIL: core not found"); return NetplayPreflightResult.CoreNotSupported }
         if (coreInfo.netplaySupport != NetplaySupportLevel.SUPPORTED) {
-            android.util.Log.d("NetplayPreflight", "FAIL: core not supported for netplay"); return NetplayPreflightResult.CoreNotSupported
+            com.nendo.argosy.util.PlatformLog.d("NetplayPreflight", "FAIL: core not supported for netplay"); return NetplayPreflightResult.CoreNotSupported
         }
 
         val igdbId = session.gameIgdbId?.toLong()
-            ?: run { android.util.Log.d("NetplayPreflight", "FAIL: igdbId is null"); return NetplayPreflightResult.RomNotFound }
+            ?: run { com.nendo.argosy.util.PlatformLog.d("NetplayPreflight", "FAIL: igdbId is null"); return NetplayPreflightResult.RomNotFound }
         val candidates = gameDao.getAllByIgdbId(igdbId)
         if (candidates.isEmpty()) {
-            android.util.Log.d("NetplayPreflight", "FAIL: no local game for igdbId=$igdbId")
+            com.nendo.argosy.util.PlatformLog.d("NetplayPreflight", "FAIL: no local game for igdbId=$igdbId")
             return NetplayPreflightResult.RomNotFound
         }
         val game = selectBestCandidate(candidates)
         if (candidates.size > 1) {
-            android.util.Log.d("NetplayPreflight", "multiple candidates for igdbId=$igdbId (${candidates.size}); picked id=${game.id} platform=${game.platformSlug} localPath=${game.localPath}")
+            com.nendo.argosy.util.PlatformLog.d("NetplayPreflight", "multiple candidates for igdbId=$igdbId (${candidates.size}); picked id=${game.id} platform=${game.platformSlug} localPath=${game.localPath}")
         }
 
         if (game.platformSlug.isNotEmpty() && !coreInfo.supportsPlatform(game.platformSlug)) {
-            android.util.Log.d("NetplayPreflight", "FAIL: core ${session.coreId} (supports=${coreInfo.supportedPlatforms}) does not support game platform '${game.platformSlug}'")
+            com.nendo.argosy.util.PlatformLog.d("NetplayPreflight", "FAIL: core ${session.coreId} (supports=${coreInfo.supportedPlatforms}) does not support game platform '${game.platformSlug}'")
             return NetplayPreflightResult.CoreNotSupported
         }
 
-        android.util.Log.d("NetplayPreflight", "found game: id=${game.id} title=${game.title} platform=${game.platformSlug}")
+        com.nendo.argosy.util.PlatformLog.d("NetplayPreflight", "found game: id=${game.id} title=${game.title} platform=${game.platformSlug}")
 
         val files = gameFileDao.getFilesForGame(game.id)
             .filter { !it.localPath.isNullOrEmpty() }
-        android.util.Log.d("NetplayPreflight", "local files: ${files.size}, paths=${files.map { it.localPath }}")
+        com.nendo.argosy.util.PlatformLog.d("NetplayPreflight", "local files: ${files.size}, paths=${files.map { it.localPath }}")
 
         if (files.isEmpty() && !game.localPath.isNullOrEmpty()) {
-            android.util.Log.d("NetplayPreflight", "no game_files rows, falling back to game.localPath=${game.localPath}")
+            com.nendo.argosy.util.PlatformLog.d("NetplayPreflight", "no game_files rows, falling back to game.localPath=${game.localPath}")
             val legacyPath = game.localPath!!
             val legacyFile = File(legacyPath)
             if (legacyFile.exists()) {
                 val hash = romHashProvider.computeRomHashPrefix(legacyFile)
-                android.util.Log.d("NetplayPreflight", "legacy hash=$hash vs session=${session.romHashPrefix}")
+                com.nendo.argosy.util.PlatformLog.d("NetplayPreflight", "legacy hash=$hash vs session=${session.romHashPrefix}")
                 if (hash != null && hash.equals(session.romHashPrefix, ignoreCase = true)) {
-                    android.util.Log.d("NetplayPreflight", "SUCCESS via legacy path")
+                    com.nendo.argosy.util.PlatformLog.d("NetplayPreflight", "SUCCESS via legacy path")
                     return resolveCore(session, legacyPath, game.id)
                 } else if (hash != null) {
                     return NetplayPreflightResult.RomVersionMismatch
                 }
             }
-            android.util.Log.d("NetplayPreflight", "FAIL: legacy file not found or unhashable")
+            com.nendo.argosy.util.PlatformLog.d("NetplayPreflight", "FAIL: legacy file not found or unhashable")
             return NetplayPreflightResult.RomNotFound
         }
 
-        if (files.isEmpty()) { android.util.Log.d("NetplayPreflight", "FAIL: no local files"); return NetplayPreflightResult.RomNotFound }
+        if (files.isEmpty()) { com.nendo.argosy.util.PlatformLog.d("NetplayPreflight", "FAIL: no local files"); return NetplayPreflightResult.RomNotFound }
 
         var sawFileWithHash = false
         var matchedFile: GameFileEntity? = null
@@ -132,14 +132,14 @@ class NetplayPreflightChecker(
             val localPath = file.localPath ?: continue
             val hashPrefix = file.romHashPrefix ?: run {
                 val computed = romHashProvider.computeRomHashPrefix(File(localPath))
-                android.util.Log.d("NetplayPreflight", "computed hash for ${file.fileName}: $computed")
+                com.nendo.argosy.util.PlatformLog.d("NetplayPreflight", "computed hash for ${file.fileName}: $computed")
                 if (computed != null) {
                     gameFileDao.updateRomHashPrefix(file.id, computed)
                 }
                 computed
             } ?: continue
             sawFileWithHash = true
-            android.util.Log.d("NetplayPreflight", "comparing: local=$hashPrefix vs session=${session.romHashPrefix} match=${hashPrefix.equals(session.romHashPrefix, ignoreCase = true)}")
+            com.nendo.argosy.util.PlatformLog.d("NetplayPreflight", "comparing: local=$hashPrefix vs session=${session.romHashPrefix} match=${hashPrefix.equals(session.romHashPrefix, ignoreCase = true)}")
             if (hashPrefix.equals(session.romHashPrefix, ignoreCase = true)) {
                 matchedFile = file
                 break
@@ -147,14 +147,14 @@ class NetplayPreflightChecker(
         }
 
         val resolved = matchedFile ?: return if (sawFileWithHash) {
-            android.util.Log.d("NetplayPreflight", "FAIL: hash mismatch")
+            com.nendo.argosy.util.PlatformLog.d("NetplayPreflight", "FAIL: hash mismatch")
             NetplayPreflightResult.RomVersionMismatch
         } else {
-            android.util.Log.d("NetplayPreflight", "FAIL: no files with hash")
+            com.nendo.argosy.util.PlatformLog.d("NetplayPreflight", "FAIL: no files with hash")
             NetplayPreflightResult.RomNotFound
         }
 
-        android.util.Log.d("NetplayPreflight", "SUCCESS via game_files path")
+        com.nendo.argosy.util.PlatformLog.d("NetplayPreflight", "SUCCESS via game_files path")
         return resolveCore(session, resolved.localPath!!, game.id)
     }
 

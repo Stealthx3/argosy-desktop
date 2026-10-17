@@ -1,13 +1,26 @@
 package com.nendo.argosy.data.titledb
 
-import android.content.Context
-import android.provider.Settings
+import com.nendo.argosy.platform.PlatformContext as Context
+import com.nendo.argosy.platform.applicationContext
+import com.nendo.argosy.platform.packageName
+import com.nendo.argosy.platform.assets
+import com.nendo.argosy.platform.contentResolver
+import com.nendo.argosy.platform.getSharedPreferences
+import com.nendo.argosy.platform.list
+import com.nendo.argosy.platform.open
+import com.nendo.argosy.platform.MODE_PRIVATE
+import com.nendo.argosy.platform.cacheDir
+import com.nendo.argosy.platform.filesDir
+import com.nendo.argosy.platform.getQuantityString
+import com.nendo.argosy.platform.getString
+import com.nendo.argosy.platform.resources
+import com.nendo.argosy.platform.PlatformSettings as Settings
 import com.nendo.argosy.data.emulator.SwitchTitleIds
 import com.nendo.argosy.data.local.dao.GameDao
 import com.nendo.argosy.util.Logger
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
-import dagger.hilt.android.qualifiers.ApplicationContext
+import com.nendo.argosy.di.ApplicationContext
 import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -180,7 +193,7 @@ class TitleDbRepository @Inject constructor(
     }
 
     private fun getOrCreateDeviceToken(): String {
-        val prefs = context.getSharedPreferences("titledb_prefs", Context.MODE_PRIVATE)
+        val prefs = context.getSharedPreferences("titledb_prefs", MODE_PRIVATE)
         val existing = prefs.getString("device_token", null)
         if (existing != null) return existing
 

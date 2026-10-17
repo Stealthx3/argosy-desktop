@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
+import com.nendo.argosy.libretro.pendingUpdateOf
 
 @Singleton
 class CoreVersionRepository @Inject constructor(

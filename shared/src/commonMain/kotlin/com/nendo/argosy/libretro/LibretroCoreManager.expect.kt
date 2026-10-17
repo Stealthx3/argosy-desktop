@@ -4,6 +4,8 @@ import com.nendo.argosy.data.local.entity.CoreVersionHistoryEntity
 import java.io.File
 
 expect class LibretroCoreManager {
+    companion object {}
+
     suspend fun migrateAbiIfNeeded()
 
     fun getCorePathForPlatform(platformSlug: String): String?

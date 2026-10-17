@@ -193,7 +193,7 @@ actual class ImageCacheManager @Inject constructor(
 
     actual fun getCurrentCachePath(): String = cacheDir.absolutePath
 
-    companion object {
+    actual companion object {
         private const val MAX_IN_MEMORY_IMAGE_BYTES = 8 * 1024 * 1024
         private const val DEFAULT_IMAGE_BUFFER_BYTES = 64 * 1024
         private const val CACHE_SUBFOLDER = "argosy_images"

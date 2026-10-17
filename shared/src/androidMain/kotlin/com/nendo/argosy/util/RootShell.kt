@@ -11,8 +11,8 @@ import java.io.File
  */
 actual object RootShell {
 
-    data class Result(val exitCode: Int?, val output: List<String>) {
-        val succeeded: Boolean get() = exitCode == 0
+    actual data class Result(actual val exitCode: Int?, actual val output: List<String>) {
+        actual val succeeded: Boolean get() = exitCode == 0
     }
 
     private const val WORK_DIR = "root-shell"
@@ -26,12 +26,12 @@ actual object RootShell {
     actual val isAvailable: Boolean
         get() = PServerExecutor.isAvailable || XsuExecutor.isAvailable
 
-    fun execute(command: String): kotlin.Result<String?> =
+    actual fun execute(command: String): kotlin.Result<String?> =
         if (PServerExecutor.isAvailable) PServerExecutor.execute(command) else XsuExecutor.execute(command)
 
     actual fun quote(value: String): String = "'" + value.replace("'", "'\\''") + "'"
 
-    fun run(context: Context, body: String): Result? = synchronized(lock) {
+    actual fun run(context: Context, body: String): Result? = synchronized(lock) {
         if (!isAvailable) return null
         try {
             val dir = File(context.cacheDir, WORK_DIR).apply { mkdirs() }
