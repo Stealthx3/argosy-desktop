@@ -1,6 +1,18 @@
 package com.nendo.argosy.data.netplay
 
-import android.view.KeyEvent
+import com.nendo.argosy.platform.PlatformKeyEvent as KeyEvent
+import com.nendo.argosy.platform.action
+import com.nendo.argosy.platform.device
+import com.nendo.argosy.platform.deviceId
+import com.nendo.argosy.platform.downTime
+import com.nendo.argosy.platform.eventTime
+import com.nendo.argosy.platform.isFromSource
+import com.nendo.argosy.platform.keyCode
+import com.nendo.argosy.platform.metaState
+import com.nendo.argosy.platform.repeatCount
+import com.nendo.argosy.platform.scanCode
+import com.nendo.argosy.platform.source
+import com.nendo.argosy.core.input.AndroidKeyCodes
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
 import kotlin.concurrent.write
@@ -37,8 +49,8 @@ class NetplayInputShadow {
     fun onAndroidKeyEvent(port: Int, action: Int, androidKeyCode: Int) {
         val retroKey = androidKeyToRetroId(androidKeyCode) ?: return
         when (action) {
-            KeyEvent.ACTION_DOWN -> onKeyDown(port, retroKey)
-            KeyEvent.ACTION_UP -> onKeyUp(port, retroKey)
+            AndroidKeyCodes.ACTION_DOWN -> onKeyDown(port, retroKey)
+            AndroidKeyCodes.ACTION_UP -> onKeyUp(port, retroKey)
         }
     }
 
@@ -67,22 +79,22 @@ class NetplayInputShadow {
         const val RETRO_DEVICE_ID_JOYPAD_R3 = 15
 
         fun androidKeyToRetroId(keyCode: Int): Int? = when (keyCode) {
-            KeyEvent.KEYCODE_BUTTON_START -> RETRO_DEVICE_ID_JOYPAD_START
-            KeyEvent.KEYCODE_BUTTON_SELECT -> RETRO_DEVICE_ID_JOYPAD_SELECT
-            KeyEvent.KEYCODE_BUTTON_A -> RETRO_DEVICE_ID_JOYPAD_A
-            KeyEvent.KEYCODE_BUTTON_B -> RETRO_DEVICE_ID_JOYPAD_B
-            KeyEvent.KEYCODE_BUTTON_X -> RETRO_DEVICE_ID_JOYPAD_X
-            KeyEvent.KEYCODE_BUTTON_Y -> RETRO_DEVICE_ID_JOYPAD_Y
-            KeyEvent.KEYCODE_BUTTON_L1 -> RETRO_DEVICE_ID_JOYPAD_L
-            KeyEvent.KEYCODE_BUTTON_L2 -> RETRO_DEVICE_ID_JOYPAD_L2
-            KeyEvent.KEYCODE_BUTTON_R1 -> RETRO_DEVICE_ID_JOYPAD_R
-            KeyEvent.KEYCODE_BUTTON_R2 -> RETRO_DEVICE_ID_JOYPAD_R2
-            KeyEvent.KEYCODE_BUTTON_THUMBL -> RETRO_DEVICE_ID_JOYPAD_L3
-            KeyEvent.KEYCODE_BUTTON_THUMBR -> RETRO_DEVICE_ID_JOYPAD_R3
-            KeyEvent.KEYCODE_DPAD_UP -> RETRO_DEVICE_ID_JOYPAD_UP
-            KeyEvent.KEYCODE_DPAD_DOWN -> RETRO_DEVICE_ID_JOYPAD_DOWN
-            KeyEvent.KEYCODE_DPAD_LEFT -> RETRO_DEVICE_ID_JOYPAD_LEFT
-            KeyEvent.KEYCODE_DPAD_RIGHT -> RETRO_DEVICE_ID_JOYPAD_RIGHT
+            AndroidKeyCodes.KEYCODE_BUTTON_START -> RETRO_DEVICE_ID_JOYPAD_START
+            AndroidKeyCodes.KEYCODE_BUTTON_SELECT -> RETRO_DEVICE_ID_JOYPAD_SELECT
+            AndroidKeyCodes.KEYCODE_BUTTON_A -> RETRO_DEVICE_ID_JOYPAD_A
+            AndroidKeyCodes.KEYCODE_BUTTON_B -> RETRO_DEVICE_ID_JOYPAD_B
+            AndroidKeyCodes.KEYCODE_BUTTON_X -> RETRO_DEVICE_ID_JOYPAD_X
+            AndroidKeyCodes.KEYCODE_BUTTON_Y -> RETRO_DEVICE_ID_JOYPAD_Y
+            AndroidKeyCodes.KEYCODE_BUTTON_L1 -> RETRO_DEVICE_ID_JOYPAD_L
+            AndroidKeyCodes.KEYCODE_BUTTON_L2 -> RETRO_DEVICE_ID_JOYPAD_L2
+            AndroidKeyCodes.KEYCODE_BUTTON_R1 -> RETRO_DEVICE_ID_JOYPAD_R
+            AndroidKeyCodes.KEYCODE_BUTTON_R2 -> RETRO_DEVICE_ID_JOYPAD_R2
+            AndroidKeyCodes.KEYCODE_BUTTON_THUMBL -> RETRO_DEVICE_ID_JOYPAD_L3
+            AndroidKeyCodes.KEYCODE_BUTTON_THUMBR -> RETRO_DEVICE_ID_JOYPAD_R3
+            AndroidKeyCodes.KEYCODE_DPAD_UP -> RETRO_DEVICE_ID_JOYPAD_UP
+            AndroidKeyCodes.KEYCODE_DPAD_DOWN -> RETRO_DEVICE_ID_JOYPAD_DOWN
+            AndroidKeyCodes.KEYCODE_DPAD_LEFT -> RETRO_DEVICE_ID_JOYPAD_LEFT
+            AndroidKeyCodes.KEYCODE_DPAD_RIGHT -> RETRO_DEVICE_ID_JOYPAD_RIGHT
             else -> null
         }
     }

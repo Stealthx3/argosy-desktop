@@ -43,19 +43,26 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.asImageBitmap
+import com.nendo.argosy.platform.asImageBitmap
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
-import com.nendo.argosy.R
-import androidx.compose.ui.res.stringResource
+import com.nendo.argosy.res.ArgosyR as R
+import com.nendo.argosy.res.stringResource
 import com.nendo.argosy.ui.components.FooterHints
 import com.nendo.argosy.ui.components.InputButton
 import com.nendo.argosy.ui.theme.Dimens
+import com.nendo.argosy.platform.config
+import com.nendo.argosy.platform.copy
+import com.nendo.argosy.platform.getPixel
+import com.nendo.argosy.platform.height
+import com.nendo.argosy.platform.recycle
+import com.nendo.argosy.platform.setPixels
+import com.nendo.argosy.platform.width
 
 data class DocumentReaderState(
     val title: String,
     val textPages: List<String> = emptyList(),
-    val pages: List<android.graphics.Bitmap> = emptyList(),
+    val pages: List<com.nendo.argosy.platform.PlatformBitmap> = emptyList(),
     val pageIndex: Int = 0,
     val isLoading: Boolean = true,
     val errorReason: String? = null,

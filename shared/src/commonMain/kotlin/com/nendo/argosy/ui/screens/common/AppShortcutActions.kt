@@ -1,7 +1,23 @@
 package com.nendo.argosy.ui.screens.common
 
-import android.content.Intent
-import android.net.Uri
+import com.nendo.argosy.platform.PlatformIntentType as Intent
+import com.nendo.argosy.platform.action
+import com.nendo.argosy.platform.addFlags
+import com.nendo.argosy.platform.data
+import com.nendo.argosy.platform.flags
+import com.nendo.argosy.platform.putExtra
+import com.nendo.argosy.platform.PlatformIntent
+import com.nendo.argosy.platform.PlatformUri as Uri
+import com.nendo.argosy.platform.authority
+import com.nendo.argosy.platform.encodedPath
+import com.nendo.argosy.platform.getQueryParameter
+import com.nendo.argosy.platform.host
+import com.nendo.argosy.platform.lastPathSegment
+import com.nendo.argosy.platform.path
+import com.nendo.argosy.platform.pathSegments
+import com.nendo.argosy.platform.queryParameterNames
+import com.nendo.argosy.platform.scheme
+import com.nendo.argosy.platform.PlatformUris
 import com.nendo.argosy.data.preferences.UserPreferencesRepository
 import com.nendo.argosy.data.repository.AppsRepository
 import kotlinx.coroutines.flow.first
@@ -45,8 +61,8 @@ class AppShortcutActions @Inject constructor(
     }
 
     fun uninstallIntent(packageName: String): Intent =
-        Intent(Intent.ACTION_DELETE, Uri.parse("package:$packageName"))
-            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        Intent(PlatformIntent.ACTION_DELETE, PlatformUris.parse("package:$packageName"))
+            .addFlags(PlatformIntent.FLAG_ACTIVITY_NEW_TASK)
 
     private suspend fun isSystemApp(packageName: String): Boolean =
         appsRepository.getInstalledApps(includeSystemApps = true)

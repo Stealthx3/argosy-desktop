@@ -1,8 +1,32 @@
 package com.nendo.argosy.core.input
 
-import android.view.InputDevice
-import android.view.InputEvent
-import android.view.KeyEvent
+import com.nendo.argosy.platform.PlatformInputDevice as InputDevice
+import com.nendo.argosy.platform.controllerNumber
+import com.nendo.argosy.platform.descriptor
+import com.nendo.argosy.platform.id
+import com.nendo.argosy.platform.isEnabled
+import com.nendo.argosy.platform.isExternal
+import com.nendo.argosy.platform.isVirtual
+import com.nendo.argosy.platform.name
+import com.nendo.argosy.platform.productId
+import com.nendo.argosy.platform.sources
+import com.nendo.argosy.platform.vendorId
+import com.nendo.argosy.platform.SOURCE_GAMEPAD
+import com.nendo.argosy.platform.SOURCE_JOYSTICK
+import com.nendo.argosy.platform.PlatformInputEvent as InputEvent
+import com.nendo.argosy.platform.device
+import com.nendo.argosy.platform.deviceId
+import com.nendo.argosy.platform.eventTime
+import com.nendo.argosy.platform.isFromSource
+import com.nendo.argosy.platform.source
+import com.nendo.argosy.platform.PlatformKeyEvent as KeyEvent
+import com.nendo.argosy.platform.action
+import com.nendo.argosy.platform.downTime
+import com.nendo.argosy.platform.keyCode
+import com.nendo.argosy.platform.metaState
+import com.nendo.argosy.platform.repeatCount
+import com.nendo.argosy.platform.scanCode
+import com.nendo.argosy.core.input.AndroidKeyCodes
 
 private const val OEM_VIRTUAL_DEVICE_PREFIX = "uinput-"
 
@@ -26,11 +50,11 @@ object VirtualPad {
     }
 
     private fun InputEvent.hasPadSource(): Boolean =
-        source and InputDevice.SOURCE_GAMEPAD == InputDevice.SOURCE_GAMEPAD ||
-            source and InputDevice.SOURCE_JOYSTICK == InputDevice.SOURCE_JOYSTICK
+        source and SOURCE_GAMEPAD == SOURCE_GAMEPAD ||
+            source and SOURCE_JOYSTICK == SOURCE_JOYSTICK
 
     private fun Int.isGamepadButtonCode(): Boolean =
-        this in KeyEvent.KEYCODE_BUTTON_A..KeyEvent.KEYCODE_BUTTON_MODE
+        this in AndroidKeyCodes.KEYCODE_BUTTON_A..AndroidKeyCodes.KEYCODE_BUTTON_MODE
 }
 
 fun InputDevice.actsAsGamepad(): Boolean = isPhysicalGamepad() || (isVirtual && VirtualPad.seen)
@@ -41,8 +65,8 @@ fun InputDevice.actsAsGamepad(): Boolean = isPhysicalGamepad() || (isVirtual && 
  * behind it, which hid the on-screen controls and claimed player one on a bare phone.
  */
 fun InputDevice.isPhysicalGamepad(): Boolean {
-    val padSource = sources and InputDevice.SOURCE_GAMEPAD == InputDevice.SOURCE_GAMEPAD ||
-        sources and InputDevice.SOURCE_JOYSTICK == InputDevice.SOURCE_JOYSTICK
+    val padSource = sources and SOURCE_GAMEPAD == SOURCE_GAMEPAD ||
+        sources and SOURCE_JOYSTICK == SOURCE_JOYSTICK
     if (!padSource || isVirtual) return false
     return !name.orEmpty().startsWith(OEM_VIRTUAL_DEVICE_PREFIX, ignoreCase = true)
 }

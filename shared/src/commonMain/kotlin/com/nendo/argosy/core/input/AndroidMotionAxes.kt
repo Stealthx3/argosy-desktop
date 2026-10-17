@@ -1,6 +1,30 @@
 package com.nendo.argosy.core.input
 
 object AndroidMotionAxes {
+    const val ACTION_BUTTON_PRESS: Int = 11
+    const val ACTION_BUTTON_RELEASE: Int = 12
+    const val ACTION_CANCEL: Int = 3
+    const val ACTION_DOWN: Int = 0
+    const val ACTION_HOVER_ENTER: Int = 9
+    const val ACTION_HOVER_EXIT: Int = 10
+    const val ACTION_HOVER_MOVE: Int = 7
+    const val ACTION_MASK: Int = 255
+    const val ACTION_MOVE: Int = 2
+    const val ACTION_OUTSIDE: Int = 4
+    const val ACTION_POINTER_1_DOWN: Int = 5
+    const val ACTION_POINTER_1_UP: Int = 6
+    const val ACTION_POINTER_2_DOWN: Int = 261
+    const val ACTION_POINTER_2_UP: Int = 262
+    const val ACTION_POINTER_3_DOWN: Int = 517
+    const val ACTION_POINTER_3_UP: Int = 518
+    const val ACTION_POINTER_DOWN: Int = 5
+    const val ACTION_POINTER_ID_MASK: Int = 65280
+    const val ACTION_POINTER_ID_SHIFT: Int = 8
+    const val ACTION_POINTER_INDEX_MASK: Int = 65280
+    const val ACTION_POINTER_INDEX_SHIFT: Int = 8
+    const val ACTION_POINTER_UP: Int = 6
+    const val ACTION_SCROLL: Int = 8
+    const val ACTION_UP: Int = 1
     const val AXIS_BRAKE: Int = 23
     const val AXIS_DISTANCE: Int = 24
     const val AXIS_GAS: Int = 22

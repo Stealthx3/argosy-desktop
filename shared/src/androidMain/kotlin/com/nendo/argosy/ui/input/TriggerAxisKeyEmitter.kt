@@ -10,9 +10,9 @@ import javax.inject.Singleton
 actual class TriggerAxisKeyEmitter @Inject constructor() {
     private val pressedState = mutableMapOf<Pair<Int, Int>, Boolean>()
 
-    fun emit(event: MotionEvent): List<KeyEvent> = emitByAxis(event).map { it.second }
+    actual fun emit(event: MotionEvent): List<KeyEvent> = emitByAxis(event).map { it.second }
 
-    fun emitByAxis(event: MotionEvent): List<Pair<Int, KeyEvent>> {
+    actual fun emitByAxis(event: MotionEvent): List<Pair<Int, KeyEvent>> {
         val device = event.device ?: return emptyList()
         val deviceId = device.id
         val results = mutableListOf<Pair<Int, KeyEvent>>()

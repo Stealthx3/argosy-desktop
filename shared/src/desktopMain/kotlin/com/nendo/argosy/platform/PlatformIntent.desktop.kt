@@ -27,4 +27,41 @@ actual object PlatformIntent {
     actual val FLAG_GRANT_READ_URI_PERMISSION: Int = 1
 }
 
-actual open class PlatformIntentType
+actual open class PlatformIntentType actual constructor() {
+    internal var intentAction: String? = null
+    internal var intentData: PlatformUri? = null
+    internal var intentFlags: Int = 0
+    internal val extras = LinkedHashMap<String, Any?>()
+
+    actual constructor(action: String?) : this() {
+        intentAction = action
+    }
+
+    actual constructor(action: String?, uri: PlatformUri?) : this(action) {
+        intentData = uri
+    }
+}
+
+actual val PlatformIntentType.action: String? get() = intentAction
+
+actual var PlatformIntentType.data: PlatformUri?
+    get() = intentData
+    set(value) {
+        intentData = value
+    }
+
+actual var PlatformIntentType.flags: Int
+    get() = intentFlags
+    set(value) {
+        intentFlags = value
+    }
+
+actual fun PlatformIntentType.addFlags(flags: Int): PlatformIntentType = apply { intentFlags = intentFlags or flags }
+
+actual fun PlatformIntentType.putExtra(name: String, value: String?): PlatformIntentType = apply { extras[name] = value }
+
+actual fun PlatformIntentType.putExtra(name: String, value: Int): PlatformIntentType = apply { extras[name] = value }
+
+actual fun PlatformIntentType.putExtra(name: String, value: Long): PlatformIntentType = apply { extras[name] = value }
+
+actual fun PlatformIntentType.putExtra(name: String, value: Boolean): PlatformIntentType = apply { extras[name] = value }

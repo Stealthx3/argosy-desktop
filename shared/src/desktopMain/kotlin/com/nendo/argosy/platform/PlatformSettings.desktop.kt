@@ -10,6 +10,14 @@ private object DesktopContentResolver : PlatformContentResolver()
 actual val PlatformContext.contentResolver: PlatformContentResolver get() = DesktopContentResolver
 
 actual object PlatformSettings {
+    actual val ACTION_APPLICATION_DETAILS_SETTINGS: String = "android.settings.APPLICATION_DETAILS_SETTINGS"
+    actual val ACTION_APP_NOTIFICATION_SETTINGS: String = "android.settings.APP_NOTIFICATION_SETTINGS"
+    actual val ACTION_MANAGE_OVERLAY_PERMISSION: String = "android.settings.action.MANAGE_OVERLAY_PERMISSION"
+    actual val ACTION_MANAGE_WRITE_SETTINGS: String = "android.settings.action.MANAGE_WRITE_SETTINGS"
+    actual val ACTION_SETTINGS: String = "android.settings.SETTINGS"
+    actual val ACTION_USAGE_ACCESS_SETTINGS: String = "android.settings.USAGE_ACCESS_SETTINGS"
+    actual val EXTRA_APP_PACKAGE: String = "android.provider.extra.APP_PACKAGE"
+
     actual object Secure {
         actual val ANDROID_ID: String = "android_id"
 

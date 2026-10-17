@@ -1,6 +1,20 @@
 package com.nendo.argosy.core.input
 
 object AndroidKeyCodes {
+    const val ACTION_DOWN: Int = 0
+    const val ACTION_MULTIPLE: Int = 2
+    const val ACTION_UP: Int = 1
+    const val FLAG_CANCELED: Int = 32
+    const val FLAG_CANCELED_LONG_PRESS: Int = 256
+    const val FLAG_EDITOR_ACTION: Int = 16
+    const val FLAG_FALLBACK: Int = 1024
+    const val FLAG_FROM_SYSTEM: Int = 8
+    const val FLAG_KEEP_TOUCH_MODE: Int = 4
+    const val FLAG_LONG_PRESS: Int = 128
+    const val FLAG_SOFT_KEYBOARD: Int = 2
+    const val FLAG_TRACKING: Int = 512
+    const val FLAG_VIRTUAL_HARD_KEY: Int = 64
+    const val FLAG_WOKE_HERE: Int = 1
     const val KEYCODE_0: Int = 7
     const val KEYCODE_1: Int = 8
     const val KEYCODE_11: Int = 227
@@ -320,4 +334,25 @@ object AndroidKeyCodes {
     const val KEYCODE_ZENKAKU_HANKAKU: Int = 211
     const val KEYCODE_ZOOM_IN: Int = 168
     const val KEYCODE_ZOOM_OUT: Int = 169
+    const val META_ALT_LEFT_ON: Int = 16
+    const val META_ALT_MASK: Int = 50
+    const val META_ALT_ON: Int = 2
+    const val META_ALT_RIGHT_ON: Int = 32
+    const val META_CAPS_LOCK_ON: Int = 1048576
+    const val META_CTRL_LEFT_ON: Int = 8192
+    const val META_CTRL_MASK: Int = 28672
+    const val META_CTRL_ON: Int = 4096
+    const val META_CTRL_RIGHT_ON: Int = 16384
+    const val META_FUNCTION_ON: Int = 8
+    const val META_META_LEFT_ON: Int = 131072
+    const val META_META_MASK: Int = 458752
+    const val META_META_ON: Int = 65536
+    const val META_META_RIGHT_ON: Int = 262144
+    const val META_NUM_LOCK_ON: Int = 2097152
+    const val META_SCROLL_LOCK_ON: Int = 4194304
+    const val META_SHIFT_LEFT_ON: Int = 64
+    const val META_SHIFT_MASK: Int = 193
+    const val META_SHIFT_ON: Int = 1
+    const val META_SHIFT_RIGHT_ON: Int = 128
+    const val META_SYM_ON: Int = 4
 }

@@ -1,6 +1,11 @@
 package com.nendo.argosy.data.netplay
 
 import com.nendo.argosy.platform.PlatformIntentType as Intent
+import com.nendo.argosy.platform.action
+import com.nendo.argosy.platform.addFlags
+import com.nendo.argosy.platform.data
+import com.nendo.argosy.platform.flags
+import com.nendo.argosy.platform.putExtra
 import com.nendo.argosy.platform.PlatformIntent
 import com.nendo.argosy.data.social.Friend
 import com.nendo.argosy.data.social.NetplaySession

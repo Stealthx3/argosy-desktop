@@ -27,4 +27,24 @@ expect object PlatformIntent {
     val FLAG_GRANT_READ_URI_PERMISSION: Int
 }
 
-expect open class PlatformIntentType
+expect open class PlatformIntentType {
+    constructor()
+    constructor(action: String?)
+    constructor(action: String?, uri: PlatformUri?)
+}
+
+expect val PlatformIntentType.action: String?
+
+expect var PlatformIntentType.data: PlatformUri?
+
+expect var PlatformIntentType.flags: Int
+
+expect fun PlatformIntentType.addFlags(flags: Int): PlatformIntentType
+
+expect fun PlatformIntentType.putExtra(name: String, value: String?): PlatformIntentType
+
+expect fun PlatformIntentType.putExtra(name: String, value: Int): PlatformIntentType
+
+expect fun PlatformIntentType.putExtra(name: String, value: Long): PlatformIntentType
+
+expect fun PlatformIntentType.putExtra(name: String, value: Boolean): PlatformIntentType

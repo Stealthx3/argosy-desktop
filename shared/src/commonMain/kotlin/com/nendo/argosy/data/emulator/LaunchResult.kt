@@ -1,6 +1,11 @@
 package com.nendo.argosy.data.emulator
 
 import com.nendo.argosy.platform.PlatformIntentType as Intent
+import com.nendo.argosy.platform.action
+import com.nendo.argosy.platform.addFlags
+import com.nendo.argosy.platform.data
+import com.nendo.argosy.platform.flags
+import com.nendo.argosy.platform.putExtra
 import com.nendo.argosy.platform.PlatformIntent
 
 data class DiscOption(

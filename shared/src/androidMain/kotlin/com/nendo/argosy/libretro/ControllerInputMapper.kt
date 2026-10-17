@@ -34,7 +34,7 @@ actual class ControllerInputMapper : KeyMapper {
     override fun mapKey(device: InputDevice, keyCode: Int): Int =
         resolveMappedKey(extendedMappings[controllerIdOf(device)], keyCode)
 
-    fun processMotionEvent(event: MotionEvent): List<SyntheticKeyEvent> {
+    actual fun processMotionEvent(event: MotionEvent): List<SyntheticKeyEvent> {
         val device = event.device ?: return emptyList()
         val controllerId = controllerIdOf(device)
         val mapping = extendedMappings[controllerId] ?: return emptyList()

@@ -1,6 +1,18 @@
 package com.nendo.argosy.ui.input
 
-import android.view.KeyEvent
+import com.nendo.argosy.platform.PlatformKeyEvent as KeyEvent
+import com.nendo.argosy.platform.action
+import com.nendo.argosy.platform.device
+import com.nendo.argosy.platform.deviceId
+import com.nendo.argosy.platform.downTime
+import com.nendo.argosy.platform.eventTime
+import com.nendo.argosy.platform.isFromSource
+import com.nendo.argosy.platform.keyCode
+import com.nendo.argosy.platform.metaState
+import com.nendo.argosy.platform.repeatCount
+import com.nendo.argosy.platform.scanCode
+import com.nendo.argosy.platform.source
+import com.nendo.argosy.core.input.AndroidKeyCodes
 
 class SelectModifier(comboMap: Map<GamepadEvent, GamepadEvent> = emptyMap()) {
 
@@ -27,7 +39,7 @@ class SelectModifier(comboMap: Map<GamepadEvent, GamepadEvent> = emptyMap()) {
         holdArmed: Boolean = false
     ): GamepadEvent? {
         if (event == GamepadEvent.Select) return filterSelect(action, isRepeat, holdArmed)
-        if (action != KeyEvent.ACTION_DOWN) return null
+        if (action != AndroidKeyCodes.ACTION_DOWN) return null
         if (state == State.IDLE) return event
         val comboEvent = comboMap[event] ?: return event
         state = State.COMBO_FIRED
@@ -45,14 +57,14 @@ class SelectModifier(comboMap: Map<GamepadEvent, GamepadEvent> = emptyMap()) {
 
     private fun filterSelect(action: Int, isRepeat: Boolean, holdArmed: Boolean): GamepadEvent? =
         when (action) {
-            KeyEvent.ACTION_DOWN -> {
+            AndroidKeyCodes.ACTION_DOWN -> {
                 if (!isRepeat) {
                     selectDeferred = comboMap.isNotEmpty() || holdArmed
                     state = if (selectDeferred) State.HELD else State.IDLE
                 }
                 if (selectDeferred) null else GamepadEvent.Select
             }
-            KeyEvent.ACTION_UP -> {
+            AndroidKeyCodes.ACTION_UP -> {
                 val wasHeld = state == State.HELD
                 if (selectDeferred) state = State.IDLE
                 if (selectDeferred && wasHeld) GamepadEvent.Select else null

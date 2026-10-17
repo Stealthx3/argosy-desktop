@@ -30,3 +30,27 @@ actual object PlatformIntent {
 }
 
 actual typealias PlatformIntentType = Intent
+
+actual val PlatformIntentType.action: String? get() = action
+
+actual var PlatformIntentType.data: PlatformUri?
+    get() = data
+    set(value) {
+        data = value
+    }
+
+actual var PlatformIntentType.flags: Int
+    get() = flags
+    set(value) {
+        flags = value
+    }
+
+actual fun PlatformIntentType.addFlags(flags: Int): PlatformIntentType = addFlags(flags)
+
+actual fun PlatformIntentType.putExtra(name: String, value: String?): PlatformIntentType = putExtra(name, value)
+
+actual fun PlatformIntentType.putExtra(name: String, value: Int): PlatformIntentType = putExtra(name, value)
+
+actual fun PlatformIntentType.putExtra(name: String, value: Long): PlatformIntentType = putExtra(name, value)
+
+actual fun PlatformIntentType.putExtra(name: String, value: Boolean): PlatformIntentType = putExtra(name, value)

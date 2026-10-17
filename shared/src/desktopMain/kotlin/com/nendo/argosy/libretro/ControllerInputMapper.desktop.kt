@@ -3,6 +3,8 @@ package com.nendo.argosy.libretro
 import com.nendo.argosy.platform.PlatformInputDevice as InputDevice
 import com.nendo.argosy.data.repository.InputSource
 import javax.inject.Inject
+import com.nendo.argosy.platform.PlatformMotionEvent as MotionEvent
+import com.nendo.argosy.core.input.AndroidMotionAxes
 
 actual class ControllerInputMapper @Inject constructor() {
     actual companion object {
@@ -28,4 +30,6 @@ actual class ControllerInputMapper @Inject constructor() {
     actual fun retroButtonFor(device: InputDevice, keyCode: Int): Int? = null
 
     actual fun getMappedButtonsForController(controllerId: String): Set<Int> = emptySet()
+
+    actual fun processMotionEvent(event: MotionEvent): List<SyntheticKeyEvent> = emptyList()
 }
