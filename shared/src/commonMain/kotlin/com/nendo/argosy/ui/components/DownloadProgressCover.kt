@@ -32,6 +32,9 @@ import com.nendo.argosy.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.nendo.argosy.platform.image.AsyncImage
+import com.nendo.argosy.platform.image.bitmap
+import com.nendo.argosy.platform.image.intrinsicHeight
+import com.nendo.argosy.platform.image.intrinsicWidth
 import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.ui.theme.Dimens
 import com.nendo.argosy.ui.theme.generated.ComponentDefaults

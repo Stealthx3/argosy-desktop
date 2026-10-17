@@ -45,7 +45,7 @@ import androidx.compose.ui.platform.LocalContext
 import coil.compose.AsyncImage
 import coil.request.CachePolicy
 import coil.request.ImageRequest
-import com.nendo.argosy.R
+import com.nendo.argosy.shared.R
 import com.nendo.argosy.libretro.SaveStateManager
 import com.nendo.argosy.util.formatSaveSize
 import com.nendo.argosy.util.formatSaveTimestamp

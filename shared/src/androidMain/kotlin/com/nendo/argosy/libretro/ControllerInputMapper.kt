@@ -9,31 +9,24 @@ import com.nendo.argosy.data.repository.InputSource
 import com.nendo.argosy.data.repository.RetroButton
 import com.swordfish.libretrodroid.KeyMapper
 
-data class SyntheticKeyEvent(
-    val keyCode: Int,
-    val action: Int,
-    val port: Int,
-    val axis: Int
-)
-
-class ControllerInputMapper : KeyMapper {
+actual class ControllerInputMapper : KeyMapper {
     private var extendedMappings: Map<String, Map<InputSource, Int>> = emptyMap()
     private val activeAnalogDirections = mutableMapOf<String, MutableSet<InputSource.AnalogDirection>>()
     private var portResolver: ((InputDevice) -> Int)? = null
 
-    fun setPortResolver(resolver: (InputDevice) -> Int) {
+    actual fun setPortResolver(resolver: (InputDevice) -> Int) {
         portResolver = resolver
     }
 
-    fun setExtendedMappings(mappings: Map<String, Map<InputSource, Int>>) {
+    actual fun setExtendedMappings(mappings: Map<String, Map<InputSource, Int>>) {
         extendedMappings = mappings
     }
 
-    fun setExtendedMappingForController(controllerId: String, mapping: Map<InputSource, Int>) {
+    actual fun setExtendedMappingForController(controllerId: String, mapping: Map<InputSource, Int>) {
         extendedMappings = extendedMappings + (controllerId to mapping)
     }
 
-    fun clearMappings() {
+    actual fun clearMappings() {
         extendedMappings = emptyMap()
         activeAnalogDirections.clear()
     }
@@ -88,7 +81,7 @@ class ControllerInputMapper : KeyMapper {
         return results
     }
 
-    fun hasAnalogMappingForAxis(device: InputDevice, axis: Int): Boolean {
+    actual fun hasAnalogMappingForAxis(device: InputDevice, axis: Int): Boolean {
         val mapping = extendedMappings[controllerIdOf(device)] ?: return false
         return mapping.keys.any { it is InputSource.AnalogDirection && it.axis == axis }
     }
@@ -97,12 +90,12 @@ class ControllerInputMapper : KeyMapper {
      * The retro button this device's resolved mapping sends [keyCode] to, or null when no mapping
      * was resolved or the key is unbound within it.
      */
-    fun retroButtonFor(device: InputDevice, keyCode: Int): Int? =
+    actual fun retroButtonFor(device: InputDevice, keyCode: Int): Int? =
         extendedMappings[controllerIdOf(device)]
             ?.takeIf { it.isNotEmpty() }
             ?.get(InputSource.Button(keyCode))
 
-    fun getMappedButtonsForController(controllerId: String): Set<Int> {
+    actual fun getMappedButtonsForController(controllerId: String): Set<Int> {
         val mapping = extendedMappings[controllerId] ?: return emptySet()
         return mapping.entries
             .filter { it.key is InputSource.Button }
@@ -110,7 +103,7 @@ class ControllerInputMapper : KeyMapper {
             .toSet()
     }
 
-    companion object {
+    actual companion object {
         /**
          * A resolved mapping is the complete binding set for that controller, so a bindable button
          * the user left unbound must reach the core as nothing at all; the raw keycode would hand
@@ -120,14 +113,14 @@ class ControllerInputMapper : KeyMapper {
          * [InputPresets.BINDABLE_KEYCODES], which the editor never offered the user any control
          * over.
          */
-        fun resolveMappedKey(mapping: Map<InputSource, Int>?, keyCode: Int): Int {
+        actual fun resolveMappedKey(mapping: Map<InputSource, Int>?, keyCode: Int): Int {
             if (mapping.isNullOrEmpty()) return keyCode
             val retroButton = mapping[InputSource.Button(keyCode)]
                 ?: return if (keyCode in InputPresets.BINDABLE_KEYCODES) KeyEvent.KEYCODE_UNKNOWN else keyCode
             return retroButtonToAndroidKeyCode(retroButton)
         }
 
-        fun retroButtonToAndroidKeyCode(retroButton: Int): Int {
+        actual fun retroButtonToAndroidKeyCode(retroButton: Int): Int {
             return when (retroButton) {
                 RetroButton.A -> KeyEvent.KEYCODE_BUTTON_A
                 RetroButton.B -> KeyEvent.KEYCODE_BUTTON_B

@@ -49,7 +49,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.nendo.argosy.R
+import com.nendo.argosy.shared.R
 import com.nendo.argosy.libretro.SaveStateManager
 import com.nendo.argosy.ui.components.NavDrawerRow
 import com.nendo.argosy.ui.components.animateScrollToItemCentered

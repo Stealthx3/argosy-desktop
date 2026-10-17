@@ -16,20 +16,19 @@ import java.io.File
 import java.io.FileOutputStream
 import java.security.MessageDigest
 
-class SaveStateManager(
+actual class SaveStateManager actual constructor(
     private val savesDir: File,
     private val statesDir: File,
     private val romPath: String,
     private val gameId: Long,
     private val activeSaveRepository: ActiveSaveRepository,
     private val saveCacheManager: SaveCacheManager,
-    private val usesExternalMemcard: Boolean = false,
-    private val channelName: String? = null,
-    private val isVariant: Boolean = false,
-    primarySavePath: String? = null,
-    private val onLiveStateWritten: ((Int, File) -> Unit)? = null,
-    private val onLiveStateRemoved: ((Int, File) -> Unit)? = null
-) {
+    private val usesExternalMemcard: Boolean,
+    private val channelName: String?,
+    private val isVariant: Boolean,
+    primarySavePath: String?,
+    private val onLiveStateWritten: ((Int, File) -> Unit)?,
+    private val onLiveStateRemoved: ((Int, File) -> Unit)?) {
     private var lastSramHash: String? = null
     var hasQuickSave by mutableStateOf(false)
         private set
@@ -38,27 +37,27 @@ class SaveStateManager(
     private val primarySaveFile: File = primarySavePath?.let { File(it) } ?: File(savesDir, "$romBaseName.srm")
     private val coreOwnsPrimary: Boolean = primarySaveFile.name != "$romBaseName.srm"
 
-    data class RestoreResult(
-        val sramData: ByteArray?,
-        val switchToHardcore: Boolean = false,
-        val casualSaveInHardcore: Boolean = false,
-        val rtcData: ByteArray? = null
+    actual data class RestoreResult(
+        actual val sramData: ByteArray?,
+        actual val switchToHardcore: Boolean = false,
+        actual val casualSaveInHardcore: Boolean = false,
+        actual val rtcData: ByteArray? = null
     )
 
-    fun getRtcFile(): File = File(savesDir, "$romBaseName.rtc")
+    actual fun getRtcFile(): File = File(savesDir, "$romBaseName.rtc")
 
-    fun withRtcFromDisk(result: RestoreResult): RestoreResult =
+    actual fun withRtcFromDisk(result: RestoreResult): RestoreResult =
         result.copy(rtcData = getRtcFile().takeIf { it.isFile && it.length() > 0 }?.readBytes())
 
-    data class SlotInfo(
-        val slotNumber: Int,
-        val file: File?,
-        val timestamp: Long?,
-        val size: Long,
-        val screenshotFile: File?
+    actual data class SlotInfo(
+        actual val slotNumber: Int,
+        actual val file: File?,
+        actual val timestamp: Long?,
+        actual val size: Long,
+        actual val screenshotFile: File?
     )
 
-    fun initializeFromExistingSave(existingSram: ByteArray?) {
+    actual fun initializeFromExistingSave(existingSram: ByteArray?) {
         lastSramHash = existingSram?.let { hashBytes(it) }
         val f = getSramFile()
         Log.i(
@@ -72,16 +71,16 @@ class SaveStateManager(
         hasQuickSave = quickRingEntries().isNotEmpty()
     }
 
-    fun getSlotFile(slotNumber: Int): File {
+    actual fun getSlotFile(slotNumber: Int): File {
         val fileName = buildSlotFileName(slotNumber)
         return File(statesDir, fileName)
     }
 
-    fun getSlotScreenshotFile(slotNumber: Int): File {
+    actual fun getSlotScreenshotFile(slotNumber: Int): File {
         return File(statesDir, "${buildSlotFileName(slotNumber)}.png")
     }
 
-    fun getSramFile(): File {
+    actual fun getSramFile(): File {
         return File(savesDir, "$romBaseName.srm")
     }
 
@@ -95,7 +94,7 @@ class SaveStateManager(
      * Adds [files] the core writes itself, such as a memory card shared by every game, to the
      * files whose writes count as this game saving. The next check re-seeds its baseline.
      */
-    fun watchCoreSaveFiles(files: List<File>) {
+    actual fun watchCoreSaveFiles(files: List<File>) {
         coreSaveFiles = files
         writtenSaveBaseline = null
     }
@@ -110,11 +109,11 @@ class SaveStateManager(
     private fun fingerprints(): Map<String, Pair<Long, Long>> =
         gameSaveFiles().associate { it.absolutePath to (it.lastModified() to it.length()) }
 
-    fun seedWrittenSaves() {
+    actual fun seedWrittenSaves() {
         writtenSaveBaseline = fingerprints()
     }
 
-    fun takeNewlyWrittenSaves(): Boolean {
+    actual fun takeNewlyWrittenSaves(): Boolean {
         val baseline = writtenSaveBaseline ?: run {
             seedWrittenSaves()
             return false
@@ -148,7 +147,7 @@ class SaveStateManager(
      * Only ever copies, and only when nothing exists at the destination, so an existing save is
      * never overwritten and the original stays where it was.
      */
-    fun adoptLegacySaveIfMissing() {
+    actual fun adoptLegacySaveIfMissing() {
         val target = getSramFile()
         if (target.exists()) return
 
@@ -174,7 +173,7 @@ class SaveStateManager(
      * Copies a shared `scd_<region>.brm` or `<size>_cart.brm` to the per-game name Genesis Plus
      * GX reads under per-game BRAM. Copies only, and only when the per-game file is absent.
      */
-    fun adoptSharedSegaCdBramIfMissing() {
+    actual fun adoptSharedSegaCdBramIfMissing() {
         val internalTarget = File(savesDir, "$romBaseName.brm")
         if (!internalTarget.exists()) {
             sharedSegaCdRegionFile()?.let { source ->
@@ -227,7 +226,7 @@ class SaveStateManager(
         }.filter { it.absolutePath != getSramFile().absolutePath }
     }
 
-    fun getSlotInfoList(): List<SlotInfo> {
+    actual fun getSlotInfoList(): List<SlotInfo> {
         val slots = mutableListOf<SlotInfo>()
         for (slot in AUTO_SLOT..MAX_SLOT) {
             val file = getSlotFile(slot)
@@ -264,7 +263,7 @@ class SaveStateManager(
      * hardcore save exists, because RetroAchievements forbids only save states in hardcore, not SRAM
      * battery saves (that fallback is flagged casualSaveInHardcore so the UI can surface it).
      */
-    suspend fun restoreSaveForLaunchMode(launchMode: LaunchMode): RestoreResult {
+    actual suspend fun restoreSaveForLaunchMode(launchMode: LaunchMode): RestoreResult {
         if (usesExternalMemcard) {
             Log.d(TAG, "External memcard (GCI folder) - skipping flat .srm restore")
             return RestoreResult(null)
@@ -516,7 +515,7 @@ class SaveStateManager(
         }
     }
 
-    fun getQuickRingInfoList(): List<SlotInfo> {
+    actual fun getQuickRingInfoList(): List<SlotInfo> {
         return quickRingEntries()
             .sortedByDescending { it.second.lastModified() }
             .map { (slotNumber, file) ->
@@ -546,7 +545,7 @@ class SaveStateManager(
      * ever quick-saves would have nothing on the server at all. The auto slot is the one slot sync
      * carries, and it holds what it says: the most recent quick-save.
      */
-    fun performQuickSave(stateData: ByteArray, screenshot: Bitmap? = null): Boolean {
+    actual fun performQuickSave(stateData: ByteArray, screenshot: Bitmap?): Boolean {
         val emptyIndex = (0 until QUICK_RING_SIZE).firstOrNull {
             !getSlotFile(QUICK_SLOT_BASE + it).exists()
         }
@@ -565,7 +564,7 @@ class SaveStateManager(
         return performSlotLoad(retroView, newest)
     }
 
-    fun performSlotSave(slotNumber: Int, stateData: ByteArray, screenshot: Bitmap? = null): Boolean {
+    actual fun performSlotSave(slotNumber: Int, stateData: ByteArray, screenshot: Bitmap?): Boolean {
         return try {
             statesDir.mkdirs()
             val stateFile = getSlotFile(slotNumber)
@@ -607,7 +606,7 @@ class SaveStateManager(
         }
     }
 
-    fun deleteSlot(slotNumber: Int): Boolean {
+    actual fun deleteSlot(slotNumber: Int): Boolean {
         return try {
             val stateFile = getSlotFile(slotNumber)
             val screenshotFile = getSlotScreenshotFile(slotNumber)
@@ -697,7 +696,7 @@ class SaveStateManager(
         return digest.digest(data).joinToString("") { "%02x".format(it) }
     }
 
-    companion object {
+    actual companion object {
         private const val TAG = "SaveStateManager"
         private const val LEGACY_CARD_SUFFIX = "_1.mcd"
         private val IGNORED_SAVE_EXTENSIONS = setOf("rtc", "tmp", "bak", "png")

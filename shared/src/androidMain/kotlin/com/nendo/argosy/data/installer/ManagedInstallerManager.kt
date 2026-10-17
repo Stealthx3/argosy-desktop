@@ -38,27 +38,8 @@ private const val TAG = "ManagedInstaller"
 private const val BUFFER_SIZE = 64 * 1024
 private const val CACHE_DIR_NAME = "managed_installer_apks"
 
-sealed class InstallerJobState {
-    data object Idle : InstallerJobState()
-    data object Checking : InstallerJobState()
-    data class Downloading(val progress: Float) : InstallerJobState()
-    data object WaitingForInstall : InstallerJobState()
-    data class NeedsVariantChoice(val assets: List<GitHubAsset>) : InstallerJobState()
-    data class Failed(val reason: InstallerFailure) : InstallerJobState()
-}
-
-enum class InstallerFailure {
-    NO_RELEASE,
-    NO_APK,
-    DOWNLOAD,
-    RATE_LIMITED,
-    NOT_FOUND
-}
-
-data class InstallerJob(val installerId: Long, val state: InstallerJobState)
-
 @Singleton
-class ManagedInstallerManager @Inject constructor(
+actual class ManagedInstallerManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val repository: ManagedInstallerRepository,
     private val releaseClient: GitHubReleaseClient,
@@ -67,7 +48,7 @@ class ManagedInstallerManager @Inject constructor(
     private val scope = SafeCoroutineScope(Dispatchers.IO, "ManagedInstallerManager")
 
     private val _job = MutableStateFlow<InstallerJob?>(null)
-    val job: StateFlow<InstallerJob?> = _job.asStateFlow()
+    actual val job: StateFlow<InstallerJob?> = _job.asStateFlow()
 
     private val client = OkHttpClient.Builder()
         .connectTimeout(30, TimeUnit.SECONDS)
@@ -100,7 +81,7 @@ class ManagedInstallerManager @Inject constructor(
         unregisterPackageReceiver()
     }
 
-    fun isInstalled(packageName: String?): Boolean {
+    actual fun isInstalled(packageName: String?): Boolean {
         if (packageName == null) return false
         return try {
             context.packageManager.getPackageInfo(packageName, 0)
@@ -110,28 +91,28 @@ class ManagedInstallerManager @Inject constructor(
         }
     }
 
-    fun canInstallPackages(): Boolean = appInstaller.canInstallPackages(context)
+    actual fun canInstallPackages(): Boolean = appInstaller.canInstallPackages(context)
 
     fun openInstallPermissionSettings() = appInstaller.openInstallPermissionSettings(context)
 
-    fun openImeSettings() {
+    actual fun openImeSettings() {
         context.startActivity(
             Intent(Settings.ACTION_INPUT_METHOD_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         )
     }
 
-    fun showImePicker() {
+    actual fun showImePicker() {
         val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
         imm?.showInputMethodPicker()
     }
 
-    fun isImeEnabled(packageName: String): Boolean {
+    actual fun isImeEnabled(packageName: String): Boolean {
         val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
             ?: return false
         return imm.enabledInputMethodList.any { it.packageName == packageName }
     }
 
-    fun isImeActive(packageName: String): Boolean {
+    actual fun isImeActive(packageName: String): Boolean {
         val current = Settings.Secure.getString(
             context.contentResolver,
             Settings.Secure.DEFAULT_INPUT_METHOD
@@ -139,11 +120,11 @@ class ManagedInstallerManager @Inject constructor(
         return current.startsWith("$packageName/")
     }
 
-    fun clearJob() {
+    actual fun clearJob() {
         _job.value = null
     }
 
-    fun reconcilePendingInstall() {
+    actual fun reconcilePendingInstall() {
         val waiting = pending ?: return
         if (_job.value?.state !is InstallerJobState.WaitingForInstall) return
         val expected = waiting.expectedPackage
@@ -175,7 +156,7 @@ class ManagedInstallerManager @Inject constructor(
         null
     }
 
-    suspend fun refresh(rows: List<ManagedInstallerEntity>) {
+    actual suspend fun refresh(rows: List<ManagedInstallerEntity>) {
         rows.forEach { row ->
             when (val lookup = releaseClient.latestRelease(row.repoOwner, row.repoName)) {
                 is ReleaseLookup.Found -> repository.recordCheck(row.id, lookup.release.tagName)
@@ -186,7 +167,7 @@ class ManagedInstallerManager @Inject constructor(
         }
     }
 
-    fun install(row: ManagedInstallerEntity, chosenAsset: GitHubAsset? = null) {
+    actual fun install(row: ManagedInstallerEntity, chosenAsset: GitHubAsset?) {
         val current = _job.value
         if (current != null && !current.state.isTerminal()) {
             val resumingVariantChoice = chosenAsset != null &&

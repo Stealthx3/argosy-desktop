@@ -48,6 +48,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.nendo.argosy.platform.image.AsyncImage
+import com.nendo.argosy.platform.image.bitmap
+import com.nendo.argosy.platform.image.intrinsicHeight
+import com.nendo.argosy.platform.image.intrinsicWidth
 import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.ui.components.PlatformIconAssets
 import com.nendo.argosy.ui.primitives.ArgosyProgressBar
@@ -68,6 +71,7 @@ import com.nendo.argosy.platform.getPackageInfo
 import com.nendo.argosy.platform.versionName
 import com.nendo.argosy.platform.getApplicationInfo
 import com.nendo.argosy.platform.getApplicationLabel
+import com.nendo.argosy.platform.startActivity
 
 private val PERSISTENT_BAR_HEIGHT = 52.dp  // Static: matches specific UI design spec
 private val FOOTER_CLEARANCE = 56.dp  // Static: matches specific UI design spec

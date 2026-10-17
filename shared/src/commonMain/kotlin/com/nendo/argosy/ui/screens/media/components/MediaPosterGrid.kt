@@ -13,6 +13,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import com.nendo.argosy.ui.screens.media.MediaItemUi
 import com.nendo.argosy.ui.theme.Dimens
+import com.nendo.argosy.platform.asImageBitmap
+import com.nendo.argosy.platform.config
+import com.nendo.argosy.platform.copy
+import com.nendo.argosy.platform.getPixel
+import com.nendo.argosy.platform.height
+import com.nendo.argosy.platform.recycle
+import com.nendo.argosy.platform.setPixels
+import com.nendo.argosy.platform.width
 
 /**
  * One library's posters as a grid, shared by the single-screen media library and the companion's
@@ -30,7 +38,7 @@ fun MediaPosterGrid(
     onColumnsChanged: (Int) -> Unit,
     onItemClick: (Int) -> Unit,
     onItemLongClick: (Int) -> Unit,
-    onPosterLoaded: (String, android.graphics.Bitmap) -> Unit,
+    onPosterLoaded: (String, com.nendo.argosy.platform.PlatformBitmap) -> Unit,
     modifier: Modifier = Modifier
 ) {
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {

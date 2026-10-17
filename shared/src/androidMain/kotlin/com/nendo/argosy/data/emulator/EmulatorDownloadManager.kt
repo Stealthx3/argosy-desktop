@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.util.Log
-import androidx.core.content.FileProvider
 import com.nendo.argosy.data.storage.StorageAttributionRepository
 import com.nendo.argosy.data.storage.StorageCategory
 import com.nendo.argosy.data.update.AppInstaller
@@ -32,14 +31,8 @@ import javax.inject.Singleton
 private const val TAG = "EmulatorDownloadMgr"
 private const val BUFFER_SIZE = 64 * 1024
 
-data class EmulatorDownloadProgress(
-    val emulatorId: String,
-    val state: EmulatorDownloadState,
-    val variant: String? = null
-)
-
 @Singleton
-class EmulatorDownloadManager @Inject constructor(
+actual class EmulatorDownloadManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val appInstaller: AppInstaller,
     private val emulatorUpdateManager: EmulatorUpdateManager,
@@ -48,7 +41,7 @@ class EmulatorDownloadManager @Inject constructor(
     private val scope = SafeCoroutineScope(Dispatchers.IO, "EmulatorDownloadManager")
 
     private val _downloadProgress = MutableStateFlow<EmulatorDownloadProgress?>(null)
-    val downloadProgress: StateFlow<EmulatorDownloadProgress?> = _downloadProgress.asStateFlow()
+    actual val downloadProgress: StateFlow<EmulatorDownloadProgress?> = _downloadProgress.asStateFlow()
 
     private val client = OkHttpClient.Builder()
         .connectTimeout(30, TimeUnit.SECONDS)
@@ -70,7 +63,7 @@ class EmulatorDownloadManager @Inject constructor(
         }
     }
 
-    fun downloadAndInstall(
+    actual fun downloadAndInstall(
         emulatorId: String,
         downloadUrl: String,
         assetName: String,
@@ -277,18 +270,18 @@ class EmulatorDownloadManager @Inject constructor(
         } catch (_: Exception) {}
     }
 
-    fun cancelDownload() {
+    actual fun cancelDownload() {
         _downloadProgress.value = null
         pendingInstall = null
     }
 
-    fun hasActiveDownload(): Boolean {
+    actual fun hasActiveDownload(): Boolean {
         val state = _downloadProgress.value?.state
         return state is EmulatorDownloadState.Downloading || state is EmulatorDownloadState.WaitingForInstall
     }
 
     /** Deletes downloaded emulator APKs; returns false while a download or install is in flight. */
-    suspend fun clearApkCache(): Boolean = withContext(Dispatchers.IO) {
+    actual suspend fun clearApkCache(): Boolean = withContext(Dispatchers.IO) {
         if (hasActiveDownload()) return@withContext false
         val cacheDir = File(context.cacheDir, "emulator_apks")
         if (cacheDir.exists()) {
@@ -298,7 +291,7 @@ class EmulatorDownloadManager @Inject constructor(
         true
     }
 
-    fun canInstallPackages(): Boolean = appInstaller.canInstallPackages(context)
+    actual fun canInstallPackages(): Boolean = appInstaller.canInstallPackages(context)
 
     fun openInstallPermissionSettings() = appInstaller.openInstallPermissionSettings(context)
 }

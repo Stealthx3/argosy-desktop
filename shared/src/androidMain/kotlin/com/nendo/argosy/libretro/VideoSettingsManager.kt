@@ -18,7 +18,7 @@ import com.swordfish.libretrodroid.ShaderConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-class VideoSettingsManager(
+actual class VideoSettingsManager(
     private val platformId: Long,
     private val platformSlug: String,
     private val globalSettings: BuiltinEmulatorSettings,
@@ -31,7 +31,7 @@ class VideoSettingsManager(
     private val getRetroView: () -> GLRetroView
 ) {
     var currentShader by mutableStateOf("None")
-    var resolvedCustomShader: ShaderConfig = ShaderConfig.Default
+    actual var resolvedCustomShader: ShaderConfig = ShaderConfig.Default
     var currentFilter by mutableStateOf("Auto")
     var currentAspectRatio by mutableStateOf("Core Provided")
     var currentPortraitPosition by mutableStateOf("Auto")
@@ -52,28 +52,28 @@ class VideoSettingsManager(
     var currentDpadAsAnalog by mutableStateOf(false)
     var currentFrame by mutableStateOf<String?>(null)
 
-    var aspectRatioMode: String = "Auto"
-    var fastForwardEnabled: Boolean = true
-    var fastForwardSpeed: Int = 4
+    actual var aspectRatioMode: String = "Auto"
+    actual var fastForwardEnabled: Boolean = true
+    actual var fastForwardSpeed: Int = 4
     // Compose-observable so InGameSettingsScreen rows refresh when toggled via
     // the in-game controls tab. Plain `var`s here silently dropped updates on
     // the UI side even though videoSettings itself held the new value.
-    var fastForwardMode: com.nendo.argosy.data.local.entity.FastForwardMode by mutableStateOf(
+    actual var fastForwardMode: com.nendo.argosy.data.local.entity.FastForwardMode by mutableStateOf(
         com.nendo.argosy.data.local.entity.FastForwardMode.HOLD
     )
-    var fastForwardPreservePitch: Boolean by mutableStateOf(false)
-    var overscanCrop: Int = 0
-    var rotationDegrees: Int = -1
-    var rewindEnabled: Boolean = false
+    actual var fastForwardPreservePitch: Boolean by mutableStateOf(false)
+    actual var overscanCrop: Int = 0
+    actual var rotationDegrees: Int = -1
+    actual var rewindEnabled: Boolean = false
 
     private var screenWidth: Int = 0
     private var screenHeight: Int = 0
 
-    var onRewindToggled: ((enabled: Boolean) -> Unit)? = null
-    var onRewindConfigChanged: (() -> Unit)? = null
-    var onPortraitPositionChanged: ((String) -> Unit)? = null
+    actual var onRewindToggled: ((enabled: Boolean) -> Unit)? = null
+    actual var onRewindConfigChanged: (() -> Unit)? = null
+    actual var onPortraitPositionChanged: ((String) -> Unit)? = null
 
-    fun applySettings(settings: BuiltinEmulatorSettings) {
+    actual fun applySettings(settings: BuiltinEmulatorSettings) {
         aspectRatioMode = settings.aspectRatio
         fastForwardEnabled = settings.fastForwardEnabled
         fastForwardSpeed = settings.fastForwardSpeed
@@ -110,18 +110,18 @@ class VideoSettingsManager(
         }
     }
 
-    fun resolveCustomShader(settings: BuiltinEmulatorSettings) {
+    actual fun resolveCustomShader(settings: BuiltinEmulatorSettings) {
         if (settings.shader == "Custom") {
             resolvedCustomShader = shaderRegistryProvider().resolveChain(settings.shaderChainConfig)
         }
     }
 
-    fun setScreenSize(width: Int, height: Int) {
+    actual fun setScreenSize(width: Int, height: Int) {
         screenWidth = width
         screenHeight = height
     }
 
-    fun getVideoSettingValue(setting: LibretroSettingDef): String = when (setting) {
+    actual fun getVideoSettingValue(setting: LibretroSettingDef): String = when (setting) {
         LibretroSettingDef.Shader -> currentShader
         LibretroSettingDef.Filter -> currentFilter
         LibretroSettingDef.AspectRatio -> currentAspectRatio
@@ -147,7 +147,7 @@ class VideoSettingsManager(
         LibretroSettingDef.HwCoreSaveStates -> ""
     }
 
-    fun getGlobalVideoSettingValue(setting: LibretroSettingDef): String = when (setting) {
+    actual fun getGlobalVideoSettingValue(setting: LibretroSettingDef): String = when (setting) {
         LibretroSettingDef.Shader -> globalSettings.shader
         LibretroSettingDef.Filter -> globalSettings.filter
         LibretroSettingDef.AspectRatio -> globalSettings.aspectRatio
@@ -177,7 +177,7 @@ class VideoSettingsManager(
      * Netplay and speedrun runs give the whole surface to the game: a frame shrinks it, and both
      * modes are judged on what the player can see.
      */
-    var framesSuppressed: Boolean = false
+    actual var framesSuppressed: Boolean = false
         set(value) {
             if (field == value) return
             field = value
@@ -193,26 +193,26 @@ class VideoSettingsManager(
      * places the game itself. A cutout bezel fixes where the game shows through, and a suppressed
      * frame hands the whole surface to the game.
      */
-    fun isFrameAdjustable(frameId: String?): Boolean {
+    actual fun isFrameAdjustable(frameId: String?): Boolean {
         if (framesSuppressed) return false
         return frameId == null || frameRegistry.findById(frameId)?.screenRect != null
     }
 
-    fun adjustFrame(frameId: String?, offsetX: Float, offsetY: Float, zoom: Float) {
+    actual fun adjustFrame(frameId: String?, offsetX: Float, offsetY: Float, zoom: Float) {
         frameOffsetX = (frameOffsetX + offsetX).coerceIn(-0.5f, 0.5f)
         frameOffsetY = (frameOffsetY + offsetY).coerceIn(-0.5f, 0.5f)
         frameZoom = (frameZoom * zoom).coerceIn(0.2f, 3f)
         applyFrame(frameId)
     }
 
-    fun resetFrameAdjustment(frameId: String?) {
+    actual fun resetFrameAdjustment(frameId: String?) {
         frameOffsetX = 0f
         frameOffsetY = 0f
         frameZoom = 1f
         applyFrame(frameId)
     }
 
-    fun persistFrameAdjustment() {
+    actual fun persistFrameAdjustment() {
         val hasOverride = frameOffsetX != 0f || frameOffsetY != 0f || frameZoom != 1f
         scope.launch {
             val current = platformLibretroSettingsDao.getByPlatformId(platformId)
@@ -227,7 +227,7 @@ class VideoSettingsManager(
         }
     }
 
-    fun applyFrame(frameId: String?) {
+    actual fun applyFrame(frameId: String?) {
         val retroView = getRetroView()
         val entry = frameId?.takeUnless { framesSuppressed }?.let { frameRegistry.findById(it) }
         val bitmap = entry?.let { frameRegistry.loadFrame(it.id) }
@@ -267,7 +267,7 @@ class VideoSettingsManager(
         return frameRegistry.getFramesForPlatform(platformSlug).firstOrNull()?.id
     }
 
-    fun resetVideoSetting(setting: LibretroSettingDef) {
+    actual fun resetVideoSetting(setting: LibretroSettingDef) {
         val globalValue = getGlobalVideoSettingValue(setting)
         when (setting) {
             LibretroSettingDef.Shader -> currentShader = globalValue
@@ -350,7 +350,7 @@ class VideoSettingsManager(
 
     }
 
-    fun cycleVideoSetting(setting: LibretroSettingDef, direction: Int) {
+    actual fun cycleVideoSetting(setting: LibretroSettingDef, direction: Int) {
         val type = setting.type as? LibretroSettingDef.SettingType.Cycle ?: return
         val options = type.options
         val current = getVideoSettingValue(setting)
@@ -377,7 +377,7 @@ class VideoSettingsManager(
 
     }
 
-    fun toggleVideoSetting(setting: LibretroSettingDef) {
+    actual fun toggleVideoSetting(setting: LibretroSettingDef) {
         when (setting) {
             LibretroSettingDef.BlackFrameInsertion -> {
                 currentBFI = !currentBFI
@@ -404,7 +404,7 @@ class VideoSettingsManager(
 
     }
 
-    fun applyVideoSettingChange(setting: LibretroSettingDef, value: String) {
+    actual fun applyVideoSettingChange(setting: LibretroSettingDef, value: String) {
         Log.d(TAG, "Video setting changed: ${setting.key} = $value")
         val retroView = getRetroView()
 
@@ -493,7 +493,7 @@ class VideoSettingsManager(
         persistVideoSetting(setting, value)
     }
 
-    fun applyAspectRatio() {
+    actual fun applyAspectRatio() {
         if (screenWidth == 0 || screenHeight == 0) {
             Log.w(TAG, "Cannot apply aspect ratio: screen size not available")
             return
@@ -522,7 +522,7 @@ class VideoSettingsManager(
         retroView.aspectRatioOverride = overrideRatio
     }
 
-    fun applyOverscanCrop() {
+    actual fun applyOverscanCrop() {
         val retroView = getRetroView()
         val platformCrop = PLATFORM_TEXTURE_CROP[platformSlug]
 
@@ -543,12 +543,12 @@ class VideoSettingsManager(
         retroView.textureCrop = RectF(left, top, right, bottom)
     }
 
-    fun applyRotation() {
+    actual fun applyRotation() {
         Log.d(TAG, "Applying rotation: $rotationDegrees degrees")
         getRetroView().rotation = rotationDegrees
     }
 
-    fun persistVideoSetting(setting: LibretroSettingDef, value: String) {
+    actual fun persistVideoSetting(setting: LibretroSettingDef, value: String) {
         scope.launch {
             val current = platformLibretroSettingsDao.getByPlatformId(platformId)
                 ?: PlatformLibretroSettingsEntity(platformId = platformId)
@@ -586,7 +586,7 @@ class VideoSettingsManager(
         }
     }
 
-    fun persistControlSetting(field: String, value: Boolean) {
+    actual fun persistControlSetting(field: String, value: Boolean) {
         scope.launch {
             val current = platformLibretroSettingsDao.getByPlatformId(platformId)
                 ?: PlatformLibretroSettingsEntity(platformId = platformId)
@@ -604,7 +604,7 @@ class VideoSettingsManager(
         }
     }
 
-    fun persistShaderChain(json: String) {
+    actual fun persistShaderChain(json: String) {
         scope.launch {
             val current = platformLibretroSettingsDao.getByPlatformId(platformId)
                 ?: PlatformLibretroSettingsEntity(platformId = platformId)
@@ -617,7 +617,7 @@ class VideoSettingsManager(
         }
     }
 
-    fun persistFrame(frameId: String?) {
+    actual fun persistFrame(frameId: String?) {
         scope.launch {
             val current = platformLibretroSettingsDao.getByPlatformId(platformId)
                 ?: PlatformLibretroSettingsEntity(platformId = platformId)
@@ -630,7 +630,7 @@ class VideoSettingsManager(
         }
     }
 
-    companion object {
+    actual companion object {
         private const val TAG = "VideoSettingsManager"
         private val FULL_SURFACE = FrameRegistry.ScreenRect(0f, 0f, 1f, 1f)
 
@@ -640,7 +640,7 @@ class VideoSettingsManager(
             "3do" to RectF(0f, 16f / 240f, 0f, 0f)
         )
 
-        fun parseRotation(value: String): Int = when (value) {
+        actual fun parseRotation(value: String): Int = when (value) {
             "Auto" -> -1
             "0\u00B0" -> 0
             "90\u00B0" -> 90
@@ -649,7 +649,7 @@ class VideoSettingsManager(
             else -> value.removeSuffix("\u00B0").toIntOrNull() ?: -1
         }
 
-        fun parseOverscan(value: String): Int = when (value) {
+        actual fun parseOverscan(value: String): Int = when (value) {
             "Off" -> 0
             else -> value.removeSuffix("px").toIntOrNull() ?: 0
         }

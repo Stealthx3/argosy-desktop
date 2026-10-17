@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import com.nendo.argosy.platform.LocalPlatformContext as LocalContext
+import com.nendo.argosy.platform.startActivity
 import com.nendo.argosy.platform.getApplicationInfo
 import com.nendo.argosy.platform.getApplicationLabel
 import com.nendo.argosy.platform.getSystemService
@@ -57,6 +58,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import com.nendo.argosy.platform.image.AsyncImage
+import com.nendo.argosy.platform.image.bitmap
+import com.nendo.argosy.platform.image.intrinsicHeight
+import com.nendo.argosy.platform.image.intrinsicWidth
 import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.ui.components.GridFocusedScroll
 import com.nendo.argosy.ui.components.PlatformIconAssets

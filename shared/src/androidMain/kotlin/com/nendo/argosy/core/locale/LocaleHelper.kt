@@ -13,9 +13,9 @@ import java.util.Locale
  * a plain `ComponentActivity`, so `AppCompatDelegate`'s locale backport (which only fires from
  * `AppCompatActivity.attachBaseContext2`) would silently do nothing here.
  */
-object LocaleHelper {
+actual object LocaleHelper {
 
-    const val SYSTEM_LANGUAGE_TAG = "system"
+    actual const val SYSTEM_LANGUAGE_TAG = "system"
 
     /**
      * Wraps [base] with [languageTag] applied, or returns [base] unchanged for the "system"
@@ -24,7 +24,7 @@ object LocaleHelper {
      * chosen language, and so switching back to "system" mid-process does not leave a stale
      * override behind.
      */
-    fun wrap(base: Context, languageTag: String): Context {
+    actual fun wrap(base: Context, languageTag: String): Context {
         val locale = resolveLocale(languageTag)
         if (locale == null) {
             Locale.setDefault(systemLocale())
@@ -41,21 +41,21 @@ object LocaleHelper {
     /**
      * Null for the "system" sentinel, meaning follow the device and override nothing.
      */
-    fun resolveLocale(languageTag: String): Locale? =
+    actual fun resolveLocale(languageTag: String): Locale? =
         if (languageTag == SYSTEM_LANGUAGE_TAG) null else Locale.forLanguageTag(languageTag)
 
     /**
      * The override an Activity hands to `applyOverrideConfiguration`. [wrap] alone is dropped by
      * the first configuration change; an override configuration is re-applied across them.
      */
-    fun overrideConfiguration(base: Configuration?, languageTag: String): Configuration? {
+    actual fun overrideConfiguration(base: Configuration?, languageTag: String): Configuration? {
         val locale = resolveLocale(languageTag) ?: return base
         val configuration = base?.let { Configuration(it) } ?: Configuration()
         configuration.setLocales(LocaleList(locale))
         return configuration
     }
 
-    fun effectiveLocale(context: Context): Locale = context.resources.configuration.locales[0]
+    actual fun effectiveLocale(context: Context): Locale = context.resources.configuration.locales[0]
 
     private fun systemLocale(): Locale = Resources.getSystem().configuration.locales[0]
 }

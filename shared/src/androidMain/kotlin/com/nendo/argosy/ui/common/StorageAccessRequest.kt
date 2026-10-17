@@ -16,7 +16,7 @@ import com.nendo.argosy.util.StorageAccess
 import com.nendo.argosy.util.openStorageAccessSettings
 
 @Composable
-fun rememberStorageAccessRequest(onResult: () -> Unit = {}): () -> Unit {
+actual fun rememberStorageAccessRequest(onResult: () -> Unit): () -> Unit {
     val context = LocalContext.current
     val currentOnResult by rememberUpdatedState(onResult)
     val launcher = rememberLauncherForActivityResult(

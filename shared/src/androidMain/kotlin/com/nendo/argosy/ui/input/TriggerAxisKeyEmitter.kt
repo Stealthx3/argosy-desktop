@@ -7,7 +7,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class TriggerAxisKeyEmitter @Inject constructor() {
+actual class TriggerAxisKeyEmitter @Inject constructor() {
     private val pressedState = mutableMapOf<Pair<Int, Int>, Boolean>()
 
     fun emit(event: MotionEvent): List<KeyEvent> = emitByAxis(event).map { it.second }
@@ -29,7 +29,7 @@ class TriggerAxisKeyEmitter @Inject constructor() {
         return results
     }
 
-    fun forget(deviceId: Int) {
+    actual fun forget(deviceId: Int) {
         pressedState.keys.removeAll { it.first == deviceId }
     }
 
@@ -48,7 +48,7 @@ class TriggerAxisKeyEmitter @Inject constructor() {
         )
     }
 
-    companion object {
+    actual companion object {
         private const val THRESHOLD = 0.5f
         private val TRIGGER_AXES = listOf(
             MotionEvent.AXIS_LTRIGGER to KeyEvent.KEYCODE_BUTTON_L2,
@@ -57,6 +57,6 @@ class TriggerAxisKeyEmitter @Inject constructor() {
             MotionEvent.AXIS_GAS to KeyEvent.KEYCODE_BUTTON_R2
         )
 
-        fun keyCodeForAxis(axis: Int): Int? = TRIGGER_AXES.firstOrNull { it.first == axis }?.second
+        actual fun keyCodeForAxis(axis: Int): Int? = TRIGGER_AXES.firstOrNull { it.first == axis }?.second
     }
 }

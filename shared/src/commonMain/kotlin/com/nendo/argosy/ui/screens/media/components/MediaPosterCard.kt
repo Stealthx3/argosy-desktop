@@ -1,7 +1,16 @@
 package com.nendo.argosy.ui.screens.media.components
 
-import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
+import com.nendo.argosy.platform.PlatformBitmap as Bitmap
+import com.nendo.argosy.platform.asImageBitmap
+import com.nendo.argosy.platform.config
+import com.nendo.argosy.platform.copy
+import com.nendo.argosy.platform.getPixel
+import com.nendo.argosy.platform.height
+import com.nendo.argosy.platform.recycle
+import com.nendo.argosy.platform.setPixels
+import com.nendo.argosy.platform.width
+import com.nendo.argosy.platform.image.PlatformBitmapDrawable as BitmapDrawable
+import com.nendo.argosy.platform.image.bitmap
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,14 +34,36 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.stringResource
+import com.nendo.argosy.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.platform.LocalContext
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
-import com.nendo.argosy.R
+import com.nendo.argosy.platform.LocalPlatformContext as LocalContext
+import com.nendo.argosy.platform.startActivity
+import com.nendo.argosy.platform.getApplicationInfo
+import com.nendo.argosy.platform.getApplicationLabel
+import com.nendo.argosy.platform.applicationContext
+import com.nendo.argosy.platform.packageName
+import com.nendo.argosy.platform.getSystemService
+import com.nendo.argosy.platform.getExternalFilesDir
+import com.nendo.argosy.platform.packageManager
+import com.nendo.argosy.platform.getPackageInfo
+import com.nendo.argosy.platform.versionName
+import com.nendo.argosy.platform.assets
+import com.nendo.argosy.platform.contentResolver
+import com.nendo.argosy.platform.getSharedPreferences
+import com.nendo.argosy.platform.list
+import com.nendo.argosy.platform.open
+import com.nendo.argosy.platform.cacheDir
+import com.nendo.argosy.platform.filesDir
+import com.nendo.argosy.platform.getQuantityString
+import com.nendo.argosy.platform.getString
+import com.nendo.argosy.platform.resources
+import com.nendo.argosy.platform.image.AsyncImage
+import com.nendo.argosy.platform.image.intrinsicHeight
+import com.nendo.argosy.platform.image.intrinsicWidth
+import com.nendo.argosy.platform.image.ImageRequest
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.ui.common.AlwaysCrossfadeFactory
 import com.nendo.argosy.ui.components.boxArtFrame
 import com.nendo.argosy.ui.components.boxart.UnbadgedBoxArtBorder

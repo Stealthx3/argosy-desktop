@@ -16,10 +16,10 @@ actual object GameNativeLauncher : SteamLauncher {
         putExtra("app_id", steamAppId.toInt())
     }
 
-    fun createCustomGameLaunchIntent(appId: Int): Intent =
+    actual fun createCustomGameLaunchIntent(appId: Int): Intent =
         createSourcedLaunchIntent(appId, "CUSTOM_GAME")
 
-    fun createSourcedLaunchIntent(appId: Int, gameSource: String): Intent = Intent().apply {
+    actual fun createSourcedLaunchIntent(appId: Int, gameSource: String): Intent = Intent().apply {
         component = ComponentName(packageName, "$packageName.MainActivity")
         action = "app.gamenative.LAUNCH_GAME"
         putExtra("app_id", appId)

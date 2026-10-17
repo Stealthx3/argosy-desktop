@@ -89,7 +89,7 @@ actual class AppsRepository @Inject constructor(
             .toList()
     }
 
-    fun getLaunchIntent(packageName: String): Intent? {
+    actual fun getLaunchIntent(packageName: String): Intent? {
         return packageManager.getLaunchIntentForPackage(packageName)
     }
 

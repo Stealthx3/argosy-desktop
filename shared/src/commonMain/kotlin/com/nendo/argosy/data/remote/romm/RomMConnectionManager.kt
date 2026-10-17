@@ -2,6 +2,7 @@ package com.nendo.argosy.data.remote.romm
 
 import com.nendo.argosy.platform.SuppressLint
 import com.nendo.argosy.platform.PlatformContext as Context
+import com.nendo.argosy.platform.startActivity
 import com.nendo.argosy.platform.getApplicationInfo
 import com.nendo.argosy.platform.getApplicationLabel
 import com.nendo.argosy.platform.applicationContext

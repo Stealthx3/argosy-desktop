@@ -10,6 +10,14 @@ import androidx.compose.ui.Modifier
 import com.nendo.argosy.ui.components.FocusedScroll
 import com.nendo.argosy.ui.screens.media.MediaItemUi
 import com.nendo.argosy.ui.theme.Dimens
+import com.nendo.argosy.platform.asImageBitmap
+import com.nendo.argosy.platform.config
+import com.nendo.argosy.platform.copy
+import com.nendo.argosy.platform.getPixel
+import com.nendo.argosy.platform.height
+import com.nendo.argosy.platform.recycle
+import com.nendo.argosy.platform.setPixels
+import com.nendo.argosy.platform.width
 
 /**
  * Titles worth going to next. A press swaps the screen to one, so every tile here is somewhere the
@@ -26,7 +34,7 @@ fun MediaSimilarRail(
     onSelect: (Int) -> Unit,
     onOpen: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    onPosterLoaded: ((String, android.graphics.Bitmap) -> Unit)? = null
+    onPosterLoaded: ((String, com.nendo.argosy.platform.PlatformBitmap) -> Unit)? = null
 ) {
     val listState = rememberLazyListState()
     FocusedScroll(listState = listState, focusedIndex = focusedIndex)

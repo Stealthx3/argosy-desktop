@@ -27,6 +27,7 @@ import com.nendo.argosy.platform.open
 import com.nendo.argosy.platform.getQuantityString
 import com.nendo.argosy.platform.getString
 import com.nendo.argosy.platform.resources
+import com.nendo.argosy.platform.startActivity
 
 enum class PackageDataAccess {
     DIRECT,

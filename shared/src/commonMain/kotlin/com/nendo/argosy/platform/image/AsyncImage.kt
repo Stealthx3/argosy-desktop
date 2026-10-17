@@ -19,6 +19,7 @@ expect fun AsyncImage(
     error: Painter? = null,
     fallback: Painter? = error,
     onError: ((Any) -> Unit)? = null,
+    onSuccess: ((AsyncImageSuccess) -> Unit)? = null,
     alignment: Alignment = Alignment.Center,
     contentScale: ContentScale = ContentScale.Fit,
     alpha: Float = DefaultAlpha,

@@ -19,6 +19,9 @@ import com.nendo.argosy.platform.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import com.nendo.argosy.platform.image.AsyncImage
+import com.nendo.argosy.platform.image.bitmap
+import com.nendo.argosy.platform.image.intrinsicHeight
+import com.nendo.argosy.platform.image.intrinsicWidth
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
 import com.nendo.argosy.platform.toColorInt

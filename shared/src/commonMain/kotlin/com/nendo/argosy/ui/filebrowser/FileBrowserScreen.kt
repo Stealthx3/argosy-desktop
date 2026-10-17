@@ -3,7 +3,7 @@ package com.nendo.argosy.ui.filebrowser
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import com.nendo.argosy.R
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.core.storage.StorageVolume
 import com.nendo.argosy.core.storage.StorageVolumeType
 import com.nendo.argosy.ui.util.clickableNoFocus
@@ -61,13 +61,17 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.res.stringResource
+import com.nendo.argosy.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.platform.LocalConfiguration
+import com.nendo.argosy.platform.LocalPlatformConfiguration as LocalConfiguration
+import com.nendo.argosy.platform.orientation
+import com.nendo.argosy.platform.screenHeightDp
+import com.nendo.argosy.platform.screenWidthDp
 import androidx.compose.ui.platform.LocalFocusManager
-import android.content.res.Configuration
-import androidx.hilt.navigation.compose.hiltViewModel
+import com.nendo.argosy.platform.PlatformConfiguration as Configuration
+import com.nendo.argosy.platform.ORIENTATION_LANDSCAPE
+import com.nendo.argosy.di.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import com.nendo.argosy.core.input.SoundType
@@ -154,7 +158,7 @@ fun FileBrowserScreen(
                 )
             } else {
                 val configuration = LocalConfiguration.current
-                val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+                val isLandscape = configuration.orientation == ORIENTATION_LANDSCAPE
                 val volumePaneFraction = if (isLandscape) 0.20f else 0.35f
 
                 Row(

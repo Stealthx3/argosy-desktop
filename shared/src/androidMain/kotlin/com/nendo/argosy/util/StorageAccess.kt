@@ -35,7 +35,7 @@ actual object StorageAccess {
      * The system screen that grants [isGranted]: All files access on Android 11 and later, the
      * app's settings page before it.
      */
-    fun settingsIntent(context: Context): Intent {
+    actual fun settingsIntent(context: Context): Intent {
         val action = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION
         } else {

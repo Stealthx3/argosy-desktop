@@ -8,7 +8,7 @@ import com.nendo.argosy.util.Logger
 
 private const val TAG = "LaunchCommand"
 
-fun EffectiveLaunchCommand.toIntent(context: Context): Intent {
+actual fun EffectiveLaunchCommand.toIntent(context: Context): Intent {
     val ownFileProviderAuthority = "${context.packageName}.fileprovider"
     for (uri in grantReadUriTo) {
         if (uri.scheme != "content") {

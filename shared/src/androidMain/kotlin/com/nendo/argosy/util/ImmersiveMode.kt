@@ -74,7 +74,7 @@ fun Window.hideSystemBars() = applySystemBars(SystemBarVisibility.IMMERSIVE)
  * hide-navigation-bar preferences. [visibility] starts fully hidden until [follow] delivers the
  * stored preferences.
  */
-class LauncherSystemBars(private val window: Window) {
+actual class LauncherSystemBars(private val window: Window) {
 
     var visibility: SystemBarVisibility = SystemBarVisibility.IMMERSIVE
         private set
@@ -83,7 +83,7 @@ class LauncherSystemBars(private val window: Window) {
 
     fun apply() = window.applySystemBars(visibility)
 
-    fun follow(scope: CoroutineScope, preferences: Flow<UserPreferences>) {
+    actual fun follow(scope: CoroutineScope, preferences: Flow<UserPreferences>) {
         followJob?.cancel()
         followJob = scope.launch {
             preferences

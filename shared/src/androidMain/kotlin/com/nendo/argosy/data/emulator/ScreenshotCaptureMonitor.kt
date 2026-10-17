@@ -36,7 +36,7 @@ import javax.inject.Singleton
 
 /** Watches MediaStore for system screenshots during a play session and queues them for RomM upload. */
 @Singleton
-class ScreenshotCaptureMonitor @Inject constructor(
+actual class ScreenshotCaptureMonitor @Inject constructor(
     @ApplicationContext private val context: Context,
     private val gameDao: GameDao,
     private val pendingSyncQueueDao: PendingSyncQueueDao,
@@ -55,7 +55,7 @@ class ScreenshotCaptureMonitor @Inject constructor(
     @Volatile private var sessionStartEpochSec: Long = 0
     @Volatile private var usageAccessWarned: Boolean = false
 
-    fun start(gameId: Long, emulatorPackage: String?, sessionStartTime: Long) {
+    actual fun start(gameId: Long, emulatorPackage: String?, sessionStartTime: Long) {
         stop()
         if (gameId <= 0) return
         if (!hasMediaPermission()) return
@@ -87,7 +87,7 @@ class ScreenshotCaptureMonitor @Inject constructor(
         }
     }
 
-    fun stop() {
+    actual fun stop() {
         observer?.let { context.contentResolver.unregisterContentObserver(it) }
         observer = null
         sessionGameId = -1
@@ -248,7 +248,7 @@ class ScreenshotCaptureMonitor @Inject constructor(
         }
     }
 
-    companion object {
+    actual companion object {
         private const val TAG = "ScreenshotCaptureMonitor"
         private const val PENDING_DIR = "pending_screenshots"
         private const val FOREGROUND_WINDOW_MS = 15_000L

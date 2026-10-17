@@ -20,7 +20,7 @@ actual interface SteamLauncher {
         }
     }
 
-    fun createLaunchIntent(steamAppId: Long): Intent
+    actual fun createLaunchIntent(steamAppId: Long): Intent
 
     suspend fun scan(context: Context, androidDataAccessor: AndroidDataAccessor? = null): List<ScannedSteamGame> = emptyList()
 }

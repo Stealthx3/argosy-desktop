@@ -19,6 +19,7 @@ actual fun AsyncImage(
     error: Painter?,
     fallback: Painter?,
     onError: ((Any) -> Unit)?,
+    onSuccess: ((AsyncImageSuccess) -> Unit)?,
     alignment: Alignment,
     contentScale: ContentScale,
     alpha: Float,
@@ -26,6 +27,9 @@ actual fun AsyncImage(
     filterQuality: FilterQuality,
 ) {
     val platformModel = remember(model) { platformImageModel(model) }
+    val successCallback = remember(onSuccess) {
+        onSuccess?.let { callback -> { state: AsyncImagePainter.State.Success -> callback(AsyncImageSuccess(AsyncImageSuccessResult(state.result.drawable))) } }
+    }
     val errorCallback = remember(onError) {
         onError?.let { callback -> { state: AsyncImagePainter.State.Error -> callback(state) } }
     }
@@ -37,6 +41,7 @@ actual fun AsyncImage(
         error = error,
         fallback = fallback,
         onError = errorCallback,
+        onSuccess = successCallback,
         alignment = alignment,
         contentScale = contentScale,
         alpha = alpha,

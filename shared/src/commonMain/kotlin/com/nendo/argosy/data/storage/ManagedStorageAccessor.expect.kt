@@ -1,15 +1,6 @@
 package com.nendo.argosy.data.storage
 
 import com.nendo.argosy.platform.PlatformUri as Uri
-import com.nendo.argosy.platform.authority
-import com.nendo.argosy.platform.encodedPath
-import com.nendo.argosy.platform.getQueryParameter
-import com.nendo.argosy.platform.host
-import com.nendo.argosy.platform.lastPathSegment
-import com.nendo.argosy.platform.path
-import com.nendo.argosy.platform.pathSegments
-import com.nendo.argosy.platform.queryParameterNames
-import com.nendo.argosy.platform.scheme
 import java.io.InputStream
 import java.io.OutputStream
 

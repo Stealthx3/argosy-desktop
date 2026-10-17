@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.CachePolicy
 import coil.request.ImageRequest
-import com.nendo.argosy.R
+import com.nendo.argosy.shared.R
 import com.nendo.argosy.libretro.SaveStateManager
 import com.nendo.argosy.ui.components.animateScrollToItemCentered
 import com.nendo.argosy.ui.primitives.FocusIndicators

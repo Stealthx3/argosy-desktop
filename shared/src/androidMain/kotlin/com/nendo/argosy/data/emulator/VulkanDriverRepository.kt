@@ -12,7 +12,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class VulkanDriverRepository @Inject constructor(
+actual class VulkanDriverRepository @Inject constructor(
     @ApplicationContext private val context: Context,
     private val driverFetcherRepository: DriverFetcherRepository
 ) {
@@ -22,27 +22,27 @@ class VulkanDriverRepository @Inject constructor(
     private val driversRoot: File
         get() = File(context.filesDir, DRIVERS_DIR)
 
-    suspend fun customDriversSupported(): Boolean = withContext(Dispatchers.IO) {
+    actual suspend fun customDriversSupported(): Boolean = withContext(Dispatchers.IO) {
         customDriversSupportedCache ?: (
             LibretroBuildbot.processIs64Bit && driverFetcherRepository.getGpuInfo().adrenoNumber > 0
         ).also { customDriversSupportedCache = it }
     }
 
-    fun vulkanSupported(): Boolean =
+    actual fun vulkanSupported(): Boolean =
         context.packageManager.hasSystemFeature(PackageManager.FEATURE_VULKAN_HARDWARE_VERSION, VULKAN_1_1)
 
-    suspend fun listInstalled(): List<InstalledVulkanDriver> = withContext(Dispatchers.IO) {
+    actual suspend fun listInstalled(): List<InstalledVulkanDriver> = withContext(Dispatchers.IO) {
         VulkanDriverPackages.listInstalled(driversRoot)
     }
 
-    suspend fun listInstallablePackages(): List<File> = withContext(Dispatchers.IO) {
+    actual suspend fun listInstallablePackages(): List<File> = withContext(Dispatchers.IO) {
         val installedIds = VulkanDriverPackages.listInstalled(driversRoot).map { it.id }.toSet()
         driverFetcherRepository.listDownloadedFiles()
             .filter { VulkanDriverPackages.isPackageFile(it) }
             .filter { VulkanDriverPackages.idForPackage(it.name) !in installedIds }
     }
 
-    suspend fun installFromDownloads(fileName: String): Result<InstalledVulkanDriver> =
+    actual suspend fun installFromDownloads(fileName: String): Result<InstalledVulkanDriver> =
         withContext(Dispatchers.IO) {
             val packageFile = driverFetcherRepository.listDownloadedFiles()
                 .firstOrNull { it.name == fileName && VulkanDriverPackages.isPackageFile(it) }
@@ -54,7 +54,7 @@ class VulkanDriverRepository @Inject constructor(
                 .onFailure { Logger.warn(TAG, "Vulkan driver install from $fileName failed: ${it.message}") }
         }
 
-    companion object {
+    actual companion object {
         private const val TAG = "VulkanDriverRepository"
         private const val DRIVERS_DIR = "vulkan_drivers"
         private const val VULKAN_1_1 = 0x401000

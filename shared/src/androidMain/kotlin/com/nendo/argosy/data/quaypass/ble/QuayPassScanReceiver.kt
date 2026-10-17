@@ -8,7 +8,7 @@ import android.content.Intent
 import android.os.Build
 import android.util.Log
 
-class QuayPassScanReceiver : BroadcastReceiver() {
+actual class QuayPassScanReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         val results: List<ScanResult>? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -38,7 +38,7 @@ class QuayPassScanReceiver : BroadcastReceiver() {
         }
     }
 
-    companion object {
+    actual companion object {
         private const val TAG = "QuayPassScanReceiver"
         private const val MIN_MANUFACTURER_DATA_BYTES = 3
 

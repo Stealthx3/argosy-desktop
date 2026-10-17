@@ -3,12 +3,12 @@ package com.nendo.argosy.data.download
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import com.nendo.argosy.R
+import com.nendo.argosy.shared.R
 
-object DownloadNotificationChannel {
-    const val CHANNEL_ID = "download_service_channel"
+actual object DownloadNotificationChannel {
+    actual const val CHANNEL_ID = "download_service_channel"
 
-    fun create(context: Context) {
+    actual fun create(context: Context) {
         val channel = NotificationChannel(
             CHANNEL_ID,
             context.getString(R.string.sync_download_channel_name),
