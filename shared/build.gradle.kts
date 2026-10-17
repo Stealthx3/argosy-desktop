@@ -265,6 +265,9 @@ kotlin {
         }
         androidMain.dependencies {
             implementation(libs.hilt.android)
+            implementation(libs.hilt.navigation.compose)
+            implementation(libs.androidx.activity.compose)
+            implementation(libs.androidx.core.ktx)
         }
         getByName("desktopMain").dependencies {
             implementation(libs.sqlite.bundled)

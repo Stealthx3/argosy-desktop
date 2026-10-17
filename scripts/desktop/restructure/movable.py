@@ -44,13 +44,14 @@ ALLOWED = (
     "androidx.annotation.",
     "androidx.compose.ui.", "androidx.compose.foundation.", "androidx.compose.animation.",
     "androidx.compose.material3.", "androidx.compose.material.icons.", "androidx.compose.material.ripple.",
-    "androidx.lifecycle.ViewModel", "androidx.lifecycle.viewModelScope",
-    "androidx.lifecycle.compose.", "androidx.lifecycle.viewmodel.compose.viewModel",
+    "androidx.lifecycle.",
 )
 NOT_ALLOWED = (
     "androidx.sqlite.db.",
-    "androidx.compose.ui.platform.LocalContext", "androidx.compose.ui.platform.LocalView",
-    "androidx.compose.ui.platform.LocalConfiguration", "androidx.compose.ui.platform.LocalLifecycleOwner",
+    "androidx.compose.ui.platform.LocalView",
+    "androidx.lifecycle.ProcessLifecycleOwner", "androidx.lifecycle.AndroidViewModel", "androidx.lifecycle.LiveData",
+    "androidx.lifecycle.MutableLiveData", "androidx.lifecycle.asLiveData", "androidx.lifecycle.Observer",
+    "androidx.lifecycle.ViewModelProvider", "androidx.lifecycle.findViewTree",
     "androidx.compose.ui.platform.ComposeView", "androidx.compose.ui.tooling.", "androidx.compose.ui.viewinterop.",
     "androidx.compose.ui.res.",
     "androidx.compose.ui.graphics.asAndroid", "androidx.compose.ui.graphics.nativeCanvas",
@@ -59,13 +60,33 @@ NOT_ALLOWED = (
     "androidx.compose.ui.input.pointer.RequestDisallowInterceptTouchEvent",
 )
 REWRITTEN = (
-    "android.util.Log", "com.nendo.argosy.BuildConfig", "dagger.hilt.android.lifecycle.HiltViewModel",
+    "android.util.Log", "android.graphics.Color.", "com.nendo.argosy.BuildConfig", "dagger.hilt.android.lifecycle.HiltViewModel",
     "com.nendo.argosy.R",
     "androidx.compose.ui.res.stringResource", "androidx.compose.ui.res.pluralStringResource",
-    "androidx.compose.ui.res.painterResource",
+    "androidx.compose.ui.res.painterResource", "androidx.compose.ui.platform.LocalLifecycleOwner",
 )
 GENERATED = ("com.nendo.argosy.config.AppBuildConfig", "com.nendo.argosy.res.ArgosyR")
+CONTEXT_BEYOND_STRINGS = (
+    r"\b(?:[a-z]\w*[cC]ontext|ctx)\??\.(?!getString\b|resources\b)[a-zA-Z_]\w*"
+    r"|\.resources\.(?!getQuantityString\b|getString\b)\w+"
+    r"|LocalContext\.current\.(?!getString\b|resources\b)\w+"
+)
 GUARDED_REWRITES = {
+    "android.content.Context": re.compile(CONTEXT_BEYOND_STRINGS),
+    "androidx.compose.ui.platform.LocalContext": re.compile(CONTEXT_BEYOND_STRINGS),
+    "dagger.hilt.android.qualifiers.ApplicationContext": re.compile(r"(?!)"),
+    "androidx.hilt.navigation.compose.hiltViewModel": re.compile(r"hiltViewModel(?:<[^>]*>)?\((?!\))"),
+    "androidx.compose.ui.platform.LocalConfiguration": re.compile(
+        r"LocalConfiguration\.current\.(?!screenWidthDp\b|screenHeightDp\b|orientation\b)\w+"
+        r"|\bconfiguration\.(?!screenWidthDp\b|screenHeightDp\b|orientation\b)\w+"
+    ),
+    "androidx.activity.compose.BackHandler": re.compile(r"BackHandler\((?!enabled = true\)|\))[^)]"),
+    "android.graphics.Color": re.compile(
+        r"\b(?:AndroidColor|android\.graphics\.Color|Color)\.(?!(?:colorToHSV|HSVToColor|parseColor|argb|rgb|red|green|blue|alpha|BLACK|WHITE|TRANSPARENT)\b)[a-z]\w*\("
+        r"|\b(?:AndroidColor|android\.graphics\.Color)\.(?!(?:colorToHSV|HSVToColor|parseColor|argb|rgb|red|green|blue|alpha|BLACK|WHITE|TRANSPARENT)\b)\w+"
+    ),
+    "android.content.res.Configuration": re.compile(r"\bConfiguration\.[A-Za-z_]"),
+    "androidx.core.graphics.ColorUtils": re.compile(r"\bColorUtils\.(?!colorToHSL\b|HSLToColor\b)\w+"),
     "android.view.KeyEvent": re.compile(r"\bKeyEvent\b(?!\.KEYCODE_\w)"),
     "com.nendo.argosy.util.DisplayAffinityHelper": re.compile(
         r"\bDisplayAffinityHelper\b(?!\.isKnownDualScreenDevice\(\))"
@@ -74,9 +95,7 @@ GUARDED_REWRITES = {
 STRINGS = re.compile(r'"(?:[^"\\\n]|\\.)*"')
 COMMENTS = re.compile(r"/\*.*?\*/|^\s*//[^\n]*", re.S | re.M)
 ANDROID_FQ = re.compile(r"(?<![\w.])(?:android|androidx|com|org|io|net|dagger|coil|in|okhttp3|retrofit2)\.[a-z]\w*(?:\.\w+)+")
-ANDROID_MAIN_ALLOWED = ALLOWED + (
-    "android.", "androidx.annotation.", "androidx.datastore.", "dagger.hilt.android.qualifiers.",
-)
+ANDROID_MAIN_ALLOWED = ALLOWED + ("android.", "androidx.", "dagger.hilt.")
 FORBIDDEN_WORDS = re.compile(r"\bR\.(color|dimen|font|xml|array|mipmap|id|style|attr|layout|menu|bool|integer)\b")
 DECL = re.compile(
     r"^(?:@\S+\s+)*(?:(?:private|internal|public|data|enum|sealed|abstract|open|inline|value|const|"
@@ -244,18 +263,27 @@ def main():
     if args[:1] == ["--why"]:
         if args[1] not in by_rel:
             sys.exit(f"{args[1]} is not in app")
-        seen, current = set(), by_rel[args[1]]
-        while current is not None and current not in seen:
-            seen.add(current)
-            if current in movable:
-                print(f"{current.rel}: movable")
-                return
+        origin = by_rel[args[1]]
+        if origin in movable:
+            print(f"{origin.rel}: movable")
+            return
+        parents, queue = {origin: None}, [origin]
+        while queue:
+            current = queue.pop(0)
             if common_reasons[current]:
-                print(f"{current.rel}: {'; '.join(common_reasons[current])}")
+                path = []
+                while current is not None:
+                    path.append(current)
+                    current = parents[current]
+                for step in reversed(path[1:]):
+                    print(f"{step.rel} ->")
+                print(f"{path[0].rel}: {'; '.join(common_reasons[path[0]])}")
                 return
-            stuck = sorted((d for d in deps[current] if d not in movable and d not in in_common), key=lambda x: x.rel)
-            print(f"{current.rel} -> {', '.join(d.rel for d in stuck[:6])}")
-            current = stuck[0] if stuck else None
+            for dep in sorted(deps[current], key=lambda x: x.rel):
+                if dep not in movable and dep not in in_common and dep not in parents:
+                    parents[dep] = current
+                    queue.append(dep)
+        print(f"{origin.rel}: held only by excluded or androidMain files")
         return
 
     if args[:1] == ["--android"]:

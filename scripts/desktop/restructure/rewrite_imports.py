@@ -20,6 +20,48 @@ RULES = [
         re.compile(r"^import androidx\.compose\.ui\.res\.(stringResource|pluralStringResource|painterResource)$", re.M),
         r"import com.nendo.argosy.res.\1",
     ),
+    (
+        re.compile(r"^import android\.content\.Context$", re.M),
+        "import com.nendo.argosy.platform.PlatformContext as Context\nimport com.nendo.argosy.platform.getQuantityString\nimport com.nendo.argosy.platform.getString\nimport com.nendo.argosy.platform.resources",
+    ),
+    (
+        re.compile(r"^import androidx\.compose\.ui\.platform\.LocalContext$", re.M),
+        "import com.nendo.argosy.platform.LocalPlatformContext as LocalContext\nimport com.nendo.argosy.platform.getQuantityString\nimport com.nendo.argosy.platform.getString\nimport com.nendo.argosy.platform.resources",
+    ),
+    (
+        re.compile(r"^import androidx\.hilt\.navigation\.compose\.hiltViewModel$", re.M),
+        "import com.nendo.argosy.di.hiltViewModel",
+    ),
+    (
+        re.compile(r"^import androidx\.compose\.ui\.platform\.LocalConfiguration$", re.M),
+        "import com.nendo.argosy.platform.LocalPlatformConfiguration as LocalConfiguration\n"
+        "import com.nendo.argosy.platform.orientation\n"
+        "import com.nendo.argosy.platform.screenHeightDp\n"
+        "import com.nendo.argosy.platform.screenWidthDp",
+    ),
+    (
+        re.compile(r"^import androidx\.activity\.compose\.BackHandler$", re.M),
+        "import com.nendo.argosy.platform.BackHandler",
+    ),
+    (
+        re.compile(r"^import android\.content\.res\.Configuration$", re.M),
+        "import com.nendo.argosy.platform.PlatformConfiguration as Configuration",
+    ),
+    (re.compile(r"^import android\.graphics\.Color$", re.M), "import com.nendo.argosy.platform.PlatformColor as Color"),
+    (re.compile(r"^import android\.graphics\.Color as (\w+)$", re.M), r"import com.nendo.argosy.platform.PlatformColor as \1"),
+    (re.compile(r"\bandroid\.graphics\.Color\."), "com.nendo.argosy.platform.PlatformColor."),
+    (
+        re.compile(r"^import androidx\.core\.graphics\.ColorUtils$", re.M),
+        "import com.nendo.argosy.platform.PlatformColorUtils as ColorUtils",
+    ),
+    (
+        re.compile(r"^import androidx\.compose\.ui\.platform\.LocalLifecycleOwner$", re.M),
+        "import androidx.lifecycle.compose.LocalLifecycleOwner",
+    ),
+    (
+        re.compile(r"^import dagger\.hilt\.android\.qualifiers\.ApplicationContext$", re.M),
+        "import com.nendo.argosy.di.ApplicationContext",
+    ),
     (re.compile(r"^import com\.nendo\.argosy\.BuildConfig$", re.M), "import com.nendo.argosy.config.AppBuildConfig as BuildConfig"),
     (re.compile(r"\bcom\.nendo\.argosy\.BuildConfig\."), "com.nendo.argosy.config.AppBuildConfig."),
     (re.compile(r"^import dagger\.hilt\.android\.lifecycle\.HiltViewModel$", re.M), "import com.nendo.argosy.di.HiltViewModel"),
