@@ -1,7 +1,7 @@
 package com.nendo.argosy.data.remote.github
 
-import android.util.Log
-import com.nendo.argosy.BuildConfig
+import com.nendo.argosy.util.PlatformLog as Log
+import com.nendo.argosy.config.AppBuildConfig as BuildConfig
 import com.nendo.argosy.data.preferences.UserPreferencesRepository
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.flow.MutableStateFlow

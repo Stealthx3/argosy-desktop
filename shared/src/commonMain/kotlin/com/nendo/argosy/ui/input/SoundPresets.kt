@@ -1,6 +1,6 @@
 package com.nendo.argosy.ui.input
 
-import com.nendo.argosy.R
+import com.nendo.argosy.res.ArgosyR as R
 import java.io.File
 
 enum class SoundPreset(val resourceId: Int?, val displayName: String) {

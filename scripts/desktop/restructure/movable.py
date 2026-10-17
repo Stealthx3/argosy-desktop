@@ -93,7 +93,7 @@ GUARDED_REWRITES = {
         r"|onError\s*=\s*\{\s*\w+\s*->|\bAsyncImagePainter\b"
     ),
     "android.os.Build": re.compile(
-        r"\bBuild\.(?!MODEL\b|MANUFACTURER\b|VERSION\.SDK_INT\b|VERSION_CODES\.(?:Q|R|S|TIRAMISU)\b)\w+(?:\.\w+)?"
+        r"\bBuild\.(?!MODEL\b|MANUFACTURER\b|VERSION\.SDK_INT\b|VERSION\.RELEASE\b|VERSION_CODES\.(?:Q|R|S|TIRAMISU)\b)\w+(?:\.\w+)?"
     ),
     "android.content.res.Configuration": re.compile(r"\bConfiguration\.[A-Za-z_]"),
     "androidx.core.graphics.ColorUtils": re.compile(r"\bColorUtils\.(?!colorToHSL\b|HSLToColor\b)\w+"),
@@ -207,6 +207,8 @@ def analyse(u, index, packages):
     for fq in FQ.findall(u.body):
         deps |= resolve(fq) or set()
     for fq in ANDROID_FQ.findall(STRINGS.sub('""', u.body)):
+        if fq.startswith("android.os.Build.") and GUARDED_REWRITES["android.os.Build"].search(fq[len("android.os."):]):
+            common.append(f"reference {fq} beyond PlatformBuild")
         if not fq.startswith(REWRITTEN) and not fq.startswith("com.nendo.argosy."):
             external(fq, "reference")
     if FORBIDDEN_WORDS.search(u.body):

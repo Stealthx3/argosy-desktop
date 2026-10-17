@@ -6,6 +6,7 @@ expect object PlatformBuild {
 
     object VERSION {
         val SDK_INT: Int
+        val RELEASE: String
     }
 
     object VERSION_CODES {

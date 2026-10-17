@@ -15,7 +15,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class HapticFeedbackManager @Inject constructor(
+actual class HapticFeedbackManager @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
     private val vibrator: Vibrator? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -54,7 +54,7 @@ class HapticFeedbackManager @Inject constructor(
         this.strength = strength.coerceIn(0f, 1f)
     }
 
-    fun vibrate(pattern: HapticPattern) {
+    actual fun vibrate(pattern: HapticPattern) {
         val vibrator = vibrator ?: return
         if (!enabled || !vibrator.hasVibrator()) return
         val waveform = HapticWaveforms.forPattern(pattern, strength) ?: return

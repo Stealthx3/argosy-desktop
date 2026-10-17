@@ -6,6 +6,7 @@ actual object PlatformBuild {
 
     actual object VERSION {
         actual val SDK_INT: Int get() = 35
+        actual val RELEASE: String get() = System.getProperty("os.version") ?: ""
     }
 
     actual object VERSION_CODES {

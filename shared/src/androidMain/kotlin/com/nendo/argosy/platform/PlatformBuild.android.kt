@@ -8,6 +8,7 @@ actual object PlatformBuild {
 
     actual object VERSION {
         actual val SDK_INT: Int get() = Build.VERSION.SDK_INT
+        actual val RELEASE: String get() = Build.VERSION.RELEASE
     }
 
     actual object VERSION_CODES {

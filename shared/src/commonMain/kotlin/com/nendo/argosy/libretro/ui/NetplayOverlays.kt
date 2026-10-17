@@ -33,14 +33,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
 import com.nendo.argosy.data.social.NetplaySessionMode
 import androidx.compose.foundation.layout.width
-import androidx.compose.ui.res.pluralStringResource
-import androidx.compose.ui.res.stringResource
+import com.nendo.argosy.res.pluralStringResource
+import com.nendo.argosy.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.nendo.argosy.R
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.ui.input.InputHandler
 import com.nendo.argosy.ui.input.InputResult
 import com.nendo.argosy.ui.theme.gripReserveBottomInset
@@ -473,7 +473,7 @@ private fun FriendPickerRow(
         MaterialTheme.colorScheme.onSurfaceVariant
     }
     val avatarColor = runCatching {
-        Color(android.graphics.Color.parseColor(friend.avatarColorHex))
+        Color(com.nendo.argosy.platform.PlatformColor.parseColor(friend.avatarColorHex))
     }.getOrDefault(Color(0xFF6366F1))
 
     Row(
@@ -1006,6 +1006,6 @@ fun NetplayBorderHud(
 private fun parseAvatarColor(hex: String?): Color {
     if (hex == null) return Color(0xFF6366F1)
     return runCatching {
-        Color(android.graphics.Color.parseColor(hex))
+        Color(com.nendo.argosy.platform.PlatformColor.parseColor(hex))
     }.getOrDefault(Color(0xFF6366F1))
 }
