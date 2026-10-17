@@ -1,7 +1,7 @@
 package com.nendo.argosy.core.emulator
 
 import androidx.annotation.StringRes
-import com.nendo.argosy.R
+import com.nendo.argosy.shared.R
 
 sealed class LibretroSettingDef(
     val key: String,

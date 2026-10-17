@@ -1,6 +1,6 @@
 package com.nendo.argosy.core.notification
 
-import com.nendo.argosy.R
+import com.nendo.argosy.shared.R
 
 fun NotificationManager.showError(message: NotificationText) {
     show(
