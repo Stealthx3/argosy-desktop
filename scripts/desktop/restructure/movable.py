@@ -63,17 +63,40 @@ REWRITTEN = (
     "com.nendo.argosy.R",
     "androidx.compose.ui.res.stringResource", "androidx.compose.ui.res.pluralStringResource",
     "androidx.compose.ui.res.painterResource", "androidx.compose.ui.platform.LocalLifecycleOwner",
+    "android.os.SystemClock.elapsedRealtime", "android.os.SystemClock.uptimeMillis", "android.os.StatFs",
+    "android.os.Environment.MEDIA_MOUNTED", "android.os.Environment.DIRECTORY_DOWNLOADS",
+    "android.os.Environment.getExternalStorage", "android.os.Environment.isExternalStorageManager",
+    "android.text.format.DateFormat.getBestDateTimePattern",
 )
 GENERATED = ("com.nendo.argosy.config.AppBuildConfig", "com.nendo.argosy.res.ArgosyR")
+CONTEXT_MEMBERS = r"(?!getString\b|resources\b|filesDir\b|cacheDir\b|assets\b)[a-zA-Z_]\w*"
 CONTEXT_BEYOND_STRINGS = (
-    r"\b(?:\w*[cC]ontext|ctx)\??\.(?!getString\b|resources\b|filesDir\b|cacheDir\b|assets\b|current\b)[a-zA-Z_]\w*"
-    r"|\.resources\.(?!getQuantityString\b|getString\b)\w+"
-    r"|LocalContext\.current\.(?!getString\b|resources\b|filesDir\b|cacheDir\b|assets\b)\w+"
-    r"|\.assets\.(?!list\b|open\b)\w+"
+    r"\b(?:context|ctx|appContext|applicationContext|baseContext)\??\." + CONTEXT_MEMBERS
+    + r"|\.resources\.(?!getQuantityString\b|getString\b)\w+"
+    r"|LocalContext\.current\." + CONTEXT_MEMBERS
+    + r"|\.assets\.(?!list\b|open\b)\w+"
 )
+CONTEXT_DECLARED = re.compile(
+    r"\b(\w+)\s*:\s*(?:android\.content\.|com\.nendo\.argosy\.platform\.Platform)?Context\b\??"
+    r"|\b(?:val|var)\s+(\w+)\s*=\s*(?:LocalContext|LocalPlatformContext)\.current\b"
+)
+
+
+class ContextGuard:
+    def __init__(self):
+        self.base = re.compile(CONTEXT_BEYOND_STRINGS)
+
+    def search(self, body):
+        names = {a or b for a, b in CONTEXT_DECLARED.findall(body)}
+        if names:
+            declared = re.compile(r"\b(?:" + "|".join(sorted(names)) + r")\??\." + CONTEXT_MEMBERS)
+            match = declared.search(body)
+            if match:
+                return match
+        return self.base.search(body)
 GUARDED_REWRITES = {
-    "android.content.Context": re.compile(CONTEXT_BEYOND_STRINGS),
-    "androidx.compose.ui.platform.LocalContext": re.compile(CONTEXT_BEYOND_STRINGS),
+    "android.content.Context": ContextGuard(),
+    "androidx.compose.ui.platform.LocalContext": ContextGuard(),
     "dagger.hilt.android.qualifiers.ApplicationContext": re.compile(r"(?!)"),
     "androidx.hilt.navigation.compose.hiltViewModel": re.compile(r"hiltViewModel(?:<[^>]*>)?\((?!\))"),
     "androidx.compose.ui.platform.LocalConfiguration": re.compile(
@@ -101,7 +124,17 @@ GUARDED_REWRITES = {
     "com.nendo.argosy.util.DisplayAffinityHelper": re.compile(
         r"\bDisplayAffinityHelper\b(?!\.isKnownDualScreenDevice\(\))"
     ),
+    "android.os.SystemClock": re.compile(r"\bSystemClock\.(?!elapsedRealtime\b|uptimeMillis\b)\w+"),
+    "android.os.Environment": re.compile(
+        r"\bEnvironment\.(?!MEDIA_MOUNTED\b|DIRECTORY_DOWNLOADS\b|getExternalStorageDirectory\b"
+        r"|getExternalStoragePublicDirectory\b|getExternalStorageState\b|isExternalStorageManager\b)\w+"
+    ),
+    "android.os.StatFs": re.compile(
+        r"\b(?:availableBlocks\w*|freeBlocks\w*|blockCount\w*|blockSize\w*|freeBytes|totalBytes|restat)\b"
+    ),
+    "android.text.format.DateFormat": re.compile(r"\bDateFormat\.(?!getBestDateTimePattern\b)\w+"),
 }
+FQ_GUARDED = ("android.content.Context", "android.os.SystemClock", "dagger.hilt.android.qualifiers.ApplicationContext")
 STRINGS = re.compile(r'"(?:[^"\\\n]|\\.)*"')
 STAND_IN_GUARDS = {
     "com.nendo.argosy.platform.PlatformContext": "android.content.Context",
@@ -117,6 +150,10 @@ STAND_IN_GUARDS = {
     "com.nendo.argosy.platform.PlatformBuild": "android.os.Build",
     "com.nendo.argosy.platform.image.AsyncImage": "coil.compose.AsyncImage",
     "com.nendo.argosy.platform.LocalPlatformView": "androidx.compose.ui.platform.LocalView",
+    "com.nendo.argosy.platform.PlatformSystemClock": "android.os.SystemClock",
+    "com.nendo.argosy.platform.PlatformEnvironment": "android.os.Environment",
+    "com.nendo.argosy.platform.PlatformStatFs": "android.os.StatFs",
+    "com.nendo.argosy.platform.PlatformDateFormat": "android.text.format.DateFormat",
 }
 COMMENTS = re.compile(r"/\*.*?\*/|^\s*//[^\n]*", re.S | re.M)
 ANDROID_FQ = re.compile(r"(?<![\w.])(?:android|androidx|com|org|io|net|dagger|coil|in|okhttp3|retrofit2)\.[a-z]\w*(?:\.\w+)+")
@@ -205,6 +242,11 @@ def analyse(u, index, packages):
     for fq in ANDROID_FQ.findall(STRINGS.sub('""', u.body)):
         if fq.startswith("android.os.Build.") and GUARDED_REWRITES["android.os.Build"].search(fq[len("android.os."):]):
             common.append(f"reference {fq} beyond PlatformBuild")
+        guarded = next((k for k in FQ_GUARDED if fq == k or fq.startswith(k + ".")), None)
+        if guarded:
+            if GUARDED_REWRITES[guarded].search(u.body):
+                common.append(f"reference {fq} beyond its portable stand-in")
+            continue
         if not fq.startswith(REWRITTEN) and not fq.startswith("com.nendo.argosy."):
             external(fq, "reference")
     if FORBIDDEN_WORDS.search(u.body):

@@ -80,6 +80,22 @@ RULES = [
     (re.compile(r"^import com\.nendo\.argosy\.BuildConfig$", re.M), "import com.nendo.argosy.config.AppBuildConfig as BuildConfig"),
     (re.compile(r"\bcom\.nendo\.argosy\.BuildConfig\."), "com.nendo.argosy.config.AppBuildConfig."),
     (re.compile(r"^import dagger\.hilt\.android\.lifecycle\.HiltViewModel$", re.M), "import com.nendo.argosy.di.HiltViewModel"),
+    (re.compile(r"^import android\.os\.SystemClock$", re.M), "import com.nendo.argosy.platform.PlatformSystemClock as SystemClock"),
+    (re.compile(r"(?<!import )\bandroid\.os\.SystemClock\b"), "com.nendo.argosy.platform.PlatformSystemClock"),
+    (re.compile(r"(?<!import )\bandroid\.content\.Context\b"), "com.nendo.argosy.platform.PlatformContext"),
+    (
+        re.compile(r"@dagger\.hilt\.android\.qualifiers\.ApplicationContext\b"),
+        "@com.nendo.argosy.di.ApplicationContext",
+    ),
+    (re.compile(r"^import android\.os\.Environment$", re.M), "import com.nendo.argosy.platform.PlatformEnvironment as Environment"),
+    (re.compile(r"\bandroid\.os\.Environment\."), "com.nendo.argosy.platform.PlatformEnvironment."),
+    (re.compile(r"^import android\.os\.StatFs$", re.M), "import com.nendo.argosy.platform.PlatformStatFs as StatFs"),
+    (re.compile(r"\bandroid\.os\.StatFs\("), "com.nendo.argosy.platform.PlatformStatFs("),
+    (re.compile(r"^import android\.text\.format\.DateFormat$", re.M), "import com.nendo.argosy.platform.PlatformDateFormat as DateFormat"),
+    (
+        re.compile(r"\bandroid\.text\.format\.DateFormat\.getBestDateTimePattern\b"),
+        "com.nendo.argosy.platform.PlatformDateFormat.getBestDateTimePattern",
+    ),
     (re.compile(r"^import android\.view\.KeyEvent$", re.M), "import com.nendo.argosy.core.input.AndroidKeyCodes as KeyEvent"),
     (
         re.compile(r"^import com\.nendo\.argosy\.util\.DisplayAffinityHelper$", re.M),
@@ -112,6 +128,8 @@ COMPANION_IMPORTS = {
 def ensure_companions(text):
     for stand_in, companions in COMPANION_IMPORTS.items():
         anchor = re.search(rf"^import {re.escape(stand_in)}( as \w+)?$", text, re.M)
+        if not anchor and re.search(rf"(?<!import ){re.escape(stand_in)}\b", text):
+            anchor = list(re.finditer(r"^(?:package|import) .*$", text, re.M))[-1]
         if not anchor:
             continue
         missing = [c for c in companions if not re.search(rf"^import {re.escape(c)}$", text, re.M)]

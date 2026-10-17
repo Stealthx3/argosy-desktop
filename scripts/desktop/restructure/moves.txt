@@ -677,3 +677,11 @@
 + ui/screens/media/components/MediaSeasonTabs.kt
 + ui/screens/media/modals/MediaDetailMenuModal.kt
 + ui/screens/media/modals/MediaDownloadModal.kt
+
+# Phase 2: files freed by the SystemClock, Environment, StatFs and DateFormat stand-ins.
+[commonMain]
++ libretro/speedrun/SpeedrunTimerEngine.kt
++ libretro/ui/SpeedrunPanel.kt
++ ui/components/HoldToConfirmButton.kt
++ ui/components/ScreenDimmerOverlay.kt
++ ui/notification/NotificationHost.kt
