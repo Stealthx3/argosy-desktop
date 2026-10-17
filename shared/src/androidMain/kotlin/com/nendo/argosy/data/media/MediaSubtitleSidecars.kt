@@ -10,20 +10,11 @@ private const val UNKNOWN_LANGUAGE = "und"
 private const val SIDECAR_NAME_PARTS = 2
 
 /**
- * How one subtitle track is asked for and what the player parses it as.
- *
- * ASS keeps its own format rather than being converted, because conversion to WebVTT discards the
- * positioning and styling a quarter of this kind of library depends on. A track with no text form at
- * all - a picture subtitle - has no delivery and answers null.
- */
-data class MediaSubtitleDelivery(val format: String, val mimeType: String)
-
-/**
  * The single answer to whether a subtitle track can be handed over as text, shared by the streaming
  * negotiation and the download path. Two answers to this question would let a track download as a
  * file the player then refuses to parse.
  */
-fun subtitleDeliveryFor(codec: String?, isTextSubtitleStream: Boolean): MediaSubtitleDelivery? =
+actual fun subtitleDeliveryFor(codec: String?, isTextSubtitleStream: Boolean): MediaSubtitleDelivery? =
     when (codec?.lowercase()) {
         "ass", "ssa" -> MediaSubtitleDelivery(FORMAT_ASS, MimeTypes.TEXT_SSA)
         "subrip", "srt" -> MediaSubtitleDelivery(FORMAT_SRT, MimeTypes.APPLICATION_SUBRIP)
@@ -37,16 +28,6 @@ fun subtitleDeliveryFor(codec: String?, isTextSubtitleStream: Boolean): MediaSub
     }
 
 /**
- * One subtitle file stored beside a downloaded video.
- */
-data class MediaSubtitleSidecar(
-    val path: String,
-    val streamIndex: Int,
-    val language: String?,
-    val delivery: MediaSubtitleDelivery
-)
-
-/**
  * Subtitle files kept next to a downloaded video.
  *
  * A device-sized download is an encode the server produces with one video stream and one audio
@@ -58,7 +39,7 @@ data class MediaSubtitleSidecar(
  * storage walk, and is what carries them through a media-folder move - the tree moves whole and the
  * rows are repointed, so a sidecar is still beside its video afterwards.
  */
-object MediaSubtitleSidecars {
+actual object MediaSubtitleSidecars {
 
     private val FORMATS = setOf(FORMAT_ASS, FORMAT_SRT, FORMAT_VTT)
 
@@ -67,14 +48,14 @@ object MediaSubtitleSidecars {
      * several tracks in one language, and a name that only spelled the language would have them
      * overwrite one another.
      */
-    fun pathFor(videoPath: String, streamIndex: Int, language: String?, format: String): String =
+    actual fun pathFor(videoPath: String, streamIndex: Int, language: String?, format: String): String =
         "${videoPath.substringBeforeLast('.')}.${languageTag(language)}.$streamIndex.$format"
 
     /**
      * Every sidecar belonging to one video. Read from the directory rather than from a record,
      * because the directory is the record.
      */
-    fun listFor(videoPath: String, fileAccessLayer: FileAccessLayer): List<MediaSubtitleSidecar> {
+    actual fun listFor(videoPath: String, fileAccessLayer: FileAccessLayer): List<MediaSubtitleSidecar> {
         val parent = videoPath.substringBeforeLast('/', "")
         if (parent.isEmpty()) return emptyList()
         val prefix = videoPath.substringAfterLast('/').substringBeforeLast('.') + "."
@@ -85,11 +66,11 @@ object MediaSubtitleSidecars {
         }
     }
 
-    fun deleteAllFor(videoPath: String, fileAccessLayer: FileAccessLayer) {
+    actual fun deleteAllFor(videoPath: String, fileAccessLayer: FileAccessLayer) {
         listFor(videoPath, fileAccessLayer).forEach { fileAccessLayer.delete(it.path) }
     }
 
-    fun bytesFor(videoPath: String, fileAccessLayer: FileAccessLayer): Long =
+    actual fun bytesFor(videoPath: String, fileAccessLayer: FileAccessLayer): Long =
         listFor(videoPath, fileAccessLayer).sumOf { fileAccessLayer.length(it.path) }
 
     private fun parse(path: String, suffix: String): MediaSubtitleSidecar? {

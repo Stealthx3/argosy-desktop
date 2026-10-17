@@ -34,12 +34,12 @@ internal val REMOVABLE_MOUNT_PROBE_PATHS = listOf(
 )
 
 @Singleton
-class StorageVolumeDetector @Inject constructor(
+actual class StorageVolumeDetector @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
     private val probePaths = REMOVABLE_MOUNT_PROBE_PATHS
 
-    fun detectStorageVolumes(): List<AppStorageVolume> {
+    actual fun detectStorageVolumes(): List<AppStorageVolume> {
         val volumes = mutableListOf<AppStorageVolume>()
         val addedPaths = mutableSetOf<String>()
 
@@ -64,7 +64,7 @@ class StorageVolumeDetector @Inject constructor(
         return volumes
     }
 
-    fun volumeRootPaths(): List<String> {
+    actual fun volumeRootPaths(): List<String> {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) return emptyList()
         val storageManager = context.getSystemService(Context.STORAGE_SERVICE) as? StorageManager ?: return emptyList()
         return storageManager.storageVolumes

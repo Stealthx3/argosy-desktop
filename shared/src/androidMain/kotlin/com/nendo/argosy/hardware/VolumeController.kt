@@ -7,27 +7,22 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.math.roundToInt
 
-data class DisplayVolume(
-    val primary: Float,
-    val secondary: Float?
-)
-
 @Singleton
-class VolumeController @Inject constructor(
+actual class VolumeController @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
     private val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
-    val maxVolume: Int
+    actual val maxVolume: Int
         get() = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
 
-    fun getVolume(): DisplayVolume {
+    actual fun getVolume(): DisplayVolume {
         val current = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
         val max = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
         return DisplayVolume(primary = current.toFloat() / max.toFloat(), secondary = null)
     }
 
-    fun setPrimaryVolume(volume: Float): Boolean {
+    actual fun setPrimaryVolume(volume: Float): Boolean {
         val clamped = volume.coerceIn(0f, 1f)
         val max = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
         val value = (clamped * max).roundToInt()

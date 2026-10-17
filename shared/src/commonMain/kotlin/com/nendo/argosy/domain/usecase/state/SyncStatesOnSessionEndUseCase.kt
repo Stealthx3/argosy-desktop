@@ -1,6 +1,6 @@
 package com.nendo.argosy.domain.usecase.state
 
-import android.util.Log
+import com.nendo.argosy.util.PlatformLog as Log
 import com.nendo.argosy.data.emulator.CoreVersionExtractor
 import com.nendo.argosy.data.emulator.EmulatorResolver
 import com.nendo.argosy.data.emulator.StatePathRegistry

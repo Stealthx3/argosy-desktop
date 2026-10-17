@@ -1,13 +1,39 @@
 package com.nendo.argosy.data.remote.romm
 
-import android.content.Context
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
-import android.os.SystemClock
+import com.nendo.argosy.platform.PlatformContext as Context
+import com.nendo.argosy.platform.getApplicationInfo
+import com.nendo.argosy.platform.getApplicationLabel
+import com.nendo.argosy.platform.applicationContext
+import com.nendo.argosy.platform.packageName
+import com.nendo.argosy.platform.getSystemService
+import com.nendo.argosy.platform.getExternalFilesDir
+import com.nendo.argosy.platform.packageManager
+import com.nendo.argosy.platform.getPackageInfo
+import com.nendo.argosy.platform.versionName
+import com.nendo.argosy.platform.assets
+import com.nendo.argosy.platform.contentResolver
+import com.nendo.argosy.platform.getSharedPreferences
+import com.nendo.argosy.platform.list
+import com.nendo.argosy.platform.open
+import com.nendo.argosy.platform.CONNECTIVITY_SERVICE
+import com.nendo.argosy.platform.cacheDir
+import com.nendo.argosy.platform.filesDir
+import com.nendo.argosy.platform.getQuantityString
+import com.nendo.argosy.platform.getString
+import com.nendo.argosy.platform.resources
+import com.nendo.argosy.platform.PlatformConnectivityManager as ConnectivityManager
+import com.nendo.argosy.platform.activeNetwork
+import com.nendo.argosy.platform.getNetworkCapabilities
+import com.nendo.argosy.platform.registerDefaultNetworkCallback
+import com.nendo.argosy.platform.unregisterNetworkCallback
+import com.nendo.argosy.platform.hasCapability
+import com.nendo.argosy.platform.PlatformNetworkCapabilities as NetworkCapabilities
+import com.nendo.argosy.platform.NET_CAPABILITY_INTERNET
+import com.nendo.argosy.platform.PlatformSystemClock as SystemClock
 import com.nendo.argosy.data.remote.ssl.UserCertStore
 import com.nendo.argosy.data.remote.ssl.UserCertTrustManager.withUserCertTrust
 import com.nendo.argosy.util.Logger
-import dagger.hilt.android.qualifiers.ApplicationContext
+import com.nendo.argosy.di.ApplicationContext
 import okhttp3.Call
 import okhttp3.HttpUrl
 import okhttp3.Interceptor
@@ -85,10 +111,10 @@ class RomMReachability @Inject constructor(
     }
 
     fun hasActiveNetwork(): Boolean {
-        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val cm = context.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
         val network = cm.activeNetwork ?: return false
         val capabilities = cm.getNetworkCapabilities(network) ?: return false
-        return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+        return capabilities.hasCapability(NET_CAPABILITY_INTERNET)
     }
 
     fun recordReachable(baseUrl: String) = ledger.recordReachable(baseUrl.trimEnd('/') + "/")

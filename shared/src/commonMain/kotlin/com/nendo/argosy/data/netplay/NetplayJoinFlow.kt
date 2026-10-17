@@ -1,6 +1,7 @@
 package com.nendo.argosy.data.netplay
 
-import android.content.Intent
+import com.nendo.argosy.platform.PlatformIntentType as Intent
+import com.nendo.argosy.platform.PlatformIntent
 import com.nendo.argosy.data.social.Friend
 import com.nendo.argosy.data.social.NetplaySession
 

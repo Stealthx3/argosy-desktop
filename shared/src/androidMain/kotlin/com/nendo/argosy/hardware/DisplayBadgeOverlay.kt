@@ -24,18 +24,16 @@ import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 
-enum class DisplayBadgeSize { LARGE, SMALL }
-
 /**
  * Badges drawn above whatever each display is showing, including another app's window. One window
  * per display, added and removed together.
  */
-class DisplayBadgeOverlay(private val context: Context) {
+actual class DisplayBadgeOverlay actual constructor(private val context: Context) {
 
     private val shown = mutableMapOf<Int, View>()
     private var owner: BadgeWindowOwner? = null
 
-    fun show(numbers: Map<Int, Int>, size: DisplayBadgeSize) {
+    actual fun show(numbers: Map<Int, Int>, size: DisplayBadgeSize) {
         hide()
         if (numbers.isEmpty()) return
         val lifecycleOwner = BadgeWindowOwner().also { owner = it }
@@ -45,7 +43,7 @@ class DisplayBadgeOverlay(private val context: Context) {
         }
     }
 
-    fun hide() {
+    actual fun hide() {
         shown.forEach { (displayId, view) ->
             runCatching { windowManagerFor(displayId)?.removeView(view) }
         }

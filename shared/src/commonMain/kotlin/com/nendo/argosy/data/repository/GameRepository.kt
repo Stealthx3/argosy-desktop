@@ -1,10 +1,31 @@
 package com.nendo.argosy.data.repository
 
-import android.content.Context
-import android.os.Build
-import android.os.Environment
-import android.os.UserManager
-import android.util.Log
+import com.nendo.argosy.platform.PlatformContext as Context
+import com.nendo.argosy.platform.getApplicationInfo
+import com.nendo.argosy.platform.getApplicationLabel
+import com.nendo.argosy.platform.applicationContext
+import com.nendo.argosy.platform.packageName
+import com.nendo.argosy.platform.getSystemService
+import com.nendo.argosy.platform.getExternalFilesDir
+import com.nendo.argosy.platform.packageManager
+import com.nendo.argosy.platform.getPackageInfo
+import com.nendo.argosy.platform.versionName
+import com.nendo.argosy.platform.assets
+import com.nendo.argosy.platform.contentResolver
+import com.nendo.argosy.platform.getSharedPreferences
+import com.nendo.argosy.platform.list
+import com.nendo.argosy.platform.open
+import com.nendo.argosy.platform.USER_SERVICE
+import com.nendo.argosy.platform.cacheDir
+import com.nendo.argosy.platform.filesDir
+import com.nendo.argosy.platform.getQuantityString
+import com.nendo.argosy.platform.getString
+import com.nendo.argosy.platform.resources
+import com.nendo.argosy.platform.PlatformBuild as Build
+import com.nendo.argosy.platform.PlatformEnvironment as Environment
+import com.nendo.argosy.platform.PlatformUserManager as UserManager
+import com.nendo.argosy.platform.isUserUnlocked
+import com.nendo.argosy.util.PlatformLog as Log
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeoutOrNull
 import com.nendo.argosy.data.download.ZipExtractor
@@ -43,7 +64,7 @@ import com.nendo.argosy.data.remote.romm.RomMResult
 import com.nendo.argosy.data.storage.StorageAttributionRepository
 import com.nendo.argosy.data.storage.StorageCategory
 import com.nendo.argosy.data.storage.StorageVolumeHealth
-import dagger.hilt.android.qualifiers.ApplicationContext
+import com.nendo.argosy.di.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -110,7 +131,7 @@ class GameRepository @Inject constructor(
 
     private fun isStorageReady(): Boolean {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            val userManager = context.getSystemService(Context.USER_SERVICE) as UserManager
+            val userManager = context.getSystemService(USER_SERVICE) as UserManager
             if (!userManager.isUserUnlocked) return false
         }
         return Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED
@@ -592,7 +613,7 @@ class GameRepository @Inject constructor(
         try {
             val downloadDir = getGlobalDownloadDir()
             downloadDir.mkdirs()
-            val stat = android.os.StatFs(downloadDir.absolutePath)
+            val stat = com.nendo.argosy.platform.PlatformStatFs(downloadDir.absolutePath)
             stat.availableBytes
         } catch (_: Exception) {
             0L

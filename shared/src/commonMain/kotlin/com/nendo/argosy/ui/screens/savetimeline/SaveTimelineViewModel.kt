@@ -3,7 +3,7 @@ package com.nendo.argosy.ui.screens.savetimeline
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nendo.argosy.R
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.core.notification.NotificationManager
 import com.nendo.argosy.core.notification.NotificationText
 import com.nendo.argosy.core.notification.showError
@@ -17,7 +17,7 @@ import com.nendo.argosy.ui.common.savechannel.snapshot.SnapshotViewActions
 import com.nendo.argosy.ui.common.savechannel.snapshot.SnapshotViewDelegate
 import com.nendo.argosy.ui.common.savechannel.snapshot.SnapshotViewState
 import com.nendo.argosy.ui.screens.gamedetail.components.SaveStatusEvent
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.nendo.argosy.di.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll

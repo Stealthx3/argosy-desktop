@@ -1,6 +1,6 @@
 package com.nendo.argosy.ui.screens.common
 
-import com.nendo.argosy.R
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.core.input.SoundType
 import com.nendo.argosy.core.notification.NotificationManager
 import com.nendo.argosy.core.notification.NotificationText

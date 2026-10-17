@@ -1,6 +1,6 @@
 package com.nendo.argosy.data.repository
 
-import android.os.SystemClock
+import com.nendo.argosy.platform.PlatformSystemClock as SystemClock
 import com.nendo.argosy.data.local.dao.MediaCreditDao
 import com.nendo.argosy.data.local.dao.MediaItemDao
 import com.nendo.argosy.data.local.dao.MediaLibraryStats

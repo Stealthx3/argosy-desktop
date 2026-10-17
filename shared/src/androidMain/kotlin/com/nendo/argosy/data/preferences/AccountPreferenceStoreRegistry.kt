@@ -24,7 +24,7 @@ import kotlinx.coroutines.sync.withLock
  * and its social link instead of coming up blank. That adoption happens once for one account; the
  * device-global store records which, and every later account starts empty.
  */
-class AccountPreferenceStoreRegistry(
+actual class AccountPreferenceStoreRegistry actual constructor(
     private val context: Context,
     private val globalStore: DataStore<Preferences>,
     private val scope: CoroutineScope
@@ -32,7 +32,7 @@ class AccountPreferenceStoreRegistry(
     private val mutex = Mutex()
     private val stores = mutableMapOf<Long, DataStore<Preferences>>()
 
-    suspend fun storeFor(rommUserId: Long): DataStore<Preferences> = mutex.withLock {
+    actual suspend fun storeFor(rommUserId: Long): DataStore<Preferences> = mutex.withLock {
         val cached = stores[rommUserId]
         if (cached != null) {
             cached
@@ -52,7 +52,7 @@ class AccountPreferenceStoreRegistry(
     /**
      * Empties a removed account's store. The instance is kept so the file is never opened twice.
      */
-    suspend fun clearFor(rommUserId: Long) {
+    actual suspend fun clearFor(rommUserId: Long) {
         storeFor(rommUserId).edit { it.clear() }
     }
 
@@ -73,7 +73,7 @@ class AccountPreferenceStoreRegistry(
 
     private fun fileNameFor(rommUserId: Long) = "account_$rommUserId"
 
-    companion object {
+    actual companion object {
         private val ADOPTED_BY = longPreferencesKey("per_account_prefs_adopted_by")
     }
 }

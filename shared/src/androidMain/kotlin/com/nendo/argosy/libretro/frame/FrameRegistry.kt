@@ -10,19 +10,19 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class FrameRegistry @Inject constructor(@ApplicationContext private val context: Context) {
+actual class FrameRegistry @Inject constructor(@ApplicationContext private val context: Context) {
 
-    enum class Source { LIBRETRO, DUIMON, CUSTOM }
+    actual enum class Source { LIBRETRO, DUIMON, CUSTOM }
 
     /**
      * Where the game sits on the frame, as fractions of the surface. Taken from the Mega Bezel
      * preset that ships the artwork, so it lands on the screen the artwork was drawn around.
      */
-    data class ScreenRect(
-        val left: Float,
-        val top: Float,
-        val right: Float,
-        val bottom: Float
+    actual data class ScreenRect(
+        actual val left: Float,
+        actual val top: Float,
+        actual val right: Float,
+        actual val bottom: Float
     )
 
     /**
@@ -30,19 +30,19 @@ class FrameRegistry @Inject constructor(@ApplicationContext private val context:
      * transparent middle, drawn over a full-surface game. Non-null is a plate with no cutout,
      * drawn behind a game placed at that rect.
      */
-    data class FrameEntry(
-        val id: String,
-        val displayName: String,
-        val platforms: Set<String>,
-        val githubPath: String,
-        val source: Source = Source.LIBRETRO,
-        val screenRect: ScreenRect? = null
+    actual data class FrameEntry(
+        actual val id: String,
+        actual val displayName: String,
+        actual val platforms: Set<String>,
+        actual val githubPath: String,
+        actual val source: Source = Source.LIBRETRO,
+        actual val screenRect: ScreenRect? = null
     )
 
     private var installedCache: Set<String>? = null
     private var customCache: List<FrameEntry>? = null
 
-    fun getInstalledIds(): Set<String> {
+    actual fun getInstalledIds(): Set<String> {
         installedCache?.let { return it }
         adoptLegacyFlatLayout()
         val ids = listOf(getFramesDir(), getCustomFramesDir())
@@ -79,7 +79,7 @@ class FrameRegistry @Inject constructor(@ApplicationContext private val context:
         }
     }
 
-    fun invalidateInstalledCache() {
+    actual fun invalidateInstalledCache() {
         installedCache = null
         customCache = null
     }
@@ -401,20 +401,20 @@ class FrameRegistry @Inject constructor(@ApplicationContext private val context:
         ),
     )
 
-    fun getCatalogFrames(): List<FrameEntry> = catalogFrames
+    actual fun getCatalogFrames(): List<FrameEntry> = catalogFrames
 
-    fun getFramesForPlatform(platformSlug: String): List<FrameEntry> {
+    actual fun getFramesForPlatform(platformSlug: String): List<FrameEntry> {
         val canonical = PlatformDefinitions.getCanonicalSlug(platformSlug)
         return catalogFrames.filter { canonical in it.platforms }
     }
 
-    fun getAllFrames(): List<FrameEntry> = catalogFrames + getCustomFrames()
+    actual fun getAllFrames(): List<FrameEntry> = catalogFrames + getCustomFrames()
 
     /**
      * Imported frames are read back off disk rather than tracked in a preference, so the file is
      * the only record: copying one in or deleting one outside the app stays consistent.
      */
-    fun getCustomFrames(): List<FrameEntry> {
+    actual fun getCustomFrames(): List<FrameEntry> {
         customCache?.let { return it }
         val entries = getCustomFramesDir().listFiles()
             ?.filter { it.isFile && it.extension.lowercase() == "png" }
@@ -428,7 +428,7 @@ class FrameRegistry @Inject constructor(@ApplicationContext private val context:
         return entries
     }
 
-    fun importCustomFrame(sourcePath: String): Result<FrameEntry> = runCatching {
+    actual fun importCustomFrame(sourcePath: String): Result<FrameEntry> = runCatching {
         val source = File(sourcePath)
         require(source.isFile) { "Frame source is not a file: $sourcePath" }
 
@@ -458,7 +458,7 @@ class FrameRegistry @Inject constructor(@ApplicationContext private val context:
         FrameEntry(id, id.removePrefix(CUSTOM_ID_PREFIX), emptySet(), "", Source.CUSTOM)
     }
 
-    fun deleteCustomFrame(id: String): Boolean {
+    actual fun deleteCustomFrame(id: String): Boolean {
         if (!id.startsWith(CUSTOM_ID_PREFIX)) return false
         val deleted = File(getCustomFramesDir(), "$id.png").delete()
         if (deleted) invalidateInstalledCache()
@@ -481,16 +481,16 @@ class FrameRegistry @Inject constructor(@ApplicationContext private val context:
         return candidate
     }
 
-    fun findById(id: String): FrameEntry? =
+    actual fun findById(id: String): FrameEntry? =
         catalogFrames.find { it.id == id } ?: getCustomFrames().find { it.id == id }
 
-    fun isInstalled(entry: FrameEntry): Boolean =
+    actual fun isInstalled(entry: FrameEntry): Boolean =
         entry.id in getInstalledIds()
 
-    fun isInstalled(id: String): Boolean =
+    actual fun isInstalled(id: String): Boolean =
         id in getInstalledIds()
 
-    fun getInstalledFramesForPlatform(platformSlug: String): List<FrameEntry> =
+    actual fun getInstalledFramesForPlatform(platformSlug: String): List<FrameEntry> =
         getFramesForPlatform(platformSlug).filter { isInstalled(it) }
 
     /**
@@ -498,7 +498,7 @@ class FrameRegistry @Inject constructor(@ApplicationContext private val context:
      * 4K, which decodes to roughly 33MB of ARGB before it reaches GL; sampling halves both axes
      * together, so the aspect ratio is preserved by construction.
      */
-    fun loadFrame(id: String, maxWidth: Int = 0, maxHeight: Int = 0): Bitmap? {
+    actual fun loadFrame(id: String, maxWidth: Int, maxHeight: Int): Bitmap? {
         val file = listOf(getFramesDir(), getCustomFramesDir())
             .map { File(it, "$id.png") }
             .firstOrNull { it.exists() }
@@ -528,24 +528,24 @@ class FrameRegistry @Inject constructor(@ApplicationContext private val context:
         )
     }
 
-    fun loadFrame(entry: FrameEntry): Bitmap? = loadFrame(entry.id)
+    actual fun loadFrame(entry: FrameEntry): Bitmap? = loadFrame(entry.id)
 
-    fun getFramesDir(): File =
+    actual fun getFramesDir(): File =
         File(context.getExternalFilesDir(null), "frames/catalog")
 
     /**
      * User-imported frames, kept apart from the catalog so [clearDownloadedFrames] cannot take
      * them: a catalog frame re-downloads on demand and an imported one is gone for good.
      */
-    fun getCustomFramesDir(): File =
+    actual fun getCustomFramesDir(): File =
         File(context.getExternalFilesDir(null), "frames/custom")
 
-    fun installedFileFor(entry: FrameEntry): File = when (entry.source) {
+    actual fun installedFileFor(entry: FrameEntry): File = when (entry.source) {
         Source.CUSTOM -> File(getCustomFramesDir(), "${entry.id}.png")
         else -> File(getFramesDir(), "${entry.id}.png")
     }
 
-    fun ensureDirectoryExists() {
+    actual fun ensureDirectoryExists() {
         getFramesDir().mkdirs()
         getCustomFramesDir().mkdirs()
     }
@@ -554,22 +554,22 @@ class FrameRegistry @Inject constructor(@ApplicationContext private val context:
      * Clears catalog frames only. The row offering this says they re-download on demand, which
      * is true of a catalog frame and false of one the user imported.
      */
-    fun clearDownloadedFrames() {
+    actual fun clearDownloadedFrames() {
         val dir = getFramesDir()
         if (dir.exists()) dir.deleteRecursively()
         installedCache = null
     }
 
-    companion object {
+    actual companion object {
         private const val TAG = "FrameRegistry"
 
-        const val CUSTOM_ID_PREFIX = "custom_"
+        actual const val CUSTOM_ID_PREFIX = "custom_"
 
         /**
          * The stored frame override meaning "no frame". A null override means Auto, which picks the
          * platform's first frame, so the two must never be conflated when saving.
          */
-        const val NO_FRAME_ID = "none"
+        actual const val NO_FRAME_ID = "none"
 
         const val GITHUB_RAW_BASE =
             "https://raw.githubusercontent.com/libretro/overlay-borders/master/"
@@ -582,7 +582,7 @@ class FrameRegistry @Inject constructor(@ApplicationContext private val context:
             "https://raw.githubusercontent.com/Duimon/Duimon-Mega-Bezel/" +
                 "d03dabf6e6b190dbf9b692efd492d8edd21abbb9/Graphics/"
 
-        fun downloadUrl(entry: FrameEntry): String = when (entry.source) {
+        actual fun downloadUrl(entry: FrameEntry): String = when (entry.source) {
             Source.LIBRETRO -> "$GITHUB_RAW_BASE${entry.githubPath}"
             Source.DUIMON -> "$DUIMON_RAW_BASE${entry.githubPath}"
             Source.CUSTOM -> ""

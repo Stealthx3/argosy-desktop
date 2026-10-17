@@ -18,20 +18,20 @@ private const val TAG = "MusicDirectoryManager"
 
 /** Resolves and manages the public Music/RomM directory where soundtrack files live. */
 @Singleton
-class MusicDirectoryManager @Inject constructor(
+actual class MusicDirectoryManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val storagePreferences: StoragePreferencesRepository
 ) {
 
-    suspend fun resolveMusicDir(): File {
+    actual suspend fun resolveMusicDir(): File {
         val override = storagePreferences.preferences.first().musicStoragePath
         return if (override != null) File(override) else defaultMusicDir()
     }
 
-    fun defaultMusicDir(): File =
+    actual fun defaultMusicDir(): File =
         File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC), "RomM")
 
-    suspend fun targetFileFor(
+    actual suspend fun targetFileFor(
         platformName: String,
         gameName: String,
         trackNumber: Int?,
@@ -39,7 +39,7 @@ class MusicDirectoryManager @Inject constructor(
         fileName: String
     ): File = targetFileIn(resolveMusicDir(), platformName, gameName, trackNumber, title, fileName)
 
-    fun targetFileIn(
+    actual fun targetFileIn(
         musicDir: File,
         platformName: String,
         gameName: String,
@@ -59,7 +59,7 @@ class MusicDirectoryManager @Inject constructor(
         return File(gameDir, targetName)
     }
 
-    fun moveIntoMusic(source: File, target: File): Boolean {
+    actual fun moveIntoMusic(source: File, target: File): Boolean {
         return try {
             target.parentFile?.mkdirs()
             if (target.exists()) target.delete()
@@ -75,13 +75,13 @@ class MusicDirectoryManager @Inject constructor(
         }
     }
 
-    suspend fun countFiles(): Int = withContext(Dispatchers.IO) {
+    actual suspend fun countFiles(): Int = withContext(Dispatchers.IO) {
         val dir = resolveMusicDir()
         if (dir.exists()) dir.walkTopDown().count { it.isFile } else 0
     }
 
     /** Moves the music tree into [destination] preserving structure; conflicts are overwritten. */
-    suspend fun relocate(source: File, destination: File): Unit = withContext(Dispatchers.IO) {
+    actual suspend fun relocate(source: File, destination: File): Unit = withContext(Dispatchers.IO) {
         if (!source.exists() || source.absolutePath == destination.absolutePath) return@withContext
         val moved = mutableListOf<String>()
         moveTree(source, destination, moved)
@@ -113,14 +113,14 @@ class MusicDirectoryManager @Inject constructor(
         if (source.listFiles()?.isEmpty() == true) source.delete()
     }
 
-    fun scanFile(file: File) {
+    actual fun scanFile(file: File) {
         MediaScannerConnection.scanFile(context, arrayOf(file.absolutePath), null, null)
     }
 
     private fun sanitize(name: String): String =
         name.replace(INVALID_CHARS, "_").trim().ifEmpty { "track" }
 
-    companion object {
+    actual companion object {
         private val INVALID_CHARS = Regex("[\\\\/:*?\"<>|;=]")
     }
 }

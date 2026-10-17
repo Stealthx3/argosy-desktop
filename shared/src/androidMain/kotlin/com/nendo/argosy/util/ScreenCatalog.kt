@@ -8,22 +8,13 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
-data class AttachedScreen(
-    val key: String,
-    val displayId: Int,
-    val number: Int,
-    val widthPx: Int,
-    val heightPx: Int,
-    val builtIn: Boolean
-)
-
 @Singleton
-class ScreenCatalog @Inject constructor(
+actual class ScreenCatalog @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
     private val displayManager = context.getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
 
-    fun attachedScreens(): List<AttachedScreen> = displayManager.displays
+    actual fun attachedScreens(): List<AttachedScreen> = displayManager.displays
         .filter { isScreen(it) }
         .sortedBy { it.displayId }
         .mapIndexed { index, display ->
@@ -38,7 +29,7 @@ class ScreenCatalog @Inject constructor(
             )
         }
 
-    fun screenFor(displayId: Int): AttachedScreen? =
+    actual fun screenFor(displayId: Int): AttachedScreen? =
         attachedScreens().find { it.displayId == displayId }
 
     /**
@@ -52,7 +43,7 @@ class ScreenCatalog @Inject constructor(
         return chooseSecondScreen(lit, gameDisplayId)?.let { displayManager.getDisplay(it.displayId) }
     }
 
-    companion object {
+    actual companion object {
         internal fun chooseSecondScreen(screens: List<AttachedScreen>, gameDisplayId: Int): AttachedScreen? =
             screens
                 .filter { it.displayId != gameDisplayId }

@@ -1,7 +1,7 @@
 package com.nendo.argosy.ui.screens.social
 
-import android.graphics.BitmapFactory
-import android.util.Base64
+import com.nendo.argosy.platform.PlatformBitmapFactory as BitmapFactory
+import com.nendo.argosy.platform.PlatformBase64 as Base64
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -38,15 +38,15 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.asImageBitmap
+import com.nendo.argosy.platform.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.pluralStringResource
-import androidx.compose.ui.res.stringResource
+import com.nendo.argosy.res.pluralStringResource
+import com.nendo.argosy.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.nendo.argosy.R
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.data.social.DailyPlaytime
 import com.nendo.argosy.data.social.MostPlayedGame
 import com.nendo.argosy.data.social.PresenceStatus

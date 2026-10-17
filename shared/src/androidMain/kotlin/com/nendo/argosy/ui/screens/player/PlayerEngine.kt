@@ -5,7 +5,7 @@ import android.net.Uri
 import androidx.annotation.OptIn
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
-import com.nendo.argosy.R
+import com.nendo.argosy.shared.R
 import com.nendo.argosy.util.Logger
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MimeTypes
@@ -36,13 +36,6 @@ private const val STREAM_READ_TIMEOUT_SECONDS = 60L
 private const val STREAM_CONNECT_TIMEOUT_SECONDS = 30L
 
 /**
- * Identifies a subtitle attached alongside the video rather than carried inside it. The player has
- * no other way to tell one of these apart from a track the container already had, and picking the
- * wrong one silently shows the wrong language.
- */
-fun sideloadedSubtitleId(streamIndex: Int): String = "argosy-sub-$streamIndex"
-
-/**
  * Builds the video player and the pipe that feeds it.
  *
  * Authorization rides in a request header rather than in the address. The server accepts a token in
@@ -51,7 +44,7 @@ fun sideloadedSubtitleId(streamIndex: Int): String = "argosy-sub-$streamIndex"
  * downloaded file needs none of it, which is why the header is optional here.
  */
 @OptIn(UnstableApi::class)
-class PlayerEngine @Inject constructor(
+actual class PlayerEngine @Inject constructor(
     @ApplicationContext private val context: Context,
     private val connectionManager: JellyfinConnectionManager,
     private val jellyfinPreferencesRepository: JellyfinPreferencesRepository,
@@ -59,7 +52,7 @@ class PlayerEngine @Inject constructor(
     private val userCertStore: com.nendo.argosy.data.remote.ssl.UserCertStore
 ) {
 
-    suspend fun authorizationHeader(): String = withContext(Dispatchers.IO) {
+    actual suspend fun authorizationHeader(): String = withContext(Dispatchers.IO) {
         val prefs = jellyfinPreferencesRepository.preferences.first()
         JellyfinApiFactory.buildAuthorizationHeader(
             deviceId = connectionManager.getDeviceId() ?: prefs.deviceId.orEmpty(),

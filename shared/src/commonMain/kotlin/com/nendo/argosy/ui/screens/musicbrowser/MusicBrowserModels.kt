@@ -1,7 +1,7 @@
 package com.nendo.argosy.ui.screens.musicbrowser
 
 import androidx.annotation.StringRes
-import com.nendo.argosy.R
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.data.remote.romm.RomMMusicFacet
 import com.nendo.argosy.domain.usecase.music.LocalMusicTrackState
 

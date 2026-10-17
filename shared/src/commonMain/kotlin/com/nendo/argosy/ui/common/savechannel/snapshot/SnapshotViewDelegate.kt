@@ -1,6 +1,6 @@
 package com.nendo.argosy.ui.common.savechannel.snapshot
 
-import com.nendo.argosy.R
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.data.sync.snapshot.SnapshotChannels
 import com.nendo.argosy.ui.common.savechannel.SaveChannelStateHolder
 import com.nendo.argosy.ui.screens.gamedetail.components.SaveStatusEvent

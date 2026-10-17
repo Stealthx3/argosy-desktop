@@ -1,6 +1,7 @@
 package com.nendo.argosy.ui.screens.common
 
-import android.content.Intent
+import com.nendo.argosy.platform.PlatformIntentType as Intent
+import com.nendo.argosy.platform.PlatformIntent
 import com.nendo.argosy.data.emulator.DiscOption
 import com.nendo.argosy.data.emulator.LaunchOrigin
 import com.nendo.argosy.domain.model.SyncProgress

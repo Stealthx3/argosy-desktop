@@ -29,11 +29,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.stringResource
+import com.nendo.argosy.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.nendo.argosy.R
-import coil.compose.AsyncImage
+import com.nendo.argosy.res.ArgosyR as R
+import com.nendo.argosy.platform.image.AsyncImage
 import com.nendo.argosy.data.netplay.CoreSubState
 import com.nendo.argosy.data.netplay.JoinCandidate
 import com.nendo.argosy.data.netplay.JoinVariant

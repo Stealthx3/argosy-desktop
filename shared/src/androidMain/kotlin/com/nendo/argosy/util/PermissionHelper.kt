@@ -13,9 +13,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class PermissionHelper @Inject constructor() {
+actual class PermissionHelper @Inject constructor() {
 
-    fun hasUsageStatsPermission(context: Context): Boolean {
+    actual fun hasUsageStatsPermission(context: Context): Boolean {
         val appOps = context.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
         val mode = appOps.checkOpNoThrow(
             AppOpsManager.OPSTR_GET_USAGE_STATS,
@@ -25,14 +25,14 @@ class PermissionHelper @Inject constructor() {
         return mode == AppOpsManager.MODE_ALLOWED
     }
 
-    fun openUsageStatsSettings(context: Context) {
+    actual fun openUsageStatsSettings(context: Context) {
         val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
         }
         context.startActivity(intent)
     }
 
-    fun isPackageInForeground(context: Context, packageName: String, withinMs: Long = 5000): Boolean {
+    actual fun isPackageInForeground(context: Context, packageName: String, withinMs: Long): Boolean {
         val last = lastForegroundTimestamp(context, packageName) ?: run {
             android.util.Log.d("PermissionHelper", "isPackageInForeground($packageName): no usage data, assuming backgrounded")
             return false
@@ -46,7 +46,7 @@ class PermissionHelper @Inject constructor() {
         return fresh
     }
 
-    fun lastForegroundTimestamp(context: Context, packageName: String): Long? {
+    actual fun lastForegroundTimestamp(context: Context, packageName: String): Long? {
         if (!hasUsageStatsPermission(context)) return null
         val usageStatsManager = context.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
         val now = System.currentTimeMillis()
@@ -65,11 +65,10 @@ class PermissionHelper @Inject constructor() {
      * query. Returns an empty map without the permission, which callers must read as "no answer"
      * rather than "nothing was running".
      */
-    fun lastForegroundTimestamps(
+    actual fun lastForegroundTimestamps(
         context: Context,
         packageNames: Set<String>,
-        lookbackMs: Long = 24 * 60 * 60 * 1000L
-    ): Map<String, Long> {
+        lookbackMs: Long): Map<String, Long> {
         if (packageNames.isEmpty()) return emptyMap()
         if (!hasUsageStatsPermission(context)) return emptyMap()
         val usageStatsManager = context.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
@@ -101,11 +100,10 @@ class PermissionHelper @Inject constructor() {
      * tracked separately because a package hands off between its own activities, and the one being
      * torn down can report STOPPED after its successor has already resumed.
      */
-    fun isPackageOnScreen(
+    actual fun isPackageOnScreen(
         context: Context,
         packageName: String,
-        lookbackMs: Long = 10 * 60 * 1000L
-    ): Boolean? {
+        lookbackMs: Long): Boolean? {
         if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.Q) return null
         if (!hasUsageStatsPermission(context)) return null
         val usm = context.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
@@ -138,11 +136,10 @@ class PermissionHelper @Inject constructor() {
      * a perfectly live app on a second display as gone. Without usage access neither half can answer
      * and the result is false, so a caller that must not act on silence checks the permission itself.
      */
-    fun isPackageOnScreenOrRecent(
+    actual fun isPackageOnScreenOrRecent(
         context: Context,
         packageName: String,
-        recencyMs: Long = 15_000
-    ): Boolean {
+        recencyMs: Long): Boolean {
         isPackageOnScreen(context, packageName)?.let { return it }
         return isPackageInForeground(context, packageName, recencyMs)
     }
@@ -151,7 +148,7 @@ class PermissionHelper @Inject constructor() {
      * Screen, keyguard and activity lifecycle events between [fromMs] and [toMs]. Empty without
      * usage access, which the caller must read as "no answer" rather than "nothing happened".
      */
-    fun presenceEvents(context: Context, fromMs: Long, toMs: Long): List<PresenceEvent> {
+    actual fun presenceEvents(context: Context, fromMs: Long, toMs: Long): List<PresenceEvent> {
         if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.Q) return emptyList()
         if (!hasUsageStatsPermission(context)) return emptyList()
         val usm = context.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
@@ -174,7 +171,7 @@ class PermissionHelper @Inject constructor() {
         return result
     }
 
-    fun currentForegroundPackage(context: Context, lookbackMs: Long = 5 * 60 * 1000L): String? {
+    actual fun currentForegroundPackage(context: Context, lookbackMs: Long): String? {
         if (!hasUsageStatsPermission(context)) return null
         val usm = context.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
         val now = System.currentTimeMillis()
@@ -192,14 +189,14 @@ class PermissionHelper @Inject constructor() {
         return pkg
     }
 
-    data class SessionDurations(
-        val foregroundMs: Long,
-        val screenOnMs: Long
+    actual data class SessionDurations(
+        actual val foregroundMs: Long,
+        actual val screenOnMs: Long
     ) {
-        val hasData: Boolean get() = foregroundMs >= 0 && screenOnMs >= 0
+        actual val hasData: Boolean get() = foregroundMs >= 0 && screenOnMs >= 0
     }
 
-    fun getSessionDurations(context: Context, packageName: String, fromMs: Long, toMs: Long): SessionDurations {
+    actual fun getSessionDurations(context: Context, packageName: String, fromMs: Long, toMs: Long): SessionDurations {
         if (!hasUsageStatsPermission(context)) return SessionDurations(-1, -1)
 
         val usageStatsManager = context.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
@@ -275,7 +272,7 @@ class PermissionHelper @Inject constructor() {
         return SessionDurations(foregroundMs, finalScreenOn)
     }
 
-    companion object {
+    actual companion object {
         // UsageEvents.Event.SCREEN_INTERACTIVE / SCREEN_NON_INTERACTIVE (API 29+)
         private const val SCREEN_INTERACTIVE = 15
         private const val SCREEN_NON_INTERACTIVE = 16

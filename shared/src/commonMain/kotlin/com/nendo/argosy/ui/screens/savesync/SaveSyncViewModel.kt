@@ -1,9 +1,9 @@
 package com.nendo.argosy.ui.screens.savesync
 
-import android.os.Build
+import com.nendo.argosy.platform.PlatformBuild as Build
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nendo.argosy.R
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.data.local.dao.GameDao
 import com.nendo.argosy.data.local.dao.PendingConflictDao
 import com.nendo.argosy.data.local.dao.SaveCountByDevice
@@ -29,7 +29,7 @@ import java.io.File
 import com.nendo.argosy.core.input.SoundType
 import com.nendo.argosy.ui.input.InputHandler
 import com.nendo.argosy.ui.input.InputResult
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.nendo.argosy.di.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -50,6 +50,25 @@ import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
+import com.nendo.argosy.platform.getApplicationInfo
+import com.nendo.argosy.platform.getApplicationLabel
+import com.nendo.argosy.platform.applicationContext
+import com.nendo.argosy.platform.packageName
+import com.nendo.argosy.platform.getSystemService
+import com.nendo.argosy.platform.getExternalFilesDir
+import com.nendo.argosy.platform.packageManager
+import com.nendo.argosy.platform.getPackageInfo
+import com.nendo.argosy.platform.versionName
+import com.nendo.argosy.platform.assets
+import com.nendo.argosy.platform.contentResolver
+import com.nendo.argosy.platform.cacheDir
+import com.nendo.argosy.platform.filesDir
+import com.nendo.argosy.platform.getSharedPreferences
+import com.nendo.argosy.platform.list
+import com.nendo.argosy.platform.open
+import com.nendo.argosy.platform.getQuantityString
+import com.nendo.argosy.platform.getString
+import com.nendo.argosy.platform.resources
 
 private const val JUST_SYNCED_THRESHOLD_MINUTES = 30L
 private const val ACTIVITY_CALENDAR_DAYS = 84
@@ -57,7 +76,7 @@ private const val ACTIVITY_DEBOUNCE_MS = 150L
 
 @HiltViewModel
 class SaveSyncViewModel @Inject constructor(
-    @dagger.hilt.android.qualifiers.ApplicationContext private val context: android.content.Context,
+    @com.nendo.argosy.di.ApplicationContext private val context: com.nendo.argosy.platform.PlatformContext,
     private val saveSyncDao: SaveSyncDao,
     private val pendingConflictDao: PendingConflictDao,
     private val syncQueueManager: SyncQueueManager,

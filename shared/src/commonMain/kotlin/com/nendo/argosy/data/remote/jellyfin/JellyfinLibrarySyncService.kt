@@ -1,6 +1,6 @@
 package com.nendo.argosy.data.remote.jellyfin
 
-import androidx.room.withTransaction
+import com.nendo.argosy.platform.withTransaction
 import com.nendo.argosy.data.local.ALauncherDatabase
 import com.nendo.argosy.data.local.dao.MediaCreditDao
 import com.nendo.argosy.data.local.dao.MediaItemDao

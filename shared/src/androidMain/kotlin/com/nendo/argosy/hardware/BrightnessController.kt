@@ -8,20 +8,15 @@ import com.nendo.argosy.util.SystemSettings
 import javax.inject.Inject
 import javax.inject.Singleton
 
-data class DisplayBrightness(
-    val primary: Float?,
-    val secondary: Float?
-)
-
 @Singleton
-class BrightnessController @Inject constructor(
+actual class BrightnessController @Inject constructor(
     private val systemSettings: SystemSettings,
     private val screenCatalog: ScreenCatalog
 ) {
-    fun getBrightness(): DisplayBrightness =
+    actual fun getBrightness(): DisplayBrightness =
         DisplayBrightness(primary = systemSettings.screenBrightness(), secondary = null)
 
-    fun setPrimaryBrightness(brightness: Float): Boolean =
+    actual fun setPrimaryBrightness(brightness: Float): Boolean =
         systemSettings.setScreenBrightness(brightness)
 
     /**
@@ -29,7 +24,7 @@ class BrightnessController @Inject constructor(
      * one panel, without a root route, or on an Android release whose display service calls are
      * not mapped. Blocks on a shell call.
      */
-    fun secondaryBrightness(): Float? {
+    actual fun secondaryBrightness(): Float? {
         val call = displayCalls ?: return null
         if (!RootShell.isAvailable) return null
         val displayId = secondaryPanelId() ?: return null
@@ -40,7 +35,7 @@ class BrightnessController @Inject constructor(
     /**
      * Sets the second built-in panel's brightness, 0 to 1. Blocks on a shell call.
      */
-    fun setSecondaryBrightness(brightness: Float): Boolean {
+    actual fun setSecondaryBrightness(brightness: Float): Boolean {
         val call = displayCalls ?: return false
         if (!RootShell.isAvailable) return false
         val displayId = secondaryPanelId() ?: return false
@@ -54,7 +49,7 @@ class BrightnessController @Inject constructor(
 
     internal class DisplayServiceCalls(val set: Int, val get: Int)
 
-    companion object {
+    actual companion object {
         private val callsBySdk = mapOf(
             Build.VERSION_CODES.TIRAMISU to DisplayServiceCalls(set = 35, get = 36)
         )

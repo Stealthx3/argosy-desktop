@@ -15,13 +15,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
+import com.nendo.argosy.platform.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import coil.compose.AsyncImage
+import com.nendo.argosy.platform.image.AsyncImage
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
-import androidx.core.graphics.toColorInt
+import com.nendo.argosy.platform.toColorInt
 import com.nendo.argosy.ui.screens.doodle.DecodedDoodle
 import com.nendo.argosy.ui.screens.doodle.DoodlePreview
 import com.nendo.argosy.ui.theme.Dimens
@@ -136,7 +136,7 @@ fun presenceOnlineColor(): Color =
 private fun decodeAvatarPng(base64: String?): ImageBitmap? {
     if (base64.isNullOrEmpty()) return null
     return runCatching {
-        val bytes = android.util.Base64.decode(base64, android.util.Base64.NO_WRAP)
-        android.graphics.BitmapFactory.decodeByteArray(bytes, 0, bytes.size)?.asImageBitmap()
+        val bytes = com.nendo.argosy.platform.PlatformBase64.decode(base64, com.nendo.argosy.platform.PlatformBase64.NO_WRAP)
+        com.nendo.argosy.platform.PlatformBitmapFactory.decodeByteArray(bytes, 0, bytes.size)?.asImageBitmap()
     }.getOrNull()
 }

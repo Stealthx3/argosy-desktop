@@ -96,16 +96,15 @@ private val IMAGE_SUBTITLE_FORMATS = listOf("pgssub", "dvdsub", "dvbsub")
  * the next.
  */
 @Singleton
-class JellyfinDeviceProfileBuilder @Inject constructor() {
+actual class JellyfinDeviceProfileBuilder @Inject constructor() {
 
     @Suppress("LongParameterList")
-    fun build(
-        maxStreamingBitrateKbps: Int? = null,
-        maxHeight: Int? = null,
-        maxFramerate: Int? = null,
-        burnInImageSubtitles: Boolean = false,
-        maxAudioChannels: Int = DEFAULT_MAX_AUDIO_CHANNELS
-    ): JellyfinDeviceProfile {
+    actual fun build(
+        maxStreamingBitrateKbps: Int?,
+        maxHeight: Int?,
+        maxFramerate: Int?,
+        burnInImageSubtitles: Boolean,
+        maxAudioChannels: Int): JellyfinDeviceProfile {
         val decoders = readDecoders()
         val videoCodecs = decoders.videoCodecs.toList()
         val audioCodecs = decoders.audioCodecs.toList()
@@ -283,7 +282,7 @@ class JellyfinDeviceProfileBuilder @Inject constructor() {
      * on its own for the download profile, which declares nothing else - a saved file has no second
      * chance to fetch a track, so a picture subtitle either goes into the encode or does not exist.
      */
-    fun burnInSubtitleProfiles(): List<JellyfinSubtitleProfile> =
+    actual fun burnInSubtitleProfiles(): List<JellyfinSubtitleProfile> =
         IMAGE_SUBTITLE_FORMATS.map {
             JellyfinSubtitleProfile(format = it, method = SUBTITLE_METHOD_ENCODE)
         }
@@ -341,7 +340,7 @@ class JellyfinDeviceProfileBuilder @Inject constructor() {
         }
     }
 
-    companion object {
+    actual companion object {
         /**
          * Ceiling on the audio channels a transcoding profile may carry, copied or encoded. Six
          * keeps a 5.1 track eligible for stream copy - the server refuses to copy a track whose
@@ -349,6 +348,6 @@ class JellyfinDeviceProfileBuilder @Inject constructor() {
          * mandatory aac decoder handles 5.1, with the audio pipeline downmixing to whatever the
          * output device actually is. Direct play is not gated by this value at all.
          */
-        const val DEFAULT_MAX_AUDIO_CHANNELS = 6
+        actual const val DEFAULT_MAX_AUDIO_CHANNELS = 6
     }
 }

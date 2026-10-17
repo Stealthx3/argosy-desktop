@@ -1,6 +1,6 @@
 package com.nendo.argosy.data.repository
 
-import android.os.StatFs
+import com.nendo.argosy.platform.PlatformStatFs as StatFs
 import com.nendo.argosy.data.emulator.BuiltinCoreResolver
 import com.nendo.argosy.data.emulator.EmulatorRegistry
 import com.nendo.argosy.data.emulator.EmulatorResolver

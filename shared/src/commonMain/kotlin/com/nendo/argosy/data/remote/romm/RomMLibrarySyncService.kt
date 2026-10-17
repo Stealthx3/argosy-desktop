@@ -1,6 +1,6 @@
 package com.nendo.argosy.data.remote.romm
 
-import androidx.room.withTransaction
+import com.nendo.argosy.platform.withTransaction
 import com.nendo.argosy.data.cache.ImageCacheManager
 import com.nendo.argosy.data.local.ALauncherDatabase
 import com.nendo.argosy.data.local.dao.CollectionDao

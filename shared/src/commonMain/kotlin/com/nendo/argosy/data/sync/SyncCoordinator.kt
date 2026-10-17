@@ -1,6 +1,25 @@
 package com.nendo.argosy.data.sync
 
-import android.content.Context
+import com.nendo.argosy.platform.PlatformContext as Context
+import com.nendo.argosy.platform.getApplicationInfo
+import com.nendo.argosy.platform.getApplicationLabel
+import com.nendo.argosy.platform.applicationContext
+import com.nendo.argosy.platform.packageName
+import com.nendo.argosy.platform.getSystemService
+import com.nendo.argosy.platform.getExternalFilesDir
+import com.nendo.argosy.platform.packageManager
+import com.nendo.argosy.platform.getPackageInfo
+import com.nendo.argosy.platform.versionName
+import com.nendo.argosy.platform.assets
+import com.nendo.argosy.platform.contentResolver
+import com.nendo.argosy.platform.getSharedPreferences
+import com.nendo.argosy.platform.list
+import com.nendo.argosy.platform.open
+import com.nendo.argosy.platform.cacheDir
+import com.nendo.argosy.platform.filesDir
+import com.nendo.argosy.platform.getQuantityString
+import com.nendo.argosy.platform.getString
+import com.nendo.argosy.platform.resources
 import com.nendo.argosy.data.local.dao.GameDao
 import com.nendo.argosy.data.local.dao.PendingSyncQueueDao
 import com.nendo.argosy.data.local.dao.SaveCacheDao
@@ -30,7 +49,7 @@ import com.nendo.argosy.data.sync.strategy.ReconcilePlan
 import com.nendo.argosy.data.sync.strategy.SaveSyncStrategySelector
 import com.nendo.argosy.util.Logger
 import dagger.Lazy
-import dagger.hilt.android.qualifiers.ApplicationContext
+import com.nendo.argosy.di.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.sync.Mutex
@@ -109,7 +128,7 @@ class SyncCoordinator @Inject constructor(
      * [RECONNECT_RECONCILE_COOLDOWN_MS] of the last one, from any caller, reconcile once.
      */
     suspend fun reconcileAfterReconnect(): ReconcileSummary? {
-        val now = android.os.SystemClock.elapsedRealtime()
+        val now = com.nendo.argosy.platform.PlatformSystemClock.elapsedRealtime()
         synchronized(this) {
             if (lastReconnectReconcileAtMs != 0L &&
                 now - lastReconnectReconcileAtMs < RECONNECT_RECONCILE_COOLDOWN_MS

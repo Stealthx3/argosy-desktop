@@ -37,8 +37,6 @@ import com.nendo.argosy.data.local.entity.GameDiscEntity
 import com.nendo.argosy.data.platform.PlatformFolderResolver
 import com.nendo.argosy.data.local.entity.GameEntity
 import com.nendo.argosy.data.model.GameSource
-import com.nendo.argosy.data.model.VariantCategory
-import com.nendo.argosy.util.LogSanitizer
 import com.nendo.argosy.util.Logger
 import com.nendo.argosy.domain.model.LaunchStep
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -52,44 +50,6 @@ private val PACKAGE_NAME = Regex("^[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z0-9_]+)+$")
 internal const val EXTRA_ALREADY_LAUNCHED = "argosy.already_launched"
 private val DISC_TAG_REGEX = Regex("\\(Disc \\d+\\)", RegexOption.IGNORE_CASE)
 private val DISC_NUMBER_REGEX = Regex("\\d+")
-
-data class DiscOption(
-    val fileName: String,
-    val filePath: String,
-    val discNumber: Int
-)
-
-sealed class LaunchResult {
-    /**
-     * @property variantFileId the `game_files` row that launched in place of the primary rom; null
-     * when the primary rom launched, whichever variant the caller requested.
-     */
-    data class Success(
-        val intent: Intent,
-        val discId: Long? = null,
-        val alreadyLaunched: Boolean = false,
-        val inProcess: Boolean = false,
-        val variantFileId: Long? = null
-    ) : LaunchResult()
-    data class SelectDisc(val gameId: Long, val discs: List<DiscOption>) : LaunchResult()
-    data class SelectVariant(val gameId: Long, val variants: List<VariantOption>) : LaunchResult()
-    data class SelectMemcard(
-        val gameId: Long,
-        val emulatorId: String,
-        val platformName: String,
-        val cards: List<com.nendo.argosy.data.sync.platform.MemcardInfo>
-    ) : LaunchResult()
-    data class NoEmulator(val platformSlug: String) : LaunchResult()
-    data class NoRomFile(val gamePath: String?) : LaunchResult()
-    data class NoSteamLauncher(val launcherPackage: String) : LaunchResult()
-    data class NoAndroidApp(val packageName: String) : LaunchResult()
-    data class NoCore(val platformSlug: String, val reason: String? = null) : LaunchResult()
-    data class MissingDiscs(val missingDiscNumbers: List<Int>) : LaunchResult()
-    data class MissingBios(val platformSlug: String) : LaunchResult()
-    data class NoScummVMGameId(val gameName: String) : LaunchResult()
-    data class Error(val message: String) : LaunchResult()
-    data object Cancelled : LaunchResult()
-}
 
 @Singleton
 class GameLauncher @Inject constructor(

@@ -11,10 +11,10 @@ import javax.inject.Singleton
 import kotlin.math.roundToInt
 
 @Singleton
-class DisplayRefreshController @Inject constructor(
+actual class DisplayRefreshController @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
-    fun supportedRatesHz(): List<Int> {
+    actual fun supportedRatesHz(): List<Int> {
         val display = context.getSystemService(DisplayManager::class.java)
             ?.getDisplay(Display.DEFAULT_DISPLAY) ?: return emptyList()
         val active = display.mode
@@ -28,13 +28,13 @@ class DisplayRefreshController @Inject constructor(
     /**
      * The pinned rate in hertz, or null while the system picks the rate itself.
      */
-    fun currentRateHz(): Int? =
+    actual fun currentRateHz(): Int? =
         Settings.System.getString(context.contentResolver, KEY_PEAK)?.toFloatOrNull()?.roundToInt()
 
     /**
      * Pins both refresh bounds to [hz], or clears them when [hz] is null. Needs the root route.
      */
-    fun setRateHz(hz: Int?): Boolean {
+    actual fun setRateHz(hz: Int?): Boolean {
         val command = if (hz == null) {
             "settings delete system $KEY_MIN; settings delete system $KEY_PEAK"
         } else {

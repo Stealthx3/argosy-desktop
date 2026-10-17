@@ -1,7 +1,17 @@
 package com.nendo.argosy.ui.audio
 
-import android.net.Uri
-import android.util.Log
+import com.nendo.argosy.platform.PlatformUri as Uri
+import com.nendo.argosy.platform.authority
+import com.nendo.argosy.platform.encodedPath
+import com.nendo.argosy.platform.getQueryParameter
+import com.nendo.argosy.platform.host
+import com.nendo.argosy.platform.lastPathSegment
+import com.nendo.argosy.platform.path
+import com.nendo.argosy.platform.pathSegments
+import com.nendo.argosy.platform.queryParameterNames
+import com.nendo.argosy.platform.scheme
+import com.nendo.argosy.platform.PlatformUris
+import com.nendo.argosy.util.PlatformLog as Log
 import com.nendo.argosy.data.preferences.UserPreferencesRepository
 import com.nendo.argosy.data.remote.romm.ConnectionState
 import com.nendo.argosy.data.remote.romm.RomMRepository
@@ -105,7 +115,7 @@ class GameThemeAudioCoordinator @Inject constructor(
     ): AmbientOverrideSource.Remote? {
         if (romMRepository.connectionState.value !is ConnectionState.Connected) return null
         val url = romMRepository.buildMediaUrlPublic(
-            "/api/roms/${theme.rommFileId}/files/content/${Uri.encode(theme.fileName)}"
+            "/api/roms/${theme.rommFileId}/files/content/${PlatformUris.encode(theme.fileName)}"
         ) ?: return null
         val headers = token?.let { mapOf("Authorization" to "Bearer $it") } ?: emptyMap()
         return AmbientOverrideSource.Remote(url, headers, theme.title)

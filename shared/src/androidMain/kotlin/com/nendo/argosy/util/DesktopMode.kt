@@ -8,12 +8,12 @@ import android.content.res.Configuration
  * when the instance field `semDesktopModeEnabled` equals the static `SEM_DESKTOP_MODE_ENABLED`.
  * Any device without those fields reads as inactive.
  */
-object DesktopMode {
+actual object DesktopMode {
     private const val ENABLED_CONSTANT = "SEM_DESKTOP_MODE_ENABLED"
     private const val MODE_FIELD = "semDesktopModeEnabled"
     private const val DESKTOP_MODE_FEATURE = "com.sec.feature.desktopmode"
 
-    fun isSupported(context: Context): Boolean = isSupported(
+    actual fun isSupported(context: Context): Boolean = isSupported(
         hasFeature = context.packageManager.hasSystemFeature(DESKTOP_MODE_FEATURE),
         configurationClass = Configuration::class.java
     )
@@ -21,9 +21,9 @@ object DesktopMode {
     internal fun isSupported(hasFeature: Boolean, configurationClass: Class<*>): Boolean =
         hasFeature || readInt { configurationClass.getField(ENABLED_CONSTANT).getInt(null) } != null
 
-    fun isActive(context: Context): Boolean = isActive(context.resources.configuration)
+    actual fun isActive(context: Context): Boolean = isActive(context.resources.configuration)
 
-    fun isActive(configuration: Configuration): Boolean =
+    actual fun isActive(configuration: Configuration): Boolean =
         isActive(configuration.javaClass, configuration)
 
     internal fun isActive(configurationClass: Class<*>, configuration: Any): Boolean {

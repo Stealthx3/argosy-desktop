@@ -24,7 +24,7 @@ private val STORAGE_ROOT_PATTERN = Regex("^(/storage/[^/]+|/mnt/media_rw/[^/]+)"
  * library to anything that only asks `File.exists()`.
  */
 @Singleton
-class StorageVolumeHealth @Inject constructor(
+actual class StorageVolumeHealth @Inject constructor(
     @ApplicationContext private val context: Context,
     private val fileAccessLayer: FileAccessLayer
 ) {
@@ -34,14 +34,14 @@ class StorageVolumeHealth @Inject constructor(
      * mean something different from the second. Create one per operation and pass it down; never
      * cache one across operations.
      */
-    fun newProbe(): VolumeProbe = VolumeProbe(context, fileAccessLayer)
+    actual fun newProbe(): VolumeProbe = VolumeProbe(context, fileAccessLayer)
 }
 
 /**
  * A single sweep's view of which storage volumes can be trusted to answer for absence.
  * Not thread-safe; confine one probe to the pass that created it.
  */
-class VolumeProbe internal constructor(
+actual class VolumeProbe internal constructor(
     private val context: Context,
     private val fileAccessLayer: FileAccessLayer
 ) {
@@ -52,7 +52,7 @@ class VolumeProbe internal constructor(
      * path that maps to no recognisable volume, which keeps unrecognised mounts on the
      * protective side.
      */
-    fun isVolumeReadable(path: String): Boolean {
+    actual fun isVolumeReadable(path: String): Boolean {
         if (path.isBlank()) return false
         val root = volumeRootFor(path) ?: return false
         return rootVerdicts.getOrPut(root) { computeRootReadable(root) }
@@ -64,7 +64,7 @@ class VolumeProbe internal constructor(
      * caller that clears a pointer, drops a row, or deletes content because a file was not
      * found must gate on this rather than on `exists()`.
      */
-    fun isGenuinelyAbsent(path: String): Boolean {
+    actual fun isGenuinelyAbsent(path: String): Boolean {
         if (path.isBlank()) return false
         if (fileAccessLayer.exists(path)) return false
         if (!isVolumeReadable(path)) {
@@ -82,7 +82,7 @@ class VolumeProbe internal constructor(
      * Whether every one of [paths] sits on a readable volume. Callers that sweep a whole library
      * use this to decide once, before touching anything, whether the sweep may run at all.
      */
-    fun allVolumesReadable(paths: Collection<String>): Boolean =
+    actual fun allVolumesReadable(paths: Collection<String>): Boolean =
         paths.all { isVolumeReadable(it) }
 
     private fun volumeRootFor(path: String): String? {

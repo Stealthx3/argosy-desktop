@@ -1,6 +1,15 @@
 package com.nendo.argosy.ui.screens.common
 
-import android.graphics.Bitmap
+import com.nendo.argosy.platform.PlatformBitmap as Bitmap
+import com.nendo.argosy.platform.asImageBitmap
+import com.nendo.argosy.platform.config
+import com.nendo.argosy.platform.copy
+import com.nendo.argosy.platform.getPixel
+import com.nendo.argosy.platform.height
+import com.nendo.argosy.platform.recycle
+import com.nendo.argosy.platform.setPixels
+import com.nendo.argosy.platform.width
+import com.nendo.argosy.platform.PlatformBitmapConfig
 import androidx.compose.ui.graphics.Color
 import com.nendo.argosy.data.cache.GradientPreset
 import com.nendo.argosy.data.cache.ImageCacheManager
@@ -333,8 +342,8 @@ class GradientExtractionDelegate @Inject constructor(
         bitmap: Bitmap,
         persist: suspend (String) -> Unit
     ) {
-        val readable = if (bitmap.config == Bitmap.Config.HARDWARE) {
-            bitmap.copy(Bitmap.Config.ARGB_8888, false) ?: return
+        val readable = if (bitmap.config == PlatformBitmapConfig.HARDWARE) {
+            bitmap.copy(PlatformBitmapConfig.ARGB_8888, false) ?: return
         } else {
             bitmap
         }

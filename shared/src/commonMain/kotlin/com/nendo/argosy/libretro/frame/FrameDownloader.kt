@@ -1,6 +1,6 @@
 package com.nendo.argosy.libretro.frame
 
-import android.util.Log
+import com.nendo.argosy.util.PlatformLog as Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File

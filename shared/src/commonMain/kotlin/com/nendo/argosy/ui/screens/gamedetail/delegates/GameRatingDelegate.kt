@@ -1,6 +1,6 @@
 package com.nendo.argosy.ui.screens.gamedetail.delegates
 
-import com.nendo.argosy.R
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.data.remote.romm.RomMRepository
 import com.nendo.argosy.data.remote.romm.RomMResult
 import com.nendo.argosy.core.notification.NotificationManager

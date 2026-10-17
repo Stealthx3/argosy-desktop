@@ -10,19 +10,12 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
-data class CoreCrashInfo(
-    val coreId: String,
-    val gameId: Long,
-    val reason: Int,
-    val exitTimestamp: Long
-)
-
 @Singleton
-class CoreCrashDetector @Inject constructor(
+actual class CoreCrashDetector @Inject constructor(
     @ApplicationContext private val context: Context,
     private val sessionPreferences: SessionPreferencesRepository
 ) {
-    suspend fun detect(): CoreCrashInfo? {
+    actual suspend fun detect(): CoreCrashInfo? {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return null
         val session = sessionPreferences.getPersistedSession() ?: return null
         if (session.emulatorPackage != EmulatorRegistry.BUILTIN_PACKAGE) return null

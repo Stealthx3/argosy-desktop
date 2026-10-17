@@ -28,3 +28,5 @@ actual object PlatformIntent {
     actual val FLAG_ACTIVITY_SINGLE_TOP: Int get() = Intent.FLAG_ACTIVITY_SINGLE_TOP
     actual val FLAG_GRANT_READ_URI_PERMISSION: Int get() = Intent.FLAG_GRANT_READ_URI_PERMISSION
 }
+
+actual typealias PlatformIntentType = Intent

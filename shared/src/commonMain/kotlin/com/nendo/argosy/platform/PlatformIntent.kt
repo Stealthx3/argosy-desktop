@@ -26,3 +26,5 @@ expect object PlatformIntent {
     val FLAG_ACTIVITY_SINGLE_TOP: Int
     val FLAG_GRANT_READ_URI_PERMISSION: Int
 }
+
+expect open class PlatformIntentType

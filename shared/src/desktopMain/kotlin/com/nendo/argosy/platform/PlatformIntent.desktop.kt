@@ -26,3 +26,5 @@ actual object PlatformIntent {
     actual val FLAG_ACTIVITY_SINGLE_TOP: Int = 536870912
     actual val FLAG_GRANT_READ_URI_PERMISSION: Int = 1
 }
+
+actual open class PlatformIntentType

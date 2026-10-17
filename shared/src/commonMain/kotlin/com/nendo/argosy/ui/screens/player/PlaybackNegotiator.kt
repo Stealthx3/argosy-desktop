@@ -1,8 +1,37 @@
 package com.nendo.argosy.ui.screens.player
 
-import android.content.Context
-import android.net.Uri
-import com.nendo.argosy.R
+import com.nendo.argosy.platform.PlatformContext as Context
+import com.nendo.argosy.platform.getApplicationInfo
+import com.nendo.argosy.platform.getApplicationLabel
+import com.nendo.argosy.platform.applicationContext
+import com.nendo.argosy.platform.packageName
+import com.nendo.argosy.platform.getSystemService
+import com.nendo.argosy.platform.getExternalFilesDir
+import com.nendo.argosy.platform.packageManager
+import com.nendo.argosy.platform.getPackageInfo
+import com.nendo.argosy.platform.versionName
+import com.nendo.argosy.platform.assets
+import com.nendo.argosy.platform.contentResolver
+import com.nendo.argosy.platform.getSharedPreferences
+import com.nendo.argosy.platform.list
+import com.nendo.argosy.platform.open
+import com.nendo.argosy.platform.cacheDir
+import com.nendo.argosy.platform.filesDir
+import com.nendo.argosy.platform.getQuantityString
+import com.nendo.argosy.platform.getString
+import com.nendo.argosy.platform.resources
+import com.nendo.argosy.platform.PlatformUri as Uri
+import com.nendo.argosy.platform.authority
+import com.nendo.argosy.platform.encodedPath
+import com.nendo.argosy.platform.getQueryParameter
+import com.nendo.argosy.platform.host
+import com.nendo.argosy.platform.lastPathSegment
+import com.nendo.argosy.platform.path
+import com.nendo.argosy.platform.pathSegments
+import com.nendo.argosy.platform.queryParameterNames
+import com.nendo.argosy.platform.scheme
+import com.nendo.argosy.platform.PlatformUris
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.data.media.MediaAvailability
 import com.nendo.argosy.data.media.MediaAvailabilityVerifier
 import com.nendo.argosy.data.media.MediaSubtitleDelivery
@@ -21,7 +50,7 @@ import com.nendo.argosy.data.remote.jellyfin.PLAY_METHOD_TRANSCODE
 import com.nendo.argosy.data.remote.jellyfin.TICKS_PER_MILLISECOND
 import com.nendo.argosy.data.repository.MediaRepository
 import com.nendo.argosy.util.Logger
-import dagger.hilt.android.qualifiers.ApplicationContext
+import com.nendo.argosy.di.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
@@ -178,7 +207,7 @@ class PlaybackNegotiator @Inject constructor(
         val sidecars = availabilityVerifier.downloadedSubtitles(localPath).map { sidecar ->
             SideloadedSubtitle(
                 streamIndex = sidecar.streamIndex,
-                url = Uri.fromFile(File(sidecar.path)).toString(),
+                url = PlatformUris.fromFile(File(sidecar.path)).toString(),
                 mimeType = sidecar.delivery.mimeType,
                 language = sidecar.language
             )
@@ -188,7 +217,7 @@ class PlaybackNegotiator @Inject constructor(
             itemId = itemId,
             mediaSourceId = itemId,
             playSessionId = null,
-            streamUrl = Uri.fromFile(file).toString(),
+            streamUrl = PlatformUris.fromFile(file).toString(),
             playMethod = PLAY_METHOD_DIRECT_PLAY,
             isTranscode = false,
             isHls = false,

@@ -1,6 +1,6 @@
 package com.nendo.argosy.ui.components.musicplayer
 
-import android.util.Log
+import com.nendo.argosy.util.PlatformLog as Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nendo.argosy.data.preferences.ControlsPreferencesRepository
@@ -14,7 +14,7 @@ import com.nendo.argosy.ui.audio.AmbientAudioManager
 import com.nendo.argosy.ui.screens.settings.delegates.VolumeLevels
 import com.nendo.argosy.ui.screens.settings.delegates.adjustInList
 import com.nendo.argosy.ui.theme.generated.ComponentDefaults
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.nendo.argosy.di.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job

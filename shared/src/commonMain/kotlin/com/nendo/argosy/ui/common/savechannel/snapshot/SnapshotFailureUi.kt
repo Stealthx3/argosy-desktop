@@ -1,7 +1,7 @@
 package com.nendo.argosy.ui.common.savechannel.snapshot
 
 import androidx.annotation.StringRes
-import com.nendo.argosy.R
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.data.sync.snapshot.SnapshotFailure
 
 @get:StringRes

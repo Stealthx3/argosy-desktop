@@ -7,19 +7,19 @@ import android.graphics.BitmapFactory
 import java.io.File
 import java.io.FileOutputStream
 
-object TouchBackdropCache {
+actual object TouchBackdropCache {
 
     private const val SUBDIR = "touch_layout_backdrop"
     private const val MAX_DIMENSION = 720
 
-    fun fileFor(context: Context, platformSlug: String, orientation: Int): File {
+    actual fun fileFor(context: Context, platformSlug: String, orientation: Int): File {
         val dir = File(context.cacheDir, SUBDIR).apply { if (!exists()) mkdirs() }
         val safe = platformSlug.replace(Regex("[^A-Za-z0-9_-]"), "_")
         val suffix = if (orientation == Configuration.ORIENTATION_PORTRAIT) "portrait" else "landscape"
         return File(dir, "${safe}_${suffix}.png")
     }
 
-    fun save(context: Context, platformSlug: String, orientation: Int, bitmap: Bitmap?) {
+    actual fun save(context: Context, platformSlug: String, orientation: Int, bitmap: Bitmap?) {
         val src = bitmap ?: return
         try {
             val scaled = scale(src)
@@ -30,7 +30,7 @@ object TouchBackdropCache {
         }
     }
 
-    fun load(context: Context, platformSlug: String, orientation: Int): Bitmap? {
+    actual fun load(context: Context, platformSlug: String, orientation: Int): Bitmap? {
         val primary = fileFor(context, platformSlug, orientation)
         if (primary.exists()) {
             return try { BitmapFactory.decodeFile(primary.absolutePath) } catch (_: Exception) { null }

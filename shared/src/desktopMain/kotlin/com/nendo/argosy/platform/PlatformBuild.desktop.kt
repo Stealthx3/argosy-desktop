@@ -2,7 +2,7 @@ package com.nendo.argosy.platform
 
 import java.io.File
 
-private val arch: String = System.getProperty("os.arch").orEmpty()
+private val arch: String = System.getProperty("os.arch")
 
 private val desktopAbi: String = when (arch) {
     "amd64", "x86_64" -> "x86_64"

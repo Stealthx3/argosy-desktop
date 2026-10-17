@@ -1,6 +1,6 @@
 package com.nendo.argosy.ui.screens.doodle
 
-import android.util.Base64
+import com.nendo.argosy.platform.PlatformBase64 as Base64
 import com.nendo.argosy.data.quaypass.ble.QuayPassDoodleCodec
 import java.io.ByteArrayOutputStream
 

@@ -1,6 +1,7 @@
 package com.nendo.argosy.data.emulator
 
-import android.content.Intent
+import com.nendo.argosy.platform.PlatformIntentType as Intent
+import com.nendo.argosy.platform.PlatformIntent
 
 data class DiscOption(
     val fileName: String,
