@@ -16,7 +16,7 @@ from pathlib import Path
 
 from PIL import Image, ImageChops, ImageDraw
 
-MASKS = [(1490, 0, 1920, 175), (0, 940, 500, 1010)]
+MASKS = [(1490, 0, 1920, 185), (0, 940, 500, 1010)]
 
 
 def load(path):
