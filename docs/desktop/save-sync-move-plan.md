@@ -1,6 +1,6 @@
 # Save-sync move plan (Phase 1 and later)
 
-Status: proposed, waiting for the owner's go-ahead. Measured 2026-10-16 on `main` after the
+Status: approved by the owner 2026-10-16. Stage 1 done and live-proven (see `DEVLOG.md`). Measured 2026-10-16 on `main` after the
 Phase 1 data-layer catch-up.
 
 Upstream treats save sync as a fragile zone: "every door into it (pre-launch negotiation,

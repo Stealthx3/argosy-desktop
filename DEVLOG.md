@@ -94,7 +94,7 @@ Project rules (set by the project owner, 2026-10-16):
 
 ## Phase 1 · Kotlin Multiplatform restructure
 
-**Status:** plan approved by the owner (2026-10-16); steps 1–7 and the data-layer catch-up done; save-sync move plan proposed (`docs/desktop/save-sync-move-plan.md`), waiting for the owner.
+**Status:** plan approved by the owner (2026-10-16); steps 1–7, the data-layer catch-up and save-sync stage 1 done; step 8 (resources) next.
 
 ### 2026-10-16 — Session 3 (Claude Code on the owner's computer)
 
@@ -287,3 +287,24 @@ Declarations, KDoc and annotations move byte for byte; each file keeps only the 
 
 **Action:** Wrote `docs/desktop/save-sync-move-plan.md` for the owner: zone definition and size (99 files), what keeps each part in `app` (`Context` 31, `@ApplicationContext` 22, WorkManager about 25 in four workers, `dagger.Lazy`/assisted 13, `R` 10, `Build` 5, Sigil 3), four stages (stage 1 = the 22 zone files portable today, plus what adding plain `dagger` to `commonMain` unblocks; stages 2–4 with the Phase 3 `FilePaths` and `BackgroundJobs` interfaces and the Sigil binding), and the live-proof protocol: a testbed with battery-backed homebrew ROMs and seeded server saves, Docker-volume and emulator snapshots so baseline and candidate start from identical state without clearing app data, then reconcile (`planReconcile` with `no_op` twice), pre-launch negotiation and session-end archiving, comparing `GET /api/saves`, device save rows, on-disk save hashes and DataStore between baseline and candidate.
 **Reasoning:** the zone's rule is live-data proof, and the testbed has no saves yet; the plan makes that proof repeatable before any zone file moves.
+
+**Action:** Owner approved the save-sync move plan: extend the testbed with saves and snapshot/restore, then run stage 1 with the live proof.
+- **Testbed (done by the testbed session from a brief, reviewed and committed here, `8bdc23f78`):** three self-made battery-backed Game Boy ROMs (MBC1+RAM+BATTERY; one never writes its SRAM, two add one to a boot counter), three seeded server saves through `POST /api/saves` (Battery Bay in two slots), `snapshot.sh` (testbed Docker volumes plus an emulator snapshot of `argosy_handheld_check`), `save-proof.sh` and `proof-diff.sh`. Snapshot `saves-baseline` holds the pre-Phase-1 APK signed in with Save Sync on and the built-in mGBA core installed. Details and two emulator caveats (the APK must be installed with `--abi arm64-v8a` because `libretrodroid` and `sigil` ship arm64 only; the core architecture setting must be ARMv8) are in `docs/desktop/testbed-runbook.md`. The session ran the pre-Phase-1 APK twice from the snapshot; the two runs' normalized captures were identical, so the protocol is deterministic.
+- **Stage 1 code:** plain `dagger` added to `commonMain` (it unblocks no stage 1 file but is plain JVM, already on Android through Hilt, and listed in the plan). Moved the 22 zone files that were portable as they are: pure renames (R100), and the scripted rewrite changed nothing in them, so their content is byte-identical. `movable.py --check`: 0 problems.
+- **Stage baseline kept:** the APK of the commit before stage 1 (`aa5efca88`) is saved as `build/desktop-baseline/app-debug-catchup-aa5efca88.apk`; the stage 1 build as `app-debug-stage1-candidate.apk`.
+**Verification:**
+- Build gate on JDK 21 → BUILD SUCCESSFUL; app 4,359 tests, 0 failures, 1 skipped; desktop 4 tests, 0 failures.
+- **Live save-sync proof** (`save-proof.sh` from snapshot `saves-baseline`, stage 1 APK, compared with the pre-Phase-1 baseline run by `proof-diff.sh`):
+
+| Door | Baseline | Stage 1 |
+| --- | --- | --- |
+| Startup reconcile | upload=0 download=2 conflict=0 no_op=1 | same |
+| Save Sync → Scan RomM, 1st | upload=0 download=0 conflict=0 **no_op=3** | same |
+| Save Sync → Scan RomM, 2nd | upload=0 download=0 conflict=0 **no_op=3** | same |
+| Pre-launch, Ledger Isle | no_op=1, disk matches | same |
+| Quit unchanged | `Sync result: NO_CHANGE`, server unchanged | same |
+| Pre-launch, Battery Bay | no_op=2, disk matches | same |
+| Session end, Battery Bay | `Sync result: UPLOADED`, one new autosave | same |
+
+  Every normalized capture is identical: `GET /api/saves`, device save tables, on-device save-file hashes (built-in saves and save cache) and DataStore, at every step. No `FATAL EXCEPTION`. This meets the zone rule (GET /api/saves; negotiate `no_op` twice).
+- Not run this time: the screen A/B check (`ab-check.sh`); the check AVD now carries the save-proof state, and the save proof itself drives the same app through launch, Home, Save Sync and game details. Stage 1 moved no UI.
