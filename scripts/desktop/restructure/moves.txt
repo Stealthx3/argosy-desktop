@@ -685,3 +685,20 @@
 + ui/components/HoldToConfirmButton.kt
 + ui/components/ScreenDimmerOverlay.kt
 + ui/notification/NotificationHost.kt
+
+# Phase 2: files freed by the Bitmap and Base64 stand-ins and the ImageCacheManager slice.
+[commonMain]
++ data/cache/ArtSourceRecorder.kt
++ data/launcher/GameNativeStoreSync.kt
++ data/repository/CollectionOverviewSource.kt
++ data/repository/HomeGridPageRepository.kt
++ data/repository/SteamRepository.kt
++ data/scanner/AndroidAppMetadataFetcher.kt
++ data/steam/SteamLibraryRepair.kt
++ domain/usecase/collection/GetCollectionsUseCase.kt
++ domain/usecase/collection/GetVirtualCollectionCategoriesUseCase.kt
++ ui/common/Coil.kt
++ ui/common/GradientColorExtractor.kt
++ ui/components/playtime/PlayCoverMosaic.kt
++ ui/screens/gamedetail/components/ReviewEditorContent.kt
++ ui/screens/gamedetail/delegates/ArtworkDelegate.kt
