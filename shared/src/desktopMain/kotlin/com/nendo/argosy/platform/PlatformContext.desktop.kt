@@ -10,6 +10,7 @@ actual abstract class PlatformContext {
     abstract val platformResources: PlatformResources
     abstract val platformFilesDir: java.io.File
     abstract val platformCacheDir: java.io.File
+    abstract val platformAssets: PlatformAssets
 }
 
 actual open class PlatformResources {
@@ -25,6 +26,7 @@ actual open class PlatformResources {
 class DesktopPlatformContext(
     override val platformFilesDir: java.io.File = DesktopDirectories.data.resolve("files"),
     override val platformCacheDir: java.io.File = DesktopDirectories.cache,
+    override val platformAssets: PlatformAssets = PlatformAssets(),
 ) : PlatformContext() {
     override val platformResources: PlatformResources = PlatformResources()
 }
@@ -59,3 +61,32 @@ actual val LocalPlatformContext: ProvidableCompositionLocal<PlatformContext> =
 actual val PlatformContext.filesDir: java.io.File get() = platformFilesDir
 
 actual val PlatformContext.cacheDir: java.io.File get() = platformCacheDir
+
+actual class PlatformAssets(private val root: String = ASSET_ROOT) {
+    private val index: List<String> by lazy {
+        javaClass.classLoader.getResourceAsStream("$root/$INDEX")?.bufferedReader()?.readLines().orEmpty()
+    }
+
+    fun children(path: String): Array<String> {
+        val prefix = path.trimEnd('/') + "/"
+        return index.filter { it.startsWith(prefix) }
+            .map { it.removePrefix(prefix).substringBefore('/') }
+            .distinct()
+            .toTypedArray()
+    }
+
+    fun stream(fileName: String): java.io.InputStream =
+        javaClass.classLoader.getResourceAsStream("$root/$fileName")
+            ?: throw java.io.FileNotFoundException(fileName)
+
+    companion object {
+        const val ASSET_ROOT = "argosy-assets"
+        const val INDEX = "index.txt"
+    }
+}
+
+actual val PlatformContext.assets: PlatformAssets get() = platformAssets
+
+actual fun PlatformAssets.list(path: String): Array<String>? = children(path)
+
+actual fun PlatformAssets.open(fileName: String): java.io.InputStream = stream(fileName)

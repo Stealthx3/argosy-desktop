@@ -131,6 +131,20 @@ val prepareDesktopComposeResources by tasks.registering(Sync::class) {
     into(layout.buildDirectory.dir("generated/desktopComposeResources"))
 }
 
+val prepareDesktopAssets by tasks.registering {
+    val assets = layout.projectDirectory.dir("src/androidMain/assets")
+    val outDir = layout.buildDirectory.dir("generated/desktopAssets")
+    inputs.dir(assets)
+    outputs.dir(outDir)
+    doLast {
+        val root = outDir.get().asFile.resolve("argosy-assets")
+        root.deleteRecursively()
+        assets.asFile.copyRecursively(root)
+        val index = root.walkTopDown().filter { it.isFile }.map { it.relativeTo(root).invariantSeparatorsPath }.sorted()
+        root.resolve("index.txt").writeText(index.joinToString("\n") + "\n")
+    }
+}
+
 val generateSharedR by tasks.registering {
     val baseStrings = androidResources.dir("values").asFileTree.matching { include("strings*.xml") }
     val drawables = androidResources.dir("drawable").asFileTree
@@ -240,6 +254,7 @@ kotlin {
         listOf("commonMain", "androidMain", "desktopMain").forEach { name ->
             getByName(name).kotlin.srcDir(generateSharedR.map { it.outputs.files.singleFile.resolve(name) })
         }
+        getByName("desktopMain").resources.srcDir(prepareDesktopAssets.map { it.outputs.files.singleFile })
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.ui)

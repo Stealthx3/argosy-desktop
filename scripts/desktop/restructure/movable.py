@@ -66,9 +66,10 @@ REWRITTEN = (
 )
 GENERATED = ("com.nendo.argosy.config.AppBuildConfig", "com.nendo.argosy.res.ArgosyR")
 CONTEXT_BEYOND_STRINGS = (
-    r"\b(?:\w*[cC]ontext|ctx)\??\.(?!getString\b|resources\b|filesDir\b|cacheDir\b|current\b)[a-zA-Z_]\w*"
+    r"\b(?:\w*[cC]ontext|ctx)\??\.(?!getString\b|resources\b|filesDir\b|cacheDir\b|assets\b|current\b)[a-zA-Z_]\w*"
     r"|\.resources\.(?!getQuantityString\b|getString\b)\w+"
-    r"|LocalContext\.current\.(?!getString\b|resources\b|filesDir\b|cacheDir\b)\w+"
+    r"|LocalContext\.current\.(?!getString\b|resources\b|filesDir\b|cacheDir\b|assets\b)\w+"
+    r"|\.assets\.(?!list\b|open\b)\w+"
 )
 GUARDED_REWRITES = {
     "android.content.Context": re.compile(CONTEXT_BEYOND_STRINGS),

@@ -82,12 +82,14 @@ RULES = [
 
 COMPANION_IMPORTS = {
     "com.nendo.argosy.platform.PlatformContext": [
-        "com.nendo.argosy.platform.cacheDir", "com.nendo.argosy.platform.filesDir",
+        "com.nendo.argosy.platform.assets", "com.nendo.argosy.platform.cacheDir", "com.nendo.argosy.platform.filesDir",
+        "com.nendo.argosy.platform.list", "com.nendo.argosy.platform.open",
         "com.nendo.argosy.platform.getQuantityString", "com.nendo.argosy.platform.getString",
         "com.nendo.argosy.platform.resources",
     ],
     "com.nendo.argosy.platform.LocalPlatformContext": [
-        "com.nendo.argosy.platform.cacheDir", "com.nendo.argosy.platform.filesDir",
+        "com.nendo.argosy.platform.assets", "com.nendo.argosy.platform.cacheDir", "com.nendo.argosy.platform.filesDir",
+        "com.nendo.argosy.platform.list", "com.nendo.argosy.platform.open",
         "com.nendo.argosy.platform.getQuantityString", "com.nendo.argosy.platform.getString",
         "com.nendo.argosy.platform.resources",
     ],

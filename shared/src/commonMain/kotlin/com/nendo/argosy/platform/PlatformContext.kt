@@ -25,3 +25,11 @@ expect val LocalPlatformContext: ProvidableCompositionLocal<PlatformContext>
 expect val PlatformContext.filesDir: java.io.File
 
 expect val PlatformContext.cacheDir: java.io.File
+
+expect class PlatformAssets
+
+expect val PlatformContext.assets: PlatformAssets
+
+expect fun PlatformAssets.list(path: String): Array<String>?
+
+expect fun PlatformAssets.open(fileName: String): java.io.InputStream

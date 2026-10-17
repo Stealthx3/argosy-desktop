@@ -29,3 +29,11 @@ actual val LocalPlatformContext: ProvidableCompositionLocal<PlatformContext> = L
 actual val PlatformContext.filesDir: java.io.File get() = filesDir
 
 actual val PlatformContext.cacheDir: java.io.File get() = cacheDir
+
+actual typealias PlatformAssets = android.content.res.AssetManager
+
+actual val PlatformContext.assets: PlatformAssets get() = assets
+
+actual fun PlatformAssets.list(path: String): Array<String>? = list(path)
+
+actual fun PlatformAssets.open(fileName: String): java.io.InputStream = open(fileName)
