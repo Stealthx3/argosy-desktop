@@ -409,7 +409,11 @@ def analyse(u, index, packages):
         common.append("R without an import")
     if u.pkg == "com.nendo.argosy" and re.search(r"\bBuildConfig\b", u.body):
         common.append("BuildConfig without an import")
-    words = set(WORD.findall(u.body))
+    imported_names = {
+        (m.group(2) or m.group(1).rsplit(".", 1)[-1])
+        for m in re.finditer(r"^import ([\w.]+)(?: as (\w+))?$", u.text, re.M)
+    }
+    words = set(WORD.findall(u.body)) - imported_names
     for w in words:
         deps |= {t for t in index.get((u.pkg, w), set()) if t.receivers.get(w, w) == w or t.receivers[w] in words}
     deps.discard(u)
