@@ -36,6 +36,8 @@ ALLOWED = (
     "org.apache.commons.compress.", "org.tukaani.xz.", "com.github.luben.zstd.",
     "`in`.dragonbra.", "org.bouncycastle.", "com.upokecenter.cbor.", "com.google.protobuf.",
     "androidx.datastore.core.", "androidx.datastore.preferences.core.",
+    "dagger.Lazy", "dagger.assisted.", "dagger.Module", "dagger.Provides", "dagger.Binds",
+    "dagger.multibindings.",
 )
 NOT_ALLOWED = ("androidx.sqlite.db.",)
 REWRITTEN = ("android.util.Log", "com.nendo.argosy.BuildConfig", "dagger.hilt.android.lifecycle.HiltViewModel")

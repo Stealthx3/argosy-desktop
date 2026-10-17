@@ -139,6 +139,7 @@ kotlin {
             implementation(libs.room.runtime)
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.javax.inject)
+            implementation(libs.dagger)
             implementation(libs.bundles.network)
             implementation(libs.commons.compress)
             implementation(libs.xz)
@@ -154,7 +155,6 @@ kotlin {
             implementation(libs.sqlite.bundled)
             implementation(libs.zstd.jni)
             implementation(libs.org.json)
-            implementation(libs.dagger)
         }
         getByName("desktopTest").dependencies {
             implementation(libs.kotlin.test)

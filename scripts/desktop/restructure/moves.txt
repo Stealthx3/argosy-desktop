@@ -316,3 +316,27 @@
 + libretro/shader/GlslParser.kt
 + libretro/shader/GlslpParser.kt
 + libretro/ui/SidePanelContent.kt
+
+# Save-sync stage 1 (docs/desktop/save-sync-move-plan.md): zone files portable as they are.
++ data/repository/ActiveSaveRepository.kt
++ data/repository/SaveListStatusRepository.kt
++ data/sync/AccountSwitchModels.kt
++ data/sync/QueueRomTarget.kt
++ data/sync/SaveAccessNotices.kt
++ data/sync/SaveRecoveryGate.kt
++ data/sync/SyncPayloads.kt
++ data/sync/SyncQueueManager.kt
++ data/sync/UnsentUserProps.kt
++ data/sync/platform/Ps2FolderCardSuperblock.kt
++ data/sync/snapshot/SnapshotDecision.kt
++ data/sync/snapshot/SnapshotFileResolver.kt
++ data/sync/strategy/LegacySaveSyncStrategy.kt
++ data/sync/strategy/ReconcilePlan.kt
++ data/sync/strategy/SaveSyncStrategy.kt
++ data/sync/xbox/FatxVolume.kt
++ data/sync/xbox/Qcow2Image.kt
++ data/sync/xbox/Qcow2Writer.kt
++ data/sync/xbox/XboxDiskImageFactory.kt
++ data/sync/xbox/XboxDiskImageProvisioner.kt
++ data/sync/xbox/XboxHddImage.kt
++ libretro/LibretroStateSlots.kt
