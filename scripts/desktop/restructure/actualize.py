@@ -2,7 +2,8 @@
 """
 Adds `actual` modifiers to Android classes that implement an expect class (actuals.txt).
 
-Only the class declaration and the listed members change; everything else in the file stays as
+Only the class declaration and the listed members change (a member written ::name is a top-level
+function in the same file); everything else in the file stays as
 upstream wrote it. Idempotent.
 """
 import re
@@ -22,16 +23,25 @@ def main():
         path = ANDROID / rel
         text = path.read_text()
         new = re.sub(
-            rf"^((?:@\w+(?:\([^)]*\))?\s+)*)((?:public |internal |open )*)(?<!actual )class {cls}\b",
-            rf"\1\2actual class {cls}",
+            rf"^((?:@\w+(?:\([^)]*\))?\s+)*)((?:public |internal |open )*)(?<!actual )(class|object) {cls}\b",
+            rf"\1\2actual \3 {cls}",
             text,
             count=1,
             flags=re.M,
         )
         for member in filter(None, (m.strip() for m in members.split(","))):
+            top_level = member.startswith("::")
+            name = member.lstrip(":")
+            indent = r"()" if top_level else r"(\s+)"
             new = re.sub(
-                rf"^(\s+)((?:public |override |open |suspend )*)(?<!actual )fun {member}\(",
-                rf"\1\2actual fun {member}(",
+                rf"^{indent}((?:public |override |open |suspend )*)(?<!actual )fun {name}\(",
+                rf"\1\2actual fun {name}(",
+                new,
+                flags=re.M,
+            )
+            new = re.sub(
+                rf"^{indent}((?:public |override |open )*)(?<!actual )(val|var) {name}\b",
+                rf"\1\2actual \3 {name}",
                 new,
                 flags=re.M,
             )

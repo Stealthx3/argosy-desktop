@@ -139,12 +139,14 @@ class Unit:
         self.text = path.read_text()
         m = re.search(r"^package\s+([\w.]+)", self.text, re.M)
         self.pkg = m.group(1) if m else ""
-        self.names, self.receivers = set(), {}
+        self.names, self.receivers, self.expects = set(), {}, set()
         for line in self.text.splitlines():
             m = DECL.match(line)
             if not m or re.search(r"\bactual\b", line.split("(")[0]):
                 continue
             self.names.add(m.group(2))
+            if re.search(r"\bexpect\b", line.split("(")[0]):
+                self.expects.add(m.group(2))
             if m.group(1):
                 self.receivers[m.group(2)] = re.sub(r"<.*|\?", "", m.group(1)).split(".")[-1]
         self.imports = IMPORT.findall(self.text)
@@ -248,6 +250,9 @@ def main():
         packages.add(u.pkg)
         for n in u.names:
             index[(u.pkg, n)].add(u)
+    for u in common_shared:
+        for n in u.expects:
+            index[(u.pkg, n)] = {u}
     in_common = set(common_shared)
     in_shared = in_common | set(android_shared)
 

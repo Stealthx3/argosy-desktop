@@ -1,5 +1,9 @@
 # Android classes in shared androidMain that are the actual of an expect class in commonMain.
 # actualize.py adds the `actual` modifier to the class and to the listed members. Format:
-#   <file under shared androidMain>: <Class>(<member>, ...)
+#   <file under shared androidMain>: <Class>(<member>, ::<top-level function>, ...)
 ui/input/HapticFeedback.kt: HapticFeedbackManager(vibrate)
 ui/input/SoundFeedback.kt: SoundFeedbackManager(playSound)
+ui/theme/backdrop/BackdropStamps.kt: BackdropStampProvider(::backdropStampProvider)
+hardware/AmbientLedManager.kt: AmbientLedManager(setUiColors)
+core/input/ConnectedControllerTracker.kt: ConnectedControllerTracker(connectedControllerIds)
+ui/theme/CustomFontLoader.kt: CustomFontLoader(loadFamily)

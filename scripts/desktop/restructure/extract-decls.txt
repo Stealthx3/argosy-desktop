@@ -13,3 +13,5 @@ ui/input/GamepadInputHandler.kt -> GamepadEvents.kt: GamepadInput GamepadEvent m
 ui/input/InputDispatcher.kt -> GamepadInputLocals.kt: LocalGamepadInputHandler
 ui/input/HapticFeedback.kt -> HapticPatterns.kt: HapticPattern
 ui/input/SoundFeedback.kt -> SoundPresets.kt: SoundPreset
+ui/theme/backdrop/BackdropStamps.kt -> BackdropStampLocals.kt: LocalBackdropStamps
+ui/theme/backdrop/SurfaceBackdrop.kt -> SurfaceBackdropLocals.kt: BackdropRole LocalSurfaceBackdrop

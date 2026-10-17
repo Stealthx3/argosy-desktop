@@ -1,11 +1,6 @@
 package com.nendo.argosy.ui.theme.backdrop
 
 import android.graphics.Matrix
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -14,7 +9,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
@@ -32,7 +26,6 @@ import com.nendo.argosy.ui.theme.LocalUiScale
 import com.nendo.argosy.ui.theme.MotionTier
 import com.nendo.argosy.ui.theme.generated.ComponentDefaults
 import kotlin.math.PI
-import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.roundToInt
 import kotlin.math.sin
@@ -42,11 +35,6 @@ import androidx.compose.runtime.withFrameNanos
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.LaunchedEffect
-
-/** Alpha-cap role of the surface the backdrop paints: CONTENT sits under menus, WALLPAPER under the companion screen. */
-enum class BackdropRole { CONTENT, WALLPAPER }
-
-val LocalSurfaceBackdrop = staticCompositionLocalOf { BackdropConfig() }
 
 private const val TWO_PI = 2f * PI.toFloat()
 private const val SWAY_X_CYCLES_PER_LOOP = 8f
@@ -175,4 +163,3 @@ private fun integratePhase(velocity: State<Float>): State<Float> {
     }
     return phase
 }
-
