@@ -497,3 +497,27 @@
 + ui/input/SoundPresets.kt
 + ui/input/VariantPickerInputHandler.kt
 + ui/screens/settings/sections/input/ToggleInput.kt
+
+# Phase 2: sound as an actual class, with the Android code it needs (unchanged).
+[androidMain]
++ core/media/SfxTranscoder.kt
++ data/cache/ImageCacheManager.kt
++ data/media/MediaDirectoryManager.kt
++ data/media/MediaPlaybackTracker.kt
++ data/media/MediaSubtitleSidecars.kt
++ data/music/MusicDirectoryManager.kt
++ data/remote/jellyfin/JellyfinApiClient.kt
++ data/remote/jellyfin/JellyfinApiFactory.kt
++ data/remote/jellyfin/JellyfinConnectionManager.kt
++ data/remote/jellyfin/JellyfinDeviceProfileBuilder.kt
++ data/remote/jellyfin/JellyfinLibrarySyncService.kt
++ data/remote/jellyfin/JellyfinServerDiscovery.kt
++ data/remote/ssl/UserCertStore.kt
++ data/remote/ssl/UserCertTrustManager.kt
++ data/repository/MediaRepository.kt
++ data/storage/StorageAttributionRepository.kt
++ data/storage/StoragePathUtils.kt
++ data/storage/StorageVolumeDetector.kt
++ data/storage/StorageVolumeHealth.kt
++ ui/input/SoundFeedback.kt
++ util/PermissionHelper.kt
