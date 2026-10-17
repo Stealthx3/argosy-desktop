@@ -926,3 +926,39 @@
 + ui/screens/media/components/MediaCastRail.kt
 + ui/screens/settings/components/SyncFiltersModal.kt
 + ui/util/FocusModifiers.kt
+
+# Phase 2: files freed by the Html, toColorInt, Configuration, Bitmap and package-manager additions.
+[commonMain]
++ data/cheats/CheatsRepository.kt
++ data/repository/TouchLayoutRepository.kt
++ libretro/touch/ResolvedLayout.kt
++ libretro/touch/TouchLayoutSerializer.kt
++ ui/components/DockGeometry.kt
++ ui/components/HomeAppBar.kt
++ ui/components/QrCode.kt
++ ui/components/friends/FriendCodeModal.kt
+
+# Phase 2: files freed by the SystemSettings functions and StorageAttributionRepository slices.
+[commonMain]
++ data/emulator/DriverFetcherRepository.kt
++ data/repository/BiosRepository.kt
++ data/repository/SaveCacheRepository.kt
++ domain/model/UnifiedSaveEntry.kt
++ ui/common/savechannel/SaveChannelState.kt
++ ui/common/savechannel/StateSlotRow.kt
++ ui/common/savechannel/snapshot/SnapshotFocus.kt
++ ui/common/savechannel/snapshot/SnapshotTiles.kt
++ ui/common/savechannel/snapshot/SnapshotViewState.kt
++ ui/components/GameStatBadges.kt
++ ui/components/PlayTimeCharts.kt
++ ui/components/VolumeMeter.kt
++ ui/components/playtime/PlayHourLabel.kt
++ ui/components/playtime/PlayShareBand.kt
++ ui/components/playtime/ShareSegments.kt
++ ui/components/recap/RecapMetaLine.kt
++ ui/components/recap/RecapPlayTime.kt
++ ui/screens/gamedetail/components/SaveStatusRow.kt
++ ui/screens/savetimeline/SaveTimelineFloater.kt
++ ui/screens/savetimeline/SaveTimelineModels.kt
++ util/Formatters.kt
++ util/SaveDebugLogger.kt

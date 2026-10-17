@@ -141,6 +141,9 @@ RULES = [
         "import com.nendo.argosy.platform.PlatformBlurMaskFilter as BlurMaskFilter\nimport com.nendo.argosy.platform.PlatformBlur",
     ),
     (re.compile(r"^import android\.app\.Application$", re.M), "import com.nendo.argosy.platform.PlatformApplication as Application"),
+    (re.compile(r"^import android\.text\.Html$", re.M), "import com.nendo.argosy.platform.PlatformHtml as Html"),
+    (re.compile(r"^import androidx\.core\.graphics\.toColorInt$", re.M), "import com.nendo.argosy.platform.toColorInt"),
+    (re.compile(r"^import androidx\.room\.withTransaction$", re.M), "import com.nendo.argosy.platform.withTransaction"),
     (re.compile(r"^import android\.view\.KeyEvent$", re.M), "import com.nendo.argosy.core.input.AndroidKeyCodes as KeyEvent"),
     (
         re.compile(r"^import com\.nendo\.argosy\.util\.DisplayAffinityHelper$", re.M),
@@ -151,6 +154,7 @@ RULES = [
 
 COMPANION_IMPORTS = {
     "com.nendo.argosy.platform.PlatformContext": [
+        "com.nendo.argosy.platform.getApplicationInfo", "com.nendo.argosy.platform.getApplicationLabel",
         "com.nendo.argosy.platform.applicationContext", "com.nendo.argosy.platform.packageName",
         "com.nendo.argosy.platform.getSystemService", "com.nendo.argosy.platform.getExternalFilesDir",
         "com.nendo.argosy.platform.packageManager", "com.nendo.argosy.platform.getPackageInfo",
@@ -162,6 +166,7 @@ COMPANION_IMPORTS = {
         "com.nendo.argosy.platform.resources",
     ],
     "com.nendo.argosy.platform.LocalPlatformContext": [
+        "com.nendo.argosy.platform.getApplicationInfo", "com.nendo.argosy.platform.getApplicationLabel",
         "com.nendo.argosy.platform.applicationContext", "com.nendo.argosy.platform.packageName",
         "com.nendo.argosy.platform.getSystemService", "com.nendo.argosy.platform.getExternalFilesDir",
         "com.nendo.argosy.platform.packageManager", "com.nendo.argosy.platform.getPackageInfo",
@@ -203,6 +208,7 @@ COMPANION_IMPORTS = {
     "com.nendo.argosy.platform.PlatformBitmap": [
         "com.nendo.argosy.platform.asImageBitmap", "com.nendo.argosy.platform.config", "com.nendo.argosy.platform.copy",
         "com.nendo.argosy.platform.getPixel", "com.nendo.argosy.platform.height", "com.nendo.argosy.platform.recycle",
+        "com.nendo.argosy.platform.setPixels",
         "com.nendo.argosy.platform.width",
     ],
     "com.nendo.argosy.platform.LocalPlatformConfiguration": [
@@ -233,6 +239,8 @@ def rewrite_bitmap_config(text):
 
 
 STATIC_STAND_INS = [
+    ("PlatformConfiguration as Configuration", r"Configuration\.(ORIENTATION_\w+|UI_MODE_NIGHT_\w+)\b", r"\1"),
+    ("PlatformBitmap as Bitmap", r"Bitmap\.(createBitmap)\(", r"PlatformBitmaps.\1("),
     ("PlatformBlurMaskFilter as BlurMaskFilter", r"BlurMaskFilter\.Blur\.", r"PlatformBlur."),
     ("PlatformInputDevice as InputDevice", r"InputDevice\.(getDevice|getDeviceIds)\(", r"PlatformInputDevices.\1("),
     ("PlatformInputDevice as InputDevice", r"InputDevice\.(SOURCE_\w+)\b", r"\1"),

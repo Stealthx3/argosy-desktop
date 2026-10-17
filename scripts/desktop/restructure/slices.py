@@ -292,7 +292,7 @@ def slice_top_level(rel):
     imports = re.findall(r"^import ([\w.]+)(?: as (\w+))?$", text, re.M)
     imported = {alias or name.rsplit(".", 1)[1]: name for name, alias in imports}
     stem = Path(rel).stem
-    expect_path = (COMMON / ROOT / rel).parent / f"{stem}.expect.kt"
+    expect_path = (COMMON / ROOT / rel).parent / f"{stem}.functions.expect.kt"
     previous = {}
     if expect_path.exists():
         for line in expect_path.read_text().splitlines():
@@ -340,7 +340,7 @@ def slice_top_level(rel):
         header = pattern.sub(replacement, header)
     expect_path.parent.mkdir(parents=True, exist_ok=True)
     expect_path.write_text(f"package {pkg}\n\n" + (header + "\n\n" if header else "") + "\n\n".join(expect_lines) + "\n")
-    desktop_path = (DESKTOP / ROOT / rel).parent / f"{stem}.desktop.kt"
+    desktop_path = (DESKTOP / ROOT / rel).parent / f"{stem}.functions.desktop.kt"
     if not desktop_path.exists():
         desktop_path.parent.mkdir(parents=True, exist_ok=True)
         desktop_path.write_text(f"package {pkg}\n\n" + (header + "\n\n" if header else "") + "\n\n".join(desktop_lines) + "\n")

@@ -39,3 +39,5 @@ data/launcher/GameNativeLauncher.kt: GameNativeLauncher
 data/launcher/DroidDeckLauncher.kt: DroidDeckLauncher
 core/input/ConnectedControllerTracker.kt: ConnectedControllerTracker
 core/input/GamepadDevices.kt: *
+util/SystemSettings.kt: *
+data/storage/StorageAttributionRepository.kt: StorageAttributionRepository

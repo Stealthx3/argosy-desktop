@@ -60,7 +60,7 @@ NOT_ALLOWED = (
     "androidx.compose.ui.input.pointer.RequestDisallowInterceptTouchEvent",
 )
 REWRITTEN = (
-    "android.annotation.SuppressLint", "android.graphics.BlurMaskFilter", "android.graphics.LinearGradient",
+    "android.annotation.SuppressLint", "androidx.room.withTransaction", "androidx.core.graphics.toColorInt", "android.graphics.BlurMaskFilter", "android.graphics.LinearGradient",
     "android.graphics.Shader.TileMode",
     "android.util.Log", "android.graphics.Color.", "android.os.Build.", "com.nendo.argosy.BuildConfig", "dagger.hilt.android.lifecycle.HiltViewModel",
     "com.nendo.argosy.R",
@@ -87,7 +87,8 @@ CONTEXT_REST = (
     + r"|\.assets\.(?!list\b|open\b)\w+"
     r"|\bcontentResolver\.\w+"
     r"|(?<![\w.])Context\.(?!MODE_PRIVATE\b|CONNECTIVITY_SERVICE\b|USER_SERVICE\b)[A-Z]\w*"
-    r"|\bpackageManager\.(?!getPackageInfo\b)\w+|\bpm\.(?!getPackageInfo\b)\w+"
+    r"|\bpackageManager\.(?!getPackageInfo\b|getApplicationInfo\b|getApplicationLabel\b)\w+"
+    r"|\bpm\.(?!getPackageInfo\b|getApplicationInfo\b|getApplicationLabel\b)\w+"
     r"|\.getPackageInfo\([^)]*\)\.(?!versionName\b)\w+"
 )
 CONTEXT_BEYOND_STRINGS = (
@@ -140,7 +141,9 @@ GUARDED_REWRITES = {
         r"|VERSION_CODES\.(?:N|O|P|Q|R|S|TIRAMISU|UPSIDE_DOWN_CAKE)\b)\w+(?:\.\w+)?"
     ),
     "android.os.Process": re.compile(r"\bProcess\.(?!is64Bit\b|myUid\b)\w+"),
-    "android.content.res.Configuration": re.compile(r"\bConfiguration\.[A-Za-z_]"),
+    "android.content.res.Configuration": re.compile(
+        r"\bConfiguration\.(?!ORIENTATION_(?:UNDEFINED|PORTRAIT|LANDSCAPE|SQUARE)\b|UI_MODE_NIGHT_(?:NO|YES|MASK)\b)[A-Za-z_]"
+    ),
     "androidx.core.graphics.ColorUtils": re.compile(r"\bColorUtils\.(?!colorToHSL\b|HSLToColor\b)\w+"),
     "android.view.KeyEvent": re.compile(r"\bKeyEvent\b(?!\.KEYCODE_\w|\.keyCodeToString\b)"),
     "android.view.MotionEvent": re.compile(r"\bMotionEvent\b(?!\.AXIS_\w)"),
@@ -157,13 +160,13 @@ GUARDED_REWRITES = {
     ),
     "android.text.format.DateFormat": re.compile(r"\bDateFormat\.(?!getBestDateTimePattern\b)\w+"),
     "android.graphics.Bitmap": re.compile(
-        r"\bBitmap\.(?!Config\.(?:ARGB_8888|HARDWARE)\b)\w+"
-        r"|\.(?:compress|eraseColor|setPixels?|getPixels|copyPixels\w*|isRecycled|byteCount|allocationByteCount"
+        r"\bBitmap\.(?!Config\.(?:ARGB_8888|HARDWARE)\b|createBitmap\(\w+, \w+, Bitmap\.Config)\w+"
+        r"|\.(?:compress|eraseColor|setPixel|getPixels|copyPixels\w*|isRecycled|byteCount|allocationByteCount"
         r"|density|hasAlpha|setHasAlpha|prepareToDraw|extractAlpha|reconfigure|rowBytes|generationId|isMutable"
         r"|colorSpace|asShared|hardwareBuffer|getHardwareBuffer|scale)\b"
     ),
     "android.graphics.BitmapFactory": re.compile(
-        r"\bBitmapFactory\.(?!decodeFile\b|Options\b)\w+"
+        r"\bBitmapFactory\.(?!decodeFile\b|decodeByteArray\b|Options\b)\w+"
         r"|\b(?:inSampleSize|inPreferredConfig|inMutable|inScaled|inDensity|inTargetDensity|outMimeType|outConfig|inBitmap)\b"
     ),
     "android.content.SharedPreferences": re.compile(
@@ -209,6 +212,7 @@ GUARDED_REWRITES = {
         r"|applicationContext\b|getSharedPreferences\b|getSystemService\b|getExternalFilesDir\b|packageManager\b|assets\b)\w+"
         r"|\bApplication\.\w+"
     ),
+    "android.text.Html": re.compile(r"\bHtml\.(?!fromHtml\b|FROM_HTML_MODE_LEGACY\b)\w+"),
     "android.util.Base64": re.compile(
         r"\bBase64\.(?!decode\b|encode\b|encodeToString\b|DEFAULT\b|NO_PADDING\b|NO_WRAP\b|CRLF\b|URL_SAFE\b)\w+"
     ),
@@ -254,6 +258,7 @@ STAND_IN_GUARDS = {
     "com.nendo.argosy.platform.image.CachePolicy": "coil.request.CachePolicy",
     "com.nendo.argosy.platform.PlatformInputDevice": "android.view.InputDevice",
     "com.nendo.argosy.platform.PlatformApplication": "android.app.Application",
+    "com.nendo.argosy.platform.PlatformHtml": "android.text.Html",
 }
 COMMENTS = re.compile(r"/\*.*?\*/|^\s*//[^\n]*", re.S | re.M)
 ANDROID_FQ = re.compile(r"(?<![\w.])(?:android|androidx|com|org|io|net|dagger|coil|in|okhttp3|retrofit2)\.[a-z]\w*(?:\.\w+)+")
@@ -330,6 +335,13 @@ def analyse(u, index, packages):
             android.append(f"{kind} {name}")
 
     for imp in u.imports:
+        if imp in ("android.graphics.Color", "com.nendo.argosy.platform.PlatformColor"):
+            alias_m = re.search(rf"^import {re.escape(imp)}(?: as (\w+))?$", u.text, re.M)
+            alias = alias_m.group(1) if alias_m and alias_m.group(1) else imp.rsplit(".", 1)[1]
+            allowed = r"(?!(?:colorToHSV|HSVToColor|parseColor|argb|rgb|red|green|blue|alpha|BLACK|WHITE|TRANSPARENT)\b)"
+            if re.search(rf"\b{alias}\.{allowed}\w+|\bandroid\.graphics\.Color\.{allowed}\w+", u.body) and not exempt(u, imp):
+                common.append(f"uses {imp} beyond its portable stand-in")
+            continue
         if imp in GUARDED_REWRITES:
             if GUARDED_REWRITES[imp].search(u.body) and not exempt(u, imp):
                 common.append(f"uses {imp} beyond its portable stand-in")
