@@ -226,7 +226,9 @@ class Unit:
         self.names, self.receivers, self.expects = set(), {}, set()
         for line in self.text.splitlines():
             m = DECL.match(line)
-            if not m or re.search(r"\b(actual|private)\b", line.split("(")[0]):
+            if not m or re.search(r"\bactual\b", line.split("(")[0]):
+                continue
+            if re.search(r"\bprivate\b", re.split(r"\b(?:class|interface|object|fun|val|var|typealias)\b", line, maxsplit=1)[0]):
                 continue
             self.names.add(m.group(2))
             if re.search(r"\bexpect\b", line.split("(")[0]):
