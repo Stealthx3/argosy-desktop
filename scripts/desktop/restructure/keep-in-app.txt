@@ -1,4 +1,10 @@
-# Files that stay in app although movable.py's import rules accept them, with the reason.
+# Files that stay out of commonMain (in app, or in shared androidMain) although movable.py's import rules accept them, with the reason.
 # One glob per line, relative to com/nendo/argosy; "#" starts the reason.
 data/quaypass/QuayPassCredentialManager.kt  # an exhaustive when over QuayPassKeystore.Algorithm, an expect enum once the keystore is sliced (K2 requires else there)
 data/netplay/NetplayHandshake.kt  # smart-casts NetplayTransport.Incoming.packet, an expect property once the transport is sliced (K2 forbids that)
+libretro/InputConfigCoordinator.kt  # the in-app emulator's UI: smart casts on expect properties and exhaustive whens over expect enums (K2); only LibretroActivity uses it
+libretro/KeyPressGate.kt  # as above
+libretro/ui/*  # as above
+core/service/ForegroundServiceStarter.kt  # extensions on Context that call Android members through the implicit receiver
+data/steam/SteamDownloadPromptController.kt  # uses SteamLaunchers.MarkOption, a nested sealed class with subclasses the slice cannot carry
+ui/screens/quaypass/QuayPassCheckInScreen.kt  # an exhaustive when over an expect enum (K2 requires else there)

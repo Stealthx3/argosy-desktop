@@ -40,3 +40,14 @@ data/media/MediaSubtitleSidecars.kt -> common:MediaSubtitleTypes.kt: MediaSubtit
 libretro/ControllerInputMapper.kt -> common:SyntheticKeyEvent.kt: SyntheticKeyEvent
 data/emulator/EmulatorDownloadManager.kt -> common:EmulatorDownloadProgress.kt: EmulatorDownloadProgress
 data/installer/ManagedInstallerManager.kt -> common:InstallerJobs.kt: InstallerJobState InstallerFailure InstallerJob
+data/repository/GameDocumentLoader.kt -> common:DocumentContent.kt: DocumentContent documentKey
+data/emulator/PlaySessionTracker.kt -> common:PlaySessionTypes.kt: ActiveSession SessionEndResult SaveConflictEvent
+data/steam/SteamPathResolver.kt -> common:SteamInstallVolume.kt: SteamInstallVolume
+data/update/ApkInstallManager.kt -> common:ApkInstallTypes.kt: PendingApkInstall ApkInstallState
+data/download/DownloadThermalManager.kt -> common:ThermalTypes.kt: ThermalState ThermalStatus
+util/DisplayAffinityHelper.kt -> common:SecondaryDisplayType.kt: SecondaryDisplayType
+util/HomeAppComponent.kt -> common:HomeAppStartup.kt: HomeAppStartup
+data/download/RomStagingManager.kt -> common:StagingTypes.kt: StagingPhase StagingManifest StagingArea ^ARCHIVE_SUBDIR ^OUTPUT_SUBDIR
+data/steam/SteamContentManager.kt -> common:SteamDownloadTypes.kt: SteamDownloadState DepotInfo SteamDownloadProgress QueuedSteamDownload
+data/download/MediaDownloadManager.kt -> common:MediaDownloadTypes.kt: MediaDownloadState isInFlight MediaDownloadProgress MediaSizeEstimate MediaSubtitleOutlook QueuedMediaDownload MediaRemovalResult
+data/steam/SteamService.kt -> common:SteamServiceState.kt: SteamConnectionState SteamServiceState

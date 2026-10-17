@@ -1700,3 +1700,67 @@
 + ui/screens/settings/BgmPlaylistManagerScreen.kt
 + ui/screens/settings/BgmTrackArt.kt
 + ui/screens/settings/dialogs/RootScriptDialog.kt
+
+# Phase 2: portable since the service slices of the shell core (was androidMain).
+[commonMain]
++ DualScreenManagerHolder.kt
++ EmulatorRelease.kt
++ data/download/DownloadManager.kt
++ data/emulator/TitleIdDownloadObserver.kt
++ data/netplay/NetplayJoinService.kt
++ data/repository/DatabaseAdminRepository.kt
++ data/steam/SteamDepotManager.kt
++ data/steam/SteamDownloadPromptController.kt
++ data/steam/SteamLibraryManager.kt
++ data/sync/AccountSwitchBlockerService.kt
++ data/sync/AccountSwitchCoordinator.kt
++ data/sync/PlatformSyncQueue.kt
++ domain/usecase/collection/PrepareCollectionQueueUseCase.kt
++ domain/usecase/download/DownloadGameUseCase.kt
++ domain/usecase/download/FilePickerFlowUseCase.kt
++ domain/usecase/game/LaunchGameUseCase.kt
++ domain/usecase/game/LaunchWithSyncUseCase.kt
++ domain/usecase/sync/SyncLibraryUseCase.kt
++ ui/common/DownloadGameFailureReasonUi.kt
++ ui/common/SyncLibraryFailureReasonUi.kt
++ ui/common/TitleIdRecheckNotice.kt
++ ui/common/savechannel/SaveChannelModal.kt
++ ui/common/savechannel/snapshot/SnapshotEntryOverlays.kt
++ ui/components/DirectionRingModal.kt
++ ui/components/QuickSettingsController.kt
++ ui/components/friends/QuickFriendsController.kt
++ ui/components/friends/QuickFriendsInputHandler.kt
++ ui/components/friends/QuickFriendsModals.kt
++ ui/components/friends/QuickSettingsFriendsPage.kt
++ ui/dualscreen/RoleSwapInput.kt
++ ui/input/GamepadInputHandler.kt
++ ui/input/GamepadInputLocals.kt
++ ui/input/NetplayJoinInputHandler.kt
++ ui/screens/apps/AppsViewModel.kt
++ ui/screens/common/GameActionsDelegate.kt
++ ui/screens/common/LibrarySyncBus.kt
++ ui/screens/downloads/DownloadsViewModel.kt
++ ui/screens/gamedetail/delegates/PlayOptionsDelegate.kt
++ ui/screens/home/delegates/HomeDockDelegate.kt
++ ui/screens/home/delegates/HomeTilePickerDelegate.kt
++ ui/screens/quaypass/QuayPassCheckInScreen.kt
++ ui/screens/quaypass/QuayPassCheckInViewModel.kt
++ ui/screens/settings/components/ControllerOrderModal.kt
++ ui/screens/settings/components/GripControllerModal.kt
++ ui/screens/settings/components/HardResetModal.kt
++ ui/screens/settings/components/HotkeysModal.kt
++ ui/screens/settings/components/InputMappingModal.kt
++ ui/screens/settings/components/ShortcutCaptureModal.kt
++ ui/screens/social/FeedEventDetailScreen.kt
++ ui/screens/social/PostEditorScreen.kt
++ ui/screens/social/PostEditorViewModel.kt
++ ui/screens/social/UserProfileScreen.kt
++ ui/screens/syncmonitor/SyncMonitorScreen.kt
++ ui/screens/syncmonitor/SyncMonitorViewModel.kt
++ util/DisplayRoleResolver.kt
++ util/HomeAppAvailability.kt
+
+# Phase 2: back to androidMain (keep-in-app.txt gives the reasons).
+[androidMain]
++ data/steam/SteamDownloadPromptController.kt
++ ui/screens/quaypass/QuayPassCheckInScreen.kt

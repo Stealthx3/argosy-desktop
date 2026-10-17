@@ -37,7 +37,7 @@ data/launcher/SteamLauncher.kt: SteamLauncher
 data/launcher/SteamLaunchers.kt: SteamLaunchers
 data/launcher/GameNativeLauncher.kt: GameNativeLauncher
 data/launcher/DroidDeckLauncher.kt: DroidDeckLauncher
-core/input/ConnectedControllerTracker.kt: ConnectedControllerTracker
+core/input/ConnectedControllerTracker.kt: ConnectedControllerTracker(noteInput: Unit)
 util/SystemSettings.kt: *
 data/storage/StorageAttributionRepository.kt: StorageAttributionRepository
 libretro/frame/FrameRegistry.kt: FrameRegistry
@@ -76,3 +76,27 @@ data/emulator/EmulatorDownloadManager.kt: EmulatorDownloadManager
 data/emulator/LaunchCommand.kt: *
 data/emulator/ScreenshotCaptureMonitor.kt: ScreenshotCaptureMonitor
 data/installer/ManagedInstallerManager.kt: ManagedInstallerManager
+libretro/LibretroActivity.kt: LibretroActivity
+DualScreenManager.kt: DualScreenManager(targetDockReorder: Unit, moveDockReorder: Unit, cancelDockReorder: Unit, saveDockReorder: Unit)
+data/quaypass/QuayPassService.kt: QuayPassService
+hardware/ScreenCaptureManager.kt: ScreenCaptureManager
+util/SecondaryHomeComponent.kt: SecondaryHomeComponent
+util/HomeAppComponent.kt: HomeAppComponent
+util/NetworkUtils.kt: NetworkUtils
+util/DisplayAffinityHelper.kt: DisplayAffinityHelper
+data/social/SocialRepository.kt: SocialRepository(clearPresenceCovers: Unit)
+data/social/discord/DiscordPresenceManager.kt: DiscordPresenceManager
+data/wallpaper/LockScreenArtManager.kt: LockScreenArtManager
+data/repository/GameDocumentLoader.kt: GameDocumentLoader
+data/emulator/GameLauncher.kt: GameLauncher
+data/emulator/PlaySessionTracker.kt: PlaySessionTracker
+libretro/shader/ShaderChainManager.kt: ShaderChainManager
+libretro/shader/ShaderPreviewRenderer.kt: ShaderPreviewRenderer
+data/download/DownloadThermalManager.kt: DownloadThermalManager
+data/download/RomStagingManager.kt: RomStagingManager(release: Unit)
+data/download/MediaDownloadManager.kt: MediaDownloadManager
+data/steam/SteamPathResolver.kt: SteamPathResolver
+data/steam/SteamContentManager.kt: SteamContentManager
+data/steam/SteamService.kt: SteamService
+data/update/ApkInstallManager.kt: ApkInstallManager
+hardware/CompanionPanel.kt: CompanionSessionTimer
