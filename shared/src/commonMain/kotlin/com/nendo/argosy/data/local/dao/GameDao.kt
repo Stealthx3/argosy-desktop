@@ -767,13 +767,6 @@ interface GameDao {
         ownerUserId: Long?
     ): List<GameEntity>
 
-    /**
-     * Identity of every row this account still believes is a live server rom, across all
-     * platforms. A projection rather than the entities: the caller compares a whole library
-     * against a server id set and only needs the full row for the few that fail. Negative ids are
-     * the marker for a rom that already left the library, so they are excluded rather than
-     * re-examined.
-     */
     @Query(
         """
         SELECT id, rommId, platformId FROM games
@@ -785,6 +778,21 @@ interface GameDao {
         """
     )
     suspend fun getServerBackedIdsForOwner(
+        sources: List<GameSource>,
+        ownerUserId: Long?
+    ): List<ServerBackedGameRef>
+
+    @Query(
+        """
+        SELECT id, rommId, platformId FROM games
+        WHERE source IN (:sources) AND rommId IS NOT NULL AND rommId < 0
+          AND id NOT IN (
+              SELECT gameId FROM game_user_overlay
+              WHERE ownerUserId = :ownerUserId AND isMember = 0
+          )
+        """
+    )
+    suspend fun getServerRemovedIdsForOwner(
         sources: List<GameSource>,
         ownerUserId: Long?
     ): List<ServerBackedGameRef>

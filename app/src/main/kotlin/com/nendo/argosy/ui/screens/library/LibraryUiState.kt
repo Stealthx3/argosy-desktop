@@ -158,6 +158,7 @@ data class LibraryGameUi(
     val isFavorite: Boolean,
     val isDownloaded: Boolean,
     val isRommGame: Boolean,
+    val canRemoveFromLibrary: Boolean = false,
     val isAndroidApp: Boolean,
     val emulatorName: String?,
     val needsInstall: Boolean = false,
