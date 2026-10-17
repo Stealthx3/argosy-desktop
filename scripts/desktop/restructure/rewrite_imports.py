@@ -47,6 +47,12 @@ RULES = [
         re.compile(r"^import android\.content\.res\.Configuration$", re.M),
         "import com.nendo.argosy.platform.PlatformConfiguration as Configuration",
     ),
+    (
+        re.compile(r"^import androidx\.compose\.ui\.platform\.LocalView$", re.M),
+        "import com.nendo.argosy.platform.LocalPlatformView as LocalView\nimport com.nendo.argosy.platform.getLocationOnScreen",
+    ),
+    (re.compile(r"^import android\.os\.Build$", re.M), "import com.nendo.argosy.platform.PlatformBuild as Build"),
+    (re.compile(r"\bandroid\.os\.Build\."), "com.nendo.argosy.platform.PlatformBuild."),
     (re.compile(r"^import android\.graphics\.Color$", re.M), "import com.nendo.argosy.platform.PlatformColor as Color"),
     (re.compile(r"^import android\.graphics\.Color as (\w+)$", re.M), r"import com.nendo.argosy.platform.PlatformColor as \1"),
     (re.compile(r"\bandroid\.graphics\.Color\."), "com.nendo.argosy.platform.PlatformColor."),
@@ -84,6 +90,7 @@ COMPANION_IMPORTS = {
         "com.nendo.argosy.platform.getQuantityString", "com.nendo.argosy.platform.getString",
         "com.nendo.argosy.platform.resources",
     ],
+    "com.nendo.argosy.platform.LocalPlatformView": ["com.nendo.argosy.platform.getLocationOnScreen"],
     "com.nendo.argosy.platform.LocalPlatformConfiguration": [
         "com.nendo.argosy.platform.orientation", "com.nendo.argosy.platform.screenHeightDp",
         "com.nendo.argosy.platform.screenWidthDp",

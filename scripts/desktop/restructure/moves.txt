@@ -446,11 +446,6 @@
 
 # Phase 2 seams 1-4 (PlatformContext, view models, configuration, back, colors, lifecycle).
 [commonMain]
-+ data/emulator/LibretroSavePathResolver.kt
-+ data/remote/jellyfin/JellyfinApiFactory.kt
-+ data/remote/ssl/UserCertStore.kt
-+ data/remote/ssl/UserCertTrustManager.kt
-+ data/repository/DocumentHighlightStore.kt
 + data/repository/LocalRomFiles.kt
 + ui/common/CompletionStatusUi.kt
 + ui/common/DisplayPreferenceLabelsUi.kt
@@ -458,7 +453,6 @@
 + ui/common/UnifiedStateEntryUi.kt
 + ui/components/EpisodePicker.kt
 + ui/components/NewBadge.kt
-+ ui/screens/gamedetail/components/DocumentSections.kt
 + ui/theme/Color.kt
 + ui/theme/GripReserve.kt
 + ui/theme/ThemeState.kt

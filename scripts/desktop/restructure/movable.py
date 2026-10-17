@@ -48,7 +48,6 @@ ALLOWED = (
 )
 NOT_ALLOWED = (
     "androidx.sqlite.db.",
-    "androidx.compose.ui.platform.LocalView",
     "androidx.lifecycle.ProcessLifecycleOwner", "androidx.lifecycle.AndroidViewModel", "androidx.lifecycle.LiveData",
     "androidx.lifecycle.MutableLiveData", "androidx.lifecycle.asLiveData", "androidx.lifecycle.Observer",
     "androidx.lifecycle.ViewModelProvider", "androidx.lifecycle.findViewTree",
@@ -60,7 +59,7 @@ NOT_ALLOWED = (
     "androidx.compose.ui.input.pointer.RequestDisallowInterceptTouchEvent",
 )
 REWRITTEN = (
-    "android.util.Log", "android.graphics.Color.", "com.nendo.argosy.BuildConfig", "dagger.hilt.android.lifecycle.HiltViewModel",
+    "android.util.Log", "android.graphics.Color.", "android.os.Build.", "com.nendo.argosy.BuildConfig", "dagger.hilt.android.lifecycle.HiltViewModel",
     "com.nendo.argosy.R",
     "androidx.compose.ui.res.stringResource", "androidx.compose.ui.res.pluralStringResource",
     "androidx.compose.ui.res.painterResource", "androidx.compose.ui.platform.LocalLifecycleOwner",
@@ -85,6 +84,12 @@ GUARDED_REWRITES = {
         r"\b(?:AndroidColor|android\.graphics\.Color|Color)\.(?!(?:colorToHSV|HSVToColor|parseColor|argb|rgb|red|green|blue|alpha|BLACK|WHITE|TRANSPARENT)\b)[a-z]\w*\("
         r"|\b(?:AndroidColor|android\.graphics\.Color)\.(?!(?:colorToHSV|HSVToColor|parseColor|argb|rgb|red|green|blue|alpha|BLACK|WHITE|TRANSPARENT)\b)\w+"
     ),
+    "androidx.compose.ui.platform.LocalView": re.compile(
+        r"LocalView\.current\.(?!getLocationOnScreen\b)\w+|\bview\.(?!getLocationOnScreen\b)\w+"
+    ),
+    "android.os.Build": re.compile(
+        r"\bBuild\.(?!MODEL\b|MANUFACTURER\b|VERSION\.SDK_INT\b|VERSION_CODES\.(?:Q|R|S|TIRAMISU)\b)\w+(?:\.\w+)?"
+    ),
     "android.content.res.Configuration": re.compile(r"\bConfiguration\.[A-Za-z_]"),
     "androidx.core.graphics.ColorUtils": re.compile(r"\bColorUtils\.(?!colorToHSL\b|HSLToColor\b)\w+"),
     "android.view.KeyEvent": re.compile(r"\bKeyEvent\b(?!\.KEYCODE_\w)"),
@@ -104,6 +109,8 @@ STAND_IN_GUARDS = {
     "com.nendo.argosy.platform.BackHandler": "androidx.activity.compose.BackHandler",
     "com.nendo.argosy.core.input.AndroidKeyCodes": "android.view.KeyEvent",
     "com.nendo.argosy.util.DualScreenDeviceInfo": "com.nendo.argosy.util.DisplayAffinityHelper",
+    "com.nendo.argosy.platform.PlatformBuild": "android.os.Build",
+    "com.nendo.argosy.platform.LocalPlatformView": "androidx.compose.ui.platform.LocalView",
 }
 COMMENTS = re.compile(r"/\*.*?\*/|^\s*//[^\n]*", re.S | re.M)
 ANDROID_FQ = re.compile(r"(?<![\w.])(?:android|androidx|com|org|io|net|dagger|coil|in|okhttp3|retrofit2)\.[a-z]\w*(?:\.\w+)+")
@@ -185,6 +192,12 @@ def analyse(u, index, packages):
                 deps |= target
         else:
             external(imp, "import")
+    injects_context = re.search(r"@Inject\s+constructor\s*\((?:[^()]|\([^()]*\))*\bContext\b", u.body)
+    context_imported = any(
+        i in ("android.content.Context", "com.nendo.argosy.platform.PlatformContext") for i in u.imports
+    )
+    if injects_context and context_imported:
+        common.append("injects Context (Dagger's generated Java cannot see the PlatformContext typealias)")
     for fq in FQ.findall(u.body):
         deps |= resolve(fq) or set()
     for fq in ANDROID_FQ.findall(STRINGS.sub('""', u.body)):
