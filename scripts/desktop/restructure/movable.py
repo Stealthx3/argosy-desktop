@@ -18,7 +18,13 @@ usually a desktop compile error the import rules cannot see).
 Usage: movable.py --check           audits files already in shared against the same rules.
        movable.py --why <file>      prints the chain of dependencies that keeps <file> in app.
        movable.py --android <file>  prints what placing <file> in androidMain also needs.
+       movable.py --rank [n]        lists the n held app files whose commonMain slice would free the most others.
+       movable.py --rank-android [n] lists the n shared androidMain files whose slice would let the most others rehome.
+       movable.py --roots <file>... lists the files with reasons of their own in the closure of <file>s.
+       movable.py --plan <n> <file>... picks n roots to slice, greedily shrinking the closure of <file>s
+                                    (--services-only: never a ui/ file or a view model).
        movable.py --rehome          lists shared androidMain files that now qualify for commonMain.
+       --assume-common <file> (repeatable, any mode) treats an app or androidMain file as already sliced into commonMain.
        movable.py [--exclude glob ...] [path-prefix ...]   (an excluded file and everything that
                                     depends on it stays in app)   prints the qualifying files under those prefixes, together
 with the qualifying files they depend on, so the printed set compiles on its own.
@@ -280,13 +286,13 @@ STAND_IN_GUARDS = {
     "com.nendo.argosy.platform.PlatformHtml": "android.text.Html",
     "com.nendo.argosy.platform.PlatformBundle": "android.os.Bundle",
 }
-COMMENTS = re.compile(r"/\*.*?\*/|^\s*//[^\n]*", re.S | re.M)
+COMMENTS = re.compile(r'("""[\s\S]*?"""|"(?:\\.|[^"\\\n])*")|/\*.*?\*/|^\s*//[^\n]*', re.S | re.M)
 ANDROID_FQ = re.compile(r"(?<![\w.])(?:android|androidx|com|org|io|net|dagger|coil|in|okhttp3|retrofit2)\.[a-z]\w*(?:\.\w+)+")
 ANDROID_MAIN_ALLOWED = ALLOWED + (
     "android.", "androidx.", "dagger.hilt.", "coil.", "org.xmlpull.", "com.swordfish.libretrodroid.",
     "com.goterl.lazysodium.", "com.sun.jna.",
 )
-FORBIDDEN_WORDS = re.compile(r"\bR\.(color|dimen|font|xml|array|mipmap|id|style|attr|layout|menu|bool|integer)\b")
+FORBIDDEN_WORDS = re.compile(r"(?<!android\.)\bR\.(color|dimen|font|xml|array|mipmap|id|style|attr|layout|menu|bool|integer)\b")
 DECL = re.compile(
     r"^(?:@\S+\s+)*(?:(?:private|internal|public|data|enum|sealed|abstract|open|inline|value|const|"
     r"annotation|suspend|operator|infix|tailrec|external|fun|expect|actual)\s+)*"
@@ -317,7 +323,7 @@ class Unit:
             if m.group(1):
                 self.receivers[m.group(2)] = re.sub(r"<.*|\?", "", m.group(1)).split(".")[-1]
         self.imports = IMPORT.findall(self.text)
-        self.body = COMMENTS.sub("", IMPORT.sub("", self.text))
+        self.body = COMMENTS.sub(lambda m: m.group(1) or "", IMPORT.sub("", self.text))
         self.sealed = set(re.findall(r"^\s*(?:\w+\s+)*sealed\s+(?:class|interface)\s+(\w+)", self.text, re.M))
 
 
@@ -405,6 +411,8 @@ def analyse(u, index, packages):
     if FORBIDDEN_WORDS.search(u.body):
         common.append("R type with no shared resources")
         android.append("R type with no shared resources")
+    elif re.search(r"\bandroid\.R\.", u.body):
+        common.append("android.R reference")
     if u.pkg == "com.nendo.argosy" and re.search(r"\bR\.\w", u.body):
         common.append("R without an import")
     if u.pkg == "com.nendo.argosy" and re.search(r"\bBuildConfig\b", u.body):
@@ -434,6 +442,11 @@ def main():
         i = args.index("--exclude")
         excluded.append(args[i + 1])
         del args[i:i + 2]
+    assumed = []
+    while "--assume-common" in args:
+        i = args.index("--assume-common")
+        assumed.append(args[i + 1])
+        del args[i:i + 2]
     app, common_shared, android_shared = load(APP), load(SHARED), load(SHARED_ANDROID)
     index = defaultdict(set)
     packages = set()
@@ -444,7 +457,7 @@ def main():
     for u in common_shared:
         for n in u.expects:
             index[(u.pkg, n)] = {u}
-    in_common = set(common_shared)
+    in_common = set(common_shared) | {u for u in app + android_shared if u.rel in assumed}
     in_shared = in_common | set(android_shared)
 
     deps, common_reasons, android_reasons = {}, {}, {}
@@ -515,6 +528,112 @@ def main():
                     parents[dep] = current
                     queue.append(dep)
         print(f"{origin.rel}: held only by excluded or androidMain files")
+        return
+
+    if args[:1] == ["--plan"]:
+        services_only = "--services-only" in args
+        args = [a for a in args if a != "--services-only"]
+        by_any = {u.rel: u for u in app + android_shared}
+        start = [by_any[a] for a in args[2:]]
+        sliced = set()
+
+        def closure():
+            seen, queue = set(start), list(start)
+            while queue:
+                for dep in deps[queue.pop()]:
+                    if dep not in in_common and dep not in movable and dep not in seen and dep not in sliced:
+                        seen.add(dep)
+                        queue.append(dep)
+            return seen
+
+        for _ in range(int(args[1])):
+            current = closure()
+            roots = [u for u in current if common_reasons[u] and u not in start
+                     and not (services_only and (u.rel.startswith("ui/") or u.rel.endswith("ViewModel.kt")))]
+            if not roots:
+                break
+            best = None
+            for r in roots:
+                sliced.add(r)
+                size = len(closure())
+                sliced.discard(r)
+                if best is None or size < best[0]:
+                    best = (size, r)
+            sliced.add(best[1])
+            after = closure()
+            print(f"slice {best[1].rel}: closure {len(after)}, roots {sum(1 for u in after if common_reasons[u])}")
+        for u in sorted((u for u in closure() if common_reasons[u]), key=lambda x: x.rel):
+            print(f"left {u.rel}: {'; '.join(common_reasons[u])[:220]}")
+        return
+
+    if args[:1] == ["--roots"]:
+        by_any = {u.rel: u for u in app + android_shared}
+        start = [by_any[a] for a in args[1:]]
+        seen, queue = set(start), list(start)
+        while queue:
+            for dep in deps[queue.pop()]:
+                if dep not in in_common and dep not in movable and dep not in seen:
+                    seen.add(dep)
+                    queue.append(dep)
+        found = sorted((u for u in seen if common_reasons[u]), key=lambda x: x.rel)
+        for u in found:
+            print(f"{u.rel}: {'; '.join(common_reasons[u])[:200]}")
+        print(f"{len(found)} roots in a closure of {len(seen)} files")
+        return
+
+    if args[:1] == ["--rank-android"]:
+        actual_decl = re.compile(r"^\s*(?:@\w+\s+)*(?:\w+\s+)*actual\b", re.M)
+        pool = [u for u in android_shared if u not in in_common]
+        pool_set = set(pool)
+        dependents = defaultdict(set)
+        for u in pool:
+            for dep in deps[u]:
+                if dep in pool_set:
+                    dependents[dep].add(u)
+        roots = {u for u in pool if common_reasons[u] or actual_decl.search(u.text)
+                 or any(d not in in_common and d not in pool_set and d not in movable for d in deps[u])}
+
+        def blocked_without(skip):
+            seen = {r for r in roots if r is not skip}
+            queue = list(seen)
+            while queue:
+                for parent in dependents[queue.pop()]:
+                    if parent not in seen and parent is not skip:
+                        seen.add(parent)
+                        queue.append(parent)
+            return seen
+
+        baseline = len(blocked_without(None))
+        gains = [(baseline - len(blocked_without(u)) - 1, u) for u in roots]
+        for gain, u in sorted(gains, key=lambda g: -g[0])[:int(args[1]) if len(args) > 1 else 40]:
+            print(f"{gain:4d} {u.rel}: {'; '.join(common_reasons[u])[:140]}")
+        return
+
+    if args[:1] == ["--rank"]:
+        held = [u for u in app if u not in movable]
+        dependents = defaultdict(set)
+        for u in held:
+            for dep in deps[u]:
+                if dep not in movable and dep not in in_common:
+                    dependents[dep].add(u)
+        roots = {u for u in held if common_reasons[u] or held_back(u)}
+        roots |= {d for u in held for d in deps[u] if d not in movable and d not in in_common and d not in by_rel.values()}
+
+        def blocked_without(skip):
+            seen = {r for r in roots if r is not skip}
+            queue = list(seen)
+            while queue:
+                for parent in dependents[queue.pop()]:
+                    if parent not in seen and parent is not skip:
+                        seen.add(parent)
+                        queue.append(parent)
+            return {u for u in seen if u in by_rel.values()}
+
+        baseline = len(blocked_without(None))
+        gains = [(baseline - len(blocked_without(u)) - 1, u) for u in held]
+        for gain, u in sorted(gains, key=lambda g: -g[0])[:int(args[1]) if len(args) > 1 else 40]:
+            reasons = "; ".join(common_reasons[u])
+            print(f"{gain:4d} {u.rel}: {reasons[:140]}")
         return
 
     if args[:1] == ["--rehome"]:
