@@ -115,6 +115,70 @@ val generateDesktopDaoModule by tasks.registering {
     }
 }
 
+val generateAndroidViewModelModules by tasks.registering {
+    val commonSources = layout.projectDirectory.dir("src/commonMain/kotlin")
+    val outDir = layout.buildDirectory.dir("generated/androidViewModelModules")
+    inputs.dir(commonSources)
+    outputs.dir(outDir)
+    doLast {
+        val annotated = Regex("""^@HiltViewModel\s*(?:\([^)]*\)\s*)?(?:@\w+\s*)*class (\w+)""", RegexOption.MULTILINE)
+        val viewModels = commonSources.asFile.walkTopDown()
+            .filter { it.isFile && it.extension == "kt" }
+            .flatMap { file ->
+                val source = file.readText()
+                val pkg = Regex("""^package ([\w.]+)""", RegexOption.MULTILINE).find(source)?.groupValues?.get(1)
+                annotated.findAll(source).map { "$pkg.${it.groupValues[1]}" }
+            }
+            .sorted()
+            .toList()
+        val names = viewModels.mapIndexed { index, fqName ->
+            val simple = fqName.substringAfterLast('.').replaceFirstChar { it.lowercase() }
+            if (viewModels.count { it.substringAfterLast('.') == fqName.substringAfterLast('.') } > 1) "$simple$index" else simple
+        }
+        val lines = buildList {
+            add("package com.nendo.argosy.di")
+            add("")
+            add("import androidx.lifecycle.ViewModel")
+            add("import dagger.Binds")
+            add("import dagger.Module")
+            add("import dagger.Provides")
+            add("import dagger.hilt.InstallIn")
+            add("import dagger.hilt.android.components.ActivityRetainedComponent")
+            add("import dagger.hilt.android.components.ViewModelComponent")
+            add("import dagger.hilt.android.internal.lifecycle.HiltViewModelMap")
+            add("import dagger.multibindings.IntoMap")
+            add("import dagger.multibindings.LazyClassKey")
+            add("")
+            add("@Module")
+            add("@InstallIn(ViewModelComponent::class)")
+            add("abstract class SharedViewModelBindsModule {")
+            viewModels.zip(names).forEach { (fqName, name) ->
+                add("    @Binds")
+                add("    @IntoMap")
+                add("    @LazyClassKey($fqName::class)")
+                add("    @HiltViewModelMap")
+                add("    abstract fun $name(viewModel: $fqName): ViewModel")
+            }
+            add("}")
+            add("")
+            add("@Module")
+            add("@InstallIn(ActivityRetainedComponent::class)")
+            add("object SharedViewModelKeyModule {")
+            viewModels.zip(names).forEach { (fqName, name) ->
+                add("    @Provides")
+                add("    @IntoMap")
+                add("    @LazyClassKey($fqName::class)")
+                add("    @HiltViewModelMap.KeySet")
+                add("    fun $name(): Boolean = true")
+            }
+            add("}")
+        }
+        val dir = outDir.get().dir("androidMain/com/nendo/argosy/di").asFile
+        dir.mkdirs()
+        dir.resolve("SharedViewModelModules.kt").writeText(lines.joinToString("\n") + "\n")
+    }
+}
+
 val androidResources = layout.projectDirectory.dir("src/androidMain/res")
 
 val prepareDesktopComposeResources by tasks.registering(Sync::class) {
@@ -250,6 +314,9 @@ kotlin {
         }
         getByName("desktopMain").kotlin.srcDir(
             generateDesktopDaoModule.map { it.outputs.files.singleFile.resolve("desktopMain") }
+        )
+        getByName("androidMain").kotlin.srcDir(
+            generateAndroidViewModelModules.map { it.outputs.files.singleFile.resolve("androidMain") }
         )
         listOf("commonMain", "androidMain", "desktopMain").forEach { name ->
             getByName(name).kotlin.srcDir(generateSharedR.map { it.outputs.files.singleFile.resolve(name) })
