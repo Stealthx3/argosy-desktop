@@ -1,0 +1,54 @@
+package com.nendo.argosy.core.input
+
+object AndroidMotionAxes {
+    const val AXIS_BRAKE: Int = 23
+    const val AXIS_DISTANCE: Int = 24
+    const val AXIS_GAS: Int = 22
+    const val AXIS_GENERIC_1: Int = 32
+    const val AXIS_GENERIC_10: Int = 41
+    const val AXIS_GENERIC_11: Int = 42
+    const val AXIS_GENERIC_12: Int = 43
+    const val AXIS_GENERIC_13: Int = 44
+    const val AXIS_GENERIC_14: Int = 45
+    const val AXIS_GENERIC_15: Int = 46
+    const val AXIS_GENERIC_16: Int = 47
+    const val AXIS_GENERIC_2: Int = 33
+    const val AXIS_GENERIC_3: Int = 34
+    const val AXIS_GENERIC_4: Int = 35
+    const val AXIS_GENERIC_5: Int = 36
+    const val AXIS_GENERIC_6: Int = 37
+    const val AXIS_GENERIC_7: Int = 38
+    const val AXIS_GENERIC_8: Int = 39
+    const val AXIS_GENERIC_9: Int = 40
+    const val AXIS_GESTURE_PINCH_SCALE_FACTOR: Int = 52
+    const val AXIS_GESTURE_SCROLL_X_DISTANCE: Int = 50
+    const val AXIS_GESTURE_SCROLL_Y_DISTANCE: Int = 51
+    const val AXIS_GESTURE_X_OFFSET: Int = 48
+    const val AXIS_GESTURE_Y_OFFSET: Int = 49
+    const val AXIS_HAT_X: Int = 15
+    const val AXIS_HAT_Y: Int = 16
+    const val AXIS_HSCROLL: Int = 10
+    const val AXIS_LTRIGGER: Int = 17
+    const val AXIS_ORIENTATION: Int = 8
+    const val AXIS_PRESSURE: Int = 2
+    const val AXIS_RELATIVE_X: Int = 27
+    const val AXIS_RELATIVE_Y: Int = 28
+    const val AXIS_RTRIGGER: Int = 18
+    const val AXIS_RUDDER: Int = 20
+    const val AXIS_RX: Int = 12
+    const val AXIS_RY: Int = 13
+    const val AXIS_RZ: Int = 14
+    const val AXIS_SCROLL: Int = 26
+    const val AXIS_SIZE: Int = 3
+    const val AXIS_THROTTLE: Int = 19
+    const val AXIS_TILT: Int = 25
+    const val AXIS_TOOL_MAJOR: Int = 6
+    const val AXIS_TOOL_MINOR: Int = 7
+    const val AXIS_TOUCH_MAJOR: Int = 4
+    const val AXIS_TOUCH_MINOR: Int = 5
+    const val AXIS_VSCROLL: Int = 9
+    const val AXIS_WHEEL: Int = 21
+    const val AXIS_X: Int = 0
+    const val AXIS_Y: Int = 1
+    const val AXIS_Z: Int = 11
+}

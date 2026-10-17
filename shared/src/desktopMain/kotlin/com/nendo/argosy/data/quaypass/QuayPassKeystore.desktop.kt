@@ -16,5 +16,7 @@ actual class QuayPassKeystore @Inject constructor() {
     actual fun clear(alias: String) {
     }
 
-    actual companion object {}
+    actual companion object {
+        actual fun aliasFor(rommUserId: Long?): String = ""
+    }
 }

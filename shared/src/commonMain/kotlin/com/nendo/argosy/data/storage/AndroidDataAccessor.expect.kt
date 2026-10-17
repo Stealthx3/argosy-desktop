@@ -5,7 +5,9 @@ import java.io.InputStream
 import java.io.OutputStream
 
 expect class AndroidDataAccessor {
-    companion object {}
+    companion object {
+        fun isOnInternalVolume(path: String): Boolean
+    }
 
     fun resetAltAccessCache()
 

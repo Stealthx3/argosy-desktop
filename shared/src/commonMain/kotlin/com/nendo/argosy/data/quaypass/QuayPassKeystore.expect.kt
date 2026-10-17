@@ -5,7 +5,9 @@ expect class QuayPassKeystore {
 
     enum class Algorithm { ED25519, EC_P256 }
 
-    companion object {}
+    companion object {
+        fun aliasFor(rommUserId: Long?): String
+    }
 
     fun sign(data: ByteArray, alias: String): ByteArray
 

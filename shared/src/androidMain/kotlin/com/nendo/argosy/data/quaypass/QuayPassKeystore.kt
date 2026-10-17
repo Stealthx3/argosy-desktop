@@ -229,7 +229,7 @@ actual class QuayPassKeystore @Inject constructor(
          * The unsuffixed alias is kept for an unpaired device so a QuayPass set up before RomM
          * pairing keeps its registration; every account gets its own suffixed key.
          */
-        fun aliasFor(rommUserId: Long?): String =
+        actual fun aliasFor(rommUserId: Long?): String =
             if (rommUserId == null) LEGACY_KEY_ALIAS else "${LEGACY_KEY_ALIAS}_u$rommUserId"
     }
 }

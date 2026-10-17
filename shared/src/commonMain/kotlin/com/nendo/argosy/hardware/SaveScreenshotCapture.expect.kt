@@ -1,13 +1,6 @@
 package com.nendo.argosy.hardware
 
 import com.nendo.argosy.platform.PlatformBitmap as Bitmap
-import com.nendo.argosy.platform.asImageBitmap
-import com.nendo.argosy.platform.config
-import com.nendo.argosy.platform.copy
-import com.nendo.argosy.platform.getPixel
-import com.nendo.argosy.platform.height
-import com.nendo.argosy.platform.recycle
-import com.nendo.argosy.platform.width
 import java.io.File
 
 expect class SaveScreenshotCapture {

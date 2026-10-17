@@ -7,10 +7,27 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
+import com.nendo.argosy.platform.LocalPlatformContext as LocalContext
+import com.nendo.argosy.platform.applicationContext
+import com.nendo.argosy.platform.packageName
+import com.nendo.argosy.platform.getSystemService
+import com.nendo.argosy.platform.getExternalFilesDir
+import com.nendo.argosy.platform.packageManager
+import com.nendo.argosy.platform.getPackageInfo
+import com.nendo.argosy.platform.versionName
+import com.nendo.argosy.platform.assets
+import com.nendo.argosy.platform.contentResolver
+import com.nendo.argosy.platform.getSharedPreferences
+import com.nendo.argosy.platform.list
+import com.nendo.argosy.platform.open
+import com.nendo.argosy.platform.cacheDir
+import com.nendo.argosy.platform.filesDir
+import com.nendo.argosy.platform.getQuantityString
+import com.nendo.argosy.platform.getString
+import com.nendo.argosy.platform.resources
 import androidx.compose.ui.unit.Dp
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
+import com.nendo.argosy.platform.image.AsyncImage
+import com.nendo.argosy.platform.image.ImageRequest
 
 /**
  * The scrub thumbnails one item actually has, taken from that item's own trickplay manifest.

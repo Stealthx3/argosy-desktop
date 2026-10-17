@@ -61,6 +61,11 @@ import com.nendo.argosy.platform.applicationContext
 import com.nendo.argosy.platform.packageName
 import com.nendo.argosy.platform.contentResolver
 import com.nendo.argosy.platform.getSharedPreferences
+import com.nendo.argosy.platform.getSystemService
+import com.nendo.argosy.platform.getExternalFilesDir
+import com.nendo.argosy.platform.packageManager
+import com.nendo.argosy.platform.getPackageInfo
+import com.nendo.argosy.platform.versionName
 
 private val PERSISTENT_BAR_HEIGHT = 52.dp  // Static: matches specific UI design spec
 private val FOOTER_CLEARANCE = 56.dp  // Static: matches specific UI design spec

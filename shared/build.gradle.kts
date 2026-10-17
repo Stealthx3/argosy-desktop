@@ -364,6 +364,9 @@ kotlin {
         }
         androidMain.dependencies {
             implementation(project(":sigil"))
+            implementation(project(":libretrodroid"))
+            implementation(libs.work.runtime.ktx)
+            implementation(libs.hilt.work)
             implementation(libs.hilt.android)
             implementation(libs.hilt.navigation.compose)
             implementation(libs.androidx.activity.compose)
@@ -377,6 +380,7 @@ kotlin {
         }
         getByName("desktopMain").dependencies {
             implementation(project(":sigil-jvm"))
+            implementation(project(":libretrodroid-api"))
             implementation(libs.sqlite.bundled)
             implementation(libs.zstd.jni)
             implementation(libs.org.json)
@@ -448,6 +452,7 @@ dependencies {
         artifact { type = "aar" }
     }
     add("kspAndroid", libs.hilt.compiler)
+    add("kspAndroid", libs.hilt.work.compiler)
     add("kspAndroid", libs.room.compiler)
     add("kspDesktop", libs.room.compiler)
     add("kspDesktop", libs.dagger.compiler)

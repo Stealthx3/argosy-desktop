@@ -8,3 +8,4 @@ hardware/AmbientLedManager.kt: AmbientLedManager(setUiColors)
 core/input/ConnectedControllerTracker.kt: ConnectedControllerTracker(connectedControllerIds)
 ui/theme/CustomFontLoader.kt: CustomFontLoader(loadFamily)
 ui/theme/backdrop/SurfaceBackdrop.kt: ::surfaceBackdrop
+ui/common/AlwaysCrossfadeFactory.kt: AlwaysCrossfadeFactory(<init>)

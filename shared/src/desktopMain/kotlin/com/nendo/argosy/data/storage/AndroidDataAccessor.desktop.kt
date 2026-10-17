@@ -63,5 +63,7 @@ actual class AndroidDataAccessor @Inject constructor() {
 
     actual fun moveDirectory(sourcePath: String, destPath: String): Boolean = false
 
-    actual companion object {}
+    actual companion object {
+        actual fun isOnInternalVolume(path: String): Boolean = false
+    }
 }

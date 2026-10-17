@@ -1,6 +1,6 @@
 package com.nendo.argosy.data.emulator
 
-import android.util.Log
+import com.nendo.argosy.util.PlatformLog as Log
 import com.nendo.argosy.data.storage.StoragePathUtils
 import java.io.File
 import javax.inject.Inject

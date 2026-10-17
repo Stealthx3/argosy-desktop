@@ -1,6 +1,6 @@
 package com.nendo.argosy.data.storage
 
-import android.os.Environment
+import com.nendo.argosy.platform.PlatformEnvironment as Environment
 import java.io.File
 
 object StoragePathUtils {

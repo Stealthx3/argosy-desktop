@@ -28,7 +28,7 @@ actual class AndroidDataAccessor @Inject constructor(
          * Whether [path] is on internal shared storage, the only volume whose Android/data needs
          * alt access; a removable volume's Android/data is reachable through the plain path.
          */
-        fun isOnInternalVolume(path: String): Boolean =
+        actual fun isOnInternalVolume(path: String): Boolean =
             !path.startsWith("/storage/") ||
                 path.startsWith("/storage/emulated/") ||
                 path.startsWith("/storage/self/")

@@ -1,13 +1,6 @@
 package com.nendo.argosy.util
 
 import com.nendo.argosy.platform.PlatformContext as Context
-import com.nendo.argosy.platform.applicationContext
-import com.nendo.argosy.platform.packageName
-import com.nendo.argosy.platform.assets
-import com.nendo.argosy.platform.contentResolver
-import com.nendo.argosy.platform.getSharedPreferences
-import com.nendo.argosy.platform.list
-import com.nendo.argosy.platform.open
 import com.nendo.argosy.platform.cacheDir
 import com.nendo.argosy.platform.filesDir
 import com.nendo.argosy.platform.getQuantityString

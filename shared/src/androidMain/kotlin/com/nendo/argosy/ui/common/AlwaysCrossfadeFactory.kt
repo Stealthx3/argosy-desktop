@@ -14,7 +14,7 @@ import coil.transition.TransitionTarget
  * a request unequal to the last one, Coil restarts the load, and the fade replays from
  * transparent. Focus changes recompose, so the result reads as a flicker on the focused cover.
  */
-data class AlwaysCrossfadeFactory(private val durationMillis: Int) : Transition.Factory {
+data actual class AlwaysCrossfadeFactory actual constructor(private val durationMillis: Int) : Transition.Factory {
     override fun create(target: TransitionTarget, result: ImageResult): Transition =
         if (result is ErrorResult) Transition.Factory.NONE.create(target, result)
         else CrossfadeTransition(target, result, durationMillis)

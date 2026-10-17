@@ -25,11 +25,12 @@ actual fun AsyncImage(
     colorFilter: ColorFilter?,
     filterQuality: FilterQuality,
 ) {
+    val platformModel = remember(model) { platformImageModel(model) }
     val errorCallback = remember(onError) {
         onError?.let { callback -> { state: AsyncImagePainter.State.Error -> callback(state) } }
     }
     coil3.compose.AsyncImage(
-        model = model,
+        model = platformModel,
         contentDescription = contentDescription,
         modifier = modifier,
         placeholder = placeholder,

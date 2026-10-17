@@ -516,7 +516,6 @@
 + data/remote/ssl/UserCertTrustManager.kt
 + data/repository/MediaRepository.kt
 + data/storage/StorageAttributionRepository.kt
-+ data/storage/StoragePathUtils.kt
 + data/storage/StorageVolumeDetector.kt
 + data/storage/StorageVolumeHealth.kt
 + ui/input/SoundFeedback.kt
@@ -775,3 +774,57 @@
 # Phase 2: LibretroCoreManager's pure update rules, moved out of its companion.
 [commonMain]
 + libretro/LibretroCoreUpdateRules.kt
+
+# Phase 2: WorkManager workers kept as Android code; commonMain sees their schedule functions.
+[androidMain]
++ data/sync/RAPatchBackfillWorker.kt
+
+# Phase 2: portable since PlatformEnvironment (was androidMain).
+[commonMain]
++ data/storage/StoragePathUtils.kt
+
+# Phase 2: files freed by the system-service, SuppressLint, key-name and motion-axis stand-ins and the worker slice.
+[commonMain]
++ data/emulator/BaseRomFileResolver.kt
++ data/emulator/BiosPathRegistry.kt
++ data/emulator/BuiltinCoreResolver.kt
++ data/emulator/CartFeatureScanner.kt
++ data/emulator/CoreVersionExtractor.kt
++ data/emulator/GpuDriverManager.kt
++ data/emulator/RaUnlockSnapshots.kt
++ data/emulator/RetroArchConfigParser.kt
++ data/emulator/RetroArchPathResolver.kt
++ data/emulator/SwitchKeyManager.kt
++ data/emulator/TitleIdExtractor.kt
++ data/emulator/savepath/SavePathAuthority.kt
++ data/platform/PlatformFolderResolver.kt
++ data/preferences/SettingsBackupRepository.kt
++ data/repository/RetroAchievementsRepository.kt
++ data/sync/RAPatchBackfill.kt
++ domain/usecase/achievement/ReconcileAchievementsOnSessionEndUseCase.kt
++ domain/usecase/recap/MonthlyDigestAssembler.kt
++ domain/usecase/recap/RecapEligibility.kt
++ domain/usecase/recap/RecapGate.kt
++ libretro/BuiltinShaderConfig.kt
++ libretro/GraphicsBackendRegistry.kt
++ libretro/coreoptions/CoreOptionResolver.kt
++ libretro/shader/ShaderDownloader.kt
++ libretro/shader/ShaderRegistry.kt
++ ui/common/GraphicsUi.kt
++ ui/common/ShaderCategoryUi.kt
++ ui/screens/settings/BuiltinGraphicsModels.kt
++ util/RootScriptRunner.kt
+
+# Phase 2: the Coil 2 crossfade factory is the Android actual of a commonMain expect class.
+[androidMain]
++ ui/common/AlwaysCrossfadeFactory.kt
+
+# Phase 2: files freed by the ImageRequest seam.
+[commonMain]
++ ui/screens/media/components/MediaBackdrop.kt
++ ui/screens/player/PlayerModels.kt
++ ui/screens/player/PlayerOverlays.kt
++ ui/screens/player/PlayerTransportBar.kt
++ ui/screens/player/PlayerTrickplay.kt
++ ui/screens/player/delegates/PlayerChromeDelegate.kt
++ ui/screens/player/delegates/PlayerQualityDelegate.kt

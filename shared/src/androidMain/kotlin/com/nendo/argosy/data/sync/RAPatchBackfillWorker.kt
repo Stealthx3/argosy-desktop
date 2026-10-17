@@ -17,19 +17,19 @@ import dagger.assisted.AssistedInject
 import java.util.concurrent.TimeUnit
 
 @HiltWorker
-class RAPatchBackfillWorker @AssistedInject constructor(
+actual class RAPatchBackfillWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
     private val raRepository: RetroAchievementsRepository,
     private val backfill: RAPatchBackfill
 ) : CoroutineWorker(context, params) {
 
-    companion object {
+    actual companion object {
         private const val TAG = "RAPatchBackfillWorker"
         private const val WORK_NAME = "ra_patch_backfill"
         private const val BACKOFF_MINUTES = 5L
 
-        fun schedule(context: Context) {
+        actual fun schedule(context: Context) {
             val request = OneTimeWorkRequestBuilder<RAPatchBackfillWorker>()
                 .setConstraints(
                     Constraints.Builder()
