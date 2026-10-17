@@ -24,7 +24,8 @@ DESKTOP = Path("shared/src/desktopMain/kotlin")
 MANIFEST = Path(__file__).with_name("slices.txt")
 PORTABLE_IMPORTS = (
     "kotlin.", "kotlinx.coroutines.", "java.io.", "java.util.", "java.time.", "java.net.", "java.security.",
-    "androidx.compose.ui.graphics.", "com.nendo.argosy.",
+    "androidx.compose.ui.graphics.", "com.nendo.argosy.", "androidx.datastore.core.", "androidx.datastore.preferences.core.",
+    "androidx.room.",
 )
 NOT_A_TYPE_STAND_IN = ("android.content.Intent",)
 
@@ -370,6 +371,11 @@ def main():
         pkg = re.search(r"^package ([\w.]+)", text, re.M).group(1)
         imports = re.findall(r"^import ([\w.]+)(?: as (\w+))?$", text, re.M)
         imported = {alias or name.rsplit(".", 1)[1]: name for name, alias in imports}
+        sliced_here = {
+            l.split(":", 1)[1].strip().split("(")[0]
+            for l in MANIFEST.read_text().splitlines()
+            if l.split("#")[0].strip().startswith(rel + ":")
+        }
         top_level = set(re.findall(r"^(?:(?:data|enum|sealed|private|internal|value)\s+)*(?:class|object|interface|typealias)\s+(\w+)", text, re.M))
         cls_match, body_start, body_end = class_body(text, cls)
         expect_path = (COMMON / ROOT / rel).parent / f"{cls}.expect.kt"
@@ -563,7 +569,7 @@ def main():
             blocked = sorted(
                 w for w in words
                 if (w in imported and not portable_import(imported[w]))
-                or (w in top_level and w != cls)
+                or (w in top_level and w != cls and w not in sliced_here)
                 or w in nested
             )
             if blocked:

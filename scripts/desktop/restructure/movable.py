@@ -18,6 +18,7 @@ usually a desktop compile error the import rules cannot see).
 Usage: movable.py --check           audits files already in shared against the same rules.
        movable.py --why <file>      prints the chain of dependencies that keeps <file> in app.
        movable.py --android <file>  prints what placing <file> in androidMain also needs.
+       movable.py --rehome          lists shared androidMain files that now qualify for commonMain.
        movable.py [--exclude glob ...] [path-prefix ...]   (an excluded file and everything that
                                     depends on it stays in app)   prints the qualifying files under those prefixes, together
 with the qualifying files they depend on, so the printed set compiles on its own.
@@ -60,7 +61,7 @@ NOT_ALLOWED = (
     "androidx.compose.ui.input.pointer.RequestDisallowInterceptTouchEvent",
 )
 REWRITTEN = (
-    "android.annotation.SuppressLint", "androidx.room.withTransaction", "androidx.core.graphics.toColorInt", "android.graphics.BlurMaskFilter", "android.graphics.LinearGradient",
+    "android.annotation.SuppressLint", "androidx.datastore.preferences.preferencesDataStoreFile", "androidx.room.withTransaction", "androidx.core.graphics.toColorInt", "android.graphics.BlurMaskFilter", "android.graphics.LinearGradient",
     "android.graphics.Shader.TileMode",
     "android.util.Log", "android.graphics.Color.", "android.os.Build.", "com.nendo.argosy.BuildConfig", "dagger.hilt.android.lifecycle.HiltViewModel",
     "com.nendo.argosy.R",
@@ -72,14 +73,14 @@ REWRITTEN = (
     "android.text.format.DateFormat.getBestDateTimePattern",
 )
 GENERATED = (
-    "com.nendo.argosy.config.AppBuildConfig", "com.nendo.argosy.res.ArgosyR",
+    "com.nendo.argosy.config.AppBuildConfig", "com.nendo.argosy.res.ArgosyR", "com.nendo.argosy.shared.R",
     "com.nendo.argosy.platform.drawRoundRect", "com.nendo.argosy.platform.PlatformBlur",
     "com.nendo.argosy.platform.PlatformBlurMaskFilter", "com.nendo.argosy.platform.PlatformTileMode",
     "com.nendo.argosy.platform.PlatformLinearGradient", "com.nendo.argosy.platform.PlatformNativePaint",
 )
 CONTEXT_MEMBERS = (
     r"(?!getString\b|resources\b|filesDir\b|cacheDir\b|assets\b|getSharedPreferences\b|contentResolver\b"
-    r"|packageName\b|applicationContext\b|getSystemService\b|getExternalFilesDir\b|packageManager\b)[a-zA-Z_]\w*"
+    r"|packageName\b|applicationContext\b|getSystemService\b|getExternalFilesDir\b|packageManager\b|preferencesDataStoreFile\b)[a-zA-Z_]\w*"
 )
 CONTEXT_REST = (
     r"\.resources\.(?!getQuantityString\b|getString\b)\w+"
@@ -174,7 +175,7 @@ GUARDED_REWRITES = {
         r"|unregisterOnSharedPreferenceChangeListener|OnSharedPreferenceChangeListener)\b"
     ),
     "android.provider.Settings": re.compile(r"\bSettings\.(?!Secure\.(?:getString|ANDROID_ID)\b)\w+(?:\.\w+)?"),
-    "android.content.Intent": re.compile(r"\bIntent\b(?!\.(?:ACTION_BATTERY_CHANGED|ACTION_BOOT_COMPLETED|ACTION_DELETE|ACTION_MAIN|ACTION_MY_PACKAGE_REPLACED|ACTION_PACKAGE_ADDED|ACTION_PACKAGE_REMOVED|ACTION_PACKAGE_REPLACED|ACTION_SCREEN_OFF|ACTION_SCREEN_ON|ACTION_USER_PRESENT|ACTION_VIEW|CATEGORY_DEFAULT|CATEGORY_HOME|CATEGORY_LAUNCHER|FLAG_ACTIVITY_CLEAR_TASK|FLAG_ACTIVITY_CLEAR_TOP|FLAG_ACTIVITY_MULTIPLE_TASK|FLAG_ACTIVITY_NEW_TASK|FLAG_ACTIVITY_NO_ANIMATION|FLAG_ACTIVITY_NO_HISTORY|FLAG_ACTIVITY_REORDER_TO_FRONT|FLAG_ACTIVITY_SINGLE_TOP|FLAG_GRANT_READ_URI_PERMISSION)\b)"),
+    "android.content.Intent": re.compile(r"\bIntent\s*\(|\bIntent\.(?!(?:ACTION_BATTERY_CHANGED|ACTION_BOOT_COMPLETED|ACTION_DELETE|ACTION_MAIN|ACTION_MY_PACKAGE_REPLACED|ACTION_PACKAGE_ADDED|ACTION_PACKAGE_REMOVED|ACTION_PACKAGE_REPLACED|ACTION_SCREEN_OFF|ACTION_SCREEN_ON|ACTION_USER_PRESENT|ACTION_VIEW|CATEGORY_DEFAULT|CATEGORY_HOME|CATEGORY_LAUNCHER|FLAG_ACTIVITY_CLEAR_TASK|FLAG_ACTIVITY_CLEAR_TOP|FLAG_ACTIVITY_MULTIPLE_TASK|FLAG_ACTIVITY_NEW_TASK|FLAG_ACTIVITY_NO_ANIMATION|FLAG_ACTIVITY_NO_HISTORY|FLAG_ACTIVITY_REORDER_TO_FRONT|FLAG_ACTIVITY_SINGLE_TOP|FLAG_GRANT_READ_URI_PERMISSION)\b)\w+"),
     "android.net.Uri": re.compile(
         r"\bUri\.(?!parse\b|fromFile\b|encode\b|decode\b)\w+"
         r"|\.(?:buildUpon|normalizeScheme|isHierarchical|isOpaque|isRelative|isAbsolute|fragment|encodedQuery"
@@ -489,6 +490,22 @@ def main():
                     parents[dep] = current
                     queue.append(dep)
         print(f"{origin.rel}: held only by excluded or androidMain files")
+        return
+
+    if args[:1] == ["--rehome"]:
+        candidates = {
+            u for u in android_shared
+            if not common_reasons[u] and not re.search(r"^\s*(?:@\w+\s+)*(?:\w+\s+)*actual\b", u.text, re.M)
+        }
+        changed = True
+        while changed:
+            changed = False
+            for u in list(candidates):
+                if any(d not in in_common and d not in candidates and d not in movable for d in deps[u]):
+                    candidates.discard(u)
+                    changed = True
+        for u in sorted(candidates, key=lambda x: x.rel):
+            print(u.rel)
         return
 
     if args[:1] == ["--android"]:

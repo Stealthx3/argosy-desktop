@@ -29,3 +29,11 @@ data/netplay/PacketCrypto.kt -> common:NetplayCryptoException.kt: NetplayCryptoE
 data/launcher/SteamLauncher.kt -> common:ScannedSteamGame.kt: ScannedSteamGame
 core/input/ActiveController.kt -> common:ActiveControllerModel.kt: ActiveController
 core/input/ConnectedControllerTracker.kt -> common:ControllerIds.kt: controllerIdOf
+hardware/DisplayBadgeOverlay.kt -> common:DisplayBadgeSize.kt: DisplayBadgeSize
+hardware/VolumeController.kt -> common:DisplayVolume.kt: DisplayVolume
+hardware/BrightnessController.kt -> common:DisplayBrightness.kt: DisplayBrightness
+libretro/CoreCrashDetector.kt -> common:CoreCrashInfo.kt: CoreCrashInfo
+ui/screens/player/PlayerEngine.kt -> common:SideloadedSubtitles.kt: sideloadedSubtitleId
+data/emulator/GameLauncher.kt -> LaunchResult.kt: LaunchResult DiscOption
+util/ScreenCatalog.kt -> common:AttachedScreen.kt: AttachedScreen
+data/media/MediaSubtitleSidecars.kt -> common:MediaSubtitleTypes.kt: MediaSubtitleDelivery MediaSubtitleSidecar

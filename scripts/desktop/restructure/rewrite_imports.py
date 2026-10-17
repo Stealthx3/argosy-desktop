@@ -110,7 +110,10 @@ RULES = [
     ),
     (re.compile(r"^import android\.provider\.Settings$", re.M), "import com.nendo.argosy.platform.PlatformSettings as Settings"),
     (re.compile(r"\bandroid\.provider\.Settings\.Secure\."), "com.nendo.argosy.platform.PlatformSettings.Secure."),
-    (re.compile(r"^import android\.content\.Intent$", re.M), "import com.nendo.argosy.platform.PlatformIntent as Intent"),
+    (
+        re.compile(r"^import android\.content\.Intent$", re.M),
+        "import com.nendo.argosy.platform.PlatformIntentType as Intent\nimport com.nendo.argosy.platform.PlatformIntent",
+    ),
     (re.compile(r"\bandroid\.net\.Uri\.(parse|fromFile|encode|decode)\("), r"com.nendo.argosy.platform.PlatformUris.\1("),
     (re.compile(r"^import android\.net\.Uri$", re.M), "import com.nendo.argosy.platform.PlatformUri as Uri"),
     (re.compile(r"(?<!import )\bandroid\.net\.Uri\b"), "com.nendo.argosy.platform.PlatformUri"),
@@ -144,6 +147,10 @@ RULES = [
     (re.compile(r"^import android\.text\.Html$", re.M), "import com.nendo.argosy.platform.PlatformHtml as Html"),
     (re.compile(r"^import androidx\.core\.graphics\.toColorInt$", re.M), "import com.nendo.argosy.platform.toColorInt"),
     (re.compile(r"^import androidx\.room\.withTransaction$", re.M), "import com.nendo.argosy.platform.withTransaction"),
+    (
+        re.compile(r"^import androidx\.datastore\.preferences\.preferencesDataStoreFile$", re.M),
+        "import com.nendo.argosy.platform.preferencesDataStoreFile",
+    ),
     (re.compile(r"^import android\.view\.KeyEvent$", re.M), "import com.nendo.argosy.core.input.AndroidKeyCodes as KeyEvent"),
     (
         re.compile(r"^import com\.nendo\.argosy\.util\.DisplayAffinityHelper$", re.M),
@@ -239,6 +246,7 @@ def rewrite_bitmap_config(text):
 
 
 STATIC_STAND_INS = [
+    ("PlatformIntentType as Intent", r"Intent\.(?=[A-Z][A-Z0-9_]+\b)", r"PlatformIntent."),
     ("PlatformConfiguration as Configuration", r"Configuration\.(ORIENTATION_\w+|UI_MODE_NIGHT_\w+)\b", r"\1"),
     ("PlatformBitmap as Bitmap", r"Bitmap\.(createBitmap)\(", r"PlatformBitmaps.\1("),
     ("PlatformBlurMaskFilter as BlurMaskFilter", r"BlurMaskFilter\.Blur\.", r"PlatformBlur."),
