@@ -1,7 +1,7 @@
 package com.nendo.argosy.ui.screens.collections
 
 import androidx.annotation.StringRes
-import com.nendo.argosy.R
+import com.nendo.argosy.res.ArgosyR as R
 
 /**
  * The Browse By rows, identified by kind rather than by the text on them.

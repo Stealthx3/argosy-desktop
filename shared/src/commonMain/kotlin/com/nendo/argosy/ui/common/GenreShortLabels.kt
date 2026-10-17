@@ -1,7 +1,7 @@
 package com.nendo.argosy.ui.common
 
 import androidx.annotation.StringRes
-import com.nendo.argosy.R
+import com.nendo.argosy.res.ArgosyR as R
 
 /**
  * Compact label for a genre name as stored on a game, matched on the exact stored token. Covers

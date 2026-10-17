@@ -2,8 +2,8 @@ package com.nendo.argosy.ui.icons
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.res.painterResource
-import com.nendo.argosy.R
+import com.nendo.argosy.res.painterResource
+import com.nendo.argosy.res.ArgosyR as R
 
 object InputIcons {
     val FaceTop: Painter

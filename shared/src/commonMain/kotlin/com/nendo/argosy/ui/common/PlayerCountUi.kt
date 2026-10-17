@@ -6,7 +6,7 @@ import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.nendo.argosy.R
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.domain.model.PlayerCount
 import com.nendo.argosy.domain.model.PlayerCountBucket
 

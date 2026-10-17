@@ -19,8 +19,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.res.painterResource
-import com.nendo.argosy.R
+import com.nendo.argosy.res.painterResource
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.ui.theme.Dimens
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay

@@ -1,8 +1,8 @@
 package com.nendo.argosy.data.quaypass
 
-import android.util.Log
+import com.nendo.argosy.util.PlatformLog as Log
 import androidx.annotation.VisibleForTesting
-import com.nendo.argosy.BuildConfig
+import com.nendo.argosy.config.AppBuildConfig as BuildConfig
 import java.util.Base64
 import org.bouncycastle.asn1.ASN1ObjectIdentifier
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo

@@ -1,7 +1,7 @@
 package com.nendo.argosy.ui.common
 
 import androidx.annotation.StringRes
-import com.nendo.argosy.R
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.data.preferences.MediaAudioLanguage
 import com.nendo.argosy.data.preferences.MediaDownloadQuality
 import com.nendo.argosy.data.preferences.MediaStreamingQuality

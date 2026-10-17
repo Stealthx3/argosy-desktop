@@ -1,7 +1,7 @@
 package com.nendo.argosy.ui.screens.library
 
 import androidx.annotation.PluralsRes
-import com.nendo.argosy.R
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.data.local.entity.MediaCollectionType
 import com.nendo.argosy.data.local.entity.MediaLibraryEntity
 import com.nendo.argosy.data.local.entity.PlatformEntity

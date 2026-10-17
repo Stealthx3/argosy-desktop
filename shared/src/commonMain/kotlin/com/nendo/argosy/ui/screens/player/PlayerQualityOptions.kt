@@ -1,7 +1,7 @@
 package com.nendo.argosy.ui.screens.player
 
 import androidx.annotation.StringRes
-import com.nendo.argosy.R
+import com.nendo.argosy.res.ArgosyR as R
 import java.util.Locale
 
 /**

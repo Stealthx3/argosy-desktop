@@ -10,8 +10,8 @@ import androidx.compose.material.icons.filled.Tv
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.res.painterResource
-import com.nendo.argosy.R
+import com.nendo.argosy.res.painterResource
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.domain.model.DeviceKind
 
 val DeviceKind.icon: Painter

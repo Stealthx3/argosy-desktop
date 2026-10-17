@@ -2,7 +2,7 @@ package com.nendo.argosy.ui.common
 
 import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.Color
-import com.nendo.argosy.R
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.domain.model.RecapAwardKind
 import com.nendo.argosy.ui.theme.generated.ColorTokens
 
