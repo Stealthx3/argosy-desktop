@@ -337,6 +337,7 @@ kotlin {
             getByName(name).kotlin.srcDir(generateSharedR.map { it.outputs.files.singleFile.resolve(name) })
         }
         getByName("desktopMain").resources.srcDir(prepareDesktopAssets.map { it.outputs.files.singleFile })
+        getByName("desktopMain").kotlin.srcDir(rootProject.file("sigil/bindings/android/src/main/kotlin"))
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.ui)
@@ -359,8 +360,11 @@ kotlin {
             implementation(libs.datastore.preferences)
             implementation(libs.androidx.annotation)
             implementation(compose.components.resources)
+            implementation("com.google.zxing:core:3.5.4")
+            implementation("org.bitlet:weupnp:0.1.4")
         }
         androidMain.dependencies {
+            implementation(project(":sigil"))
             implementation(libs.hilt.android)
             implementation(libs.hilt.navigation.compose)
             implementation(libs.androidx.activity.compose)

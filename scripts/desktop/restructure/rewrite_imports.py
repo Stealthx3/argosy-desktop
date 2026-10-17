@@ -104,6 +104,18 @@ RULES = [
     (re.compile(r"^import androidx\.compose\.ui\.graphics\.asImageBitmap$", re.M), "import com.nendo.argosy.platform.asImageBitmap"),
     (re.compile(r"^import android\.util\.Base64$", re.M), "import com.nendo.argosy.platform.PlatformBase64 as Base64"),
     (re.compile(r"\bandroid\.util\.Base64\."), "com.nendo.argosy.platform.PlatformBase64."),
+    (
+        re.compile(r"^import android\.content\.SharedPreferences$", re.M),
+        "import com.nendo.argosy.platform.PlatformSharedPreferences as SharedPreferences",
+    ),
+    (re.compile(r"^import android\.provider\.Settings$", re.M), "import com.nendo.argosy.platform.PlatformSettings as Settings"),
+    (re.compile(r"\bandroid\.provider\.Settings\.Secure\."), "com.nendo.argosy.platform.PlatformSettings.Secure."),
+    (re.compile(r"^import android\.content\.Intent$", re.M), "import com.nendo.argosy.platform.PlatformIntent as Intent"),
+    (re.compile(r"\bandroid\.net\.Uri\.(parse|fromFile|encode|decode)\("), r"com.nendo.argosy.platform.PlatformUris.\1("),
+    (re.compile(r"^import android\.net\.Uri$", re.M), "import com.nendo.argosy.platform.PlatformUri as Uri"),
+    (re.compile(r"(?<!import )\bandroid\.net\.Uri\b"), "com.nendo.argosy.platform.PlatformUri"),
+    (re.compile(r"^import android\.os\.Process$", re.M), "import com.nendo.argosy.platform.PlatformProcess as Process"),
+    (re.compile(r"\bandroid\.os\.Process\.(is64Bit|myUid)\b"), r"com.nendo.argosy.platform.PlatformProcess.\1"),
     (re.compile(r"^import android\.view\.KeyEvent$", re.M), "import com.nendo.argosy.core.input.AndroidKeyCodes as KeyEvent"),
     (
         re.compile(r"^import com\.nendo\.argosy\.util\.DisplayAffinityHelper$", re.M),
@@ -114,18 +126,29 @@ RULES = [
 
 COMPANION_IMPORTS = {
     "com.nendo.argosy.platform.PlatformContext": [
-        "com.nendo.argosy.platform.assets", "com.nendo.argosy.platform.cacheDir", "com.nendo.argosy.platform.filesDir",
+        "com.nendo.argosy.platform.applicationContext", "com.nendo.argosy.platform.packageName",
+        "com.nendo.argosy.platform.assets", "com.nendo.argosy.platform.contentResolver", "com.nendo.argosy.platform.cacheDir", "com.nendo.argosy.platform.filesDir",
+        "com.nendo.argosy.platform.getSharedPreferences",
         "com.nendo.argosy.platform.list", "com.nendo.argosy.platform.open",
         "com.nendo.argosy.platform.getQuantityString", "com.nendo.argosy.platform.getString",
         "com.nendo.argosy.platform.resources",
     ],
     "com.nendo.argosy.platform.LocalPlatformContext": [
-        "com.nendo.argosy.platform.assets", "com.nendo.argosy.platform.cacheDir", "com.nendo.argosy.platform.filesDir",
+        "com.nendo.argosy.platform.applicationContext", "com.nendo.argosy.platform.packageName",
+        "com.nendo.argosy.platform.assets", "com.nendo.argosy.platform.contentResolver", "com.nendo.argosy.platform.cacheDir", "com.nendo.argosy.platform.filesDir",
+        "com.nendo.argosy.platform.getSharedPreferences",
         "com.nendo.argosy.platform.list", "com.nendo.argosy.platform.open",
         "com.nendo.argosy.platform.getQuantityString", "com.nendo.argosy.platform.getString",
         "com.nendo.argosy.platform.resources",
     ],
     "com.nendo.argosy.platform.LocalPlatformView": ["com.nendo.argosy.platform.getLocationOnScreen"],
+    "com.nendo.argosy.platform.PlatformUri": [
+        "com.nendo.argosy.platform.authority", "com.nendo.argosy.platform.encodedPath",
+        "com.nendo.argosy.platform.getQueryParameter", "com.nendo.argosy.platform.host",
+        "com.nendo.argosy.platform.lastPathSegment", "com.nendo.argosy.platform.path",
+        "com.nendo.argosy.platform.pathSegments", "com.nendo.argosy.platform.queryParameterNames",
+        "com.nendo.argosy.platform.scheme",
+    ],
     "com.nendo.argosy.platform.PlatformBitmap": [
         "com.nendo.argosy.platform.asImageBitmap", "com.nendo.argosy.platform.config", "com.nendo.argosy.platform.copy",
         "com.nendo.argosy.platform.getPixel", "com.nendo.argosy.platform.height", "com.nendo.argosy.platform.recycle",
@@ -158,6 +181,46 @@ def rewrite_bitmap_config(text):
     return text
 
 
+MODE_PRIVATE = re.compile(r"(?<![\w.])Context\.MODE_PRIVATE\b")
+
+
+def rewrite_mode_private(text):
+    if not re.search(r"^import com\.nendo\.argosy\.platform\.PlatformContext as Context$", text, re.M):
+        return text
+    if not MODE_PRIVATE.search(text):
+        return text
+    text = MODE_PRIVATE.sub("MODE_PRIVATE", text)
+    if not re.search(r"^import com\.nendo\.argosy\.platform\.MODE_PRIVATE$", text, re.M):
+        text = re.sub(
+            r"^(import com\.nendo\.argosy\.platform\.PlatformContext as Context)$",
+            r"\1\nimport com.nendo.argosy.platform.MODE_PRIVATE",
+            text,
+            count=1,
+            flags=re.M,
+        )
+    return text
+
+
+URI_STATICS = re.compile(r"(?<![\w.])Uri\.(parse|fromFile|encode|decode)\(")
+
+
+def rewrite_uri_statics(text):
+    if not re.search(r"^import com\.nendo\.argosy\.platform\.PlatformUri as Uri$", text, re.M):
+        return text
+    if not URI_STATICS.search(text):
+        return text
+    text = URI_STATICS.sub(r"PlatformUris.\1(", text)
+    if not re.search(r"^import com\.nendo\.argosy\.platform\.PlatformUris$", text, re.M):
+        text = re.sub(
+            r"^(import com\.nendo\.argosy\.platform\.PlatformUri as Uri)$",
+            r"\1\nimport com.nendo.argosy.platform.PlatformUris",
+            text,
+            count=1,
+            flags=re.M,
+        )
+    return text
+
+
 def ensure_companions(text):
     for stand_in, companions in COMPANION_IMPORTS.items():
         anchor = re.search(rf"^import {re.escape(stand_in)}( as \w+)?$", text, re.M)
@@ -179,6 +242,8 @@ def main():
         for pattern, replacement in RULES:
             new = pattern.sub(replacement, new)
         new = rewrite_bitmap_config(new)
+        new = rewrite_mode_private(new)
+        new = rewrite_uri_statics(new)
         new = ensure_companions(new)
         if new != text:
             path.write_text(new)

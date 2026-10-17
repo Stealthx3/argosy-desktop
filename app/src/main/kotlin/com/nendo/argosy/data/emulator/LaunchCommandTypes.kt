@@ -1,0 +1,110 @@
+package com.nendo.argosy.data.emulator
+
+import android.content.Intent
+import android.net.Uri
+
+enum class LaunchMethod { INTENT, SHELL }
+
+enum class RomPathFormat {
+    AUTO,
+    ABSOLUTE_PATH,
+    FILE_PROVIDER,
+    DOCUMENT_URI
+}
+
+/**
+ * - [NONE]: slot is cleared -- don't bind the ROM here.
+ * - [ABSOLUTE_PATH]: raw filesystem path (for data slot, an opaque URI wrapping the path).
+ * - [FILE_PROVIDER]: content:// URI via Argosy's FileProvider, with URI grant + clipData delegation.
+ * - [DOCUMENT_URI]: content:// URI from DocumentsContract.buildDocumentUri (plain document form,
+ *   not tree-delegated).
+ */
+enum class RomBindingFormat {
+    NONE,
+    ABSOLUTE_PATH,
+    FILE_PROVIDER,
+    DOCUMENT_URI
+}
+
+sealed class ResolvedExtra {
+    abstract val key: String
+    data class StringExtra(override val key: String, val value: String) : ResolvedExtra()
+    data class UriExtra(override val key: String, val uri: Uri) : ResolvedExtra()
+    data class BoolExtra(override val key: String, val value: Boolean) : ResolvedExtra()
+    data class StringArrayExtra(override val key: String, val values: Array<String>) : ResolvedExtra() {
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other !is StringArrayExtra) return false
+            return key == other.key && values.contentEquals(other.values)
+        }
+        override fun hashCode(): Int = 31 * key.hashCode() + values.contentHashCode()
+    }
+}
+
+data class EffectiveLaunchCommand(
+    val action: String,
+    val packageName: String,
+    val activityClass: String?,
+    val categories: List<String> = listOf(Intent.CATEGORY_DEFAULT),
+    val dataUri: Uri? = null,
+    val mimeType: String? = null,
+    val extras: List<ResolvedExtra> = emptyList(),
+    val intentFlags: Int,
+    val grantReadUriTo: List<Uri> = emptyList(),
+    val clipDataUri: Uri? = null,
+    val launchMethod: LaunchMethod = LaunchMethod.INTENT
+)
+
+fun EffectiveLaunchCommand.toShellArgv(): Array<String> {
+    val cmd = StringBuilder("/system/bin/am start")
+    cmd.append(" -a ").append(shellEscape(action))
+
+    if (activityClass != null) {
+        cmd.append(" -n ").append(shellEscape("$packageName/$activityClass"))
+    } else {
+        cmd.append(" -p ").append(shellEscape(packageName))
+    }
+
+    categories.forEach { category ->
+        cmd.append(" -c ").append(shellEscape(category))
+    }
+
+    if (dataUri != null) {
+        cmd.append(" -d ").append(shellEscape(dataUri.toString()))
+    }
+
+    if (mimeType != null) {
+        cmd.append(" -t ").append(shellEscape(mimeType))
+    }
+
+    if (intentFlags != 0) {
+        cmd.append(" -f 0x").append(intentFlags.toString(16))
+    }
+
+    if (clipDataUri != null || grantReadUriTo.isNotEmpty()) {
+        cmd.append(" --grant-read-uri-permission")
+    }
+
+    extras.forEach { extra ->
+        when (extra) {
+            is ResolvedExtra.StringExtra -> {
+                cmd.append(" --es ").append(shellEscape(extra.key))
+                    .append(" ").append(shellEscape(extra.value))
+            }
+            is ResolvedExtra.UriExtra -> {
+                cmd.append(" --eu ").append(shellEscape(extra.key))
+                    .append(" ").append(shellEscape(extra.uri.toString()))
+            }
+            is ResolvedExtra.BoolExtra -> {
+                cmd.append(" --ez ").append(shellEscape(extra.key))
+                    .append(" ").append(extra.value)
+            }
+            is ResolvedExtra.StringArrayExtra -> {
+                cmd.append(" --esa ").append(shellEscape(extra.key))
+                    .append(" ").append(shellEscape(extra.values.joinToString(",")))
+            }
+        }
+    }
+
+    return arrayOf("sh", "-c", cmd.toString())
+}

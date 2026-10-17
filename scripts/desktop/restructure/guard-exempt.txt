@@ -1,0 +1,5 @@
+# Files whose stand-in guard hits were reviewed as false positives, with the guarded import and the
+# reason. The compiler stays the final check: a real use beyond the stand-in fails the desktop build.
+#   <glob relative to com/nendo/argosy>: <guarded import>  # reason
+data/sync/platform/*Handler*.kt: android.content.Context  # a context: SaveContext parameter shadows the injected Context
+data/sync/platform/PlatformSaveHandlerRegistry.kt: android.content.Context  # a context: SaveContext parameter shadows the injected Context

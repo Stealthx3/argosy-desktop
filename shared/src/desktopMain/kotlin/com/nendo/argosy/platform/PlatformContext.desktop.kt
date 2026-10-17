@@ -90,3 +90,7 @@ actual val PlatformContext.assets: PlatformAssets get() = platformAssets
 actual fun PlatformAssets.list(path: String): Array<String>? = children(path)
 
 actual fun PlatformAssets.open(fileName: String): java.io.InputStream = stream(fileName)
+
+actual val PlatformContext.packageName: String get() = "com.nendo.argosy"
+
+actual val PlatformContext.applicationContext: PlatformContext get() = this

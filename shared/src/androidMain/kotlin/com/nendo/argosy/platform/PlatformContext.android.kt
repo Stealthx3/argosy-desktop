@@ -37,3 +37,7 @@ actual val PlatformContext.assets: PlatformAssets get() = assets
 actual fun PlatformAssets.list(path: String): Array<String>? = list(path)
 
 actual fun PlatformAssets.open(fileName: String): java.io.InputStream = open(fileName)
+
+actual val PlatformContext.packageName: String get() = packageName
+
+actual val PlatformContext.applicationContext: PlatformContext get() = applicationContext

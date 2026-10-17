@@ -33,3 +33,7 @@ expect val PlatformContext.assets: PlatformAssets
 expect fun PlatformAssets.list(path: String): Array<String>?
 
 expect fun PlatformAssets.open(fileName: String): java.io.InputStream
+
+expect val PlatformContext.packageName: String
+
+expect val PlatformContext.applicationContext: PlatformContext

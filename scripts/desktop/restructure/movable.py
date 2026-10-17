@@ -45,6 +45,7 @@ ALLOWED = (
     "androidx.compose.ui.", "androidx.compose.foundation.", "androidx.compose.animation.",
     "androidx.compose.material3.", "androidx.compose.material.icons.", "androidx.compose.material.ripple.",
     "androidx.lifecycle.",
+    "com.nendo.sigil.", "com.google.zxing.", "org.bitlet.weupnp.",
 )
 NOT_ALLOWED = (
     "androidx.sqlite.db.",
@@ -69,12 +70,16 @@ REWRITTEN = (
     "android.text.format.DateFormat.getBestDateTimePattern",
 )
 GENERATED = ("com.nendo.argosy.config.AppBuildConfig", "com.nendo.argosy.res.ArgosyR")
-CONTEXT_MEMBERS = r"(?!getString\b|resources\b|filesDir\b|cacheDir\b|assets\b)[a-zA-Z_]\w*"
-CONTEXT_BEYOND_STRINGS = (
-    r"\b(?:context|ctx|appContext|applicationContext|baseContext)\??\." + CONTEXT_MEMBERS
-    + r"|\.resources\.(?!getQuantityString\b|getString\b)\w+"
+CONTEXT_MEMBERS = r"(?!getString\b|resources\b|filesDir\b|cacheDir\b|assets\b|getSharedPreferences\b|contentResolver\b|packageName\b|applicationContext\b)[a-zA-Z_]\w*"
+CONTEXT_REST = (
+    r"\.resources\.(?!getQuantityString\b|getString\b)\w+"
     r"|LocalContext\.current\." + CONTEXT_MEMBERS
     + r"|\.assets\.(?!list\b|open\b)\w+"
+    r"|\bcontentResolver\.\w+"
+    r"|(?<![\w.])Context\.(?!MODE_PRIVATE\b)[A-Z]\w*"
+)
+CONTEXT_BEYOND_STRINGS = (
+    r"\b(?:context|ctx|appContext|applicationContext|baseContext)\??\." + CONTEXT_MEMBERS + "|" + CONTEXT_REST
 )
 CONTEXT_DECLARED = re.compile(
     r"\b(\w+)\s*:\s*(?:android\.content\.|com\.nendo\.argosy\.platform\.Platform)?Context\b\??"
@@ -82,18 +87,20 @@ CONTEXT_DECLARED = re.compile(
 )
 
 
+CONTEXT_NAMES = ("context", "ctx", "appContext", "applicationContext", "baseContext")
+ANY_DECLARED = re.compile(r"\b(\w+)\s*:\s*([\w.]+)")
+
+
 class ContextGuard:
     def __init__(self):
-        self.base = re.compile(CONTEXT_BEYOND_STRINGS)
+        self.rest = re.compile(CONTEXT_REST)
 
     def search(self, body):
         names = {a or b for a, b in CONTEXT_DECLARED.findall(body)}
-        if names:
-            declared = re.compile(r"\b(?:" + "|".join(sorted(names)) + r")\??\." + CONTEXT_MEMBERS)
-            match = declared.search(body)
-            if match:
-                return match
-        return self.base.search(body)
+        other = {n for n, t in ANY_DECLARED.findall(body) if not re.fullmatch(r"(?:android\.content\.|com\.nendo\.argosy\.platform\.Platform)?Context", t)}
+        names |= {n for n in CONTEXT_NAMES if n not in other}
+        declared = re.compile(r"\b(?:" + "|".join(sorted(names)) + r")\??\." + CONTEXT_MEMBERS)
+        return declared.search(body) or self.rest.search(body)
 GUARDED_REWRITES = {
     "android.content.Context": ContextGuard(),
     "androidx.compose.ui.platform.LocalContext": ContextGuard(),
@@ -116,8 +123,11 @@ GUARDED_REWRITES = {
         r"|onError\s*=\s*\{\s*\w+\s*->|\bAsyncImagePainter\b"
     ),
     "android.os.Build": re.compile(
-        r"\bBuild\.(?!MODEL\b|MANUFACTURER\b|VERSION\.SDK_INT\b|VERSION\.RELEASE\b|VERSION_CODES\.(?:Q|R|S|TIRAMISU)\b)\w+(?:\.\w+)?"
+        r"\bBuild\.(?!MODEL\b|MANUFACTURER\b|BRAND\b|DEVICE\b|PRODUCT\b|BOARD\b|FINGERPRINT\b"
+        r"|SUPPORTED_64_BIT_ABIS\b|SUPPORTED_32_BIT_ABIS\b|VERSION\.SDK_INT\b|VERSION\.RELEASE\b"
+        r"|VERSION_CODES\.(?:N|O|P|Q|R|S|TIRAMISU|UPSIDE_DOWN_CAKE)\b)\w+(?:\.\w+)?"
     ),
+    "android.os.Process": re.compile(r"\bProcess\.(?!is64Bit\b|myUid\b)\w+"),
     "android.content.res.Configuration": re.compile(r"\bConfiguration\.[A-Za-z_]"),
     "androidx.core.graphics.ColorUtils": re.compile(r"\bColorUtils\.(?!colorToHSL\b|HSLToColor\b)\w+"),
     "android.view.KeyEvent": re.compile(r"\bKeyEvent\b(?!\.KEYCODE_\w)"),
@@ -143,6 +153,18 @@ GUARDED_REWRITES = {
         r"\bBitmapFactory\.(?!decodeFile\b|Options\b)\w+"
         r"|\b(?:inSampleSize|inPreferredConfig|inMutable|inScaled|inDensity|inTargetDensity|outMimeType|outConfig|inBitmap)\b"
     ),
+    "android.content.SharedPreferences": re.compile(
+        r"\b(?:getStringSet|putStringSet|getFloat|putFloat|getAll|registerOnSharedPreferenceChangeListener"
+        r"|unregisterOnSharedPreferenceChangeListener|OnSharedPreferenceChangeListener)\b"
+    ),
+    "android.provider.Settings": re.compile(r"\bSettings\.(?!Secure\.(?:getString|ANDROID_ID)\b)\w+(?:\.\w+)?"),
+    "android.content.Intent": re.compile(r"\bIntent\b(?!\.(?:ACTION_BATTERY_CHANGED|ACTION_BOOT_COMPLETED|ACTION_DELETE|ACTION_MAIN|ACTION_MY_PACKAGE_REPLACED|ACTION_PACKAGE_ADDED|ACTION_PACKAGE_REMOVED|ACTION_PACKAGE_REPLACED|ACTION_SCREEN_OFF|ACTION_SCREEN_ON|ACTION_USER_PRESENT|ACTION_VIEW|CATEGORY_DEFAULT|CATEGORY_HOME|CATEGORY_LAUNCHER|FLAG_ACTIVITY_CLEAR_TASK|FLAG_ACTIVITY_CLEAR_TOP|FLAG_ACTIVITY_MULTIPLE_TASK|FLAG_ACTIVITY_NEW_TASK|FLAG_ACTIVITY_NO_ANIMATION|FLAG_ACTIVITY_NO_HISTORY|FLAG_ACTIVITY_REORDER_TO_FRONT|FLAG_ACTIVITY_SINGLE_TOP|FLAG_GRANT_READ_URI_PERMISSION)\b)"),
+    "android.net.Uri": re.compile(
+        r"\bUri\.(?!parse\b|fromFile\b|encode\b|decode\b)\w+"
+        r"|\.(?:buildUpon|normalizeScheme|isHierarchical|isOpaque|isRelative|isAbsolute|fragment|encodedQuery"
+        r"|encodedFragment|port|userInfo|schemeSpecificPart|encodedSchemeSpecificPart|encodedAuthority"
+        r"|getQueryParameters|getBooleanQueryParameter|encodedPathSegments|encodedUserInfo)\b"
+    ),
     "android.util.Base64": re.compile(
         r"\bBase64\.(?!decode\b|encode\b|encodeToString\b|DEFAULT\b|NO_PADDING\b|NO_WRAP\b|CRLF\b|URL_SAFE\b)\w+"
     ),
@@ -150,6 +172,7 @@ GUARDED_REWRITES = {
 FQ_GUARDED = (
     "android.content.Context", "android.os.SystemClock", "dagger.hilt.android.qualifiers.ApplicationContext",
     "android.graphics.Bitmap", "android.graphics.BitmapFactory", "android.util.Base64",
+    "android.provider.Settings", "android.net.Uri", "android.os.Process",
 )
 STRINGS = re.compile(r'"(?:[^"\\\n]|\\.)*"')
 STAND_IN_GUARDS = {
@@ -173,6 +196,11 @@ STAND_IN_GUARDS = {
     "com.nendo.argosy.platform.PlatformBitmap": "android.graphics.Bitmap",
     "com.nendo.argosy.platform.PlatformBitmapFactory": "android.graphics.BitmapFactory",
     "com.nendo.argosy.platform.PlatformBase64": "android.util.Base64",
+    "com.nendo.argosy.platform.PlatformSharedPreferences": "android.content.SharedPreferences",
+    "com.nendo.argosy.platform.PlatformSettings": "android.provider.Settings",
+    "com.nendo.argosy.platform.PlatformIntent": "android.content.Intent",
+    "com.nendo.argosy.platform.PlatformUri": "android.net.Uri",
+    "com.nendo.argosy.platform.PlatformProcess": "android.os.Process",
 }
 COMMENTS = re.compile(r"/\*.*?\*/|^\s*//[^\n]*", re.S | re.M)
 ANDROID_FQ = re.compile(r"(?<![\w.])(?:android|androidx|com|org|io|net|dagger|coil|in|okhttp3|retrofit2)\.[a-z]\w*(?:\.\w+)+")
@@ -214,6 +242,18 @@ def load(root):
     return [Unit(p, root) for p in sorted((root / PKG_ROOT).rglob("*.kt"))]
 
 
+GUARD_EXEMPT = Path(__file__).with_name("guard-exempt.txt")
+EXEMPTIONS = [
+    tuple(part.strip() for part in line.split("#")[0].split(":", 1))
+    for line in (GUARD_EXEMPT.read_text().splitlines() if GUARD_EXEMPT.exists() else [])
+    if line.split("#")[0].strip()
+]
+
+
+def exempt(u, imp):
+    return any(imp == guarded and fnmatch.fnmatchcase(u.rel, glob) for glob, guarded in EXEMPTIONS)
+
+
 def analyse(u, index, packages):
     def resolve(fqn):
         parts = fqn.split(".")
@@ -233,7 +273,7 @@ def analyse(u, index, packages):
 
     for imp in u.imports:
         if imp in GUARDED_REWRITES:
-            if GUARDED_REWRITES[imp].search(u.body):
+            if GUARDED_REWRITES[imp].search(u.body) and not exempt(u, imp):
                 common.append(f"uses {imp} beyond its portable stand-in")
             target = resolve(imp)
             if target:
@@ -241,7 +281,7 @@ def analyse(u, index, packages):
             continue
         if imp in REWRITTEN or imp in GENERATED:
             continue
-        if imp in STAND_IN_GUARDS and GUARDED_REWRITES[STAND_IN_GUARDS[imp]].search(u.body):
+        if imp in STAND_IN_GUARDS and GUARDED_REWRITES[STAND_IN_GUARDS[imp]].search(u.body) and not exempt(u, STAND_IN_GUARDS[imp]):
             common.append(f"uses {imp} beyond what it offers")
         if imp.startswith("com.nendo.argosy."):
             if imp.endswith(".*"):
@@ -263,7 +303,7 @@ def analyse(u, index, packages):
             common.append(f"reference {fq} beyond PlatformBuild")
         guarded = next((k for k in FQ_GUARDED if fq == k or fq.startswith(k + ".")), None)
         if guarded:
-            if GUARDED_REWRITES[guarded].search(u.body):
+            if GUARDED_REWRITES[guarded].search(u.body) and not exempt(u, guarded):
                 common.append(f"reference {fq} beyond its portable stand-in")
             continue
         if not fq.startswith(REWRITTEN) and not fq.startswith("com.nendo.argosy.") and fq != "com.nendo.argosy":
