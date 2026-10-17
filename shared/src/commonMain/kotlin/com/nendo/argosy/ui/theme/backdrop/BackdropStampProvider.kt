@@ -1,6 +1,8 @@
 package com.nendo.argosy.ui.theme.backdrop
 
 import com.nendo.argosy.platform.PlatformContext
+import com.nendo.argosy.platform.getApplicationInfo
+import com.nendo.argosy.platform.getApplicationLabel
 import com.nendo.argosy.platform.getSystemService
 import com.nendo.argosy.platform.getExternalFilesDir
 import com.nendo.argosy.platform.packageManager

@@ -1,6 +1,8 @@
 package com.nendo.argosy.ui.screens.gamedetail.delegates
 
 import com.nendo.argosy.platform.PlatformContext as Context
+import com.nendo.argosy.platform.getApplicationInfo
+import com.nendo.argosy.platform.getApplicationLabel
 import com.nendo.argosy.platform.getSystemService
 import com.nendo.argosy.platform.getExternalFilesDir
 import com.nendo.argosy.platform.packageManager

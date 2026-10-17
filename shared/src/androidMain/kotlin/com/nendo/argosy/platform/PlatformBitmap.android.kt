@@ -24,6 +24,14 @@ actual fun PlatformBitmap.recycle() = recycle()
 
 actual fun PlatformBitmap.asImageBitmap(): ImageBitmap = composeImageBitmap()
 
+actual fun PlatformBitmap.setPixels(pixels: IntArray, offset: Int, stride: Int, x: Int, y: Int, width: Int, height: Int) =
+    setPixels(pixels, offset, stride, x, y, width, height)
+
+actual object PlatformBitmaps {
+    actual fun createBitmap(width: Int, height: Int, config: PlatformBitmapConfig): PlatformBitmap =
+        Bitmap.createBitmap(width, height, config)
+}
+
 actual object PlatformBitmapFactory {
     actual class Options actual constructor() {
         internal val options = BitmapFactory.Options()
@@ -41,4 +49,7 @@ actual object PlatformBitmapFactory {
 
     actual fun decodeFile(pathName: String, opts: Options?): PlatformBitmap? =
         BitmapFactory.decodeFile(pathName, opts?.options)
+
+    actual fun decodeByteArray(data: ByteArray, offset: Int, length: Int): PlatformBitmap? =
+        BitmapFactory.decodeByteArray(data, offset, length)
 }

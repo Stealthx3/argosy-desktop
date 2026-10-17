@@ -1,6 +1,8 @@
 package com.nendo.argosy.data.launcher
 
 import com.nendo.argosy.platform.PlatformContext as Context
+import com.nendo.argosy.platform.getApplicationInfo
+import com.nendo.argosy.platform.getApplicationLabel
 import com.nendo.argosy.platform.applicationContext
 import com.nendo.argosy.platform.packageName
 import com.nendo.argosy.platform.getSystemService

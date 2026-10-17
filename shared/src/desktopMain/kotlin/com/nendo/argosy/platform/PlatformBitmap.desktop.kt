@@ -3,6 +3,12 @@ package com.nendo.argosy.platform
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asComposeImageBitmap
 import org.jetbrains.skia.Bitmap
+import org.jetbrains.skia.BlendMode
+import org.jetbrains.skia.Canvas
+import org.jetbrains.skia.Paint
+import org.jetbrains.skia.ColorAlphaType
+import org.jetbrains.skia.ColorType
+import org.jetbrains.skia.ImageInfo
 import org.jetbrains.skia.Codec
 import org.jetbrains.skia.Data
 import org.jetbrains.skia.Image
@@ -30,6 +36,32 @@ actual fun PlatformBitmap.recycle() = skiaBitmap.close()
 
 actual fun PlatformBitmap.asImageBitmap(): ImageBitmap = skiaBitmap.asComposeImageBitmap()
 
+actual fun PlatformBitmap.setPixels(pixels: IntArray, offset: Int, stride: Int, x: Int, y: Int, width: Int, height: Int) {
+    val bytes = ByteArray(width * height * 4)
+    for (row in 0 until height) {
+        for (col in 0 until width) {
+            val argb = pixels[offset + row * stride + col]
+            val i = (row * width + col) * 4
+            bytes[i] = (argb and 0xFF).toByte()
+            bytes[i + 1] = (argb shr 8 and 0xFF).toByte()
+            bytes[i + 2] = (argb shr 16 and 0xFF).toByte()
+            bytes[i + 3] = (argb ushr 24).toByte()
+        }
+    }
+    val region = Bitmap().apply {
+        allocPixels(ImageInfo(width, height, ColorType.BGRA_8888, ColorAlphaType.UNPREMUL))
+        installPixels(bytes)
+    }
+    val replace = Paint().apply { blendMode = BlendMode.SRC }
+    Canvas(skiaBitmap).use { it.drawImage(Image.makeFromBitmap(region), x.toFloat(), y.toFloat(), replace) }
+    region.close()
+}
+
+actual object PlatformBitmaps {
+    actual fun createBitmap(width: Int, height: Int, config: PlatformBitmapConfig): PlatformBitmap =
+        PlatformBitmap(Bitmap().apply { allocN32Pixels(width, height) })
+}
+
 actual object PlatformBitmapFactory {
     actual class Options actual constructor() {
         actual var inJustDecodeBounds: Boolean = false
@@ -41,6 +73,11 @@ actual object PlatformBitmapFactory {
     }
 
     actual fun decodeFile(pathName: String): PlatformBitmap? = decodeFile(pathName, null)
+
+    actual fun decodeByteArray(data: ByteArray, offset: Int, length: Int): PlatformBitmap? {
+        val image = runCatching { Image.makeFromEncoded(data.copyOfRange(offset, offset + length)) }.getOrNull() ?: return null
+        return image.use { PlatformBitmap(Bitmap.makeFromImage(it)) }
+    }
 
     actual fun decodeFile(pathName: String, opts: Options?): PlatformBitmap? {
         val bytes = runCatching { File(pathName).readBytes() }.getOrNull() ?: return null

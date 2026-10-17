@@ -13,6 +13,8 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.layout.ContentScale
 import com.nendo.argosy.platform.LocalPlatformContext as LocalContext
+import com.nendo.argosy.platform.getApplicationInfo
+import com.nendo.argosy.platform.getApplicationLabel
 import com.nendo.argosy.platform.applicationContext
 import com.nendo.argosy.platform.packageName
 import com.nendo.argosy.platform.getSystemService

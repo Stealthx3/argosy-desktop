@@ -19,6 +19,13 @@ actual typealias PlatformPackageManager = PackageManager
 actual fun PlatformPackageManager.getPackageInfo(packageName: String, flags: Int): PlatformPackageInfo =
     getPackageInfo(packageName, flags)
 
+actual fun PlatformPackageManager.getApplicationInfo(packageName: String, flags: Int): PlatformApplicationInfo =
+    getApplicationInfo(packageName, flags)
+
+actual fun PlatformPackageManager.getApplicationLabel(info: PlatformApplicationInfo): CharSequence = getApplicationLabel(info)
+
+actual typealias PlatformApplicationInfo = android.content.pm.ApplicationInfo
+
 actual typealias PlatformPackageInfo = PackageInfo
 
 actual val PlatformPackageInfo.versionName: String? get() = versionName

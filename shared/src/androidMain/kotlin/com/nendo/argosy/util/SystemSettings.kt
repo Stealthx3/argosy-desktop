@@ -111,13 +111,13 @@ actual class SystemSettings @Inject constructor(
 /**
  * Formats a wall-clock time in the 12- or 24-hour form the device is configured for.
  */
-fun formatClockTime(context: Context, epochMillis: Long): String =
+actual fun formatClockTime(context: Context, epochMillis: Long): String =
     DateFormat.getTimeFormat(context).format(Date(epochMillis))
 
 /**
  * Formats a short date followed by the time in the device's configured clock form.
  */
-fun formatClockDateTime(context: Context, epochMillis: Long): String {
+actual fun formatClockDateTime(context: Context, epochMillis: Long): String {
     val date = SimpleDateFormat(CLOCK_DATE_PATTERN, Locale.getDefault()).format(Date(epochMillis))
     return "$date, ${formatClockTime(context, epochMillis)}"
 }

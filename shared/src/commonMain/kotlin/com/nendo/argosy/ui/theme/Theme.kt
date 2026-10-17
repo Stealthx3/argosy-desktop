@@ -18,6 +18,8 @@ import com.nendo.argosy.platform.orientation
 import com.nendo.argosy.platform.screenHeightDp
 import com.nendo.argosy.platform.screenWidthDp
 import com.nendo.argosy.platform.LocalPlatformContext as LocalContext
+import com.nendo.argosy.platform.getApplicationInfo
+import com.nendo.argosy.platform.getApplicationLabel
 import com.nendo.argosy.platform.getSystemService
 import com.nendo.argosy.platform.getExternalFilesDir
 import com.nendo.argosy.platform.packageManager

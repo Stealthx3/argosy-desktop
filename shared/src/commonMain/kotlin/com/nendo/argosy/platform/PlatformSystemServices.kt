@@ -18,6 +18,12 @@ expect abstract class PlatformPackageManager
 
 expect fun PlatformPackageManager.getPackageInfo(packageName: String, flags: Int): PlatformPackageInfo
 
+expect fun PlatformPackageManager.getApplicationInfo(packageName: String, flags: Int): PlatformApplicationInfo
+
+expect fun PlatformPackageManager.getApplicationLabel(info: PlatformApplicationInfo): CharSequence
+
+expect open class PlatformApplicationInfo
+
 expect open class PlatformPackageInfo
 
 expect val PlatformPackageInfo.versionName: String?

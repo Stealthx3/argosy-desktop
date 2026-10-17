@@ -85,7 +85,7 @@ private val NIO_CATEGORIES = setOf(
 
 /** Computes per-category, per-volume disk usage attribution; walks run on an app-lifetime IO scope. */
 @Singleton
-class StorageAttributionRepository @Inject constructor(
+actual class StorageAttributionRepository @Inject constructor(
     @ApplicationContext private val context: Context,
     private val volumeDetector: StorageVolumeDetector,
     private val snapshotStore: StorageSnapshotStore,
@@ -107,19 +107,19 @@ class StorageAttributionRepository @Inject constructor(
     private var activeRefresh: Job? = null
 
     private val _snapshot = MutableStateFlow<StorageSnapshot?>(null)
-    val snapshot: StateFlow<StorageSnapshot?> = _snapshot.asStateFlow()
+    actual val snapshot: StateFlow<StorageSnapshot?> = _snapshot.asStateFlow()
 
     private val _walkProgress = MutableStateFlow<Map<StorageCategory, WalkState>>(emptyMap())
-    val walkProgress: StateFlow<Map<StorageCategory, WalkState>> = _walkProgress.asStateFlow()
+    actual val walkProgress: StateFlow<Map<StorageCategory, WalkState>> = _walkProgress.asStateFlow()
 
     private val _volumes = MutableStateFlow<List<StorageVolumeInfo>>(emptyList())
-    val volumes: StateFlow<List<StorageVolumeInfo>> = _volumes.asStateFlow()
+    actual val volumes: StateFlow<List<StorageVolumeInfo>> = _volumes.asStateFlow()
 
     private val _isRefreshing = MutableStateFlow(false)
-    val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
+    actual val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
 
     private val _dirtyCategories = MutableStateFlow<Set<StorageCategory>>(emptySet())
-    val dirtyCategories: StateFlow<Set<StorageCategory>> = _dirtyCategories.asStateFlow()
+    actual val dirtyCategories: StateFlow<Set<StorageCategory>> = _dirtyCategories.asStateFlow()
 
     private val initialLoad: Job = scope.launch {
         snapshotStore.load()?.let { persisted ->
@@ -127,7 +127,7 @@ class StorageAttributionRepository @Inject constructor(
         }
     }
 
-    fun markDirty(category: StorageCategory) {
+    actual fun markDirty(category: StorageCategory) {
         _dirtyCategories.update { it + category }
     }
 
@@ -135,7 +135,7 @@ class StorageAttributionRepository @Inject constructor(
      * Single-flight full recompute; [force] cancels an active refresh. Clean-fingerprint volumes
      * still reuse their store-walk totals unless [deep], which re-walks everything.
      */
-    fun refresh(force: Boolean = false, deep: Boolean = false): Job = synchronized(refreshLock) {
+    actual fun refresh(force: Boolean, deep: Boolean): Job = synchronized(refreshLock) {
         val current = activeRefresh
         if (current != null && current.isActive) {
             if (!force) return current
@@ -159,7 +159,7 @@ class StorageAttributionRepository @Inject constructor(
      * Page-open validation: re-detects volumes and recomputes cheap categories every time, but
      * walks only categories that are dirty, missing, or rooted on a volume whose fingerprint drifted.
      */
-    fun refreshOnOpen(): Job = synchronized(refreshLock) {
+    actual fun refreshOnOpen(): Job = synchronized(refreshLock) {
         val current = activeRefresh
         if (current != null && current.isActive) return current
         scope.launch {
@@ -693,7 +693,7 @@ class StorageAttributionRepository @Inject constructor(
      * than re-deriving it from mount-point names. Touches the filesystem, so call it off the main
      * thread.
      */
-    fun isPathAvailable(path: String): Boolean {
+    actual fun isPathAvailable(path: String): Boolean {
         val known = _volumes.value.ifEmpty { detectVolumes() }
         return isPathReachable(StoragePathUtils.canonicalize(path), known)
     }
@@ -704,7 +704,7 @@ class StorageAttributionRepository @Inject constructor(
      * answer -- anything that would forget a record because its storage looked gone -- asks for this
      * first: a card unplugged since the last pass is still listed until it does.
      */
-    fun refreshVolumes(): List<StorageVolumeInfo> = detectVolumes().also { _volumes.value = it }
+    actual fun refreshVolumes(): List<StorageVolumeInfo> = detectVolumes().also { _volumes.value = it }
 
     /**
      * Whether a path can be read right now. A path that no longer resolves and sits on no mounted

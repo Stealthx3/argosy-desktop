@@ -21,6 +21,13 @@ private object DesktopPackageManager : PlatformPackageManager()
 actual fun PlatformPackageManager.getPackageInfo(packageName: String, flags: Int): PlatformPackageInfo =
     throw IllegalStateException("$packageName is not an installed package on the desktop")
 
+actual fun PlatformPackageManager.getApplicationInfo(packageName: String, flags: Int): PlatformApplicationInfo =
+    throw IllegalStateException("$packageName is not an installed package on the desktop")
+
+actual fun PlatformPackageManager.getApplicationLabel(info: PlatformApplicationInfo): CharSequence = ""
+
+actual open class PlatformApplicationInfo
+
 actual open class PlatformPackageInfo
 
 actual val PlatformPackageInfo.versionName: String? get() = null

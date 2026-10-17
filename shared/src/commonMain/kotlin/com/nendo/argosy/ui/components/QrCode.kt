@@ -1,6 +1,15 @@
 package com.nendo.argosy.ui.components
 
-import android.graphics.Bitmap
+import com.nendo.argosy.platform.PlatformBitmap as Bitmap
+import com.nendo.argosy.platform.config
+import com.nendo.argosy.platform.copy
+import com.nendo.argosy.platform.getPixel
+import com.nendo.argosy.platform.height
+import com.nendo.argosy.platform.recycle
+import com.nendo.argosy.platform.setPixels
+import com.nendo.argosy.platform.width
+import com.nendo.argosy.platform.PlatformBitmaps
+import com.nendo.argosy.platform.PlatformBitmapConfig
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -14,10 +23,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
+import com.nendo.argosy.platform.asImageBitmap
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.res.stringResource
-import com.nendo.argosy.R
+import com.nendo.argosy.res.stringResource
+import com.nendo.argosy.res.ArgosyR as R
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
@@ -93,7 +102,7 @@ private fun generateQrBitmap(data: String, size: Int): Bitmap? {
             }
         }
 
-        Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888).apply {
+        PlatformBitmaps.createBitmap(width, height, PlatformBitmapConfig.ARGB_8888).apply {
             setPixels(pixels, 0, width, 0, 0, width, height)
         }
     } catch (e: Exception) {

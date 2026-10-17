@@ -1,6 +1,7 @@
 package com.nendo.argosy.libretro.touch
 
-import android.content.res.Configuration
+import com.nendo.argosy.platform.PlatformConfiguration as Configuration
+import com.nendo.argosy.platform.ORIENTATION_PORTRAIT
 
 data class GroupPlacement(
     val anchorX: Float,
@@ -20,7 +21,7 @@ data class ResolvedLayout(
 object LayoutDefaults {
 
     fun forOrientation(spec: TouchLayoutSpec, orientation: Int): ResolvedLayout =
-        if (orientation == Configuration.ORIENTATION_PORTRAIT) portraitFor(spec) else landscapeFor(spec)
+        if (orientation == ORIENTATION_PORTRAIT) portraitFor(spec) else landscapeFor(spec)
 
     private fun landscapeFor(spec: TouchLayoutSpec): ResolvedLayout {
         val placements = mutableMapOf<GroupId, GroupPlacement>()

@@ -1,6 +1,7 @@
 package com.nendo.argosy.data.repository
 
-import android.content.res.Configuration
+import com.nendo.argosy.platform.PlatformConfiguration as Configuration
+import com.nendo.argosy.platform.ORIENTATION_PORTRAIT
 import com.nendo.argosy.data.local.dao.TouchLayoutOverrideDao
 import com.nendo.argosy.data.local.entity.TouchLayoutOverrideEntity
 import com.nendo.argosy.libretro.touch.LayoutDefaults
@@ -49,5 +50,5 @@ class TouchLayoutRepository @Inject constructor(
     }
 
     private fun orientationKey(orientation: Int): String =
-        if (orientation == Configuration.ORIENTATION_PORTRAIT) "portrait" else "landscape"
+        if (orientation == ORIENTATION_PORTRAIT) "portrait" else "landscape"
 }

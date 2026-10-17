@@ -1,7 +1,26 @@
 package com.nendo.argosy.util
 
-import android.content.Context
-import com.nendo.argosy.R
+import com.nendo.argosy.platform.PlatformContext as Context
+import com.nendo.argosy.platform.getApplicationInfo
+import com.nendo.argosy.platform.getApplicationLabel
+import com.nendo.argosy.platform.applicationContext
+import com.nendo.argosy.platform.packageName
+import com.nendo.argosy.platform.getSystemService
+import com.nendo.argosy.platform.getExternalFilesDir
+import com.nendo.argosy.platform.packageManager
+import com.nendo.argosy.platform.getPackageInfo
+import com.nendo.argosy.platform.versionName
+import com.nendo.argosy.platform.assets
+import com.nendo.argosy.platform.contentResolver
+import com.nendo.argosy.platform.getSharedPreferences
+import com.nendo.argosy.platform.list
+import com.nendo.argosy.platform.open
+import com.nendo.argosy.platform.cacheDir
+import com.nendo.argosy.platform.filesDir
+import com.nendo.argosy.platform.getQuantityString
+import com.nendo.argosy.platform.getString
+import com.nendo.argosy.platform.resources
+import com.nendo.argosy.res.ArgosyR as R
 import java.text.SimpleDateFormat
 import java.time.Duration
 import java.time.Instant
@@ -24,7 +43,7 @@ private const val DAYS_PER_MONTH = 30L
  */
 fun formatMonthDay(instant: Instant): String {
     val locale = Locale.getDefault()
-    val pattern = android.text.format.DateFormat.getBestDateTimePattern(locale, "MMMd")
+    val pattern = com.nendo.argosy.platform.PlatformDateFormat.getBestDateTimePattern(locale, "MMMd")
     return DateTimeFormatter.ofPattern(pattern, locale)
         .withZone(ZoneId.systemDefault())
         .format(instant)
@@ -32,7 +51,7 @@ fun formatMonthDay(instant: Instant): String {
 
 fun formatMonthYear(month: YearMonth): String {
     val locale = Locale.getDefault()
-    val pattern = android.text.format.DateFormat.getBestDateTimePattern(locale, "MMMMyyyy")
+    val pattern = com.nendo.argosy.platform.PlatformDateFormat.getBestDateTimePattern(locale, "MMMMyyyy")
     return DateTimeFormatter.ofPattern(pattern, locale).format(month)
 }
 
@@ -209,7 +228,7 @@ fun formatAbsoluteTimestamp(instant: Instant): String =
  */
 fun formatAbsoluteTimestamp(context: Context, instant: Instant): String {
     val locale = Locale.getDefault()
-    val pattern = android.text.format.DateFormat.getBestDateTimePattern(locale, "MMMdyyyy")
+    val pattern = com.nendo.argosy.platform.PlatformDateFormat.getBestDateTimePattern(locale, "MMMdyyyy")
     val date = DateTimeFormatter.ofPattern(pattern, locale)
         .withZone(ZoneId.systemDefault())
         .format(instant)

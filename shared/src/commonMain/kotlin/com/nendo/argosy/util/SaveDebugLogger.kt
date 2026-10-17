@@ -1,6 +1,6 @@
 package com.nendo.argosy.util
 
-import android.util.Log as AndroidLog
+import com.nendo.argosy.util.PlatformLog as AndroidLog
 import com.nendo.argosy.util.SafeCoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel

@@ -23,6 +23,12 @@ expect fun PlatformBitmap.recycle()
 
 expect fun PlatformBitmap.asImageBitmap(): ImageBitmap
 
+expect fun PlatformBitmap.setPixels(pixels: IntArray, offset: Int, stride: Int, x: Int, y: Int, width: Int, height: Int)
+
+expect object PlatformBitmaps {
+    fun createBitmap(width: Int, height: Int, config: PlatformBitmapConfig): PlatformBitmap
+}
+
 expect object PlatformBitmapFactory {
     class Options() {
         var inJustDecodeBounds: Boolean
@@ -33,4 +39,6 @@ expect object PlatformBitmapFactory {
     fun decodeFile(pathName: String): PlatformBitmap?
 
     fun decodeFile(pathName: String, opts: Options?): PlatformBitmap?
+
+    fun decodeByteArray(data: ByteArray, offset: Int, length: Int): PlatformBitmap?
 }

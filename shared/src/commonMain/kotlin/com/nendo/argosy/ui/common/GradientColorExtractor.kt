@@ -1,6 +1,7 @@
 package com.nendo.argosy.ui.common
 
 import com.nendo.argosy.platform.PlatformBitmap as Bitmap
+import com.nendo.argosy.platform.setPixels
 import com.nendo.argosy.platform.asImageBitmap
 import com.nendo.argosy.platform.config
 import com.nendo.argosy.platform.copy
