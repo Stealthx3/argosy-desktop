@@ -6,14 +6,16 @@ This repository is a fork of `rommapp/argosy-launcher`. It is GPL-3.0, like upst
 
 ## Status
 
-**Phase 0 (discovery and spikes): complete, gate passed (2026-10-16).**
+**Phase 1 (Kotlin Multiplatform restructure): complete (2026-10-16).**
 
-- The Android app builds unchanged (`./gradlew :app:assembleDebug`).
-- [`spikes/room-kmp-jvm`](spikes/room-kmp-jvm): upstream's Room database (schema v214) opens on the JVM under Room KMP, with no source edits and an identical schema hash.
-- [`spikes/compose-desktop-library`](spikes/compose-desktop-library): upstream's Library list and theme render in a Compose desktop window, with 71 upstream files compiled unchanged.
-- [`spikes/flatpak-launch`](spikes/flatpak-launch): a sandboxed Flatpak starts the RetroArch Flatpak on a ROM in `~/Games/Argosy` and gets its exit status back.
+- New modules: `shared` (Kotlin Multiplatform: `commonMain`, `androidMain`, `desktopMain`) and `desktopApp`; the Android app stays in `app/` and builds from `shared`.
+- 560 Kotlin files now live in `shared/src/commonMain` with no Android imports: the Room database, preferences, network clients, domain logic, the first part of save sync and the Android-free UI. Strings, plurals, drawables and sounds moved to `shared`; desktop reads them through Compose Multiplatform resources.
+- The Android app is unchanged for users: same tests (4,359 passing), same dependency versions, identical resource table, pixel-identical screens against the pre-Phase-1 APK in English and German, and an identical live save-sync proof against a local RomM server.
+- The restructure is scripted (`scripts/desktop/restructure/`) and re-applies to upstream releases: rehearsed on v2.24.0.
 
-Next: Phase 1, the Kotlin Multiplatform restructure. The development log is in [`DEVLOG.md`](DEVLOG.md).
+**Phase 0 (discovery and spikes): complete, gate passed.** Room KMP, upstream's Library UI on Compose desktop, and a sandboxed Flatpak starting RetroArch all worked; see the spikes under [`spikes/`](spikes).
+
+Next: Phase 2, every screen on the desktop. The development log is in [`DEVLOG.md`](DEVLOG.md).
 
 ![Upstream's Library list rendered by Compose Multiplatform on the desktop](spikes/compose-desktop-library/library.png)
 
@@ -26,6 +28,8 @@ As of 2026-10-16 · Micaiah Fonken · Source of truth: the "Argosy Desktop — L
 > **Phase 0 corrections** (from the codebase survey, see `docs/desktop/phase-0-survey.md`): upstream is now **v2.23.0** (not v2.10), and **TV Compose is no longer used anywhere**, so the TV Compose swap below is already done upstream.
 
 > **Phase 0 results** (2026-10-16, details in `DEVLOG.md` and each spike's folder): gate **passed**. The Android app builds unchanged. Upstream's Room database (v214) runs on the JVM under Room KMP with no source edits and an identical schema hash. Upstream's Library list and theme render in a Compose desktop window with 71 files compiled unchanged; 15 Android APIs needed shims, and resources (6,254 strings) are the largest Phase 2 item. A sandboxed Flatpak starts the RetroArch Flatpak on a ROM in `~/Games/Argosy` and receives its exit status. Proposed change: `org.freedesktop.Platform` 24.08 is end-of-life, so build on 25.08 from Phase 1.
+
+> **Phase 1 results** (2026-10-16, details in `DEVLOG.md`): exit criteria **met**. `shared` (Kotlin Multiplatform, Android + desktop) holds 560 Kotlin files in `commonMain` and 10 in `androidMain`; `app` keeps 1,140 of the original 1,695. `commonMain` has no Android imports, enforced by compiling it for the desktop without `android.jar`. The Android app passes its 4,359 unit tests, its dependency versions are unchanged, its APK resource table is identical, and A/B screenshots against the pre-Phase-1 APK (English and German, populated RomM testbed) are pixel-identical. The save-sync zone moved its first stage with live proof (`no_op` twice, identical server and device state). Decisions made in the phase: no `jvmShared` set (both targets are JVMs); `app/` keeps its name; Dagger on desktop, Hilt on Android (Hilt also runs in `shared`); Compose Multiplatform 1.7.3 to match Android's Compose BOM; Android keeps native resources while desktop serves the same strings through Compose Multiplatform resources behind the same `R` API; `app` treats `shared` as a Kotlin friend module so upstream's smart casts and `internal` declarations keep working across the module boundary. Re-applying the restructure on upstream v2.24.0 was rehearsed: `scripts/desktop/restructure/reapply.sh` resolved both conflicts, and the merged tree builds and passes 4,426 tests. Phase 2 sizing: 636 UI files remain in `app`, 307 with direct blockers (`Context`/`LocalContext`, Coil 2, Hilt Android entry points, Android lifecycle, Media3, `Bitmap`).
 
 ## Summary
 
@@ -44,10 +48,10 @@ Upstream is a single-module Android app, but nearly all of it is Kotlin and Comp
 | Area | Upstream today | Desktop path |
 | --- | --- | --- |
 | Language / build | Kotlin 2.3.20, Gradle, AGP 8.7.3, one `app` module | Kotlin Multiplatform: `shared` + `androidApp` + `desktopApp` |
-| UI | Jetpack Compose, Material 3 | Compose Multiplatform; same APIs, code moves almost as is |
+| UI | Jetpack Compose, Material 3 | Compose Multiplatform; same APIs, code moves almost as is. CMP release matched to Android's Compose BOM so Android does not change |
 | TV Compose | No longer used (Phase 0 finding) | Nothing to do |
 | Navigation, ViewModel | Navigation Compose 2.8, Lifecycle 2.8 | JetBrains multiplatform builds of the same libraries |
-| DI | Hilt 2.57 | Koin, or plain Dagger 2 components (Hilt is Android-only; `javax.inject` annotations are plain JVM) |
+| DI | Hilt 2.57 | Decided in Phase 1: plain Dagger 2 component on the desktop, Hilt kept on Android; `javax.inject` and `@InstallIn` (`hilt-core`) are plain JVM |
 | Database | Room 2.7.1 | Room KMP with the bundled SQLite driver; same schema |
 | Settings | DataStore Preferences 1.1.1 | DataStore KMP |
 | Network | Retrofit 2.9, OkHttp 4.12, Moshi, Socket.IO | Unchanged: both targets are JVM, so these stay in a shared JVM source set |
@@ -91,6 +95,8 @@ Argosy Desktop is a single JVM app whose screens, view models and data layer are
 Look-alike is guaranteed by construction: the pixels come from the same composables, themes, fonts and animations as on Android, so the work is in the platform layer, not the UI.
 
 **Module layout.** Restructure upstream into Kotlin Multiplatform modules with three source sets: `commonMain` (UI, view models, domain), `jvmShared` (Retrofit, Moshi, OkHttp, archive and Steam libraries that run on both Android and desktop JVMs) and per-target `androidMain` / `desktopMain`. The Android app becomes a thin `androidApp` module over `shared`.
+
+> **Phase 1 decision** (owner, 2026-10-16): no separate `jvmShared` set. Both targets are JVMs, so `commonMain` can use JDK APIs and the plain-Java libraries directly. The Android app keeps its upstream module name `app/` (it plays the `androidApp` role), which avoids renaming about 1,000 Android-only files on every upstream merge. Modules: `:shared` (KMP: `commonMain`, `androidMain`, `desktopMain`), `:app`, `:desktopApp`. Package names never change. Plan and order of moves: `DEVLOG.md`, Phase 1.
 
 **Platform interfaces.** Every Android call site gets an interface in `commonMain` with two implementations: `GameLauncher`, `AppSource`, `MediaPlayer`, `BackgroundJobs`, `DeviceControls` (brightness, volume, haptics, performance), `SecretStore`, `FilePaths`, `Updater`.
 

@@ -94,7 +94,7 @@ Project rules (set by the project owner, 2026-10-16):
 
 ## Phase 1 · Kotlin Multiplatform restructure
 
-**Status:** plan approved by the owner (2026-10-16); steps 1–9, the data-layer catch-up and save-sync stage 1 done; step 10 (tooling sweep, re-apply rehearsal) and the phase gate next.
+**Status:** complete (2026-10-16). Exit criteria met; `main` pushed. Waiting for the owner: Phase 2 now or later.
 
 ### 2026-10-16 — Session 3 (Claude Code on the owner's computer)
 
@@ -334,3 +334,22 @@ Declarations, KDoc and annotations move byte for byte; each file keeps only the 
 - A/B from snapshot `saves-baseline`, English and German per-app language: all five screens pixel-identical, database and DataStore identical, no `FATAL EXCEPTION`.
 - Save-sync live proof on the step 9 build (it moved save-sync UI labels): every normalized capture identical to the pre-Phase-1 baseline; `no_op=3` twice; `NO_CHANGE` and `UPLOADED` doors unchanged.
 **State of the move:** `shared` holds 560 Kotlin files in `commonMain` and 10 in `androidMain`; `app` keeps 1,140 (of the original 1,695), plus 219 resource files moved.
+
+**Action:** Step 10 (tooling and re-apply) done.
+- **CI:** `.github/workflows/build.yml` already builds, tests and lints every module (`assembleDebug`, `testDebugUnitTest`, `lintDebug` are unqualified), so `shared`'s Android side was covered. Added a step that builds and tests the desktop target (`:shared:desktopTest :desktopApp:assemble`) and uploads `shared`'s test reports. Checked CI's lint command locally: `./gradlew lintDebug -PallAbis` → BUILD SUCCESSFUL (27 min). A first `:shared:lintDebug` attempt ran out of heap while lint analyzed three variants in parallel; with workers serialized it passes, and the full run passed despite heap warnings. If CI ever hits the limit, `--max-workers=2` on the lint step is the remedy.
+- The CI checks (comment, stability, service stability, smell rules), translation check and hooks were moved to cover `shared` in steps 6 and 8.
+- **Re-apply rehearsal on a real release.** rommapp released **v2.24.0** (7 commits after our base, 97 files). In a scratch worktree off `main`: `git merge v2.24.0` produced 2 conflicts, both in step 1's extraction sources (upstream changed `DisplayRoleOverride` and added a field to `LibraryUiState`); every moved file merged cleanly through rename detection. New `scripts/desktop/restructure/reapply.sh` resolved them: it takes upstream's version of an extraction source, re-extracts (`extract_decls.py --refresh` replaces the earlier extraction wherever it now lives), re-moves (`apply_moves.py` now also moves untracked regenerated files), re-applies member moves and import rewrites, and audits. The rehearsal also showed that a hand edit inside a derived file is lost on re-extraction (step 6's `shaderConfig` came back), so that edit became a scripted transform too (`move_members.py`, `member-moves.txt`); its regenerated extension is byte-identical to the hand-written one. Result: audit 0 problems; the merged tree builds for Android and desktop; **4,426 app tests** (upstream added 67) and 8 desktop tests pass. Three new upstream files landed in `app`, which is correct by default (the closure script can promote them later). The rehearsal was not merged into `main`: integrating v2.24.0 is the owner's call at the phase gate.
+
+### Phase 1 close
+
+**Exit criteria:**
+- `shared` builds for Android and desktop: yes (every step's gate).
+- No Android imports in `commonMain`: 0 `import android.*`; the only fully qualified mention is a KDoc comment. Enforced by compiling `commonMain` for the desktop, where `android.jar` is absent.
+- The Android app passes its existing tests: 4,359 `testDebugUnitTest`, 0 failures, at every step.
+- The Android app looks unchanged: pixel-identical A/B screenshots against the pre-Phase-1 APK (Home, Game Detail, side menu, both Library views; English and German) on a populated RomM testbed; identical database and DataStore; identical APK resource table; no dependency version changes; save-sync live proof identical at every door.
+
+**Where things are:** `shared/src/commonMain` 560 Kotlin files, `shared/src/androidMain` 10, `app` 1,140 of the original 1,695; 219 resource files in `shared/src/androidMain/res`. `desktopApp` opens a window; Phase 2 puts screens in it.
+
+**Carried forward:** the Flatpak runtime move to `org.freedesktop.Platform` 25.08 (Phase 0 proposal) goes with the Flatpak packaging in Phase 3. Save-sync stages 2–4 go with the Phase 3 `FilePaths` and `BackgroundJobs` interfaces (`docs/desktop/save-sync-move-plan.md`). Phase 2's first items, by the blocker count after step 9: a context-free resources/config layer (`Context`/`LocalContext`), Coil 3, a shared `hiltViewModel` accessor and Hilt entry points, lifecycle observers, Media3 and bitmap seams.
+
+**Action:** Rebuilt `README.md` (intro, Phase 1 status, full `PORT_PLAN.md`, upstream link) and added a Phase 1 results note to `PORT_PLAN.md`; committed and pushed `main` to `origin`.
