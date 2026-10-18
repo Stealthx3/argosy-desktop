@@ -1945,3 +1945,8 @@
 + ui/screens/settings/delegates/StorageSettingsDelegate.kt
 + ui/screens/settings/libretro/LibretroSettingsSection.kt
 + ui/screens/settings/menu/SettingsLayout.kt
+
+# Phase 2: portable since the SubcomposeAsyncImage stand-in (was androidMain).
+[commonMain]
++ ui/screens/apps/AppsScreen.kt
++ ui/screens/settings/components/AppPickerModal.kt

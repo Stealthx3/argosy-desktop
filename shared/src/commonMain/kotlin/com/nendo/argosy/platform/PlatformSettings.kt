@@ -13,6 +13,8 @@ expect object PlatformSettings {
     val ACTION_USAGE_ACCESS_SETTINGS: String
     val EXTRA_APP_PACKAGE: String
 
+    fun canDrawOverlays(context: PlatformContext): Boolean
+
     object Secure {
         val ANDROID_ID: String
 

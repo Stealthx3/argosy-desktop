@@ -86,6 +86,7 @@ RULES = [
     ),
     (re.compile(r"^import coil\.compose\.AsyncImage$", re.M), "import com.nendo.argosy.platform.image.AsyncImage"),
     (re.compile(r"\bcoil\.compose\.AsyncImage\("), "com.nendo.argosy.platform.image.AsyncImage("),
+    (re.compile(r"^import coil\.compose\.SubcomposeAsyncImage$", re.M), "import com.nendo.argosy.platform.image.SubcomposeAsyncImage"),
     (re.compile(r"^import android\.os\.Build$", re.M), "import com.nendo.argosy.platform.PlatformBuild as Build"),
     (re.compile(r"\bandroid\.os\.Build\."), "com.nendo.argosy.platform.PlatformBuild."),
     (re.compile(r"^import android\.graphics\.Color$", re.M), "import com.nendo.argosy.platform.PlatformColor as Color"),

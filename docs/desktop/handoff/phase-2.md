@@ -4,20 +4,20 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 History and reasoning live in `DEVLOG.md`; read only the parts this file points to. Earlier phases:
 `phase-0.md`, `phase-1.md` (closed summaries; carried-forward items are listed there).
 
-**Updated:** 2026-10-17, end of unit p2x
+**Updated:** 2026-10-17, end of unit p2y
 
 ## Where things stand
 
 - **Phase:** 2 · Desktop UI (third of six). Still on the seam stage: moving upstream's UI into `shared/commonMain` behind Android seams. No desktop window shows the real app yet.
-- **Last committed batch:** p2x (`PlatformContext.externalCacheDir`/`dataDir` stand-ins; Context guard no longer flags scope functions, a file's own `Context.` extensions, or `.assets` on non-contexts; 8 files rehomed incl. `DriversSettingsDelegate`, `StorageSettingsDelegate`, `SettingsLayout`, `SaveSyncPresentation`), verified. See the p2x entry in `DEVLOG.md`.
-- **Counts:** app 30 files, commonMain 1,535, androidMain 379. Navigation-graph closure: 149 files, 21 Android roots.
+- **Last committed batch:** p2y (`SubcomposeAsyncImage` stand-in, `PlatformSettings.canDrawOverlays`; `AppsScreen`, `AppPickerModal` rehomed), verified. See the p2y entry in `DEVLOG.md`.
+- **Counts:** app 30 files, commonMain 1,538, androidMain 378. Navigation-graph closure: 147 files, 18 Android roots.
 - **Baseline for "Android unchanged":** plain upstream v2.24.0, `build/desktop-baseline/app-debug-upstream-v2.24.0.apk`. Plain save proof: `build/desktop-check/save-proof/v224-plain-1017`.
 - Nothing uncommitted.
 
 ## Next action
 
-1. List the remaining roots: `python3 -I scripts/desktop/restructure/movable.py --roots ui/navigation/NavGraph.kt` (21). Choose the next batch with `--plan <n> ui/navigation/NavGraph.kt` (`--services-only` for slices) or `--rank-android`.
-   Smaller next: Coil `SubcomposeAsyncImage` (`AppsScreen`, `AppPickerModal`), `FirstRunViewModel` (`Settings.canDrawOverlays` beyond the `Settings` stand-in), `ImagePrefetchManager` (Context + `coil.imageLoader`), `SettingsAboutRouter` (`LocaleManager`/`LocaleList`), `SettingsInitRouter` (`DisplayManager`), `PermissionsSettingsDelegate`.
+1. List the remaining roots: `python3 -I scripts/desktop/restructure/movable.py --roots ui/navigation/NavGraph.kt` (18). Choose the next batch with `--plan <n> ui/navigation/NavGraph.kt` (`--services-only` for slices) or `--rank-android`.
+   Smaller next: `SettingsAboutRouter` (a `setApplicationLocales(context, tag)` stand-in plus a `rewrite_imports.py` rewrite of the multi-line `LocaleManager` block), `ImagePrefetchManager` (Context + `coil.imageLoader`), `SettingsInitRouter` (`DisplayManager`), `PermissionsSettingsDelegate`, `QrScanner` (unblocks `FirstRunViewModel`, which is otherwise clear now).
    Then `SettingsFontRouter`, `SettingsScreen`/`ViewModel`, `SteamSettingsDelegate`, players (Media3, YouTube WebView), `QrScanner`, `Box3dCover`, `SectionBreadcrumb`, `SystemStatusBar`, `OnScreenControls`, `BgmTrackArt`, `MusicBrowserViewModel`.
 2. Run the pipeline (`extract_decls.py --refresh`, `inline_constants.py`, `move_companion_functions.py`, `apply_moves.py`, `move_members.py`, `actualize.py`, `slices.py`, `rewrite_imports.py`, then `movable.py --check`; the list is in `reapply.sh`). Then `movable.py --rehome`, append its output to `moves.txt` as a new labelled `[commonMain]` section, and run `apply_moves.py` and `rewrite_imports.py` again.
 3. `git add -A app/src/main/kotlin shared/src`, compile first (`quiet.sh <label> ./gradlew :shared:compileKotlinDesktop :shared:compileDebugKotlinAndroid`, about 3 min), then verify with `scripts/desktop/check/verify.sh <label> build/desktop-check/save-proof/v224-plain-1017` in the background (about 20 min).
@@ -43,4 +43,5 @@ After the roots are gone: the desktop shell, SDL3 input and screen bring-up (Pha
 - Never start a verification while files are still being edited (the race has happened twice).
 - A moved `@HiltViewModel` is proven only by a device run; generated-code evidence only from a build that ran the generating task.
 - Stand-ins must not add null checks upstream never had (unit tests run on `android.jar` stubs).
+- `DownloadManagerPlatformFolderTest` can fail in the full gate with "Dispatchers.Main is used concurrently with setting it" (test-ordering race, untouched by the port). Rerun the class alone, then the full verification.
 - The plain proof ages: once it is more than 24 hours older than a candidate, upstream's daily checks run again in the candidate. The masks now cover the two epoch-millisecond keys; a new unmasked difference of that kind means another clock key, not a regression, until shown otherwise.

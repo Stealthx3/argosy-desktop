@@ -18,6 +18,8 @@ actual object PlatformSettings {
     actual val ACTION_USAGE_ACCESS_SETTINGS: String = "android.settings.USAGE_ACCESS_SETTINGS"
     actual val EXTRA_APP_PACKAGE: String = "android.provider.extra.APP_PACKAGE"
 
+    actual fun canDrawOverlays(context: PlatformContext): Boolean = true
+
     actual object Secure {
         actual val ANDROID_ID: String = "android_id"
 

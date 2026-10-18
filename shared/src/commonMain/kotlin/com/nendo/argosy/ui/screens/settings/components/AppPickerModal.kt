@@ -24,10 +24,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.lerp
-import androidx.compose.ui.res.stringResource
+import com.nendo.argosy.res.stringResource
 import androidx.compose.ui.unit.dp
-import coil.compose.SubcomposeAsyncImage
-import com.nendo.argosy.shared.R
+import com.nendo.argosy.platform.image.SubcomposeAsyncImage
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.data.platform.LaunchableApp
 import com.nendo.argosy.ui.coil.AppIconData
 import com.nendo.argosy.ui.components.Modal

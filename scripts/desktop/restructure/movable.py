@@ -150,6 +150,10 @@ GUARDED_REWRITES = {
         r"\b(?:onLoading|onState|transform|clipToBounds|imageLoader|modelEqualityDelegate)\s*="
         r"|onError\s*=\s*\{\s*\w+\s*->|\bAsyncImagePainter\b"
     ),
+    "coil.compose.SubcomposeAsyncImage": re.compile(
+        r"(?<!val )(?<!var )\b(?:loading|success|onLoading|onSuccess|onError|onState|transform|imageLoader|contentScale|colorFilter|filterQuality)\s*="
+        r"|error\s*=\s*\{\s*\w+\s*->|\bSubcomposeAsyncImageContent\b|\bAsyncImagePainter\b"
+    ),
     "android.os.Build": re.compile(
         r"\bBuild\.(?!MODEL\b|MANUFACTURER\b|BRAND\b|DEVICE\b|PRODUCT\b|BOARD\b|FINGERPRINT\b"
         r"|SUPPORTED_64_BIT_ABIS\b|SUPPORTED_32_BIT_ABIS\b|VERSION\.SDK_INT\b|VERSION\.RELEASE\b"
@@ -202,7 +206,7 @@ GUARDED_REWRITES = {
     "android.provider.Settings": re.compile(
         r"(?<!\.)\bSettings\.(?!Secure\.(?:getString|ANDROID_ID)\b|System\.CONTENT_URI\b|(?:ACTION_APPLICATION_DETAILS_SETTINGS|ACTION_APP_NOTIFICATION_SETTINGS"
         r"|ACTION_MANAGE_OVERLAY_PERMISSION|ACTION_MANAGE_WRITE_SETTINGS|ACTION_SETTINGS|ACTION_USAGE_ACCESS_SETTINGS"
-        r"|EXTRA_APP_PACKAGE)\b)\w+(?:\.\w+)?"
+        r"|EXTRA_APP_PACKAGE|canDrawOverlays)\b)\w+(?:\.\w+)?"
     ),
     "android.content.Intent": re.compile(r"\bIntent\s*\(\s*(?:this|context|ctx|\w*[cC]ontext|applicationContext)\b|\bIntent\s*\(\s*\w+\s*,\s*\w+::class|\bIntent\.(?!(?:ACTION_BATTERY_CHANGED|ACTION_BOOT_COMPLETED|ACTION_DELETE|ACTION_MAIN|ACTION_MY_PACKAGE_REPLACED|ACTION_PACKAGE_ADDED|ACTION_PACKAGE_REMOVED|ACTION_PACKAGE_REPLACED|ACTION_SCREEN_OFF|ACTION_SCREEN_ON|ACTION_USER_PRESENT|ACTION_VIEW|CATEGORY_DEFAULT|CATEGORY_HOME|CATEGORY_LAUNCHER|FLAG_ACTIVITY_CLEAR_TASK|FLAG_ACTIVITY_CLEAR_TOP|FLAG_ACTIVITY_MULTIPLE_TASK|FLAG_ACTIVITY_NEW_TASK|FLAG_ACTIVITY_NO_ANIMATION|FLAG_ACTIVITY_NO_HISTORY|FLAG_ACTIVITY_REORDER_TO_FRONT|FLAG_ACTIVITY_SINGLE_TOP|FLAG_GRANT_READ_URI_PERMISSION)\b)\w+"),
     "android.net.Uri": re.compile(
@@ -277,6 +281,7 @@ STAND_IN_GUARDS = {
     "com.nendo.argosy.core.input.AndroidKeyCodes": "android.view.KeyEvent",
     "com.nendo.argosy.platform.PlatformBuild": "android.os.Build",
     "com.nendo.argosy.platform.image.AsyncImage": "coil.compose.AsyncImage",
+    "com.nendo.argosy.platform.image.SubcomposeAsyncImage": "coil.compose.SubcomposeAsyncImage",
     "com.nendo.argosy.platform.LocalPlatformView": "androidx.compose.ui.platform.LocalView",
     "com.nendo.argosy.platform.PlatformSystemClock": "android.os.SystemClock",
     "com.nendo.argosy.platform.PlatformEnvironment": "android.os.Environment",
