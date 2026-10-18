@@ -311,7 +311,7 @@ class SettingsViewModel @Inject constructor(
                 if (com.nendo.argosy.data.launcher.SteamLaunchers.getByPackage(packageName) != null &&
                     uiState.value.currentSection == SettingsSection.STEAM_SETTINGS
                 ) {
-                    refreshSteamSettings()
+                    refreshSteamLauncherAvailability()
                 }
             }
         }
@@ -1046,6 +1046,10 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun refreshSteamSettings() = steamDelegate.loadSteamSettings(context, viewModelScope)
+
+    fun refreshSteamLauncherAvailability() = viewModelScope.launch {
+        steamDelegate.refreshLauncherAvailability(context)
+    }
 
     fun confirmLauncherAction() = routeConfirmLauncherAction(this)
 

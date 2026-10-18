@@ -59,6 +59,7 @@ class SteamLauncherPickerTest {
             }
         }
 
+        compose.onNodeWithText("DroidDeck").assertIsDisplayed()
         compose.onNodeWithText("Uses DroidDeck").assertDoesNotExist()
     }
 }

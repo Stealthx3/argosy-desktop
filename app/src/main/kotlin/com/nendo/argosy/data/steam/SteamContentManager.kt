@@ -1401,7 +1401,13 @@ class SteamContentManager @Inject constructor(
                 if (!File(target, ".download_complete").exists()) {
                     runCatching { File(target, ".download_complete").createNewFile() }
                 }
-                gameDao.update(game.copy(localPath = target.absolutePath, source = GameSource.STEAM))
+                gameDao.updateLocalPath(
+                    gameId = game.id,
+                    path = target.absolutePath,
+                    source = GameSource.STEAM,
+                    fileOrigin = game.fileOrigin,
+                    addedAt = game.addedAt
+                )
                 steamDownloadQueueDao.updateInstallPath(appId, target.absolutePath)
             } else {
                 Log.w(TAG, "Reclaim move failed for ${game.title}; leaving at $current")
@@ -1430,12 +1436,12 @@ class SteamContentManager @Inject constructor(
                 if (game?.localPath != null) continue
 
                 if (game != null) {
-                    gameDao.update(
-                        game.copy(
-                            localPath = appDir.absolutePath,
-                            fileOrigin = FileOrigin.ADOPTED,
-                            source = GameSource.STEAM
-                        )
+                    gameDao.updateLocalPath(
+                        gameId = game.id,
+                        path = appDir.absolutePath,
+                        source = GameSource.STEAM,
+                        fileOrigin = FileOrigin.ADOPTED,
+                        addedAt = game.addedAt
                     )
                     Log.d(TAG, "Discovered Steam game: ${game.title} at ${appDir.absolutePath}")
                     discovered++
@@ -1482,12 +1488,12 @@ class SteamContentManager @Inject constructor(
                 queueEntry?.installDir == dirName
             }
             if (match != null && match.localPath == null) {
-                gameDao.update(
-                    match.copy(
-                        localPath = gameDirPath,
-                        fileOrigin = FileOrigin.ADOPTED,
-                        source = GameSource.STEAM
-                    )
+                gameDao.updateLocalPath(
+                    gameId = match.id,
+                    path = gameDirPath,
+                    source = GameSource.STEAM,
+                    fileOrigin = FileOrigin.ADOPTED,
+                    addedAt = match.addedAt
                 )
                 match.steamAppId?.let { appId ->
                     steamDownloadQueueDao.updateState(appId, SteamDownloadDbState.COMPLETED.name)

@@ -591,7 +591,7 @@ fun SettingsScreen(
                     viewModel.refreshEmulators()
                 }
                 if (viewModel.uiState.value.currentSection == SettingsSection.STEAM_SETTINGS) {
-                    viewModel.refreshSteamSettings()
+                    viewModel.refreshSteamLauncherAvailability()
                 }
             }
         }
