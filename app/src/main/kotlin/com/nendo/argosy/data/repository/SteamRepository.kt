@@ -172,17 +172,18 @@ class SteamRepository @Inject constructor(
                 ?.mapNotNull { it.description }
                 ?.joinToString(", ")
 
-            val updatedGame = game.copy(
-                description = appData.shortDescription ?: game.description,
-                genre = if (!storeGenres.isNullOrBlank()) storeGenres else game.genre,
-                rating = appData.metacritic?.score?.toFloat() ?: game.rating
+            gameDao.updateSteamStoreMetadata(
+                gameId = game.id,
+                description = appData.shortDescription,
+                genre = storeGenres?.takeIf { it.isNotBlank() },
+                rating = appData.metacritic?.score?.toFloat()
             )
-
-            gameDao.update(updatedGame)
             writeArtSources(game.id, steamAppId, game.title, appData, backgroundUrl)
             if (screenshotUrls.isNotEmpty()) gameScreenshotDao.replaceSources(game.id, screenshotUrls)
 
             Log.d(TAG, "Enriched ${game.title} with store data")
+            val updatedGame = gameDao.getById(game.id)
+                ?: return@withContext SteamResult.Error("Game not found")
             SteamResult.Success(updatedGame)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to enrich Steam game", e)

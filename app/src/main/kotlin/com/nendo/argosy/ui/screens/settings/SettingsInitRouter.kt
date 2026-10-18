@@ -14,6 +14,7 @@ import com.nendo.argosy.data.remote.romm.ConnectionState
 import com.nendo.argosy.libretro.LibretroCoreRegistry
 import com.nendo.argosy.core.input.DetectedLayout
 import com.nendo.argosy.ui.screens.settings.delegates.StorageSettingsDelegate
+import com.nendo.argosy.ui.screens.settings.sections.steamMaxFocusIndex
 import com.nendo.argosy.util.AppPaths
 import com.nendo.argosy.R
 import kotlinx.coroutines.delay
@@ -176,7 +177,7 @@ internal fun routeObserveDelegateStates(vm: SettingsViewModel) {
     }.launchIn(vm.viewModelScope)
 
     vm.steamDelegate.state.onEach { steam ->
-        vm._uiState.update { it.copy(steam = steam) }
+        routeUpdateSteamState(vm, steam)
     }.launchIn(vm.viewModelScope)
 
     vm.jellyfinDelegate.state.onEach { jellyfin ->
@@ -198,6 +199,17 @@ internal fun routeObserveDelegateStates(vm: SettingsViewModel) {
     vm.driversDelegate.state.onEach { drivers ->
         vm._uiState.update { it.copy(drivers = drivers) }
     }.launchIn(vm.viewModelScope)
+}
+
+internal fun routeUpdateSteamState(vm: SettingsViewModel, steam: SteamSettingsState) {
+    vm._uiState.update { state ->
+        state.copy(
+            steam = steam,
+            focusedIndex = if (state.currentSection == SettingsSection.STEAM_SETTINGS) {
+                state.focusedIndex.coerceIn(0, steamMaxFocusIndex(steam))
+            } else state.focusedIndex
+        )
+    }
 }
 
 internal fun routeObserveDelegateEvents(vm: SettingsViewModel) {

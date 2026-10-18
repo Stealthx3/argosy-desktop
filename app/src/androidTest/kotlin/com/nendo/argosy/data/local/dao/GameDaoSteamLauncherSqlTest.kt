@@ -87,4 +87,50 @@ class GameDaoSteamLauncherSqlTest {
         assertTrue(db.gameDao().getById(1)!!.launcherSetManually)
         assertEquals(1, db.gameDao().compareAndSetSteamLauncher(1, gameNative, true, gameNative, false, 20))
     }
+
+    @Test
+    fun metadata_updates_preserve_recovered_launcher_and_current_game_state() = runBlocking {
+        val dao = db.gameDao()
+        assertEquals(1, dao.compareAndSetSteamLauncher(1, gameNative, true, droidDeck, false, 10))
+        val recovered = dao.getById(1)!!.copy(
+            localPath = "/current/install", playCount = 8, saveId = "current-save",
+            igdbId = 123, storeEnrichStatus = GameEntity.STORE_FAILED
+        )
+        dao.update(recovered)
+
+        dao.updateSteamStoreMetadata(1, "Store description", "Action", 91f)
+        val enriched = recovered.copy(description = "Store description", genre = "Action", rating = 91f)
+        assertEquals(enriched, dao.getById(1))
+
+        dao.updateSteamInstallInfo(1, "Updated")
+        assertEquals(enriched.copy(steamInstallDir = "Updated"), dao.getById(1))
+
+        dao.updateSteamLibraryMetadata(1, "Updated Game", "updated game", "Developer", "Publisher", 2020, "Puzzle", "Forced")
+        assertEquals(enriched.copy(
+            title = "Updated Game", sortTitle = "updated game", developer = "Developer",
+            publisher = "Publisher", releaseYear = 2020, genre = "Puzzle", steamInstallDir = "Forced",
+            storeEnrichStatus = GameEntity.STORE_NOT_ATTEMPTED, igdbId = null
+        ), dao.getById(1))
+    }
+
+    @Test
+    fun missing_metadata_uses_current_columns_and_only_defaults_unassigned_launchers() = runBlocking {
+        val dao = db.gameDao()
+        val selected = dao.getById(1)!!.copy(
+            steamLauncher = "com.xiaoji.egggame", description = "Current description", genre = "Current genre",
+            rating = 80f, developer = "Current developer", publisher = "Current publisher",
+            releaseYear = 2024, steamInstallDir = "Current"
+        )
+        dao.update(selected)
+
+        dao.updateSteamStoreMetadata(1, null, null, null)
+        dao.updateSteamInstallInfo(1, null)
+        dao.updateSteamLibraryMetadata(1, null, null, null, null, null, null, null)
+        assertEquals(selected, dao.getById(1))
+
+        val unassigned = selected.copy(steamLauncher = null, launcherSetManually = false)
+        dao.update(unassigned)
+        dao.updateSteamInstallInfo(1, null)
+        assertEquals(unassigned.copy(steamLauncher = "native"), dao.getById(1))
+    }
 }
