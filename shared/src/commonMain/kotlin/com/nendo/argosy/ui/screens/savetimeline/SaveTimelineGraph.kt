@@ -44,11 +44,11 @@ import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.stringResource
+import com.nendo.argosy.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
-import com.nendo.argosy.shared.R
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.ui.components.scrollToItemCentered
 import com.nendo.argosy.ui.primitives.FocusIndicators
 import com.nendo.argosy.ui.primitives.argosyFocusIndicators
@@ -78,10 +78,10 @@ internal fun saveTimelineLaneColors(): List<Color> {
     val accent = LocalArgosyTheme.current.focusAccent
     return remember(accent) {
         val hsl = FloatArray(3)
-        androidx.core.graphics.ColorUtils.colorToHSL(accent.toArgb(), hsl)
+        com.nendo.argosy.platform.PlatformColorUtils.colorToHSL(accent.toArgb(), hsl)
         LANE_HUE_STEPS.map { step ->
             Color(
-                androidx.core.graphics.ColorUtils.HSLToColor(
+                com.nendo.argosy.platform.PlatformColorUtils.HSLToColor(
                     floatArrayOf((hsl[0] + step) % 360f, hsl[1].coerceAtLeast(LANE_MIN_SATURATION), LANE_LIGHTNESS)
                 )
             )

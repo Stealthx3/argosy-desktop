@@ -4,26 +4,26 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 History and reasoning live in `DEVLOG.md`; read only the parts this file points to. Earlier phases:
 `phase-0.md`, `phase-1.md` (closed summaries; carried-forward items are listed there).
 
-**Updated:** 2026-10-17, end of unit p2v
+**Updated:** 2026-10-17, end of unit p2w
 
 ## Where things stand
 
 - **Phase:** 2 · Desktop UI (third of six). Still on the seam stage: moving upstream's UI into `shared/commonMain` behind Android seams. No desktop window shows the real app yet.
-- **Last committed batch:** p2v (`GameActivityStarter` slice, 9 files rehomed, `forceStopEmulator` and `className` stand-ins, comparator fix for epoch-millisecond DataStore times), verified. See the last p2v entry in `DEVLOG.md`.
-- **Counts:** app 30 files, commonMain 1,519, androidMain 392. Navigation-graph closure: 164 files, 33 Android roots.
+- **Last committed batch:** p2w (stand-ins for `ActivityNotFoundException`, `ContextCompat` display/permission, `Manifest.permission`, `PackageManager.PERMISSION_*`, `Resources`, fully qualified `ColorUtils`; `ClipboardTextReader` slice; 6 files rehomed), verified. See the last p2w entry in `DEVLOG.md`.
+- **Counts:** app 30 files, commonMain 1,527, androidMain 387. Navigation-graph closure: 157 files, 25 Android roots.
 - **Baseline for "Android unchanged":** plain upstream v2.24.0, `build/desktop-baseline/app-debug-upstream-v2.24.0.apk`. Plain save proof: `build/desktop-check/save-proof/v224-plain-1017`.
 - Nothing uncommitted.
 
 ## Next action
 
-1. List the remaining roots: `python3 -I scripts/desktop/restructure/movable.py --roots ui/navigation/NavGraph.kt` (33). Choose the next batch with `--plan <n> ui/navigation/NavGraph.kt` (`--services-only` for slices) or `--rank-android`.
-   Small seams first: `GameDetailViewModel` (one `Context` reference), `FriendsActivityBadge` (`Resources`), `FirstRunScreen` (`ActivityNotFoundException`), `SaveTimelineGraph` (`ColorUtils` HSL), `ClipboardTextReader`, the `ContextCompat` permission checks in two settings sections and `SyncSettingsDelegate`, Coil `SubcomposeAsyncImage` (`AppsScreen`, `AppPickerModal`).
-   Then the Settings routers, delegates and `SettingsScreen`/`ViewModel`, players (Media3, YouTube WebView), `QrScanner`, `Box3dCover`, `SectionBreadcrumb`, `SystemStatusBar`, `OnScreenControls`.
-2. Run the pipeline (`extract_decls.py --refresh`, `inline_constants.py`, `move_companion_functions.py`, `apply_moves.py`, `move_members.py`, `actualize.py`, `slices.py`, `rewrite_imports.py`, then `movable.py --check`; the list is in `reapply.sh`). Then `movable.py --rehome`, append its output to `moves.txt` as a new `[commonMain]` section, and run `apply_moves.py` and `rewrite_imports.py` again.
-3. `git add -A app/src/main/kotlin shared/src`, then verify with `scripts/desktop/check/verify.sh <label> build/desktop-check/save-proof/v224-plain-1017` in the background (about 20 min).
+1. List the remaining roots: `python3 -I scripts/desktop/restructure/movable.py --roots ui/navigation/NavGraph.kt` (25). Choose the next batch with `--plan <n> ui/navigation/NavGraph.kt` (`--services-only` for slices) or `--rank-android`.
+   Smaller next: Coil `SubcomposeAsyncImage` (`AppsScreen`, `AppPickerModal`), `FirstRunViewModel` (`Settings` beyond its stand-in; `Manifest`/`ContextCompat` are covered now), `SettingsLayout`, `DriversSettingsDelegate`, `StorageSettingsDelegate` (one Context use each), `SaveSyncPresentation`, `ImagePrefetchManager`.
+   Then the Settings routers, `SettingsScreen`/`ViewModel`, `PermissionsSettingsDelegate`, `SteamSettingsDelegate`, players (Media3, YouTube WebView), `QrScanner`, `Box3dCover`, `SectionBreadcrumb`, `SystemStatusBar`, `OnScreenControls`, `BgmTrackArt`, `MusicBrowserViewModel`.
+2. Run the pipeline (`extract_decls.py --refresh`, `inline_constants.py`, `move_companion_functions.py`, `apply_moves.py`, `move_members.py`, `actualize.py`, `slices.py`, `rewrite_imports.py`, then `movable.py --check`; the list is in `reapply.sh`). Then `movable.py --rehome`, append its output to `moves.txt` as a new labelled `[commonMain]` section, and run `apply_moves.py` and `rewrite_imports.py` again.
+3. `git add -A app/src/main/kotlin shared/src`, compile first (`quiet.sh <label> ./gradlew :shared:compileKotlinDesktop :shared:compileDebugKotlinAndroid`, about 3 min), then verify with `scripts/desktop/check/verify.sh <label> build/desktop-check/save-proof/v224-plain-1017` in the background (about 20 min).
 4. Commit, log in `DEVLOG.md`, rewrite this file, end the unit.
 
-After the roots are gone: the desktop shell, SDL3 input and screen bring-up (Phase 2 plan, steps 6–8, in `PORT_PLAN.md`).
+After the roots are gone: the desktop shell, SDL3 input and screen bring-up (Phase 2 plan, steps 6–8, in `PORT_PLAN.md`). `ClipboardTextReader`'s desktop actual returns null; give it a real clipboard there.
 
 ## Commands and tools
 
@@ -36,6 +36,7 @@ After the roots are gone: the desktop shell, SDL3 input and screen bring-up (Pha
 
 - `movable.py --check` and `--rehome` do not prove that an expect slice carries every member a rehomed file calls. Only the compile catches that. An expression-bodied member needs its return type in `slices.txt`, or the slice leaves it out.
 - A stand-in extension property (like `className`) also needs an entry in `rewrite_imports.py`'s stand-in lists, or the moved files won't import it.
+- Check a new stand-in's name against `shared/src/commonMain/kotlin/com/nendo/argosy/platform/` first (`PlatformPackageManager` was taken; only the compile caught it).
 - Desktop actuals are generated once and hand-owned from then on; `slices.py` appends missing members to them.
 - Never start a verification while files are still being edited (the race has happened twice).
 - A moved `@HiltViewModel` is proven only by a device run; generated-code evidence only from a build that ran the generating task.

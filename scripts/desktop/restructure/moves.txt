@@ -1925,3 +1925,12 @@
 + ui/screens/social/FeedOptionsModal.kt
 + ui/screens/social/SocialScreen.kt
 + ui/screens/social/SocialViewModel.kt
+
+# Phase 2: portable since the Resources, ColorUtils, ContextCompat, Manifest and PackageManager stand-ins (was androidMain).
+[commonMain]
++ ui/components/friends/FriendsActivityBadge.kt
++ ui/screens/home/HomeTitleSection.kt
++ ui/screens/savetimeline/SaveTimelineGraph.kt
++ ui/screens/savetimeline/SaveTimelineScreen.kt
++ ui/screens/settings/delegates/RASettingsDelegate.kt
++ ui/screens/settings/delegates/SyncSettingsDelegate.kt

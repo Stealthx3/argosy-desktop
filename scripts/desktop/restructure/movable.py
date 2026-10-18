@@ -79,6 +79,7 @@ REWRITTEN = (
     "android.os.Environment.getExternalStorage", "android.os.Environment.isExternalStorageManager",
     "android.text.format.DateFormat.getBestDateTimePattern",
     "android.widget.Toast", "android.view.inputmethod.InputMethodManager",
+    "android.content.ActivityNotFoundException",
 )
 GENERATED = (
     "com.nendo.argosy.config.AppBuildConfig", "com.nendo.argosy.res.ArgosyR", "com.nendo.argosy.shared.R",
@@ -89,7 +90,7 @@ GENERATED = (
 CONTEXT_MEMBERS = (
     r"(?!getString\b|resources\b|filesDir\b|cacheDir\b|assets\b|getSharedPreferences\b|contentResolver\b"
     r"|packageName\b|applicationContext\b|getSystemService\b|getExternalFilesDir\b|packageManager\b|preferencesDataStoreFile\b"
-    r"|startActivity\b)[a-zA-Z_]\w*"
+    r"|startActivity\b|openStorageAccessSettings\b)[a-zA-Z_]\w*"
 )
 CONTEXT_REST = (
     r"\.resources\.(?!getQuantityString\b|getString\b)\w+"
@@ -243,12 +244,16 @@ GUARDED_REWRITES = {
     "android.util.Base64": re.compile(
         r"\bBase64\.(?!decode\b|encode\b|encodeToString\b|DEFAULT\b|NO_PADDING\b|NO_WRAP\b|CRLF\b|URL_SAFE\b)\w+"
     ),
+    "android.content.res.Resources": re.compile(r"\bResources\.\w+|\bresources\.(?!getString\b|getQuantityString\b)\w+"),
+    "androidx.core.content.ContextCompat": re.compile(r"\bContextCompat\.(?!getDisplayOrDefault\b|checkSelfPermission\b)\w+"),
+    "android.content.pm.PackageManager": re.compile(r"(?<!\.pm\.)\bPackageManager\b(?!\.PERMISSION_(?:GRANTED|DENIED)\b)"),
+    "android.Manifest": re.compile(r"(?<!android\.)\bManifest\.(?!permission\.(?:POST_NOTIFICATIONS|READ_MEDIA_IMAGES|READ_EXTERNAL_STORAGE|WRITE_EXTERNAL_STORAGE|CAMERA|BLUETOOTH_SCAN|BLUETOOTH_CONNECT|BLUETOOTH_ADVERTISE)\b)\w+(?:\.\w+)?"),
 }
 FQ_GUARDED = (
     "android.content.Context", "android.content.Intent", "android.os.SystemClock", "dagger.hilt.android.qualifiers.ApplicationContext",
     "android.graphics.Bitmap", "android.graphics.BitmapFactory", "android.util.Base64",
     "android.provider.Settings", "android.net.Uri", "android.os.Process", "android.graphics.Paint", "android.os.Bundle",
-    "coil.compose.AsyncImage",
+    "coil.compose.AsyncImage", "androidx.core.graphics.ColorUtils",
 )
 STRINGS = re.compile(r'"(?:[^"\\\n]|\\.)*"')
 STAND_IN_GUARDS = {
@@ -258,6 +263,10 @@ STAND_IN_GUARDS = {
     "com.nendo.argosy.platform.PlatformConfiguration": "android.content.res.Configuration",
     "com.nendo.argosy.platform.PlatformColor": "android.graphics.Color",
     "com.nendo.argosy.platform.PlatformColorUtils": "androidx.core.graphics.ColorUtils",
+    "com.nendo.argosy.platform.PlatformResources": "android.content.res.Resources",
+    "com.nendo.argosy.platform.PlatformContextCompat": "androidx.core.content.ContextCompat",
+    "com.nendo.argosy.platform.PlatformPackageManagerConstants": "android.content.pm.PackageManager",
+    "com.nendo.argosy.platform.PlatformManifest": "android.Manifest",
     "com.nendo.argosy.di.hiltViewModel": "androidx.hilt.navigation.compose.hiltViewModel",
     "com.nendo.argosy.platform.BackHandler": "androidx.activity.compose.BackHandler",
     "com.nendo.argosy.core.input.AndroidKeyCodes": "android.view.KeyEvent",

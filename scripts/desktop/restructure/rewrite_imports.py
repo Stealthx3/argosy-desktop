@@ -95,6 +95,18 @@ RULES = [
         re.compile(r"^import androidx\.core\.graphics\.ColorUtils$", re.M),
         "import com.nendo.argosy.platform.PlatformColorUtils as ColorUtils",
     ),
+    (re.compile(r"\bandroidx\.core\.graphics\.ColorUtils\."), "com.nendo.argosy.platform.PlatformColorUtils."),
+    (re.compile(r"^import android\.content\.res\.Resources$", re.M), "import com.nendo.argosy.platform.PlatformResources as Resources"),
+    (
+        re.compile(r"^import android\.content\.ActivityNotFoundException$", re.M),
+        "import com.nendo.argosy.platform.PlatformActivityNotFoundException as ActivityNotFoundException",
+    ),
+    (
+        re.compile(r"^import androidx\.core\.content\.ContextCompat$", re.M),
+        "import com.nendo.argosy.platform.PlatformContextCompat as ContextCompat",
+    ),
+    (re.compile(r"^import android\.content\.pm\.PackageManager$", re.M), "import com.nendo.argosy.platform.PlatformPackageManagerConstants as PackageManager"),
+    (re.compile(r"^import android\.Manifest$", re.M), "import com.nendo.argosy.platform.PlatformManifest as Manifest"),
     (
         re.compile(r"^import androidx\.compose\.ui\.platform\.LocalLifecycleOwner$", re.M),
         "import androidx.lifecycle.compose.LocalLifecycleOwner",
@@ -246,6 +258,10 @@ COMPANION_IMPORTS = {
         "com.nendo.argosy.platform.image.intrinsicWidth",
     ],
     "com.nendo.argosy.platform.PlatformToasts": ["com.nendo.argosy.platform.show"],
+    "com.nendo.argosy.platform.PlatformResources": [
+        "com.nendo.argosy.platform.getQuantityString", "com.nendo.argosy.platform.getString",
+    ],
+    "com.nendo.argosy.platform.PlatformContextCompat": ["com.nendo.argosy.platform.displayId"],
     "com.nendo.argosy.platform.PlatformContentObserver": [
         "com.nendo.argosy.platform.registerContentObserver", "com.nendo.argosy.platform.unregisterContentObserver",
     ],

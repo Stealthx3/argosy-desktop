@@ -1,10 +1,19 @@
 package com.nendo.argosy.ui.screens.settings.delegates
 
-import android.Manifest
-import android.app.Application
-import android.content.pm.PackageManager
-import android.os.Build
-import androidx.core.content.ContextCompat
+import com.nendo.argosy.platform.PlatformManifest as Manifest
+import com.nendo.argosy.platform.PlatformApplication as Application
+import com.nendo.argosy.platform.applicationContext
+import com.nendo.argosy.platform.cacheDir
+import com.nendo.argosy.platform.contentResolver
+import com.nendo.argosy.platform.filesDir
+import com.nendo.argosy.platform.getSharedPreferences
+import com.nendo.argosy.platform.getString
+import com.nendo.argosy.platform.packageName
+import com.nendo.argosy.platform.resources
+import com.nendo.argosy.platform.PlatformPackageManagerConstants as PackageManager
+import com.nendo.argosy.platform.PlatformBuild as Build
+import com.nendo.argosy.platform.PlatformContextCompat as ContextCompat
+import com.nendo.argosy.platform.displayId
 import com.nendo.argosy.data.cache.ImageCacheManager
 import com.nendo.argosy.data.repository.PlatformRepository
 import com.nendo.argosy.data.preferences.RegionFilterMode
@@ -17,7 +26,7 @@ import com.nendo.argosy.data.repository.SaveSyncRepository
 import com.nendo.argosy.data.repository.StateCacheManager
 import com.nendo.argosy.data.storage.StorageAttributionRepository
 import com.nendo.argosy.data.storage.StorageCategory
-import com.nendo.argosy.shared.R
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.core.notification.NotificationManager
 import com.nendo.argosy.core.notification.NotificationText
 import com.nendo.argosy.core.notification.showError
