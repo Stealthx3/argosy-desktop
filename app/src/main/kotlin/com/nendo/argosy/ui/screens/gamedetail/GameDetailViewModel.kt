@@ -69,6 +69,7 @@ import com.nendo.argosy.ui.screens.gamedetail.delegates.SaveManagementDelegate
 import com.nendo.argosy.ui.screens.gamedetail.delegates.ScreenshotDelegate
 import com.nendo.argosy.ui.ModalResetSignal
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
@@ -83,6 +84,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 
@@ -168,6 +170,7 @@ class GameDetailViewModel @Inject constructor(
     val launchEvents: SharedFlow<LaunchEvent> = _launchEvents.asSharedFlow()
 
     private var currentGameId: Long = 0
+    private var steamLauncherRefreshVersion = 0L
     private val documentReaderController =
         com.nendo.argosy.ui.screens.gamedetail.components.DocumentReaderController(
             scope = viewModelScope,
@@ -560,6 +563,7 @@ class GameDetailViewModel @Inject constructor(
     }
 
     fun loadGame(gameId: Long) {
+        steamLauncherRefreshVersion++
         currentGameId = gameId
         pageLoadTime = System.currentTimeMillis()
         downloadDelegate.reset()
@@ -610,22 +614,7 @@ class GameDetailViewModel @Inject constructor(
 
             val isSteamGame = game.isSteamGame
             val isAndroidApp = game.isAndroidApp
-            val steamPackage = game.steamLauncher?.takeIf { it != GameEntity.LAUNCHER_UNSPECIFIED }
-            val steamPinned = isSteamGame && game.launcherSetManually && steamPackage != null &&
-                runCatching { SteamLaunchers.getByPackage(steamPackage)?.isInstalled(context) == true }.getOrDefault(false)
-            val steamCandidates = if (isSteamGame) {
-                SteamLaunchers.launchCandidates(
-                    storedPackage = steamPackage,
-                    pinned = steamPinned,
-                    reporting = if (steamPinned) emptyList() else game.steamAppId?.let {
-                        steamInstallReports.launchersReporting(it)
-                    }.orEmpty(),
-                    isInstalled = { pkg ->
-                        runCatching { SteamLaunchers.getByPackage(pkg)?.isInstalled(context) == true }.getOrDefault(false)
-                    }
-                )
-            } else emptyList()
-            val steamLauncherName = steamCandidates.singleOrNull()?.let { SteamLaunchers.getByPackage(it)?.displayName }
+            val steamCandidates = steamLauncherCandidates(game)
             val fileExists = gameRepository.validateAndDiscoverGame(gameId)
 
             val steamPathExists = isSteamGame && downloadFileStatusRepository.pathExists(game.localPath)
@@ -635,9 +624,7 @@ class GameDetailViewModel @Inject constructor(
             val canPlay = when {
                 game.source == GameSource.ANDROID_APP -> true
                 isAndroidApp -> game.packageName != null
-                isSteamGame -> {
-                    steamCandidates.isNotEmpty() && (game.isExternallyManaged || (game.localPath != null && steamPathExists))
-                }
+                isSteamGame -> false
                 game.isMultiDisc -> {
                     val downloadedCount = gameDiscDao.getDownloadedDiscCount(gameId)
                     downloadedCount > 0 && emulatorDetector.hasAnyEmulator(game.platformSlug)
@@ -748,9 +735,8 @@ class GameDetailViewModel @Inject constructor(
                         achievements = cachedAchievements,
                         canManageSaves = canManageSaves,
                         canManageStates = canManageStates,
-                        steamLauncherName = steamLauncherName,
                         isHidden = isHiddenForOwner
-                    ).copy(steamLauncherSetManually = steamPinned),
+                    ).withSteamLauncher(game, steamCandidates, steamPathExists),
                     canSearchCovers = romMRepository.getCapabilities().supportsCoverSearch,
                     isLoading = false,
                     selectedCoreId = selectedCoreId,
@@ -869,12 +855,16 @@ class GameDetailViewModel @Inject constructor(
 
                 val launcherChanged = launcherInitialized &&
                     (lastSeenLauncher != updatedGame.steamLauncher || lastSeenManual != updatedGame.launcherSetManually)
+                val wasExternallyManaged = lastSeenLauncher != null && lastSeenLauncher != GameEntity.LAUNCHER_UNSPECIFIED
                 lastSeenLauncher = updatedGame.steamLauncher
                 lastSeenManual = updatedGame.launcherSetManually
                 launcherInitialized = true
                 if (launcherChanged) {
-                    loadGame(gameId)
-                    return@collect
+                    if (!updatedGame.isSteamGame || wasExternallyManaged != updatedGame.isExternallyManaged) {
+                        loadGame(gameId)
+                        return@collect
+                    }
+                    refreshSteamLauncher()
                 }
 
                 _uiState.update { state ->
@@ -1133,7 +1123,34 @@ class GameDetailViewModel @Inject constructor(
     }
 
     fun refreshSteamLauncher() {
-        if (_uiState.value.game?.isSteamGame == true) loadGame(currentGameId)
+        val displayedGame = _uiState.value.game ?: return
+        val gameId = currentGameId
+        if (!displayedGame.isSteamGame || displayedGame.id != gameId) return
+        val refreshVersion = ++steamLauncherRefreshVersion
+        viewModelScope.launch {
+            val ownerUserId = preferencesRepository.userPreferences.first().rommUserId
+            val game = gameRepository.getById(gameId) ?: return@launch
+            val candidates = steamLauncherCandidates(game)
+            val pathExists = downloadFileStatusRepository.pathExists(game.localPath)
+            if (preferencesRepository.userPreferences.first().rommUserId != ownerUserId) return@launch
+            _uiState.update { state ->
+                val currentGame = state.game ?: return@update state
+                if (refreshVersion != steamLauncherRefreshVersion || currentGameId != gameId || currentGame.id != gameId) {
+                    return@update state
+                }
+                state.copy(game = currentGame.withSteamLauncher(game, candidates, pathExists))
+            }
+        }
+    }
+
+    private suspend fun steamLauncherCandidates(game: GameEntity): List<String> = withContext(Dispatchers.IO) {
+        if (!game.isSteamGame) return@withContext emptyList()
+        val reporting = if (game.hasSteamLauncherPin) emptyList() else game.steamAppId?.let {
+            steamInstallReports.launchersReporting(it)
+        }.orEmpty()
+        game.steamLaunchCandidates(reporting) { pkg ->
+            SteamLaunchers.getByPackage(pkg)?.isInstalled(context) == true
+        }
     }
 
     // --- Play/Launch ---
