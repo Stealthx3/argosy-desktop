@@ -129,6 +129,9 @@
     <string name="notif_gamelaunch_no_emulator">此平台未安裝任何模擬器</string>
     <string name="notif_gamelaunch_no_rom_file">找不到ROM檔案</string>
     <string name="notif_gamelaunch_no_steam_launcher">尚未安裝Steam啟動程式</string>
+    <string name="notif_gamelaunch_no_steam_launcher_installed">尚未安裝 Steam 啟動程式。請前往設定 &gt; Steam 安裝。</string>
+    <string name="notif_gamelaunch_steam_launcher_unavailable">Steam 啟動程式無法使用。請前往遊戲詳情 &gt; 變更啟動程式選擇啟動程式。</string>
+    <string name="notif_gamelaunch_steam_launcher_updating">啟動程式正在更新。請稍後再試。</string>
     <string name="notif_gamelaunch_no_core_base">%1$s沒有可用的核心</string>
     <string name="notif_gamelaunch_no_core_with_reason">%1$s沒有可用的核心：%2$s</string>
     <string name="notif_gamelaunch_missing_discs">缺少光碟：%1$s，請至遊戲詳情頁面修復。</string>
