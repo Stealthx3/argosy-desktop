@@ -1,7 +1,18 @@
 package com.nendo.argosy.ui.screens.social
 
-import android.content.Intent
-import android.util.Log
+import com.nendo.argosy.platform.PlatformIntentType as Intent
+import com.nendo.argosy.platform.className
+import com.nendo.argosy.platform.action
+import com.nendo.argosy.platform.addFlags
+import com.nendo.argosy.platform.data
+import com.nendo.argosy.platform.flags
+import com.nendo.argosy.platform.putExtra
+import com.nendo.argosy.platform.component
+import com.nendo.argosy.platform.`package`
+import com.nendo.argosy.platform.getStringExtra
+import com.nendo.argosy.platform.packageName
+import com.nendo.argosy.platform.PlatformIntent
+import com.nendo.argosy.util.PlatformLog as Log
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -22,13 +33,13 @@ import com.nendo.argosy.data.social.UserProfileData
 import com.nendo.argosy.domain.usecase.game.LaunchGameUseCase
 import com.nendo.argosy.libretro.LibretroActivity
 import com.nendo.argosy.ui.input.InputHandler
-import com.nendo.argosy.shared.R
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.core.notification.NotificationManager
 import com.nendo.argosy.core.notification.NotificationText
 import com.nendo.argosy.ui.input.InputResult
 import com.nendo.argosy.ui.screens.doodle.GamePickerItem
 import com.nendo.argosy.ui.screens.doodle.toGamePickerItems
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.nendo.argosy.di.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -234,7 +245,7 @@ class SocialViewModel @Inject constructor(
                         if (preflight.resolvedCorePath != null) {
                             putExtra(LibretroActivity.EXTRA_CORE_PATH, preflight.resolvedCorePath)
                         }
-                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        addFlags(PlatformIntent.FLAG_ACTIVITY_NEW_TASK)
                     }
                     gameStartRouter.start(gameId, decorated)
                 }

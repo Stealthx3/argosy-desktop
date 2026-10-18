@@ -1,6 +1,7 @@
 package com.nendo.argosy.ui.screens.gamedetail
 
 import com.nendo.argosy.platform.PlatformIntentType as Intent
+import com.nendo.argosy.platform.className
 import com.nendo.argosy.platform.action
 import com.nendo.argosy.platform.addFlags
 import com.nendo.argosy.platform.data

@@ -10,6 +10,7 @@ import com.nendo.argosy.platform.component
 import com.nendo.argosy.platform.`package`
 import com.nendo.argosy.platform.getStringExtra
 import com.nendo.argosy.platform.packageName
+import com.nendo.argosy.platform.className
 
 /**
  * A game intent with the placement its display target resolved to.

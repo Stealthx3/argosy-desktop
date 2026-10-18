@@ -22,6 +22,7 @@ import com.nendo.argosy.platform.getQuantityString
 import com.nendo.argosy.platform.getString
 import com.nendo.argosy.platform.resources
 import com.nendo.argosy.platform.PlatformIntentType as Intent
+import com.nendo.argosy.platform.className
 import com.nendo.argosy.platform.component
 import com.nendo.argosy.platform.`package`
 import com.nendo.argosy.platform.getStringExtra

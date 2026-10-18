@@ -1324,7 +1324,7 @@ actual class GameLauncher @Inject constructor(
         )
     }
 
-    suspend fun forceStopEmulator(packageName: String) = withContext(Dispatchers.IO) {
+    actual suspend fun forceStopEmulator(packageName: String) = withContext(Dispatchers.IO) {
         if (PACKAGE_NAME.matches(packageName) && com.nendo.argosy.util.RootShell.isAvailable) {
             val result = com.nendo.argosy.util.RootShell.execute("am force-stop $packageName")
             if (result.isSuccess) {

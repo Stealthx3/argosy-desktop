@@ -1,7 +1,15 @@
 package com.nendo.argosy.ui.screens.common
 
-import android.app.Application
-import android.util.Log
+import com.nendo.argosy.platform.PlatformApplication as Application
+import com.nendo.argosy.platform.applicationContext
+import com.nendo.argosy.platform.cacheDir
+import com.nendo.argosy.platform.contentResolver
+import com.nendo.argosy.platform.filesDir
+import com.nendo.argosy.platform.getSharedPreferences
+import com.nendo.argosy.platform.getString
+import com.nendo.argosy.platform.packageName
+import com.nendo.argosy.platform.resources
+import com.nendo.argosy.util.PlatformLog as Log
 import com.nendo.argosy.data.emulator.ActiveSession
 import com.nendo.argosy.data.emulator.EmulatorRegistry
 import com.nendo.argosy.data.emulator.EmulatorResolver

@@ -12,8 +12,8 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.stringResource
-import com.nendo.argosy.shared.R
+import com.nendo.argosy.res.stringResource
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.ui.components.Modal
 import com.nendo.argosy.ui.screens.gamedetail.components.OptionItem
 

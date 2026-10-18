@@ -88,7 +88,7 @@ data/social/SocialRepository.kt: SocialRepository(clearPresenceCovers: Unit)
 data/social/discord/DiscordPresenceManager.kt: DiscordPresenceManager
 data/wallpaper/LockScreenArtManager.kt: LockScreenArtManager
 data/repository/GameDocumentLoader.kt: GameDocumentLoader
-data/emulator/GameLauncher.kt: GameLauncher
+data/emulator/GameLauncher.kt: GameLauncher(forceStopEmulator: Unit)
 data/emulator/PlaySessionTracker.kt: PlaySessionTracker
 libretro/shader/ShaderChainManager.kt: ShaderChainManager
 libretro/shader/ShaderPreviewRenderer.kt: ShaderPreviewRenderer
@@ -102,3 +102,4 @@ data/update/ApkInstallManager.kt: ApkInstallManager
 hardware/CompanionPanel.kt: CompanionSessionTimer
 ArgosyActivity.kt: ArgosyActivity
 data/wallpaper/LockScreenScenes.kt: LockScreenScenes
+ui/screens/common/GameActivityStarter.kt: GameActivityStarter

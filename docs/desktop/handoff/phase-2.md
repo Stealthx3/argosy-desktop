@@ -4,39 +4,40 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 History and reasoning live in `DEVLOG.md`; read only the parts this file points to. Earlier phases:
 `phase-0.md`, `phase-1.md` (closed summaries; carried-forward items are listed there).
 
-**Updated:** 2026-10-17 (seeded by the orchestrator session when work units were introduced)
+**Updated:** 2026-10-17, end of unit p2v
 
 ## Where things stand
 
 - **Phase:** 2 · Desktop UI (third of six). Still on the seam stage: moving upstream's UI into `shared/commonMain` behind Android seams. No desktop window shows the real app yet.
-- **Last committed batch:** `f13e679f5` (p2u: navigation, `ArgosyApp`/`ArgosyViewModel` seams, 142 files rehomed), verified. Pacing rule committed in `3ffa1950e`.
-- **Counts:** app 30 files, commonMain ~1,508, androidMain ~400. Navigation-graph closure: 174 files, 34 Android roots after the parked tooling.
-- **Baseline for "Android unchanged":** plain upstream v2.24.0, `build/desktop-baseline/app-debug-upstream-v2.24.0.apk`. Run proof baseline and candidate on the same day.
-
-## In progress (uncommitted, unverified)
-
-Parked tooling for the next batch (see `DEVLOG.md`, last "Parked" paragraph):
-- `scripts/desktop/restructure/movable.py`: `DisplayAffinityHelper` stand-in guard removed; `Application` guard allows `openStorageAccessSettings`.
-- `scripts/desktop/restructure/rewrite_imports.py`: no longer aliases `DisplayAffinityHelper` to `DualScreenDeviceInfo`.
-- `scripts/desktop/restructure/slices.txt`: lists `GameActivityStarter` (slice not generated yet).
+- **Last committed batch:** p2v (`GameActivityStarter` slice, 9 files rehomed, `forceStopEmulator` and `className` stand-ins, comparator fix for epoch-millisecond DataStore times), verified. See the last p2v entry in `DEVLOG.md`.
+- **Counts:** app 30 files, commonMain 1,519, androidMain 392. Navigation-graph closure: 164 files, 33 Android roots.
+- **Baseline for "Android unchanged":** plain upstream v2.24.0, `build/desktop-baseline/app-debug-upstream-v2.24.0.apk`. Plain save proof: `build/desktop-check/save-proof/v224-plain-1017`.
+- Nothing uncommitted.
 
 ## Next action
 
-1. Run the restructure pipeline: extract, apply moves, actualize, slices, rewrite, `movable.py --check`; then `movable.py --rehome`.
-2. Compile, then verify with `scripts/desktop/check/verify.sh <label> <plain-proof-dir>` (gate, A/B, save-sync proof).
-3. Commit the batch, log it in `DEVLOG.md`, rewrite this file, end the work unit.
+1. List the remaining roots: `python3 -I scripts/desktop/restructure/movable.py --roots ui/navigation/NavGraph.kt` (33). Choose the next batch with `--plan <n> ui/navigation/NavGraph.kt` (`--services-only` for slices) or `--rank-android`.
+   Small seams first: `GameDetailViewModel` (one `Context` reference), `FriendsActivityBadge` (`Resources`), `FirstRunScreen` (`ActivityNotFoundException`), `SaveTimelineGraph` (`ColorUtils` HSL), `ClipboardTextReader`, the `ContextCompat` permission checks in two settings sections and `SyncSettingsDelegate`, Coil `SubcomposeAsyncImage` (`AppsScreen`, `AppPickerModal`).
+   Then the Settings routers, delegates and `SettingsScreen`/`ViewModel`, players (Media3, YouTube WebView), `QrScanner`, `Box3dCover`, `SectionBreadcrumb`, `SystemStatusBar`, `OnScreenControls`.
+2. Run the pipeline (`extract_decls.py --refresh`, `inline_constants.py`, `move_companion_functions.py`, `apply_moves.py`, `move_members.py`, `actualize.py`, `slices.py`, `rewrite_imports.py`, then `movable.py --check`; the list is in `reapply.sh`). Then `movable.py --rehome`, append its output to `moves.txt` as a new `[commonMain]` section, and run `apply_moves.py` and `rewrite_imports.py` again.
+3. `git add -A app/src/main/kotlin shared/src`, then verify with `scripts/desktop/check/verify.sh <label> build/desktop-check/save-proof/v224-plain-1017` in the background (about 20 min).
+4. Commit, log in `DEVLOG.md`, rewrite this file, end the unit.
 
-Remaining Phase 2 roots after that (from `DEVLOG.md`, "Where it stands" under p2u): Settings routers/delegates and `SettingsScreen`/`ViewModel`, players (Media3, YouTube WebView), `QrScanner`, `Box3dCover`, `SectionBreadcrumb`, session end, first run, clipboard, image prefetch. Then the desktop shell, SDL3 input and screen bring-up (Phase 2 plan, steps 6–8).
+After the roots are gone: the desktop shell, SDL3 input and screen bring-up (Phase 2 plan, steps 6–8, in `PORT_PLAN.md`).
 
 ## Commands and tools
 
 - Restructure tools: `scripts/desktop/restructure/` (manifests `*.txt`, scripts `*.py`; `movable.py --path/--roots/--plan/--rank` for planning).
 - Verification: `scripts/desktop/check/verify.sh`, `ab-check.sh`, `save-proof.sh`; testbed: `scripts/desktop/testbed/` and `docs/desktop/testbed-runbook.md`.
-- Quiet runner for anything noisy: `scripts/desktop/quiet.sh <label> <command...>` (full log to `build/desktop-logs/`, prints only status, time and error lines).
+- Quiet runner for anything noisy: `scripts/desktop/quiet.sh <label> <command...>`.
 - JDK: `JAVA_HOME=~/.jdks/jdk-21.0.12.1+1`.
 
 ## Gotchas worth remembering
 
+- `movable.py --check` and `--rehome` do not prove that an expect slice carries every member a rehomed file calls. Only the compile catches that. An expression-bodied member needs its return type in `slices.txt`, or the slice leaves it out.
+- A stand-in extension property (like `className`) also needs an entry in `rewrite_imports.py`'s stand-in lists, or the moved files won't import it.
+- Desktop actuals are generated once and hand-owned from then on; `slices.py` appends missing members to them.
 - Never start a verification while files are still being edited (the race has happened twice).
 - A moved `@HiltViewModel` is proven only by a device run; generated-code evidence only from a build that ran the generating task.
 - Stand-ins must not add null checks upstream never had (unit tests run on `android.jar` stubs).
+- The plain proof ages: once it is more than 24 hours older than a candidate, upstream's daily checks run again in the candidate. The masks now cover the two epoch-millisecond keys; a new unmasked difference of that kind means another clock key, not a regression, until shown otherwise.

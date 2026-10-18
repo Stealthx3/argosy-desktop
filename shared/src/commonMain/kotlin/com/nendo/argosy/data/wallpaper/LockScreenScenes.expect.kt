@@ -30,6 +30,7 @@ import com.nendo.argosy.platform.putExtra
 import com.nendo.argosy.platform.component
 import com.nendo.argosy.platform.`package`
 import com.nendo.argosy.platform.getStringExtra
+import com.nendo.argosy.platform.className
 import com.nendo.argosy.platform.PlatformIntent
 
 expect class LockScreenScenes {

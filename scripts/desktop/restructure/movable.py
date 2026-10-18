@@ -165,9 +165,6 @@ GUARDED_REWRITES = {
         r"\bMotionEvent\.(?!(?:AXIS_|ACTION_)\w)\w+"
         r"|\.(?:getHistorical\w*|historySize|pointerCount|getPointerId|getToolType|buttonState|getRawX|getRawY|rawX|rawY)\b"
     ),
-    "com.nendo.argosy.util.DisplayAffinityHelper": re.compile(
-        r"\bDisplayAffinityHelper\b(?!\.isKnownDualScreenDevice\(\))"
-    ),
     "android.os.SystemClock": re.compile(r"\bSystemClock\.(?!elapsedRealtime\b|uptimeMillis\b)\w+"),
     "android.os.Environment": re.compile(
         r"\bEnvironment\.(?!MEDIA_MOUNTED\b|DIRECTORY_DOWNLOADS\b|getExternalStorageDirectory\b"
@@ -237,7 +234,8 @@ GUARDED_REWRITES = {
     "android.graphics.Paint": re.compile(r"\bandroid\.graphics\.Paint\b(?!\(\))|\bPaint\.\w+"),
     "android.app.Application": re.compile(
         r"\b(?:application|app)\??\.(?!contentResolver\b|filesDir\b|cacheDir\b|getString\b|resources\b|packageName\b"
-        r"|applicationContext\b|getSharedPreferences\b|getSystemService\b|getExternalFilesDir\b|packageManager\b|assets\b)\w+"
+        r"|applicationContext\b|getSharedPreferences\b|getSystemService\b|getExternalFilesDir\b|packageManager\b|assets\b"
+        r"|openStorageAccessSettings\b)\w+"
         r"|\bApplication\.\w+"
     ),
     "android.text.Html": re.compile(r"\bHtml\.(?!fromHtml\b|FROM_HTML_MODE_LEGACY\b)\w+"),
@@ -263,7 +261,6 @@ STAND_IN_GUARDS = {
     "com.nendo.argosy.di.hiltViewModel": "androidx.hilt.navigation.compose.hiltViewModel",
     "com.nendo.argosy.platform.BackHandler": "androidx.activity.compose.BackHandler",
     "com.nendo.argosy.core.input.AndroidKeyCodes": "android.view.KeyEvent",
-    "com.nendo.argosy.util.DualScreenDeviceInfo": "com.nendo.argosy.util.DisplayAffinityHelper",
     "com.nendo.argosy.platform.PlatformBuild": "android.os.Build",
     "com.nendo.argosy.platform.image.AsyncImage": "coil.compose.AsyncImage",
     "com.nendo.argosy.platform.LocalPlatformView": "androidx.compose.ui.platform.LocalView",

@@ -56,6 +56,8 @@ actual class PlatformComponentName(internal val pkg: String, internal val cls: S
 
 actual val PlatformComponentName.packageName: String get() = pkg
 
+actual val PlatformComponentName.className: String get() = cls
+
 actual val PlatformIntentType.component: PlatformComponentName? get() = intentComponent
 
 actual val PlatformIntentType.`package`: String? get() = intentPackage

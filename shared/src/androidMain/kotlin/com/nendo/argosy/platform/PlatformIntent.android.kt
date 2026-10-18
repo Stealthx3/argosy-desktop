@@ -36,6 +36,8 @@ actual typealias PlatformComponentName = ComponentName
 
 actual val PlatformComponentName.packageName: String get() = packageName
 
+actual val PlatformComponentName.className: String get() = className
+
 actual val PlatformIntentType.component: PlatformComponentName? get() = component
 
 actual val PlatformIntentType.`package`: String? get() = `package`

@@ -1,6 +1,7 @@
 package com.nendo.argosy.ui.screens.common
 
 import com.nendo.argosy.platform.PlatformIntentType as Intent
+import com.nendo.argosy.platform.className
 import com.nendo.argosy.platform.component
 import com.nendo.argosy.platform.`package`
 import com.nendo.argosy.platform.getStringExtra

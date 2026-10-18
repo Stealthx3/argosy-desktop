@@ -1,7 +1,25 @@
 package com.nendo.argosy.ui.screens.common
 
-import android.app.Application
-import android.content.Intent
+import com.nendo.argosy.platform.PlatformApplication as Application
+import com.nendo.argosy.platform.applicationContext
+import com.nendo.argosy.platform.cacheDir
+import com.nendo.argosy.platform.contentResolver
+import com.nendo.argosy.platform.filesDir
+import com.nendo.argosy.platform.getSharedPreferences
+import com.nendo.argosy.platform.getString
+import com.nendo.argosy.platform.packageName
+import com.nendo.argosy.platform.resources
+import com.nendo.argosy.platform.PlatformIntentType as Intent
+import com.nendo.argosy.platform.className
+import com.nendo.argosy.platform.action
+import com.nendo.argosy.platform.addFlags
+import com.nendo.argosy.platform.data
+import com.nendo.argosy.platform.flags
+import com.nendo.argosy.platform.putExtra
+import com.nendo.argosy.platform.component
+import com.nendo.argosy.platform.`package`
+import com.nendo.argosy.platform.getStringExtra
+import com.nendo.argosy.platform.PlatformIntent
 import com.nendo.argosy.data.emulator.EmulatorRegistry
 import com.nendo.argosy.data.emulator.EmulatorResolver
 import com.nendo.argosy.data.emulator.GameLauncher
@@ -31,7 +49,7 @@ import com.nendo.argosy.libretro.LaunchMode
 import com.nendo.argosy.libretro.LibretroActivity
 import com.nendo.argosy.core.input.controllerIdOf
 import com.nendo.argosy.core.input.isPhysicalGamepad
-import com.nendo.argosy.shared.R
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.core.notification.NotificationManager
 import com.nendo.argosy.core.notification.NotificationText
 import com.nendo.argosy.core.notification.showError
@@ -151,7 +169,7 @@ class GameLaunchDelegate @Inject constructor(
         val requiresKill = noTrackedSession && emulatorResolver.resolveEmulatorId(emulatorPackage)
             ?.let { EmulatorRegistry.getById(it) }?.launchConfig?.requiresEmulatorKill == true
         if (!requiresKill && !withContext(Dispatchers.IO) { RootShell.isAvailable }) return
-        android.util.Log.d("GameLaunchDelegate", "Force-stopping $emulatorPackage before launch (requiresKill=$requiresKill)")
+        com.nendo.argosy.util.PlatformLog.d("GameLaunchDelegate", "Force-stopping $emulatorPackage before launch (requiresKill=$requiresKill)")
         gameLauncher.forceStopEmulator(emulatorPackage)
         delay(EMULATOR_KILL_DELAY_MS)
     }
@@ -186,7 +204,7 @@ class GameLaunchDelegate @Inject constructor(
                 return@launch
             }
             val ticket = launchProgressTracker.begin(game.title) ?: run {
-                android.util.Log.d("GameLaunchDelegate", "launchGame: another launch is in progress")
+                com.nendo.argosy.util.PlatformLog.d("GameLaunchDelegate", "launchGame: another launch is in progress")
                 onLaunchFailed()
                 return@launch
             }
@@ -208,14 +226,14 @@ class GameLaunchDelegate @Inject constructor(
                 }
 
                 if (sessionRequiresKill) {
-                    android.util.Log.d("GameLaunchDelegate", "Session requires emulator kill, ending before fresh launch")
+                    com.nendo.argosy.util.PlatformLog.d("GameLaunchDelegate", "Session requires emulator kill, ending before fresh launch")
                     endSessionAndAwaitConflictAnswer()
                     delay(EMULATOR_KILL_DELAY_MS)
                 }
 
                 var stoppedPackage: String? = null
                 if (!canResume && activeSession != null && !sessionRequiresKill) {
-                    android.util.Log.d("GameLaunchDelegate", "Evicting stale session for game ${activeSession.gameId}, killing ${activeSession.emulatorPackage}")
+                    com.nendo.argosy.util.PlatformLog.d("GameLaunchDelegate", "Evicting stale session for game ${activeSession.gameId}, killing ${activeSession.emulatorPackage}")
                     endSessionAndAwaitConflictAnswer()
                     gameLauncher.forceStopEmulator(activeSession.emulatorPackage)
                     stoppedPackage = activeSession.emulatorPackage
@@ -236,7 +254,7 @@ class GameLaunchDelegate @Inject constructor(
                     emulatorId,
                     prefs.saveSyncEnabled
                 )
-                android.util.Log.d("GameLaunchDelegate", "launchGame: emulatorPackage=$emulatorPackage, emulatorId=$emulatorId, canSync=$canSync")
+                com.nendo.argosy.util.PlatformLog.d("GameLaunchDelegate", "launchGame: emulatorPackage=$emulatorPackage, emulatorId=$emulatorId, canSync=$canSync")
 
                 val syncStartTime = if (canSync) {
                     ticket.step(LaunchStep.Save(SyncProgress.PreLaunch.CheckingSave(channelName)))
@@ -260,7 +278,7 @@ class GameLaunchDelegate @Inject constructor(
                                     LaunchPromptOption.SKIP_HARDCORE_SAVE -> HardcoreConflictChoice.KEEP_LOCAL
                                     else -> null
                                 }
-                                android.util.Log.d("GameLaunchDelegate", "Hardcore conflict resolved: $hardcoreConflictChoice")
+                                com.nendo.argosy.util.PlatformLog.d("GameLaunchDelegate", "Hardcore conflict resolved: $hardcoreConflictChoice")
                             }
                             is SyncProgress.LocalModified -> if (progress.snapshotConflict) {
                                 localModifiedInfo = progress
@@ -280,7 +298,7 @@ class GameLaunchDelegate @Inject constructor(
                                     LaunchPromptOption.LAUNCH_WITHOUT_SYNC -> LocalModifiedChoice.LAUNCH_WITHOUT_SYNC
                                     else -> null
                                 }
-                                android.util.Log.d("GameLaunchDelegate", "LocalModified resolved: $localModifiedChoice")
+                                com.nendo.argosy.util.PlatformLog.d("GameLaunchDelegate", "LocalModified resolved: $localModifiedChoice")
                             }
                             else -> ticket.step(LaunchStep.Save(progress))
                         }
@@ -307,7 +325,7 @@ class GameLaunchDelegate @Inject constructor(
                         HardcoreConflictChoice.KEEP_LOCAL -> HardcoreResolutionChoice.KEEP_LOCAL
                     }
                     val resolveResult = saveSyncRepository.resolveHardcoreConflict(resolution, repoChoice)
-                    android.util.Log.d("GameLaunchDelegate", "Resolution result: $resolveResult")
+                    com.nendo.argosy.util.PlatformLog.d("GameLaunchDelegate", "Resolution result: $resolveResult")
                 }
 
                 val snapshotChoice = snapshotConflictChoice
@@ -319,7 +337,7 @@ class GameLaunchDelegate @Inject constructor(
                     val info = localModifiedInfo!!
                     when (localModifiedChoice!!) {
                         LocalModifiedChoice.KEEP_LOCAL -> {
-                            android.util.Log.d("GameLaunchDelegate", "User chose to keep local save - caching and uploading as new authoritative version")
+                            com.nendo.argosy.util.PlatformLog.d("GameLaunchDelegate", "User chose to keep local save - caching and uploading as new authoritative version")
                             if (emulatorId != null) {
                                 val cacheResult = saveCacheManager.cacheCurrentSave(
                                     gameId = gameId,
@@ -327,7 +345,7 @@ class GameLaunchDelegate @Inject constructor(
                                     savePath = info.localSavePath,
                                     channelName = info.channelName
                                 )
-                                android.util.Log.d("GameLaunchDelegate", "Cache result after LocalModified keep: $cacheResult")
+                                com.nendo.argosy.util.PlatformLog.d("GameLaunchDelegate", "Cache result after LocalModified keep: $cacheResult")
                                 if (cacheResult is SaveCacheManager.CacheResult.Created) {
                                     activeSaveRepository.activateCache(gameId, cacheResult.cacheId)
                                 }
@@ -338,23 +356,23 @@ class GameLaunchDelegate @Inject constructor(
                                     channelName = info.channelName,
                                     forceOverwrite = true
                                 )
-                                android.util.Log.d("GameLaunchDelegate", "Upload after LocalModified keep: $uploadResult")
+                                com.nendo.argosy.util.PlatformLog.d("GameLaunchDelegate", "Upload after LocalModified keep: $uploadResult")
                             }
                         }
                         LocalModifiedChoice.RESTORE_SELECTED -> {
-                            android.util.Log.d("GameLaunchDelegate", "User chose to restore selected save - backing up local first")
+                            com.nendo.argosy.util.PlatformLog.d("GameLaunchDelegate", "User chose to restore selected save - backing up local first")
                             if (emulatorId != null) {
                                 saveCacheManager.cacheAsRollback(gameId, emulatorId, info.localSavePath)
                                 val downloadResult = saveSyncRepository.downloadSave(
                                     gameId, emulatorId, info.channelName,
                                     knownServerSaveId = info.serverSaveId
                                 )
-                                android.util.Log.d("GameLaunchDelegate", "Download result after LocalModified restore: $downloadResult")
+                                com.nendo.argosy.util.PlatformLog.d("GameLaunchDelegate", "Download result after LocalModified restore: $downloadResult")
                                 activeSaveRepository.setActiveSaveApplied(gameId, true)
                             }
                         }
                         LocalModifiedChoice.LAUNCH_WITHOUT_SYNC ->
-                            android.util.Log.d("GameLaunchDelegate", "User chose to launch with the save on disk; nothing uploaded")
+                            com.nendo.argosy.util.PlatformLog.d("GameLaunchDelegate", "User chose to launch with the save on disk; nothing uploaded")
                     }
                 }
 
@@ -600,7 +618,7 @@ class GameLaunchDelegate @Inject constructor(
         scope.launch {
             val game = gameRepository.getById(gameId)
             val ticket = launchProgressTracker.begin(game?.title) ?: run {
-                android.util.Log.d("GameLaunchDelegate", "launchSimple: another launch is in progress")
+                com.nendo.argosy.util.PlatformLog.d("GameLaunchDelegate", "launchSimple: another launch is in progress")
                 callbacks.onLaunchFailed()
                 return@launch
             }
@@ -613,7 +631,7 @@ class GameLaunchDelegate @Inject constructor(
                 }
                 val activeSession = playSessionTracker.activeSession.value
                 if (activeSession != null) {
-                    android.util.Log.d("GameLaunchDelegate", "launchSimple: ending session for game ${activeSession.gameId} before fresh launch")
+                    com.nendo.argosy.util.PlatformLog.d("GameLaunchDelegate", "launchSimple: ending session for game ${activeSession.gameId} before fresh launch")
                     endSessionAndAwaitConflictAnswer()
                     gameLauncher.forceStopEmulator(activeSession.emulatorPackage)
                     delay(EMULATOR_KILL_DELAY_MS)

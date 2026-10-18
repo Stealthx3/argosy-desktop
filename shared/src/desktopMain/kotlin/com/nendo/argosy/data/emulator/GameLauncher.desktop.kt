@@ -14,4 +14,7 @@ actual class GameLauncher @Inject constructor() {
     actual suspend fun buildInstallIntent(game: GameEntity, file: File): Intent? = null
 
     actual suspend fun buildBatchInstallIntent(game: GameEntity, files: List<File>): Intent? = null
+
+    actual suspend fun forceStopEmulator(packageName: String) {
+    }
 }

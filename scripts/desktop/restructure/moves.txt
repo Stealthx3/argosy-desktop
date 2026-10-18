@@ -1913,3 +1913,15 @@
 # Phase 2: back to androidMain (keep-in-app.txt gives the reason).
 [androidMain]
 + ui/screens/settings/sections/ShaderStackSection.kt
+
+# Phase 2: portable since the DisplayAffinityHelper and GameActivityStarter slices (was androidMain).
+[commonMain]
++ ui/screens/common/EmulatorLaunchTargetResolver.kt
++ ui/screens/common/GameLaunchDelegate.kt
++ ui/screens/common/GameStartRouter.kt
++ ui/screens/common/SessionEndCoordinator.kt
++ ui/screens/gamedetail/delegates/PerGameSettingsDelegate.kt
++ ui/screens/social/FeedOptionsDelegate.kt
++ ui/screens/social/FeedOptionsModal.kt
++ ui/screens/social/SocialScreen.kt
++ ui/screens/social/SocialViewModel.kt

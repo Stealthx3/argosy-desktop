@@ -1,6 +1,6 @@
 package com.nendo.argosy.ui.screens.social
 
-import com.nendo.argosy.shared.R
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.core.notification.NotificationText
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -44,19 +44,39 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.foundation.Image
-import androidx.compose.ui.graphics.asImageBitmap
+import com.nendo.argosy.platform.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import android.graphics.BitmapFactory
-import android.util.Base64
+import com.nendo.argosy.platform.PlatformBitmapFactory as BitmapFactory
+import com.nendo.argosy.platform.PlatformBase64 as Base64
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.platform.LocalContext
+import com.nendo.argosy.platform.LocalPlatformContext as LocalContext
+import com.nendo.argosy.platform.startActivity
+import com.nendo.argosy.platform.getApplicationInfo
+import com.nendo.argosy.platform.getApplicationLabel
+import com.nendo.argosy.platform.applicationContext
+import com.nendo.argosy.platform.packageName
+import com.nendo.argosy.platform.getSystemService
+import com.nendo.argosy.platform.getExternalFilesDir
+import com.nendo.argosy.platform.packageManager
+import com.nendo.argosy.platform.getPackageInfo
+import com.nendo.argosy.platform.versionName
+import com.nendo.argosy.platform.assets
+import com.nendo.argosy.platform.contentResolver
+import com.nendo.argosy.platform.getSharedPreferences
+import com.nendo.argosy.platform.list
+import com.nendo.argosy.platform.open
+import com.nendo.argosy.platform.cacheDir
+import com.nendo.argosy.platform.filesDir
+import com.nendo.argosy.platform.getQuantityString
+import com.nendo.argosy.platform.getString
+import com.nendo.argosy.platform.resources
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.pluralStringResource
-import androidx.compose.ui.res.stringResource
+import com.nendo.argosy.res.pluralStringResource
+import com.nendo.argosy.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
@@ -66,7 +86,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.lerp
-import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.zIndex
@@ -77,10 +97,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import com.nendo.argosy.di.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import coil.compose.AsyncImage
+import com.nendo.argosy.platform.image.AsyncImage
+import com.nendo.argosy.platform.image.bitmap
+import com.nendo.argosy.platform.image.intrinsicHeight
+import com.nendo.argosy.platform.image.intrinsicWidth
 import com.nendo.argosy.data.social.CommunityFollow
 import com.nendo.argosy.data.social.FeedEventDto
 import com.nendo.argosy.data.social.FeedEventType
@@ -1336,7 +1359,7 @@ private fun FeedEventCardFooter(
 
 private fun parseColor(hexColor: String): Color {
     return try {
-        Color(android.graphics.Color.parseColor(hexColor))
+        Color(com.nendo.argosy.platform.PlatformColor.parseColor(hexColor))
     } catch (e: Exception) {
         Color(0xFF6366F1)
     }

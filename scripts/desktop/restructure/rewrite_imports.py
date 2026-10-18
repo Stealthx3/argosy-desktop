@@ -192,10 +192,6 @@ RULES = [
         re.compile(r"^import android\.view\.KeyEvent$", re.M),
         "import com.nendo.argosy.platform.PlatformKeyEvent as KeyEvent\nimport com.nendo.argosy.core.input.AndroidKeyCodes",
     ),
-    (
-        re.compile(r"^import com\.nendo\.argosy\.util\.DisplayAffinityHelper$", re.M),
-        "import com.nendo.argosy.util.DualScreenDeviceInfo as DisplayAffinityHelper",
-    ),
 ]
 
 
@@ -263,6 +259,7 @@ COMPANION_IMPORTS = {
         "com.nendo.argosy.platform.flags", "com.nendo.argosy.platform.putExtra",
         "com.nendo.argosy.platform.component", "com.nendo.argosy.platform.`package`",
         "com.nendo.argosy.platform.getStringExtra", "com.nendo.argosy.platform.packageName",
+        "com.nendo.argosy.platform.className",
     ],
     "com.nendo.argosy.platform.PlatformInputEvent": [
         "com.nendo.argosy.platform.device", "com.nendo.argosy.platform.deviceId", "com.nendo.argosy.platform.eventTime",

@@ -38,6 +38,8 @@ expect class PlatformComponentName
 
 expect val PlatformComponentName.packageName: String
 
+expect val PlatformComponentName.className: String
+
 expect val PlatformIntentType.component: PlatformComponentName?
 
 expect val PlatformIntentType.`package`: String?

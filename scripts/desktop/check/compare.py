@@ -34,7 +34,12 @@ def timestamp(value):
         return None
 
 
-def advanced(before, after):
+EPOCH_MS_KEYS = {"emulator_update_last_check", "last_integrity_check_time"}
+
+
+def advanced(before, after, key=None):
+    if key in EPOCH_MS_KEYS and isinstance(before, int) and isinstance(after, int):
+        return after >= before
     b, a = timestamp(before), timestamp(after)
     return b is not None and a is not None and a >= b
 
@@ -85,7 +90,7 @@ def main():
         for k in sorted(set(b) | set(c)):
             if b.get(k) == c.get(k):
                 continue
-            (ds_moved if advanced(b.get(k), c.get(k)) else ds_diff).append(f"{name}:{k}")
+            (ds_moved if advanced(b.get(k), c.get(k), k) else ds_diff).append(f"{name}:{k}")
     keys = sum(len(v) for v in cand_ds.values())
     print(f"datastore: {'identical' if not ds_diff else 'DIFFERS in ' + ', '.join(ds_diff)} ({len(cand_ds)} files, {keys} keys)")
     if ds_moved:

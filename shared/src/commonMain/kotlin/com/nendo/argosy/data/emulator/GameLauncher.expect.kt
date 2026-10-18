@@ -10,12 +10,15 @@ import com.nendo.argosy.platform.component
 import com.nendo.argosy.platform.`package`
 import com.nendo.argosy.platform.getStringExtra
 import com.nendo.argosy.platform.packageName
+import com.nendo.argosy.platform.className
 import com.nendo.argosy.platform.PlatformIntent
 import com.nendo.argosy.data.local.entity.GameEntity
 import java.io.File
 
 expect class GameLauncher {
     suspend fun launch(gameId: Long, discId: Long? = null, forResume: Boolean = false, selectedDiscPath: String? = null, variantFileId: Long? = null, skipVariantPrompt: Boolean = false, allowVariantPrompt: Boolean = true, prefetchedGame: GameEntity? = null): LaunchResult
+
+    suspend fun forceStopEmulator(packageName: String)
 
     suspend fun buildInstallIntent(game: GameEntity, file: File): Intent?
 

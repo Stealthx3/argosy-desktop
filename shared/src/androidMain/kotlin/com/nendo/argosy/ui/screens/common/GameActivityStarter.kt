@@ -13,11 +13,11 @@ private const val TAG = "GameActivityStarter"
  * [appContext] as a new task when it is not. A request whose emulator the launch already started
  * is reported as started without a second start.
  */
-class GameActivityStarter(
+actual class GameActivityStarter actual constructor(
     private val appContext: Context,
     private val activityContext: () -> Context?
 ) {
-    fun start(request: GameLaunchRequest): Result<Unit> {
+    actual fun start(request: GameLaunchRequest): Result<Unit> {
         val intent = request.intent
         if (intent.getBooleanExtra(EXTRA_ALREADY_LAUNCHED, false)) return Result.success(Unit)
         val host = activityContext()?.takeIf { it.isLiveActivity() }

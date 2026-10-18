@@ -7,7 +7,7 @@ Dumps the device's save tables, or a RomM GET /api/saves response, as sorted JSO
   save_tables.py datastore <datastore.json> --normalize
 
 --normalize masks what legitimately differs between two runs from the same snapshot: clock values
-(columns or keys ending in At/_at, epoch-millisecond columns), the timestamps RomM puts in stored
+(columns or keys ending in At/_at, epoch-millisecond columns and DataStore keys), the timestamps RomM puts in stored
 file names, and the dated folder names of the device's save cache. Hashes, sizes, slots, channels,
 ids and flags are kept, so equal normalized output means equal save state.
 
@@ -25,6 +25,7 @@ TABLES = ["save_sync", "save_cache", "save_channels", "save_ownership", "pending
           "state_cache", "state_ownership", "state_tombstones", "sigil_sync_state"]
 STATE_TABLES = {"state_cache", "state_ownership", "state_tombstones"}
 CLOCK_KEY = re.compile(r"(At|_at)$")
+EPOCH_MS_KEYS = {"emulator_update_last_check", "last_integrity_check_time"}
 CLOCK_COLUMNS = {"cachedAt", "localUpdatedAt", "serverUpdatedAt", "lastSyncedAt", "createdAt",
                  "updatedAt", "userSelectedRestorePointAt", "corruptZipTimestamp"}
 STAMP = [
@@ -46,7 +47,7 @@ def mask(value):
 def normalize_row(row):
     out = {}
     for key, value in row.items():
-        if key in CLOCK_COLUMNS or CLOCK_KEY.search(key):
+        if key in CLOCK_COLUMNS or key in EPOCH_MS_KEYS or CLOCK_KEY.search(key):
             out[key] = None if value is None else "<clock>"
         elif isinstance(value, dict):
             out[key] = normalize_row(value)
