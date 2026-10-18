@@ -45,6 +45,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import com.nendo.argosy.platform.LocalPlatformContext as LocalContext
+import com.nendo.argosy.platform.externalCacheDir
+import com.nendo.argosy.platform.dataDir
 import com.nendo.argosy.platform.startActivity
 import com.nendo.argosy.platform.getApplicationInfo
 import com.nendo.argosy.platform.getApplicationLabel

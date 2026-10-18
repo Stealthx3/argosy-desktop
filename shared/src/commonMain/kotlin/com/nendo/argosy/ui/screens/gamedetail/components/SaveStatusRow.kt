@@ -20,6 +20,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import com.nendo.argosy.ui.theme.LocalLauncherTheme
 import com.nendo.argosy.platform.PlatformContext as Context
+import com.nendo.argosy.platform.externalCacheDir
+import com.nendo.argosy.platform.dataDir
 import com.nendo.argosy.platform.startActivity
 import com.nendo.argosy.platform.getApplicationInfo
 import com.nendo.argosy.platform.getApplicationLabel

@@ -12,6 +12,10 @@ actual fun PlatformContext.getSystemService(name: String): Any? = getSystemServi
 
 actual fun PlatformContext.getExternalFilesDir(type: String?): File? = getExternalFilesDir(type)
 
+actual val PlatformContext.externalCacheDir: File? get() = externalCacheDir
+
+actual val PlatformContext.dataDir: File get() = dataDir
+
 actual val PlatformContext.packageManager: PlatformPackageManager get() = packageManager
 
 actual typealias PlatformPackageManager = PackageManager

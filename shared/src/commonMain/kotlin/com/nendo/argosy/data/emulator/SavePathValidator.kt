@@ -28,6 +28,8 @@ import com.nendo.argosy.platform.getQuantityString
 import com.nendo.argosy.platform.getString
 import com.nendo.argosy.platform.resources
 import com.nendo.argosy.platform.startActivity
+import com.nendo.argosy.platform.externalCacheDir
+import com.nendo.argosy.platform.dataDir
 
 enum class PackageDataAccess {
     DIRECT,

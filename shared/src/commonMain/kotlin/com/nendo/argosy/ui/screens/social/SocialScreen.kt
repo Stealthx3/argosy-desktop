@@ -54,6 +54,8 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
 import com.nendo.argosy.platform.LocalPlatformContext as LocalContext
+import com.nendo.argosy.platform.externalCacheDir
+import com.nendo.argosy.platform.dataDir
 import com.nendo.argosy.platform.startActivity
 import com.nendo.argosy.platform.getApplicationInfo
 import com.nendo.argosy.platform.getApplicationLabel

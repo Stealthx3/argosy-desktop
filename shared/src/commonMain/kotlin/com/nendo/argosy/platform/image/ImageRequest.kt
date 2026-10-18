@@ -1,6 +1,8 @@
 package com.nendo.argosy.platform.image
 
 import com.nendo.argosy.platform.PlatformContext
+import com.nendo.argosy.platform.externalCacheDir
+import com.nendo.argosy.platform.dataDir
 import com.nendo.argosy.platform.startActivity
 import com.nendo.argosy.platform.getApplicationInfo
 import com.nendo.argosy.platform.getApplicationLabel

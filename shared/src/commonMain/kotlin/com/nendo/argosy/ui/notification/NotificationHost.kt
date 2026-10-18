@@ -72,6 +72,8 @@ import com.nendo.argosy.platform.versionName
 import com.nendo.argosy.platform.getApplicationInfo
 import com.nendo.argosy.platform.getApplicationLabel
 import com.nendo.argosy.platform.startActivity
+import com.nendo.argosy.platform.externalCacheDir
+import com.nendo.argosy.platform.dataDir
 
 private val PERSISTENT_BAR_HEIGHT = 52.dp  // Static: matches specific UI design spec
 private val FOOTER_CLEARANCE = 56.dp  // Static: matches specific UI design spec

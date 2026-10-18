@@ -54,6 +54,8 @@ import com.nendo.argosy.platform.versionName
 import com.nendo.argosy.platform.getApplicationInfo
 import com.nendo.argosy.platform.getApplicationLabel
 import com.nendo.argosy.platform.startActivity
+import com.nendo.argosy.platform.externalCacheDir
+import com.nendo.argosy.platform.dataDir
 
 private const val TAG = "SteamAuthManager"
 

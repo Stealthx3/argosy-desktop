@@ -8,6 +8,8 @@ import com.nendo.argosy.platform.applicationContext
 import com.nendo.argosy.platform.packageName
 import com.nendo.argosy.platform.getSystemService
 import com.nendo.argosy.platform.getExternalFilesDir
+import com.nendo.argosy.platform.externalCacheDir
+import com.nendo.argosy.platform.dataDir
 import com.nendo.argosy.platform.packageManager
 import com.nendo.argosy.platform.getPackageInfo
 import com.nendo.argosy.platform.versionName

@@ -1934,3 +1934,14 @@
 + ui/screens/savetimeline/SaveTimelineScreen.kt
 + ui/screens/settings/delegates/RASettingsDelegate.kt
 + ui/screens/settings/delegates/SyncSettingsDelegate.kt
+
+# Phase 2: portable since the externalCacheDir/dataDir stand-ins and the narrower Context guard (was androidMain).
+[commonMain]
++ ui/screens/gamedetail/components/GameDetailMenu.kt
++ ui/screens/savesync/SaveSyncPresentation.kt
++ ui/screens/savesync/SaveSyncScreen.kt
++ ui/screens/settings/components/EmulatorPickerPopup.kt
++ ui/screens/settings/delegates/DriversSettingsDelegate.kt
++ ui/screens/settings/delegates/StorageSettingsDelegate.kt
++ ui/screens/settings/libretro/LibretroSettingsSection.kt
++ ui/screens/settings/menu/SettingsLayout.kt

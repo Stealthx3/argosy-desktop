@@ -90,12 +90,13 @@ GENERATED = (
 CONTEXT_MEMBERS = (
     r"(?!getString\b|resources\b|filesDir\b|cacheDir\b|assets\b|getSharedPreferences\b|contentResolver\b"
     r"|packageName\b|applicationContext\b|getSystemService\b|getExternalFilesDir\b|packageManager\b|preferencesDataStoreFile\b"
-    r"|startActivity\b|openStorageAccessSettings\b)[a-zA-Z_]\w*"
+    r"|startActivity\b|openStorageAccessSettings\b|externalCacheDir\b|dataDir\b"
+    r"|let\b|also\b|run\b|apply\b|takeIf\b|takeUnless\b)[a-zA-Z_]\w*"
 )
 CONTEXT_REST = (
     r"\.resources\.(?!getQuantityString\b|getString\b)\w+"
     r"|LocalContext\.current\." + CONTEXT_MEMBERS
-    + r"|\.assets\.(?!list\b|open\b)\w+"
+    + r"|\b(?:context|ctx|appContext|applicationContext|baseContext|current)\??\.assets\.(?!list\b|open\b)\w+"
     r"|\bcontentResolver\.\w+"
     r"|(?<![\w.])Context\.(?!MODE_PRIVATE\b|CONNECTIVITY_SERVICE\b|USER_SERVICE\b)[A-Z]\w*"
     r"|\bpackageManager\.(?!getPackageInfo\b|getApplicationInfo\b|getApplicationLabel\b)\w+"
@@ -113,6 +114,7 @@ CONTEXT_DECLARED = re.compile(
 
 CONTEXT_NAMES = ("context", "ctx", "appContext", "applicationContext", "baseContext")
 ANY_DECLARED = re.compile(r"\b(\w+)\s*:\s*([\w.]+)")
+LOCAL_CONTEXT_EXTENSIONS = re.compile(r"\bfun\s+(?:android\.content\.|com\.nendo\.argosy\.platform\.Platform)?Context\.(\w+)")
 
 
 class ContextGuard:
@@ -123,7 +125,9 @@ class ContextGuard:
         names = {a or b for a, b in CONTEXT_DECLARED.findall(body)}
         other = {n for n, t in ANY_DECLARED.findall(body) if not re.fullmatch(r"(?:android\.content\.|com\.nendo\.argosy\.platform\.Platform)?Context", t)}
         names |= {n for n in CONTEXT_NAMES if n not in other}
-        declared = re.compile(r"\b(?:" + "|".join(sorted(names)) + r")\??\." + CONTEXT_MEMBERS)
+        local = set(LOCAL_CONTEXT_EXTENSIONS.findall(body))
+        own = r"(?!(?:" + "|".join(sorted(local)) + r")\b)" if local else ""
+        declared = re.compile(r"\b(?:" + "|".join(sorted(names)) + r")\??\." + own + CONTEXT_MEMBERS)
         return declared.search(body) or self.rest.search(body)
 GUARDED_REWRITES = {
     "android.content.Context": ContextGuard(),
@@ -236,6 +240,7 @@ GUARDED_REWRITES = {
     "android.app.Application": re.compile(
         r"\b(?:application|app)\??\.(?!contentResolver\b|filesDir\b|cacheDir\b|getString\b|resources\b|packageName\b"
         r"|applicationContext\b|getSharedPreferences\b|getSystemService\b|getExternalFilesDir\b|packageManager\b|assets\b"
+        r"|externalCacheDir\b|dataDir\b"
         r"|openStorageAccessSettings\b)\w+"
         r"|\bApplication\.\w+"
     ),

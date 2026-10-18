@@ -70,6 +70,8 @@ import com.nendo.argosy.platform.getQuantityString
 import com.nendo.argosy.platform.getString
 import com.nendo.argosy.platform.resources
 import com.nendo.argosy.platform.startActivity
+import com.nendo.argosy.platform.externalCacheDir
+import com.nendo.argosy.platform.dataDir
 
 private const val JUST_SYNCED_THRESHOLD_MINUTES = 30L
 private const val ACTIVITY_CALENDAR_DAYS = 84

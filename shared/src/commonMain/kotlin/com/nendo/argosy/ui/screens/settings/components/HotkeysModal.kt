@@ -98,6 +98,8 @@ import com.nendo.argosy.platform.contentResolver
 import com.nendo.argosy.platform.getSharedPreferences
 import com.nendo.argosy.platform.list
 import com.nendo.argosy.platform.open
+import com.nendo.argosy.platform.externalCacheDir
+import com.nendo.argosy.platform.dataDir
 
 private val HOTKEY_ACTIONS = listOf(
     HotkeyAction.IN_GAME_MENU,

@@ -12,6 +12,10 @@ actual fun PlatformContext.getSystemService(name: String): Any? = when (name) {
 actual fun PlatformContext.getExternalFilesDir(type: String?): File? =
     filesDir.resolveSibling("external").let { if (type == null) it else it.resolve(type) }.also { it.mkdirs() }
 
+actual val PlatformContext.externalCacheDir: File? get() = cacheDir.resolveSibling("external-cache").also { it.mkdirs() }
+
+actual val PlatformContext.dataDir: File get() = filesDir.parentFile
+
 actual val PlatformContext.packageManager: PlatformPackageManager get() = DesktopPackageManager
 
 actual abstract class PlatformPackageManager

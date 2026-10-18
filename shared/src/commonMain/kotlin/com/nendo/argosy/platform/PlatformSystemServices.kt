@@ -12,6 +12,10 @@ expect fun PlatformContext.getSystemService(name: String): Any?
 
 expect fun PlatformContext.getExternalFilesDir(type: String?): File?
 
+expect val PlatformContext.externalCacheDir: File?
+
+expect val PlatformContext.dataDir: File
+
 expect val PlatformContext.packageManager: PlatformPackageManager
 
 expect abstract class PlatformPackageManager
