@@ -82,6 +82,7 @@ fun GameEntity.toGameDetailUi(
         canManageStates = canManageStates,
         isSteamGame = isSteamGame,
         steamLauncherName = steamLauncherName,
+        steamLauncherSetManually = launcherSetManually,
         isExternallyManaged = isExternallyManaged,
         managingLauncherDisplayName = steamLauncher
             ?.takeIf { it != GameEntity.LAUNCHER_UNSPECIFIED }

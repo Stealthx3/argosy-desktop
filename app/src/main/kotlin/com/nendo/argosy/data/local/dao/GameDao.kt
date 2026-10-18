@@ -534,6 +534,27 @@ interface GameDao {
     @Query("UPDATE games SET steamLauncher = :launcherPackage WHERE id = :gameId")
     suspend fun setSteamLauncher(gameId: Long, launcherPackage: String?)
 
+    @Query("UPDATE games SET launcherSetManually = 0 WHERE id = :gameId AND source = 'STEAM'")
+    suspend fun clearSteamLauncherPin(gameId: Long)
+
+    @Query("""
+        UPDATE games SET steamLauncher = :launcher, launcherSetManually = :setManually
+        WHERE id = :gameId AND source = 'STEAM'
+          AND steamLauncher IS :expectedLauncher AND launcherSetManually = :expectedManually
+          AND id NOT IN (
+              SELECT gameId FROM game_user_overlay
+              WHERE ownerUserId = :ownerUserId AND isMember = 0
+          )
+    """)
+    suspend fun compareAndSetSteamLauncher(
+        gameId: Long,
+        expectedLauncher: String?,
+        expectedManually: Boolean,
+        launcher: String?,
+        setManually: Boolean,
+        ownerUserId: Long?
+    ): Int
+
     /**
      * Every caller states where the file came from: a download completion writes its download
      * origin, a scan writes ADOPTED, and a repair that re-points the same content passes the

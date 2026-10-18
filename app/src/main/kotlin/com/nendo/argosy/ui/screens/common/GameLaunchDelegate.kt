@@ -516,7 +516,12 @@ class GameLaunchDelegate @Inject constructor(
                 NotificationText.Res(R.string.notif_gamelaunch_no_rom_file)
             )
             is LaunchResult.NoSteamLauncher -> notificationManager.showError(
-                NotificationText.Res(R.string.notif_gamelaunch_no_steam_launcher)
+                NotificationText.Res(when (result.reason) {
+                    LaunchResult.NoSteamLauncher.Reason.CONFIGURED_MISSING -> R.string.notif_gamelaunch_no_steam_launcher
+                    LaunchResult.NoSteamLauncher.Reason.NONE_INSTALLED -> R.string.notif_gamelaunch_no_steam_launcher_installed
+                    LaunchResult.NoSteamLauncher.Reason.NO_REPORTED_REPLACEMENT -> R.string.notif_gamelaunch_steam_launcher_unavailable
+                    LaunchResult.NoSteamLauncher.Reason.UPDATING -> R.string.notif_gamelaunch_steam_launcher_updating
+                })
             )
             is LaunchResult.NoCore -> {
                 val message = result.reason?.let {

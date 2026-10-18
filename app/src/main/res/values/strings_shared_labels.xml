@@ -202,6 +202,7 @@
 
     <!-- The Steam launcher picker's default option: let the app choose which installed launcher opens the game, rather than a specific one the player pinned. -->
     <string name="gamedetail_steam_launcher_auto">Auto</string>
+    <string name="gamedetail_steam_launcher_auto_uses">Uses %1$s</string>
 
     <!-- ================= Memcard picker "use the inherited default" entry ================= -->
 

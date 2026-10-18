@@ -590,6 +590,9 @@ fun SettingsScreen(
                 if (viewModel.uiState.value.currentSection == SettingsSection.PLATFORMS) {
                     viewModel.refreshEmulators()
                 }
+                if (viewModel.uiState.value.currentSection == SettingsSection.STEAM_SETTINGS) {
+                    viewModel.refreshSteamSettings()
+                }
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)

@@ -325,6 +325,9 @@
     <string name="notif_gamelaunch_no_emulator">No emulator installed for this platform</string>
     <string name="notif_gamelaunch_no_rom_file">ROM file not found</string>
     <string name="notif_gamelaunch_no_steam_launcher">Steam launcher not installed</string>
+    <string name="notif_gamelaunch_no_steam_launcher_installed">No Steam launcher installed. Install one in Settings &gt; Steam.</string>
+    <string name="notif_gamelaunch_steam_launcher_unavailable">Steam launcher unavailable. Choose a launcher in game details &gt; Change Launcher.</string>
+    <string name="notif_gamelaunch_steam_launcher_updating">Launcher updating. Try again in a moment.</string>
     <!-- %1$s is the platform slug (untranslated, upstream identifier). -->
     <string name="notif_gamelaunch_no_core_base">No core available for %1$s</string>
     <!-- %1$s is the platform slug (untranslated, upstream identifier), %2$s is the

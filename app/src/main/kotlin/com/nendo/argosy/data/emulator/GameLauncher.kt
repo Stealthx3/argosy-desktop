@@ -81,7 +81,12 @@ sealed class LaunchResult {
     ) : LaunchResult()
     data class NoEmulator(val platformSlug: String) : LaunchResult()
     data class NoRomFile(val gamePath: String?) : LaunchResult()
-    data class NoSteamLauncher(val launcherPackage: String) : LaunchResult()
+    data class NoSteamLauncher(
+        val launcherPackage: String,
+        val reason: Reason = Reason.CONFIGURED_MISSING
+    ) : LaunchResult() {
+        enum class Reason { CONFIGURED_MISSING, NONE_INSTALLED, NO_REPORTED_REPLACEMENT, UPDATING }
+    }
     data class NoAndroidApp(val packageName: String) : LaunchResult()
     data class NoCore(val platformSlug: String, val reason: String? = null) : LaunchResult()
     data class MissingDiscs(val missingDiscNumbers: List<Int>) : LaunchResult()
@@ -127,7 +132,8 @@ class GameLauncher @Inject constructor(
     private val dreamcastVmuMigrator: DreamcastVmuMigrator,
     private val volumeHealth: StorageVolumeHealth,
     private val launchProgressTracker: LaunchProgressTracker,
-    private val steamInstallReports: SteamInstallReports
+    private val steamInstallReports: SteamInstallReports,
+    private val appsRepository: com.nendo.argosy.data.repository.AppsRepository
 ) {
     private val shellAmAvailable: Boolean by lazy {
         try {
@@ -617,52 +623,74 @@ class GameLauncher @Inject constructor(
         )
     }
 
-    private suspend fun launchSteamGame(game: GameEntity): LaunchResult {
-        Logger.debug(TAG, "launchSteamGame(): steamAppId=${game.steamAppId}, launcher=${game.steamLauncher}")
+    private suspend fun launchSteamGame(initialGame: GameEntity): LaunchResult {
+        Logger.debug(TAG, "launchSteamGame(): steamAppId=${initialGame.steamAppId}, launcher=${initialGame.steamLauncher}")
 
-        val steamAppId = game.steamAppId
+        val steamAppId = initialGame.steamAppId
             ?: return LaunchResult.Error("Steam game missing app ID").also {
                 Logger.warn(TAG, "launchSteamGame() failed: missing steamAppId")
             }
 
-        val storedPackage = game.steamLauncher?.takeIf { it != GameEntity.LAUNCHER_UNSPECIFIED }
-        val pinned = game.launcherSetManually && storedPackage != null
-        val choices = SteamLaunchers.launchChoices(
-            pinned = pinned,
-            reporting = if (pinned) emptyList() else steamInstallReports.launchersReporting(steamAppId),
-            isInstalled = { pkg -> SteamLaunchers.getByPackage(pkg)?.isInstalled(context) == true }
-        )
-        val ticket = launchProgressTracker.current
-        val promptedPackage = if (choices.isNotEmpty() && ticket != null) {
-            val answer = ticket.chooseLauncher(choices.mapNotNull(SteamLaunchers::promptOptionFor))
-                ?: return LaunchResult.Cancelled.also {
-                    Logger.info(TAG, "launchSteamGame(): launcher choice cancelled for appId=$steamAppId")
-                }
-            SteamLaunchers.forPromptOption(answer)?.packageName
-        } else {
-            null
-        }
-        val chosenPackage = promptedPackage ?: storedPackage
-
-        val launcher = if (chosenPackage != null) {
-            SteamLaunchers.getByPackage(chosenPackage) ?: GameNativeLauncher
-        } else {
-            SteamLaunchers.getPreferred(context) ?: GameNativeLauncher
-        }
-
-        if (!launcher.isInstalled(context)) {
-            return LaunchResult.NoSteamLauncher(launcher.packageName).also {
-                Logger.warn(TAG, "launchSteamGame() failed: ${launcher.displayName} not installed")
+        val ownerUserId = userPreferencesRepository.userPreferences.first().rommUserId
+        var game = initialGame
+        repeat(2) {
+            val storedPackage = game.steamLauncher?.takeIf { it != GameEntity.LAUNCHER_UNSPECIFIED }
+            if (storedPackage != null && appsRepository.isPackageUpdating(storedPackage)) {
+                return LaunchResult.NoSteamLauncher(storedPackage, LaunchResult.NoSteamLauncher.Reason.UPDATING)
             }
+            if (storedPackage != null && game.launcherSetManually && appsRepository.isPackageMissing(storedPackage)) {
+                if (userPreferencesRepository.userPreferences.first().rommUserId != ownerUserId) return LaunchResult.Cancelled
+                if (gameDao.compareAndSetSteamLauncher(game.id, storedPackage, true, storedPackage, false, ownerUserId) == 0) {
+                    game = gameDao.getById(game.id) ?: return LaunchResult.Cancelled
+                    return@repeat
+                }
+                game = game.copy(launcherSetManually = false)
+            }
+            val pinned = game.launcherSetManually && storedPackage != null
+            val candidates = SteamLaunchers.launchCandidates(
+                storedPackage = storedPackage,
+                pinned = pinned,
+                reporting = if (pinned) emptyList() else steamInstallReports.launchersReporting(steamAppId),
+                isInstalled = { pkg ->
+                    runCatching { SteamLaunchers.getByPackage(pkg)?.isInstalled(context) == true }.getOrDefault(false)
+                }
+            )
+            if (candidates.isEmpty()) {
+                val installed = SteamLaunchers.all.any { runCatching { it.isInstalled(context) }.getOrDefault(false) }
+                return LaunchResult.NoSteamLauncher(
+                    storedPackage.orEmpty(),
+                    if (installed) LaunchResult.NoSteamLauncher.Reason.NO_REPORTED_REPLACEMENT
+                    else LaunchResult.NoSteamLauncher.Reason.NONE_INSTALLED
+                )
+            }
+            val replacement = candidates.singleOrNull()
+            if (storedPackage != null && replacement != null && replacement != storedPackage &&
+                !game.launcherSetManually && appsRepository.isPackageMissing(storedPackage)
+            ) {
+                if (userPreferencesRepository.userPreferences.first().rommUserId != ownerUserId) return LaunchResult.Cancelled
+                if (gameDao.compareAndSetSteamLauncher(game.id, storedPackage, false, replacement, false, ownerUserId) == 0) {
+                    game = gameDao.getById(game.id) ?: return LaunchResult.Cancelled
+                    return@repeat
+                }
+            }
+            val chosenPackage = if (candidates.size > 1) {
+                val ticket = launchProgressTracker.current ?: return LaunchResult.Cancelled
+                val answer = ticket.chooseLauncher(candidates.mapNotNull(SteamLaunchers::promptOptionFor))
+                    ?: return LaunchResult.Cancelled
+                SteamLaunchers.forPromptOption(answer)?.packageName ?: return LaunchResult.Cancelled
+            } else candidates.single()
+            val launcher = SteamLaunchers.getByPackage(chosenPackage) ?: return LaunchResult.Cancelled
+            if (userPreferencesRepository.userPreferences.first().rommUserId != ownerUserId) return LaunchResult.Cancelled
+            if (!runCatching { launcher.isInstalled(context) }.getOrDefault(false)) {
+                return LaunchResult.NoSteamLauncher(chosenPackage, LaunchResult.NoSteamLauncher.Reason.NO_REPORTED_REPLACEMENT)
+            }
+            val intent = launcher.createLaunchIntent(steamAppId)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            overlayWriter.recordPlayStart(game.id, Instant.now())
+            Logger.info(TAG, "Launching Steam: appId=$steamAppId via ${launcher.displayName}")
+            return LaunchResult.Success(intent)
         }
-
-        val intent = launcher.createLaunchIntent(steamAppId)
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-
-        overlayWriter.recordPlayStart(game.id, Instant.now())
-
-        Logger.info(TAG, "Launching Steam: appId=$steamAppId via ${launcher.displayName}")
-        return LaunchResult.Success(intent)
+        return LaunchResult.Cancelled
     }
 
     private suspend fun launchAndroidApp(game: GameEntity): LaunchResult {
