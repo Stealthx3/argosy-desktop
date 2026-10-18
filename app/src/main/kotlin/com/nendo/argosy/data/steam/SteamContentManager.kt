@@ -182,7 +182,7 @@ class SteamContentManager @Inject constructor(
                 // Clear localPath if it points to staging so game doesn't appear installed
                 gameDao.getBySteamAppId(entity.appId)?.let { game ->
                     if (game.localPath?.contains(AppPaths.STEAM_STAGING_DIR) == true) {
-                        gameDao.update(game.copy(localPath = null))
+                        gameDao.updateLocalPath(game.id, null, game.source, game.fileOrigin, game.addedAt)
                     }
                 }
             }
@@ -249,15 +249,15 @@ class SteamContentManager @Inject constructor(
                     state = SteamDownloadDbState.PAUSED.name,
                     errorReason = null
                 ))
-                gameDao.update(game.copy(localPath = null))
+                gameDao.updateLocalPath(game.id, null, game.source, game.fileOrigin, game.addedAt)
             } else {
                 Log.d(TAG, "Clearing stale staging path for ${game.title}")
-                gameDao.update(game.copy(localPath = null))
+                gameDao.updateLocalPath(game.id, null, game.source, game.fileOrigin, game.addedAt)
             }
         }
     }
 
-    private suspend fun resumeInterruptedDeploy(entity: SteamDownloadQueueEntity) {
+    internal suspend fun resumeInterruptedDeploy(entity: SteamDownloadQueueEntity) {
         val appId = entity.appId
         val gameName = entity.gameName
         val stagingDir = AppPaths.steamStagingDir(context.filesDir, appId)
@@ -277,12 +277,12 @@ class SteamContentManager @Inject constructor(
             if (stagingDir.exists()) stagingDir.deleteRecursively()
             gameDao.getBySteamAppId(appId)?.let { game ->
                 if (game.localPath != finalDir.absolutePath) {
-                    gameDao.update(
-                        game.copy(
-                            localPath = finalDir.absolutePath,
-                            fileOrigin = FileOrigin.STEAM_DOWNLOAD,
-                            source = GameSource.STEAM
-                        )
+                    gameDao.updateLocalPath(
+                        gameId = game.id,
+                        path = finalDir.absolutePath,
+                        source = GameSource.STEAM,
+                        fileOrigin = FileOrigin.STEAM_DOWNLOAD,
+                        addedAt = game.addedAt
                     )
                 }
             }
@@ -333,12 +333,13 @@ class SteamContentManager @Inject constructor(
                     }
 
                     gameDao.getBySteamAppId(appId)?.let { game ->
-                        gameDao.update(game.copy(
-                            localPath = finalDir.absolutePath,
-                            fileOrigin = FileOrigin.STEAM_DOWNLOAD,
+                        gameDao.updateLocalPath(
+                            gameId = game.id,
+                            path = finalDir.absolutePath,
                             source = GameSource.STEAM,
+                            fileOrigin = FileOrigin.STEAM_DOWNLOAD,
                             addedAt = java.time.Instant.now()
-                        ))
+                        )
                     }
                     File(finalDir, ".download_complete").createNewFile()
                     File(finalDir, ".download_in_progress").delete()
@@ -412,7 +413,7 @@ class SteamContentManager @Inject constructor(
         for (entity in pending) {
             gameDao.getBySteamAppId(entity.appId)?.let { game ->
                 if (game.localPath?.contains(AppPaths.STEAM_STAGING_DIR) == true) {
-                    gameDao.update(game.copy(localPath = null))
+                    gameDao.updateLocalPath(game.id, null, game.source, game.fileOrigin, game.addedAt)
                 }
             }
             downloadTracker.clearForApp(entity.appId)
@@ -790,7 +791,9 @@ class SteamContentManager @Inject constructor(
                 // Store install path so restore/cleanup can find it
                 gameDao.getBySteamAppId(appId)?.let { game ->
                     if (game.localPath != installDir.absolutePath) {
-                        gameDao.update(game.copy(localPath = installDir.absolutePath))
+                        gameDao.updateLocalPath(
+                            game.id, installDir.absolutePath, game.source, game.fileOrigin, game.addedAt
+                        )
                     }
                 }
 
@@ -1123,12 +1126,13 @@ class SteamContentManager @Inject constructor(
 
                 // Files already at destination -- finalize
                 gameDao.getBySteamAppId(appId)?.let { game ->
-                    gameDao.update(game.copy(
-                        localPath = installDir.absolutePath,
-                        fileOrigin = FileOrigin.STEAM_DOWNLOAD,
+                    gameDao.updateLocalPath(
+                        gameId = game.id,
+                        path = installDir.absolutePath,
                         source = GameSource.STEAM,
+                        fileOrigin = FileOrigin.STEAM_DOWNLOAD,
                         addedAt = java.time.Instant.now()
-                    ))
+                    )
                 }
                 steamDownloadQueueDao.updateInstallPath(appId, installDir.absolutePath)
                 steamDownloadQueueDao.updateState(appId, SteamDownloadDbState.COMPLETED.name)
@@ -1184,7 +1188,7 @@ class SteamContentManager @Inject constructor(
                 gameDao.getBySteamAppId(appId)?.let { game ->
                     val path = game.localPath
                     if (path != null && !File(path, ".download_complete").exists()) {
-                        gameDao.update(game.copy(localPath = null))
+                        gameDao.updateLocalPath(game.id, null, game.source, game.fileOrigin, game.addedAt)
                     }
                 }
                 scope.launch(Dispatchers.IO) {
@@ -1236,7 +1240,7 @@ class SteamContentManager @Inject constructor(
                 val installPath = game?.localPath
 
                 if (game != null && installPath != null) {
-                    gameDao.update(game.copy(localPath = null))
+                    gameDao.updateLocalPath(game.id, null, game.source, game.fileOrigin, game.addedAt)
                 }
 
                 kotlinx.coroutines.delay(3000)
@@ -1654,7 +1658,7 @@ class SteamContentManager @Inject constructor(
 
         gameDao.getBySteamAppId(appId)?.let { game ->
             if (game.localPath != null) {
-                gameDao.update(game.copy(localPath = null))
+                gameDao.updateLocalPath(game.id, null, game.source, game.fileOrigin, game.addedAt)
                 Log.d(TAG, "Cleared local path in database for ${game.title}")
             }
         }

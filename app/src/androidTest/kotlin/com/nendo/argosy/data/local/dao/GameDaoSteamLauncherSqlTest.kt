@@ -6,6 +6,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.nendo.argosy.data.local.ALauncherDatabase
 import com.nendo.argosy.data.local.entity.GameEntity
 import com.nendo.argosy.data.local.entity.GameUserOverlayEntity
+import com.nendo.argosy.data.model.FileOrigin
 import com.nendo.argosy.data.model.GameSource
 import com.nendo.argosy.data.platform.LocalPlatformIds
 import com.nendo.argosy.data.platform.PlatformDefinitions
@@ -132,5 +133,20 @@ class GameDaoSteamLauncherSqlTest {
         dao.update(unassigned)
         dao.updateSteamInstallInfo(1, null)
         assertEquals(unassigned.copy(steamLauncher = "native"), dao.getById(1))
+    }
+
+    @Test
+    fun download_path_updates_preserve_retired_preferences_and_game_state() = runBlocking {
+        val dao = db.gameDao()
+        assertEquals(1, dao.compareAndSetSteamLauncher(1, gameNative, true, droidDeck, false, 10))
+        val retired = dao.getById(1)!!.copy(playCount = 8, saveId = "current-save")
+        dao.update(retired)
+
+        dao.updateLocalPath(1, "/download/install", GameSource.STEAM, FileOrigin.STEAM_DOWNLOAD, retired.addedAt)
+        val completed = retired.copy(localPath = "/download/install", fileOrigin = FileOrigin.STEAM_DOWNLOAD)
+        assertEquals(completed, dao.getById(1))
+
+        dao.updateLocalPath(1, null, completed.source, completed.fileOrigin, completed.addedAt)
+        assertEquals(completed.copy(localPath = null), dao.getById(1))
     }
 }
