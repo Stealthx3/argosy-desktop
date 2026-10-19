@@ -38,6 +38,8 @@ import com.nendo.argosy.ui.coil.AppIconFetcher
 import dagger.hilt.android.HiltAndroidApp
 import okhttp3.OkHttpClient
 import com.nendo.argosy.util.SafeCoroutineScope
+import com.nendo.argosy.util.Logger
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -197,13 +199,7 @@ class ArgosyApp : Application(), Configuration.Provider, ImageLoaderFactory {
         CoreUpdateCheckWorker.schedule(this)
         com.nendo.argosy.data.quaypass.QuayPassCredentialRefreshWorker.schedule(this)
         ProcessLifecycleOwner.get().lifecycle.addObserver(foregroundObserver)
-        appScope.launch {
-            appsRepository.packageChanges.collect { packageName ->
-                if (SteamLaunchers.getByPackage(packageName) != null) {
-                    gameNativeStoreSync.refreshSteamInstallations()
-                }
-            }
-        }
+        appScope.launch { observeSteamPackageChanges() }
         saveSyncDownloadObserver.start()
         cheatsDownloadObserver.start()
         titleIdDownloadObserver.start()
@@ -256,6 +252,20 @@ class ArgosyApp : Application(), Configuration.Provider, ImageLoaderFactory {
      * Brings stored platform order back in line with the built-in one, unless the user has arranged
      * it themselves, in which case their order is what should survive a relaunch.
      */
+    internal suspend fun observeSteamPackageChanges() {
+        appsRepository.packageChanges.collect { packageName ->
+            if (SteamLaunchers.getByPackage(packageName) != null) {
+                try {
+                    gameNativeStoreSync.refreshSteamInstallations()
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    Logger.error("ArgosyApp", "Failed to refresh Steam installations after package change", e)
+                }
+            }
+        }
+    }
+
     private fun syncPlatformSortOrders() {
         appScope.launch {
             if (appPreferencesRepository.isPlatformOrderCustomised()) return@launch
