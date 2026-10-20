@@ -143,6 +143,9 @@ bool Video::tryBuildShaderChain(const ShaderManager::Chain& shaders, std::vector
         shader.gFrameCountHandle = glGetUniformLocation(shader.gProgram, "FrameCount");
         shader.gFrameDirectionHandle = glGetUniformLocation(shader.gProgram, "FrameDirection");
         shader.gMVPMatrixHandle = glGetUniformLocation(shader.gProgram, "MVPMatrix");
+        shader.gGyroscopeHandle = glGetUniformLocation(shader.gProgram, "Gyroscope");
+        shader.gAccelerometerHandle = glGetUniformLocation(shader.gProgram, "Accelerometer");
+        shader.gAccelerometerRestHandle = glGetUniformLocation(shader.gProgram, "AccelerometerRest");
 
         outChain.push_back(shader);
     }
@@ -190,6 +193,20 @@ void Video::updateProgram() {
 
     shadersChain = std::move(newChain);
     renderer->setShaders(shaders);
+    shaderSensorUsage = 0;
+    for (const auto& shader : shadersChain) {
+        if (shader.gAccelerometerHandle != -1 || shader.gAccelerometerRestHandle != -1)
+            shaderSensorUsage |= SENSOR_ACCELEROMETER;
+        if (shader.gGyroscopeHandle != -1)
+            shaderSensorUsage |= SENSOR_ACCELEROMETER | SENSOR_GYROSCOPE;
+    }
+}
+
+int Video::prepareShaderAndGetSensorUsage() {
+    bool shaderPending = !loadedShaderType.has_value() || !(loadedShaderType.value() == requestedShaderConfig);
+    updateProgram();
+    if (shaderPending) isDirty = true;
+    return shaderSensorUsage;
 }
 
 void Video::renderFrame(bool force) {
@@ -313,6 +330,12 @@ void Video::renderFrame(bool force) {
 
         if (shader.gFrameDirectionHandle != -1)
             glUniform1i(shader.gFrameDirectionHandle, 1);
+        if (shader.gGyroscopeHandle != -1)
+            glUniform3fv(shader.gGyroscopeHandle, 1, shaderSensorState.data());
+        if (shader.gAccelerometerHandle != -1)
+            glUniform3fv(shader.gAccelerometerHandle, 1, shaderSensorState.data() + 3);
+        if (shader.gAccelerometerRestHandle != -1)
+            glUniform3fv(shader.gAccelerometerRestHandle, 1, shaderSensorState.data() + 6);
 
         if (shader.gMVPMatrixHandle != -1) {
             static const GLfloat identity[16] = {
@@ -569,6 +592,12 @@ void Video::setIntegerScaling(bool enabled) {
 
 void Video::setTextureCrop(float left, float top, float right, float bottom) {
     videoLayout.setTextureCrop(left, top, right, bottom);
+}
+
+void Video::setShaderSensorState(const std::array<float, 9>& state) {
+    if (shaderSensorState == state) return;
+    shaderSensorState = state;
+    if (shaderSensorUsage != 0) isDirty = true;
 }
 
 void Video::setBlackFrameInsertion(bool enabled) {

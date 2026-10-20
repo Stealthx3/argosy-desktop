@@ -39,6 +39,9 @@ public class LibretroDroid {
     public static final int SHADER_UPSCALE_CUT3 = 6;
     public static final int SHADER_CUSTOM = 100;
 
+    public static final int SHADER_SENSOR_ACCELEROMETER = 1;
+    public static final int SHADER_SENSOR_GYROSCOPE = 2;
+
     public static final String SHADER_UPSCALE_CUT_PARAM_USE_DYNAMIC_BLEND = "USE_DYNAMIC_BLEND";
     public static final String SHADER_UPSCALE_CUT_PARAM_BLEND_MIN_CONTRAST_EDGE = "BLEND_MIN_CONTRAST_EDGE";
     public static final String SHADER_UPSCALE_CUT_PARAM_BLEND_MAX_CONTRAST_EDGE = "BLEND_MAX_CONTRAST_EDGE";
@@ -130,6 +133,12 @@ public class LibretroDroid {
     public static native void setPitchPreservationEnabled(boolean enabled);
     public static native void setAudioVolume(float volume);
     public static native void setShaderConfig(GLRetroShader shader);
+    public static native int prepareShaderAndGetSensorUsage();
+    public static native void setShaderSensorState(
+        float gyroX, float gyroY, float gyroZ,
+        float accelX, float accelY, float accelZ,
+        float restX, float restY, float restZ
+    );
     public static native void setFilterMode(int mode);
     public static native void setIntegerScaling(boolean enabled);
     public static native void setBlackFrameInsertion(boolean enabled);

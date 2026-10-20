@@ -49,6 +49,43 @@ class GLRetroView(
     private val data: GLRetroViewData
 ) : GLSurfaceView(context), DefaultLifecycleObserver {
 
+    private val shaderSensors = ShaderSensors(context)
+    private var sensorsResumed = false
+    private var shaderSensorUsage = 0
+
+    private fun updateShaderSensors() {
+        val active = sensorsResumed && !isDestroyed && isAttachedToWindow && hasWindowFocus()
+        shaderSensors.setRequiredSensors(if (active) shaderSensorUsage else 0)
+    }
+
+    private fun prepareShaderAndUpdateSensors() {
+        val usage = LibretroDroid.prepareShaderAndGetSensorUsage()
+        KtUtils.runOnUIThread {
+            shaderSensorUsage = usage
+            updateShaderSensors()
+        }
+    }
+
+    override fun onResume(owner: LifecycleOwner) {
+        sensorsResumed = true
+        updateShaderSensors()
+    }
+
+    override fun onPause(owner: LifecycleOwner) {
+        sensorsResumed = false
+        updateShaderSensors()
+    }
+
+    override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
+        super.onWindowFocusChanged(hasWindowFocus)
+        updateShaderSensors()
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        updateShaderSensors()
+    }
+
     var audioEnabled: Boolean by Delegates.observable(true) { _, _, value ->
         LibretroDroid.setAudioEnabled(value)
     }
@@ -71,13 +108,19 @@ class GLRetroView(
 
     var shader: ShaderConfig by Delegates.observable(data.shader) { _, _, value ->
         queueEvent {
-            LibretroDroid.setShaderConfig(buildShader(value))
+            catchExceptions {
+                LibretroDroid.setShaderConfig(buildShader(value))
+                prepareShaderAndUpdateSensors()
+            }
         }
     }
 
     var filterMode: Int by Delegates.observable(-1) { _, _, value ->
-        runOnGLThread {
-            LibretroDroid.setFilterMode(value)
+        queueEvent {
+            catchExceptions {
+                LibretroDroid.setFilterMode(value)
+                prepareShaderAndUpdateSensors()
+            }
         }
     }
 
@@ -226,12 +269,14 @@ class GLRetroView(
     }
 
     override fun onPause() {
+        shaderSensors.setRequiredSensors(0)
         Log.i(TAG_LOG, "TEARDOWN GLSurfaceView.onPause BEGIN destroyed=$isDestroyed")
         super<GLSurfaceView>.onPause()
         Log.i(TAG_LOG, "TEARDOWN GLSurfaceView.onPause END")
     }
 
     override fun onDetachedFromWindow() {
+        shaderSensors.setRequiredSensors(0)
         Log.i(TAG_LOG, "TEARDOWN onDetachedFromWindow BEGIN destroyed=$isDestroyed")
         super<GLSurfaceView>.onDetachedFromWindow()
         Log.i(TAG_LOG, "TEARDOWN onDetachedFromWindow END")
@@ -266,6 +311,8 @@ class GLRetroView(
     }
 
     override fun onDestroy(owner: LifecycleOwner) {
+        sensorsResumed = false
+        shaderSensors.setRequiredSensors(0)
         // Native resources are destroyed via destroyNative() in onPause,
         // while the GL thread is still alive. No cleanup needed here.
         lifecycle = null
@@ -485,6 +532,7 @@ class GLRetroView(
     fun destroyNative() {
         if (isDestroyed) return
         isDestroyed = true
+        post { updateShaderSensors() }
         renderMode = RENDERMODE_WHEN_DIRTY
         runOnGLThreadVoid {
             LibretroDroid.destroy()
@@ -607,9 +655,19 @@ class GLRetroView(
 
     inner class Renderer : GLSurfaceView.Renderer {
         private var bfiShowBlackNext = false
+        private var lastSensorState: ShaderSensorState? = null
 
         override fun onDrawFrame(gl: GL10) = catchExceptions {
             if (isDestroyed) return@catchExceptions
+            val sensors = shaderSensors.state
+            if (sensors !== lastSensorState) {
+                LibretroDroid.setShaderSensorState(
+                    sensors.gyroscope.x, sensors.gyroscope.y, sensors.gyroscope.z,
+                    sensors.accelerometer.x, sensors.accelerometer.y, sensors.accelerometer.z,
+                    sensors.accelerometerRest.x, sensors.accelerometerRest.y, sensors.accelerometerRest.z
+                )
+                lastSensorState = sensors
+            }
             val tick = netplayTick
             if (tick != null) {
                 if (isEmulationReady) {
@@ -654,6 +712,8 @@ class GLRetroView(
         override fun onSurfaceCreated(gl: GL10, config: EGLConfig) = catchExceptions {
             Thread.currentThread().priority = Thread.MAX_PRIORITY
             initializeCore()
+            prepareShaderAndUpdateSensors()
+            lastSensorState = null
             lifecycle?.coroutineScope?.launch {
                 retroGLEventsSubject.emit(GLRetroEvents.SurfaceCreated)
             }

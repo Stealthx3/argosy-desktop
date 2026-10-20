@@ -828,6 +828,29 @@ JNIEXPORT void JNICALL Java_com_swordfish_libretrodroid_LibretroDroid_setShaderC
     LibretroDroid::getInstance().setShaderConfig(JavaUtils::shaderFromJava(env, shaderConfig));
 }
 
+JNIEXPORT jint JNICALL Java_com_swordfish_libretrodroid_LibretroDroid_prepareShaderAndGetSensorUsage(
+    JNIEnv* env, jclass
+) {
+    try {
+        return LibretroDroid::getInstance().prepareShaderAndGetSensorUsage();
+    } catch (std::exception& exception) {
+        LOGE("Error preparing shader: %s", exception.what());
+        JavaUtils::throwRetroException(env, ERROR_GENERIC);
+        return 0;
+    }
+}
+
+JNIEXPORT void JNICALL Java_com_swordfish_libretrodroid_LibretroDroid_setShaderSensorState(
+    JNIEnv*, jclass,
+    jfloat gyroX, jfloat gyroY, jfloat gyroZ,
+    jfloat accelX, jfloat accelY, jfloat accelZ,
+    jfloat restX, jfloat restY, jfloat restZ
+) {
+    LibretroDroid::getInstance().setShaderSensorState({
+        gyroX, gyroY, gyroZ, accelX, accelY, accelZ, restX, restY, restZ
+    });
+}
+
 JNIEXPORT void JNICALL Java_com_swordfish_libretrodroid_LibretroDroid_setFilterMode(
     JNIEnv* env,
     jclass obj,
