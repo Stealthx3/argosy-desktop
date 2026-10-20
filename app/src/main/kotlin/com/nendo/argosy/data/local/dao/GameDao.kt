@@ -545,6 +545,7 @@ interface GameDao {
         UPDATE games SET steamLauncher = COALESCE(steamLauncher, 'native'),
             steamInstallDir = COALESCE(:installDir, steamInstallDir)
         WHERE id = :gameId
+            AND (steamLauncher IS NULL OR (:installDir IS NOT NULL AND steamInstallDir IS NOT :installDir))
     """)
     suspend fun updateSteamInstallInfo(gameId: Long, installDir: String?)
 

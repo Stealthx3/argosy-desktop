@@ -248,10 +248,6 @@ class ArgosyApp : Application(), Configuration.Provider, ImageLoaderFactory {
         startServiceSafely(intent)
     }
 
-    /**
-     * Brings stored platform order back in line with the built-in one, unless the user has arranged
-     * it themselves, in which case their order is what should survive a relaunch.
-     */
     internal suspend fun observeSteamPackageChanges() {
         appsRepository.packageChanges.collect { packageName ->
             if (SteamLaunchers.getByPackage(packageName) != null) {
@@ -266,6 +262,10 @@ class ArgosyApp : Application(), Configuration.Provider, ImageLoaderFactory {
         }
     }
 
+    /**
+     * Brings stored platform order back in line with the built-in one, unless the user has arranged
+     * it themselves, in which case their order is what should survive a relaunch.
+     */
     private fun syncPlatformSortOrders() {
         appScope.launch {
             if (appPreferencesRepository.isPlatformOrderCustomised()) return@launch
