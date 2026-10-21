@@ -1,8 +1,5 @@
 package com.nendo.argosy.ui.components
 
-import android.graphics.Paint
-import android.graphics.Rect
-import android.graphics.Typeface
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -37,7 +34,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.res.stringResource
+import com.nendo.argosy.res.stringResource
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFontFamilyResolver
@@ -49,7 +46,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.Dp
-import com.nendo.argosy.shared.R
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.ui.icons.InputIcons
 import com.nendo.argosy.ui.theme.Dimens
 import com.nendo.argosy.ui.theme.LocalUiScale
@@ -109,16 +106,11 @@ fun SectionBreadcrumb(
     )
     val triggerFontSizePx = with(density) { selectedTextStyle.fontSize.toPx() }
     val triggerGlyphHeightPx = remember(resolvedTypeface, triggerFontSizePx) {
-        val typeface = resolvedTypeface as? Typeface
+        val typeface = com.nendo.argosy.platform.platformTypefaceOf(resolvedTypeface)
         if (typeface == null) {
             triggerFontSizePx
         } else {
-            val bounds = Rect()
-            Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                this.typeface = typeface
-                textSize = triggerFontSizePx
-            }.getTextBounds("H", 0, 1, bounds)
-            bounds.height().toFloat().takeIf { it > 0f } ?: triggerFontSizePx
+            com.nendo.argosy.platform.textBoundsHeight(typeface, triggerFontSizePx, "H").toFloat().takeIf { it > 0f } ?: triggerFontSizePx
         }
     }
     val triggerPaintedHeight = with(density) { triggerGlyphHeightPx.toDp() }

@@ -5,6 +5,6 @@ ui/input/HapticFeedback.kt: HapticFeedbackManager(vibrate, setEnabled, setStreng
 ui/input/SoundFeedback.kt: SoundFeedbackManager(playSound, play, setEnabled, clearSfxCache, setVolume, setSoundConfig, clearSoundConfig)
 ui/theme/backdrop/BackdropStamps.kt: BackdropStampProvider(::backdropStampProvider)
 hardware/AmbientLedManager.kt: AmbientLedManager(setUiColors)
-ui/theme/CustomFontLoader.kt: CustomFontLoader(loadFamily)
+ui/theme/CustomFontLoader.kt: CustomFontLoader(fontsDir, loadFamily, validate)
 ui/theme/backdrop/SurfaceBackdrop.kt: ::surfaceBackdrop
 ui/common/AlwaysCrossfadeFactory.kt: AlwaysCrossfadeFactory(<init>)

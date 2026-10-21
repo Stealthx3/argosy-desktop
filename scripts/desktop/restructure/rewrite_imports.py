@@ -391,6 +391,44 @@ def rewrite_static_stand_ins(text):
     return text
 
 
+TEXT_BOUNDS_BLOCK = re.compile(
+    r"val (\w+) = Rect\(\)\n\s*Paint\(Paint\.ANTI_ALIAS_FLAG\)\.apply \{\n\s*this\.typeface = (\w+)\n\s*textSize = (\w+)\n"
+    r"\s*\}\.getTextBounds\(\"(\w)\", 0, 1, \1\)\n\s*\1\.height\(\)"
+)
+TYPEFACE_CAST = re.compile(r"(?<![\w.])(\w+) as\? Typeface\b")
+
+
+def rewrite_text_bounds(text):
+    text = TEXT_BOUNDS_BLOCK.sub(r'com.nendo.argosy.platform.textBoundsHeight(\2, \3, "\4")', text)
+    if not re.search(r"^import android\.graphics\.Typeface$", text, re.M):
+        return text
+    return TYPEFACE_CAST.sub(r"com.nendo.argosy.platform.platformTypefaceOf(\1)", text)
+
+
+DISPLAY_NAME_QUERY = re.compile(
+    r"(\w+)\.contentResolver\.query\((\w+), arrayOf\(OpenableColumns\.DISPLAY_NAME\), null, null, null\)\?\.use \{ (\w+) ->\n"
+    r"\s*if \(\3\.moveToFirst\(\)\) \3\.getString\(0\) else null\n\s*\}"
+)
+OPEN_INPUT_STREAM = re.compile(r"\bcontentResolver\.openInputStream\(")
+
+
+def rewrite_display_name_query(text):
+    return DISPLAY_NAME_QUERY.sub(r"com.nendo.argosy.platform.queryOpenableDisplayName(\1.contentResolver, \2)", text)
+
+
+def import_open_input_stream(text):
+    if OPEN_INPUT_STREAM.search(text) and re.search(r"^import com\.nendo\.argosy\.platform\.contentResolver$", text, re.M):
+        if not re.search(r"^import com\.nendo\.argosy\.platform\.openInputStream$", text, re.M):
+            text = re.sub(
+                r"^(import com\.nendo\.argosy\.platform\.contentResolver)$",
+                r"\1\nimport com.nendo.argosy.platform.openInputStream",
+                text,
+                count=1,
+                flags=re.M,
+            )
+    return text
+
+
 URI_STATICS = re.compile(r"(?<![\w.])Uri\.(parse|fromFile|encode|decode)\(")
 
 
@@ -440,13 +478,14 @@ def main():
     changed = 0
     for path in sorted(COMMON.rglob("*.kt")):
         text = path.read_text()
-        new = drop_unused_android_imports(text)
+        new = drop_unused_android_imports(rewrite_display_name_query(rewrite_text_bounds(text)))
         for pattern, replacement in RULES:
             new = pattern.sub(replacement, new)
         new = rewrite_bitmap_config(new)
         new = rewrite_static_stand_ins(new)
         new = rewrite_uri_statics(new)
         new = ensure_companions(new)
+        new = import_open_input_stream(new)
         if new != text:
             path.write_text(new)
             changed += 1

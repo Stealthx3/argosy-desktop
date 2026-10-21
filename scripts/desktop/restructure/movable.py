@@ -36,6 +36,9 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).parent))
+import rewrite_imports  # noqa: E402
+
 PKG_ROOT = "com/nendo/argosy"
 APP = Path("app/src/main/kotlin")
 SHARED = Path("shared/src/commonMain/kotlin")
@@ -99,7 +102,7 @@ CONTEXT_REST = (
     r"\.resources\.(?!getQuantityString\b|getString\b)\w+"
     r"|LocalContext\.current\." + CONTEXT_MEMBERS
     + r"|\b(?:context|ctx|appContext|applicationContext|baseContext|current)\??\.assets\.(?!list\b|open\b)\w+"
-    r"|\bcontentResolver\.\w+"
+    r"|\bcontentResolver\.(?!openInputStream\b)\w+"
     r"|(?<![\w.])Context\.(?!MODE_PRIVATE\b|CONNECTIVITY_SERVICE\b|USER_SERVICE\b|DISPLAY_SERVICE\b)[A-Z]\w*"
     r"|\bpackageManager\.(?!getPackageInfo\b|getApplicationInfo\b|getApplicationLabel\b)\w+"
     r"|\bpm\.(?!getPackageInfo\b|getApplicationInfo\b|getApplicationLabel\b)\w+"
@@ -119,11 +122,20 @@ ANY_DECLARED = re.compile(r"\b(\w+)\s*:\s*([\w.]+)")
 LOCAL_CONTEXT_EXTENSIONS = re.compile(r"\bfun\s+(?:android\.content\.|com\.nendo\.argosy\.platform\.Platform)?Context\.(\w+)")
 
 
+class StrippedGuard:
+    def __init__(self, strip, rest):
+        self.strip, self.rest = strip, re.compile(rest)
+
+    def search(self, body):
+        return self.rest.search(self.strip.sub("", body))
+
+
 class ContextGuard:
     def __init__(self):
         self.rest = re.compile(CONTEXT_REST)
 
     def search(self, body):
+        body = rewrite_imports.DISPLAY_NAME_QUERY.sub("", body)
         names = {a or b for a, b in CONTEXT_DECLARED.findall(body)}
         other = {n for n, t in ANY_DECLARED.findall(body) if not re.fullmatch(r"(?:android\.content\.|com\.nendo\.argosy\.platform\.Platform)?Context", t)}
         names |= {n for n in CONTEXT_NAMES if n not in other}
@@ -243,7 +255,10 @@ GUARDED_REWRITES = {
         r"|lightsManager|sensorManager|keyCharacterMap|getKeyCodeForKeyLocation)\b"
     ),
     "androidx.compose.ui.graphics.nativeCanvas": re.compile(r"\bnativeCanvas\.(?!drawRoundRect\b|drawCircle\b)\w+"),
-    "android.graphics.Paint": re.compile(r"\bandroid\.graphics\.Paint\b(?!\(\))|\bPaint\.\w+"),
+    "android.graphics.Paint": StrippedGuard(rewrite_imports.TEXT_BOUNDS_BLOCK, r"\bandroid\.graphics\.Paint\b(?!\(\))|\bPaint\.\w+"),
+    "android.provider.OpenableColumns": StrippedGuard(rewrite_imports.DISPLAY_NAME_QUERY, r"\bOpenableColumns\b"),
+    "android.graphics.Rect": StrippedGuard(rewrite_imports.TEXT_BOUNDS_BLOCK, r"\bRect\b"),
+    "android.graphics.Typeface": StrippedGuard(rewrite_imports.TYPEFACE_CAST, r"\bTypeface\b"),
     "android.app.Application": re.compile(
         r"\b(?:application|app)\??\.(?!contentResolver\b|filesDir\b|cacheDir\b|getString\b|resources\b|packageName\b"
         r"|applicationContext\b|getSharedPreferences\b|getSystemService\b|getExternalFilesDir\b|packageManager\b|assets\b"

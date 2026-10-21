@@ -8,7 +8,7 @@ import java.io.File
 
 actual object CustomFontLoader {
 
-    fun fontsDir(context: Context): File = File(context.filesDir, "fonts")
+    actual fun fontsDir(context: Context): File = File(context.filesDir, "fonts")
 
     actual fun loadFamily(path: String): FontFamily? {
         val file = File(path)
@@ -40,7 +40,7 @@ actual object CustomFontLoader {
     }
 
     /** Throws if the file is not a parseable font. */
-    fun validate(file: File) {
+    actual fun validate(file: File) {
         val typeface = Typeface.createFromFile(file)
         check(typeface != null && typeface != Typeface.DEFAULT) { "Typeface could not be loaded" }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
