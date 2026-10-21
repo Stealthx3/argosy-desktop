@@ -80,6 +80,7 @@ REWRITTEN = (
     "android.text.format.DateFormat.getBestDateTimePattern",
     "android.widget.Toast", "android.view.inputmethod.InputMethodManager",
     "android.content.ActivityNotFoundException",
+    "android.hardware.display.DisplayManager", "android.view.Display.DEFAULT_DISPLAY",
 )
 GENERATED = (
     "com.nendo.argosy.config.AppBuildConfig", "com.nendo.argosy.res.ArgosyR", "com.nendo.argosy.shared.R",
@@ -98,7 +99,7 @@ CONTEXT_REST = (
     r"|LocalContext\.current\." + CONTEXT_MEMBERS
     + r"|\b(?:context|ctx|appContext|applicationContext|baseContext|current)\??\.assets\.(?!list\b|open\b)\w+"
     r"|\bcontentResolver\.\w+"
-    r"|(?<![\w.])Context\.(?!MODE_PRIVATE\b|CONNECTIVITY_SERVICE\b|USER_SERVICE\b)[A-Z]\w*"
+    r"|(?<![\w.])Context\.(?!MODE_PRIVATE\b|CONNECTIVITY_SERVICE\b|USER_SERVICE\b|DISPLAY_SERVICE\b)[A-Z]\w*"
     r"|\bpackageManager\.(?!getPackageInfo\b|getApplicationInfo\b|getApplicationLabel\b)\w+"
     r"|\bpm\.(?!getPackageInfo\b|getApplicationInfo\b|getApplicationLabel\b)\w+"
     r"|\.getPackageInfo\([^)]*\)\.(?!versionName\b)\w+"
@@ -204,7 +205,7 @@ GUARDED_REWRITES = {
         r"|unregisterOnSharedPreferenceChangeListener|OnSharedPreferenceChangeListener)\b"
     ),
     "android.provider.Settings": re.compile(
-        r"(?<!\.)\bSettings\.(?!Secure\.(?:getString|ANDROID_ID)\b|System\.CONTENT_URI\b|(?:ACTION_APPLICATION_DETAILS_SETTINGS|ACTION_APP_NOTIFICATION_SETTINGS"
+        r"(?<!\.)\bSettings\.(?!Secure\.(?:getString|ANDROID_ID)\b|System\.(?:CONTENT_URI|canWrite)\b|(?:ACTION_APPLICATION_DETAILS_SETTINGS|ACTION_APP_NOTIFICATION_SETTINGS"
         r"|ACTION_MANAGE_OVERLAY_PERMISSION|ACTION_MANAGE_WRITE_SETTINGS|ACTION_SETTINGS|ACTION_USAGE_ACCESS_SETTINGS"
         r"|EXTRA_APP_PACKAGE|canDrawOverlays)\b)\w+(?:\.\w+)?"
     ),
@@ -244,7 +245,7 @@ GUARDED_REWRITES = {
     "android.app.Application": re.compile(
         r"\b(?:application|app)\??\.(?!contentResolver\b|filesDir\b|cacheDir\b|getString\b|resources\b|packageName\b"
         r"|applicationContext\b|getSharedPreferences\b|getSystemService\b|getExternalFilesDir\b|packageManager\b|assets\b"
-        r"|externalCacheDir\b|dataDir\b"
+        r"|externalCacheDir\b|dataDir\b|startActivity\b"
         r"|openStorageAccessSettings\b)\w+"
         r"|\bApplication\.\w+"
     ),

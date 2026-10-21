@@ -6,6 +6,7 @@ import java.net.NetworkInterface
 actual fun PlatformContext.getSystemService(name: String): Any? = when (name) {
     CONNECTIVITY_SERVICE -> DesktopConnectivityManager
     USER_SERVICE -> DesktopUserManager
+    DISPLAY_SERVICE -> DesktopDisplayManager
     else -> null
 }
 

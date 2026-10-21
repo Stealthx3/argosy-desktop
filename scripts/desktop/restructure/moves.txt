@@ -1950,3 +1950,7 @@
 [commonMain]
 + ui/screens/apps/AppsScreen.kt
 + ui/screens/settings/components/AppPickerModal.kt
+
+# Phase 2: portable since the Settings.System.canWrite and Application.startActivity stand-ins (was androidMain).
+[commonMain]
++ ui/screens/settings/delegates/PermissionsSettingsDelegate.kt

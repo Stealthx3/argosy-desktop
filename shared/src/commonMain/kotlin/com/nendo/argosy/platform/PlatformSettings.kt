@@ -23,5 +23,7 @@ expect object PlatformSettings {
 
     object System {
         val CONTENT_URI: PlatformUri
+
+        fun canWrite(context: PlatformContext): Boolean
     }
 }

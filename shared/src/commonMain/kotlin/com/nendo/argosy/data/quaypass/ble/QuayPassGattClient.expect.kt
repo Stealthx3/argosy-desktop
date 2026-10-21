@@ -9,6 +9,7 @@ import com.nendo.argosy.platform.getSharedPreferences
 import com.nendo.argosy.platform.getString
 import com.nendo.argosy.platform.packageName
 import com.nendo.argosy.platform.resources
+import com.nendo.argosy.platform.startActivity
 
 expect class QuayPassGattClient(application: Application) {
     companion object {}

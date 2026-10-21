@@ -27,5 +27,7 @@ actual object PlatformSettings {
 
     actual object System {
         actual val CONTENT_URI: PlatformUri get() = Settings.System.CONTENT_URI
+
+        actual fun canWrite(context: PlatformContext): Boolean = Settings.System.canWrite(context)
     }
 }

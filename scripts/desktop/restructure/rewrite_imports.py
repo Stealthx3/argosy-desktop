@@ -32,6 +32,8 @@ RULES = [
         re.compile(r"\bandroid\.content\.Intent\((?!\s*(?:this|context|ctx|\w*[cC]ontext|applicationContext)\b)"),
         "com.nendo.argosy.platform.PlatformIntentType(",
     ),
+    (re.compile(r"(?<!import )\bandroid\.hardware\.display\.DisplayManager\b(?!\.)"), "com.nendo.argosy.platform.PlatformDisplayManager"),
+    (re.compile(r"\bandroid\.view\.Display\.DEFAULT_DISPLAY\b"), "com.nendo.argosy.platform.DEFAULT_DISPLAY"),
     (re.compile(r"^import android\.os\.Looper$", re.M), "import com.nendo.argosy.platform.PlatformLooper as Looper"),
     (re.compile(r"^import android\.os\.Handler$", re.M), "import com.nendo.argosy.platform.PlatformHandler as Handler"),
     (
@@ -243,6 +245,9 @@ COMPANION_IMPORTS = {
     ],
     "com.nendo.argosy.platform.PlatformNetworkCapabilities": ["com.nendo.argosy.platform.hasCapability"],
     "com.nendo.argosy.platform.PlatformUserManager": ["com.nendo.argosy.platform.isUserUnlocked"],
+    "com.nendo.argosy.platform.PlatformDisplayManager": [
+        "com.nendo.argosy.platform.getDisplay", "com.nendo.argosy.platform.refreshRate", "com.nendo.argosy.platform.supportedModes",
+    ],
     "com.nendo.argosy.platform.PlatformInputDevice": [
         "com.nendo.argosy.platform.controllerNumber", "com.nendo.argosy.platform.descriptor",
         "com.nendo.argosy.platform.id", "com.nendo.argosy.platform.isEnabled", "com.nendo.argosy.platform.isExternal",
@@ -255,6 +260,7 @@ COMPANION_IMPORTS = {
         "com.nendo.argosy.platform.contentResolver", "com.nendo.argosy.platform.filesDir",
         "com.nendo.argosy.platform.getSharedPreferences", "com.nendo.argosy.platform.getString",
         "com.nendo.argosy.platform.packageName", "com.nendo.argosy.platform.resources",
+        "com.nendo.argosy.platform.startActivity",
     ],
     "com.nendo.argosy.platform.image.AsyncImage": [
         "com.nendo.argosy.platform.image.bitmap", "com.nendo.argosy.platform.image.intrinsicHeight",
@@ -348,7 +354,7 @@ STATIC_STAND_INS = [
     ("PlatformInputDevice as InputDevice", r"InputDevice\.(getDevice|getDeviceIds)\(", r"PlatformInputDevices.\1("),
     ("PlatformInputDevice as InputDevice", r"InputDevice\.(SOURCE_\w+)\b", r"\1"),
     ("core.input.AndroidKeyCodes as KeyEvent", r"KeyEvent\.(keyCodeToString)\b", r"\1"),
-    ("PlatformContext as Context", r"Context\.(MODE_PRIVATE|CONNECTIVITY_SERVICE|USER_SERVICE)\b", r"\1"),
+    ("PlatformContext as Context", r"Context\.(MODE_PRIVATE|CONNECTIVITY_SERVICE|USER_SERVICE|DISPLAY_SERVICE)\b", r"\1"),
     ("PlatformNetworkCapabilities as NetworkCapabilities", r"NetworkCapabilities\.(NET_CAPABILITY_INTERNET)\b", r"\1"),
     ("PlatformConnectivityManager as ConnectivityManager", r"ConnectivityManager\.(NetworkCallback)\b", r"Platform\1"),
 ]

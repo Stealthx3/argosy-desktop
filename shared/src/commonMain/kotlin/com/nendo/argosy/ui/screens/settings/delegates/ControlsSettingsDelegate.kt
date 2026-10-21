@@ -1,6 +1,7 @@
 package com.nendo.argosy.ui.screens.settings.delegates
 
 import com.nendo.argosy.platform.PlatformApplication as Application
+import com.nendo.argosy.platform.startActivity
 import com.nendo.argosy.platform.applicationContext
 import com.nendo.argosy.platform.cacheDir
 import com.nendo.argosy.platform.contentResolver

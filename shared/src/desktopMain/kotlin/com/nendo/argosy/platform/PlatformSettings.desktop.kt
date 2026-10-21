@@ -45,5 +45,7 @@ actual object PlatformSettings {
 
     actual object System {
         actual val CONTENT_URI: PlatformUri = PlatformUris.parse("content://settings/system")
+
+        actual fun canWrite(context: PlatformContext): Boolean = true
     }
 }

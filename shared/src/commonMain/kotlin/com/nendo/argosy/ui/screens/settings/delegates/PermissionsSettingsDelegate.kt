@@ -1,13 +1,43 @@
 package com.nendo.argosy.ui.screens.settings.delegates
 
-import android.Manifest
-import android.app.Application
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.net.Uri
-import android.os.Build
-import android.provider.Settings
-import androidx.core.content.ContextCompat
+import com.nendo.argosy.platform.PlatformManifest as Manifest
+import com.nendo.argosy.platform.PlatformApplication as Application
+import com.nendo.argosy.platform.applicationContext
+import com.nendo.argosy.platform.cacheDir
+import com.nendo.argosy.platform.contentResolver
+import com.nendo.argosy.platform.filesDir
+import com.nendo.argosy.platform.getSharedPreferences
+import com.nendo.argosy.platform.getString
+import com.nendo.argosy.platform.packageName
+import com.nendo.argosy.platform.resources
+import com.nendo.argosy.platform.startActivity
+import com.nendo.argosy.platform.PlatformIntentType as Intent
+import com.nendo.argosy.platform.action
+import com.nendo.argosy.platform.addFlags
+import com.nendo.argosy.platform.data
+import com.nendo.argosy.platform.flags
+import com.nendo.argosy.platform.putExtra
+import com.nendo.argosy.platform.component
+import com.nendo.argosy.platform.`package`
+import com.nendo.argosy.platform.getStringExtra
+import com.nendo.argosy.platform.className
+import com.nendo.argosy.platform.PlatformIntent
+import com.nendo.argosy.platform.PlatformPackageManagerConstants as PackageManager
+import com.nendo.argosy.platform.PlatformUri as Uri
+import com.nendo.argosy.platform.authority
+import com.nendo.argosy.platform.encodedPath
+import com.nendo.argosy.platform.getQueryParameter
+import com.nendo.argosy.platform.host
+import com.nendo.argosy.platform.lastPathSegment
+import com.nendo.argosy.platform.path
+import com.nendo.argosy.platform.pathSegments
+import com.nendo.argosy.platform.queryParameterNames
+import com.nendo.argosy.platform.scheme
+import com.nendo.argosy.platform.PlatformUris
+import com.nendo.argosy.platform.PlatformBuild as Build
+import com.nendo.argosy.platform.PlatformSettings as Settings
+import com.nendo.argosy.platform.PlatformContextCompat as ContextCompat
+import com.nendo.argosy.platform.displayId
 import com.nendo.argosy.data.wallpaper.LockScreenScenes
 import com.nendo.argosy.hardware.FanController
 import com.nendo.argosy.hardware.LEDController
@@ -82,7 +112,7 @@ class PermissionsSettingsDelegate @Inject constructor(
     }
 
     fun openLiveWallpaperPicker() {
-        application.startActivity(LockScreenScenes.pickerIntent(application).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        application.startActivity(LockScreenScenes.pickerIntent(application).addFlags(PlatformIntent.FLAG_ACTIVITY_NEW_TASK))
     }
 
     fun observeScreenCapturePermission(scope: CoroutineScope) {
@@ -104,23 +134,23 @@ class PermissionsSettingsDelegate @Inject constructor(
     fun openNotificationSettings() {
         val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
             putExtra(Settings.EXTRA_APP_PACKAGE, application.packageName)
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            flags = PlatformIntent.FLAG_ACTIVITY_NEW_TASK
         }
         application.startActivity(intent)
     }
 
     fun openWriteSettings() {
         val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS).apply {
-            data = Uri.parse("package:${application.packageName}")
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            data = PlatformUris.parse("package:${application.packageName}")
+            flags = PlatformIntent.FLAG_ACTIVITY_NEW_TASK
         }
         application.startActivity(intent)
     }
 
     fun openDisplayOverlaySettings() {
         val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION).apply {
-            data = Uri.parse("package:${application.packageName}")
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            data = PlatformUris.parse("package:${application.packageName}")
+            flags = PlatformIntent.FLAG_ACTIVITY_NEW_TASK
         }
         application.startActivity(intent)
     }
