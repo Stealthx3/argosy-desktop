@@ -4,23 +4,23 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 History and reasoning live in `DEVLOG.md`; read only the parts this file points to. Earlier phases:
 `phase-0.md`, `phase-1.md` (closed summaries; carried-forward items are listed there).
 
-**Updated:** 2026-10-21, end of unit p2z
+**Updated:** 2026-10-21, end of unit p3a
 
 ## Where things stand
 
 - **Phase:** 2 · Desktop UI (third of six). Still on the seam stage: moving upstream's UI into `shared/commonMain` behind Android seams. No desktop window shows the real app yet.
-- **Last committed batch:** p2z (display-manager stand-in, `Settings.System.canWrite`, `Application.startActivity`; `PermissionsSettingsDelegate` rehomed, `SettingsInitRouter` cleared but waits on `SettingsViewModel`), verified. See the p2z entry in `DEVLOG.md`.
-- **Counts:** app 30 files, commonMain 1,540, androidMain 378. Navigation-graph closure: 146 files, 16 Android roots.
-- **Baseline for "Android unchanged":** plain upstream v2.24.0, `build/desktop-baseline/app-debug-upstream-v2.24.0.apk`. Plain save proof: `build/desktop-check/save-proof/v224-plain-1021` (recaptured 2026-10-21; recapture again when it is days older than the candidate).
+- **Last committed batch:** p3a (`imageLoader` and `setApplicationLocales` stand-ins; `ImagePrefetchManager` and `HomeNavigationDelegate` rehomed, `SettingsAboutRouter` cleared but waits on `SettingsViewModel`), verified. See the p3a entry in `DEVLOG.md`.
+- **Counts:** app 30 files, commonMain 1,544, androidMain 378. Navigation-graph closure: 144 files, 14 Android roots.
+- **Baseline for "Android unchanged":** plain upstream v2.24.0, `build/desktop-baseline/app-debug-upstream-v2.24.0.apk`. Plain save proof: `build/desktop-check/save-proof/v224-plain-1021b` (recaptured 2026-10-21; recapture again when it is days older than the candidate).
 - Nothing uncommitted.
 
 ## Next action
 
-1. List the remaining roots: `python3 -I scripts/desktop/restructure/movable.py --roots ui/navigation/NavGraph.kt` (16). Choose the next batch with `--plan <n> ui/navigation/NavGraph.kt` (`--services-only` for slices) or `--rank-android`.
-   Smaller next: `SettingsAboutRouter` (a `setApplicationLocales(context, tag)` stand-in plus a `rewrite_imports.py` rewrite of the multi-line `LocaleManager` block), `ImagePrefetchManager` (Context + `coil.imageLoader`), `QrScanner` (unblocks `FirstRunViewModel`, which is otherwise clear now).
-   Then `SettingsFontRouter`, `SettingsScreen`/`ViewModel`, `SteamSettingsDelegate`, players (Media3, YouTube WebView), `QrScanner`, `Box3dCover`, `SectionBreadcrumb`, `SystemStatusBar`, `OnScreenControls`, `BgmTrackArt`, `MusicBrowserViewModel`.
+1. List the remaining roots: `python3 -I scripts/desktop/restructure/movable.py --roots ui/navigation/NavGraph.kt` (14). Choose the next batch with `--plan <n> ui/navigation/NavGraph.kt` (`--services-only` for slices) or `--rank-android`.
+   Smaller next: `SettingsFontRouter` (Context + `OpenableColumns`), `SectionBreadcrumb` (Paint, Rect, Typeface), `QrScanner` (unblocks `FirstRunViewModel`, which is otherwise clear now).
+   Then `SettingsScreen`/`ViewModel`, `SteamSettingsDelegate`, players (Media3, YouTube WebView), `Box3dCover`, `SystemStatusBar`, `OnScreenControls`, `BgmTrackArt`, `MusicBrowserViewModel`.
 2. Run the pipeline (`extract_decls.py --refresh`, `inline_constants.py`, `move_companion_functions.py`, `apply_moves.py`, `move_members.py`, `actualize.py`, `slices.py`, `rewrite_imports.py`, then `movable.py --check`; the list is in `reapply.sh`). Then `movable.py --rehome`, append its output to `moves.txt` as a new labelled `[commonMain]` section, and run `apply_moves.py` and `rewrite_imports.py` again.
-3. `git add -A app/src/main/kotlin shared/src`, compile first (`quiet.sh <label> ./gradlew :shared:compileKotlinDesktop :shared:compileDebugKotlinAndroid`, about 3 min), then verify with `scripts/desktop/check/verify.sh <label> build/desktop-check/save-proof/v224-plain-1021` in the background (about 20 min).
+3. `git add -A app/src/main/kotlin shared/src`, compile first (`quiet.sh <label> ./gradlew :shared:compileKotlinDesktop :shared:compileDebugKotlinAndroid`, about 3 min), then verify with `scripts/desktop/check/verify.sh <label> build/desktop-check/save-proof/v224-plain-1021b` in the background (about 20 min).
 4. Commit, log in `DEVLOG.md`, rewrite this file, end the unit.
 
 After the roots are gone: the desktop shell, SDL3 input and screen bring-up (Phase 2 plan, steps 6–8, in `PORT_PLAN.md`). `ClipboardTextReader`'s desktop actual returns null; give it a real clipboard there.
@@ -46,4 +46,5 @@ After the roots are gone: the desktop shell, SDL3 input and screen bring-up (Pha
 - `DownloadManagerPlatformFolderTest` can fail in the full gate with "Dispatchers.Main is used concurrently with setting it" (test-ordering race, untouched by the port). Rerun the class alone, then the full verification.
 - A fully qualified rewrite rule must skip import lines (`(?<!import )`): `slices.py` runs imports through `rewrite_imports.RULES` to judge portability, so a rule that matches an import line makes that Android type look portable and widens slices.
 - If the testbed containers are gone (it happened while paused), `scripts/desktop/testbed/up.sh` recreates them on the kept volumes; the proof's snapshot restore does the rest. `adb` is not on PATH in a plain shell; the scripts find it.
+- The Battery Bay cached-copy count varies between runs of plain upstream (p3a: two plain proofs 25 minutes apart differed in 12 captures). If a proof differs only there with equal verdicts, recapture the plain proof (`save-proof.sh build/desktop-baseline/app-debug-upstream-v2.24.0.apk <dir>`, about 8 min) and compare again before calling it a regression.
 - The plain proof ages: once it is more than 24 hours older than a candidate, upstream's daily checks run again in the candidate. The masks now cover the two epoch-millisecond keys; a new unmasked difference of that kind means another clock key, not a regression, until shown otherwise.

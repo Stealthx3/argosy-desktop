@@ -177,6 +177,15 @@ RULES = [
     ),
     (re.compile(r"^import coil\.request\.ImageRequest$", re.M), "import com.nendo.argosy.platform.image.ImageRequest"),
     (re.compile(r"^import coil\.request\.CachePolicy$", re.M), "import com.nendo.argosy.platform.image.CachePolicy"),
+    (re.compile(r"^import coil\.imageLoader$", re.M), "import com.nendo.argosy.platform.image.imageLoader"),
+    (
+        re.compile(
+            r"val (\w+) = ([\w.]+)\.getSystemService\(android\.app\.LocaleManager::class\.java\)\n\s*\1\?\.applicationLocales = "
+            r"if \((.+?)\) \{\n\s*android\.os\.LocaleList\.getEmptyLocaleList\(\)\n\s*\} else \{\n"
+            r"\s*android\.os\.LocaleList\.forLanguageTags\((\w+)\)\n\s*\}"
+        ),
+        r"com.nendo.argosy.platform.setApplicationLocales(\2, if (\3) null else \4)",
+    ),
     (re.compile(r"^import android\.view\.InputDevice$", re.M), "import com.nendo.argosy.platform.PlatformInputDevice as InputDevice"),
     (re.compile(r"\bandroid\.graphics\.BlurMaskFilter\.Blur\."), "com.nendo.argosy.platform.PlatformBlur."),
     (re.compile(r"\bandroid\.graphics\.BlurMaskFilter\("), "com.nendo.argosy.platform.PlatformBlurMaskFilter("),

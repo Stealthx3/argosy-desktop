@@ -81,6 +81,7 @@ REWRITTEN = (
     "android.widget.Toast", "android.view.inputmethod.InputMethodManager",
     "android.content.ActivityNotFoundException",
     "android.hardware.display.DisplayManager", "android.view.Display.DEFAULT_DISPLAY",
+    "android.app.LocaleManager", "android.os.LocaleList.getEmptyLocaleList", "android.os.LocaleList.forLanguageTags",
 )
 GENERATED = (
     "com.nendo.argosy.config.AppBuildConfig", "com.nendo.argosy.res.ArgosyR", "com.nendo.argosy.shared.R",
@@ -91,7 +92,7 @@ GENERATED = (
 CONTEXT_MEMBERS = (
     r"(?!getString\b|resources\b|filesDir\b|cacheDir\b|assets\b|getSharedPreferences\b|contentResolver\b"
     r"|packageName\b|applicationContext\b|getSystemService\b|getExternalFilesDir\b|packageManager\b|preferencesDataStoreFile\b"
-    r"|startActivity\b|openStorageAccessSettings\b|externalCacheDir\b|dataDir\b"
+    r"|startActivity\b|openStorageAccessSettings\b|externalCacheDir\b|dataDir\b|imageLoader\b"
     r"|let\b|also\b|run\b|apply\b|takeIf\b|takeUnless\b)[a-zA-Z_]\w*"
 )
 CONTEXT_REST = (
@@ -234,6 +235,7 @@ GUARDED_REWRITES = {
         r"|decoderDispatcher|transformationDispatcher|sizeResolver|newBuilder|defaults)\("
         r"|\bImageRequest\.(?!Builder\b)\w+"
     ),
+    "coil.imageLoader": re.compile(r"\bimageLoader\.(?!enqueue\b)\w+"),
     "coil.request.CachePolicy": re.compile(r"\bCachePolicy\.(?!ENABLED\b|READ_ONLY\b|WRITE_ONLY\b|DISABLED\b)\w+"),
     "android.view.InputDevice": re.compile(
         r"(?<!fun )\bInputDevice\.(?!getDevice\b|getDeviceIds\b|SOURCE_(?:CLASS_BUTTON|CLASS_JOYSTICK|DPAD|GAMEPAD|JOYSTICK|KEYBOARD)\b)\w+"
