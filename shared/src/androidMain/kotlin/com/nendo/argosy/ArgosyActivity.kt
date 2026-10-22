@@ -198,7 +198,7 @@ actual class ArgosyActivity : ComponentActivity() {
     lateinit var dualScreenManager: DualScreenManager
         private set
 
-    var isOnHomeScreen = false
+    actual var isOnHomeScreen = false
 
     actual var isOverlayFocused: Boolean
         get() = dualScreenManager.isOverlayFocused

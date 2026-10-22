@@ -77,7 +77,7 @@ data/emulator/LaunchCommand.kt: *
 data/emulator/ScreenshotCaptureMonitor.kt: ScreenshotCaptureMonitor
 data/installer/ManagedInstallerManager.kt: ManagedInstallerManager(openInstallPermissionSettings: Unit)
 libretro/LibretroActivity.kt: LibretroActivity
-DualScreenManager.kt: DualScreenManager(targetDockReorder: Unit, moveDockReorder: Unit, cancelDockReorder: Unit, saveDockReorder: Unit)
+DualScreenManager.kt: DualScreenManager(targetDockReorder: Unit, moveDockReorder: Unit, cancelDockReorder: Unit, saveDockReorder: Unit, isOverlayFocused: Boolean)
 data/quaypass/QuayPassService.kt: QuayPassService
 hardware/ScreenCaptureManager.kt: ScreenCaptureManager
 util/SecondaryHomeComponent.kt: SecondaryHomeComponent
@@ -100,7 +100,7 @@ data/steam/SteamContentManager.kt: SteamContentManager
 data/steam/SteamService.kt: SteamService
 data/update/ApkInstallManager.kt: ApkInstallManager
 hardware/CompanionPanel.kt: CompanionSessionTimer
-ArgosyActivity.kt: ArgosyActivity
+ArgosyActivity.kt: ArgosyActivity(isOnHomeScreen: Boolean)
 data/wallpaper/LockScreenScenes.kt: LockScreenScenes
 ui/screens/common/GameActivityStarter.kt: GameActivityStarter
 ui/util/ClipboardTextReader.kt: ClipboardTextReader

@@ -2130,3 +2130,12 @@
 + ui/screens/library/LibraryGameList.kt
 + ui/screens/library/LibraryScreen.kt
 + ui/screens/library/LibraryViewModel.kt
+
+# Phase 2: portable since ArgosyApp's seams and PlatformValueAnimator (was androidMain).
+[commonMain]
++ ui/ArgosyApp.kt
++ ui/components/LaunchOverlay.kt
++ ui/components/recap/LaunchRecapCard.kt
++ ui/components/recap/MonthlyRecapCard.kt
++ ui/components/recap/MonthlyRecapOverlay.kt
++ ui/components/recap/UnlockRevealRow.kt

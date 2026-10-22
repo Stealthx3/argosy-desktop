@@ -67,3 +67,4 @@ ui/components/SystemStatusBar.kt -> common:SystemStatusState.kt: BatteryState Ne
 ui/components/SystemStatusBar.kt -> SystemStatusProbes.kt: rememberBatteryState rememberNetworkLink toNetworkLink
 libretro/touch/OnScreenControls.kt -> common:OnScreenSlotLayout.kt: computeFacePositions DpOffset SlotLayout layoutFaceSlots layoutShoulderSlots layoutSystemSlots
 ui/screens/settings/sections/ShaderStackSection.kt -> common:ShaderStackFocus.kt: shaderStackMaxFocusIndex
+ui/screens/player/PlayerViewModel.kt -> common:PlayerArgs.kt: PlayerArgs

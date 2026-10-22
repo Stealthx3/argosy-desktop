@@ -1,7 +1,8 @@
 package com.nendo.argosy.ui.components.recap
 
-import android.animation.ValueAnimator
-import android.graphics.BlurMaskFilter
+import com.nendo.argosy.platform.PlatformValueAnimator as ValueAnimator
+import com.nendo.argosy.platform.PlatformBlurMaskFilter as BlurMaskFilter
+import com.nendo.argosy.platform.PlatformBlur
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -49,7 +50,10 @@ import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
+import com.nendo.argosy.platform.image.AsyncImage
+import com.nendo.argosy.platform.image.bitmap
+import com.nendo.argosy.platform.image.intrinsicHeight
+import com.nendo.argosy.platform.image.intrinsicWidth
 import com.nendo.argosy.domain.model.SessionUnlock
 import com.nendo.argosy.ui.common.recapTierColor
 import com.nendo.argosy.ui.theme.Dimens
@@ -269,7 +273,7 @@ private fun UnlockTile(
                 val stroke = Stroke(width = strokePx, cap = StrokeCap.Round)
                 val glowPaint = Paint()
                 glowPaint.asFrameworkPaint().maskFilter =
-                    BlurMaskFilter(glowRadius.toPx(), BlurMaskFilter.Blur.NORMAL)
+                    BlurMaskFilter(glowRadius.toPx(), PlatformBlur.NORMAL)
                 onDrawBehind {
                     val current = frame()
                     val ringFraction = if (cursorTakenOver) 1f else current.borderFraction

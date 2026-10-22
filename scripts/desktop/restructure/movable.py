@@ -78,6 +78,7 @@ REWRITTEN = (
     "androidx.compose.ui.res.stringResource", "androidx.compose.ui.res.pluralStringResource",
     "androidx.compose.ui.res.painterResource", "androidx.compose.ui.platform.LocalLifecycleOwner",
     "android.os.SystemClock.elapsedRealtime", "android.os.SystemClock.uptimeMillis", "android.os.StatFs",
+    "android.animation.ValueAnimator.areAnimatorsEnabled",
     "android.os.Environment.MEDIA_MOUNTED", "android.os.Environment.DIRECTORY_DOWNLOADS",
     "android.os.Environment.getExternalStorage", "android.os.Environment.isExternalStorageManager",
     "android.text.format.DateFormat.getBestDateTimePattern",
@@ -189,6 +190,7 @@ GUARDED_REWRITES = {
         r"|\.(?:getHistorical\w*|historySize|pointerCount|getPointerId|getToolType|buttonState|getRawX|getRawY|rawX|rawY)\b"
     ),
     "android.os.SystemClock": re.compile(r"\bSystemClock\.(?!elapsedRealtime\b|uptimeMillis\b)\w+"),
+    "android.animation.ValueAnimator": re.compile(r"\bValueAnimator\.(?!areAnimatorsEnabled\b)\w+"),
     "android.os.Environment": re.compile(
         r"\bEnvironment\.(?!MEDIA_MOUNTED\b|DIRECTORY_DOWNLOADS\b|getExternalStorageDirectory\b"
         r"|getExternalStoragePublicDirectory\b|getExternalStorageState\b|isExternalStorageManager\b)\w+"
@@ -320,6 +322,7 @@ STAND_IN_GUARDS = {
     "com.nendo.argosy.platform.image.SubcomposeAsyncImage": "coil.compose.SubcomposeAsyncImage",
     "com.nendo.argosy.platform.LocalPlatformView": "androidx.compose.ui.platform.LocalView",
     "com.nendo.argosy.platform.PlatformSystemClock": "android.os.SystemClock",
+    "com.nendo.argosy.platform.PlatformValueAnimator": "android.animation.ValueAnimator",
     "com.nendo.argosy.platform.PlatformEnvironment": "android.os.Environment",
     "com.nendo.argosy.platform.PlatformStatFs": "android.os.StatFs",
     "com.nendo.argosy.platform.PlatformDateFormat": "android.text.format.DateFormat",

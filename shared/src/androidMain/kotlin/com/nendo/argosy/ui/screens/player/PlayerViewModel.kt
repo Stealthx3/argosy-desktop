@@ -61,17 +61,6 @@ private const val LOCK_RELEASE_DOUBLE_PRESS_MS = 400L
  */
 private const val EXIT_CONFIRM_LEAVE_INDEX = 1
 
-/**
- * How the player was asked to open. [startPositionMs] below zero means the caller made no decision
- * and the player resolves resume itself, which is what a relaunch on another display sends.
- */
-data class PlayerArgs(
-    val itemId: String,
-    val title: String = "",
-    val subtitle: String = "",
-    val startPositionMs: Long = -1
-)
-
 sealed interface PlayerEvent {
     data object Finish : PlayerEvent
 

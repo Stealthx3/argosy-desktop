@@ -5,3 +5,4 @@
 #   <file under shared androidMain>: <Outer>.<Nested>
 data/quaypass/QuayPassService.kt: QuayPassService.QuayPassRunState
 data/launcher/SteamLaunchers.kt: SteamLaunchers.MarkOption
+DualScreenManager.kt: DualScreenManager.CompanionHost

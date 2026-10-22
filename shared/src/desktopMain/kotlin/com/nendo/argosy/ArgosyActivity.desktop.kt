@@ -7,4 +7,6 @@ actual class ArgosyActivity @Inject constructor() {
 
     actual fun requestScreenCapturePermission() {
     }
+
+    actual var isOnHomeScreen: Boolean = false
 }

@@ -1,6 +1,5 @@
 package com.nendo.argosy.ui.components
 
-import android.content.Context
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
@@ -41,17 +40,40 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.focus.focusProperties
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import com.nendo.argosy.platform.LocalPlatformContext as LocalContext
+import com.nendo.argosy.platform.startActivity
+import com.nendo.argosy.platform.getApplicationInfo
+import com.nendo.argosy.platform.getApplicationLabel
+import com.nendo.argosy.platform.applicationContext
+import com.nendo.argosy.platform.packageName
+import com.nendo.argosy.platform.getSystemService
+import com.nendo.argosy.platform.getExternalFilesDir
+import com.nendo.argosy.platform.externalCacheDir
+import com.nendo.argosy.platform.dataDir
+import com.nendo.argosy.platform.packageManager
+import com.nendo.argosy.platform.getPackageInfo
+import com.nendo.argosy.platform.getLaunchIntentForPackage
+import com.nendo.argosy.platform.addFlags
+import com.nendo.argosy.platform.versionName
+import com.nendo.argosy.platform.assets
+import com.nendo.argosy.platform.contentResolver
+import com.nendo.argosy.platform.getSharedPreferences
+import com.nendo.argosy.platform.list
+import com.nendo.argosy.platform.open
+import com.nendo.argosy.platform.cacheDir
+import com.nendo.argosy.platform.filesDir
+import com.nendo.argosy.platform.getQuantityString
+import com.nendo.argosy.platform.getString
+import com.nendo.argosy.platform.resources
+import com.nendo.argosy.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import com.nendo.argosy.di.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.nendo.argosy.shared.R
-import com.nendo.argosy.data.emulator.LaunchProgressTracker
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.data.launcher.SteamLaunchers
 import com.nendo.argosy.domain.model.LaunchProgress
 import com.nendo.argosy.domain.model.LaunchPromptOption
@@ -61,7 +83,6 @@ import com.nendo.argosy.domain.model.SyncProgress
 import com.nendo.argosy.ui.common.statusMessage
 import com.nendo.argosy.ui.components.recap.LaunchRecapCard
 import com.nendo.argosy.ui.components.recap.LaunchRecapCompactCard
-import com.nendo.argosy.ui.components.recap.LaunchRecapCursor
 import com.nendo.argosy.ui.components.recap.RecapCursor
 import com.nendo.argosy.ui.components.recap.RecapSurface
 import com.nendo.argosy.ui.components.recap.rememberRecapFullCardSurface
@@ -75,20 +96,6 @@ import com.nendo.argosy.ui.theme.Motion
 import com.nendo.argosy.ui.theme.MotionTier
 import com.nendo.argosy.ui.theme.generated.ComponentDefaults
 import com.nendo.argosy.ui.util.clickableNoFocus
-import dagger.hilt.EntryPoint
-import dagger.hilt.InstallIn
-import dagger.hilt.android.EntryPointAccessors
-import dagger.hilt.components.SingletonComponent
-
-@EntryPoint
-@InstallIn(SingletonComponent::class)
-interface LaunchProgressEntryPoint {
-    fun launchProgressTracker(): LaunchProgressTracker
-    fun launchRecapCursor(): LaunchRecapCursor
-}
-
-private fun launchProgressEntryPoint(context: Context): LaunchProgressEntryPoint =
-    EntryPointAccessors.fromApplication(context.applicationContext, LaunchProgressEntryPoint::class.java)
 
 /**
  * The launch in progress over the surface that starts launches. It holds the input stack while a

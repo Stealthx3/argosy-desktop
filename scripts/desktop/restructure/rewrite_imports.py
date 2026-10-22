@@ -56,6 +56,7 @@ RULES = [
         re.compile(r"^import androidx\.compose\.ui\.res\.(stringResource|pluralStringResource|painterResource)$", re.M),
         r"import com.nendo.argosy.res.\1",
     ),
+    (re.compile(r"(?<!import )\bandroidx\.compose\.ui\.res\.(stringResource|pluralStringResource|painterResource)\b"), r"com.nendo.argosy.res.\1"),
     (
         re.compile(r"^import android\.content\.Context$", re.M),
         "import com.nendo.argosy.platform.PlatformContext as Context\nimport com.nendo.argosy.platform.cacheDir\nimport com.nendo.argosy.platform.filesDir\nimport com.nendo.argosy.platform.getQuantityString\nimport com.nendo.argosy.platform.getString\nimport com.nendo.argosy.platform.resources",
@@ -126,6 +127,7 @@ RULES = [
     (re.compile(r"^import dagger\.hilt\.android\.lifecycle\.HiltViewModel$", re.M), "import com.nendo.argosy.di.HiltViewModel"),
     (re.compile(r"^import android\.os\.SystemClock$", re.M), "import com.nendo.argosy.platform.PlatformSystemClock as SystemClock"),
     (re.compile(r"(?<!import )\bandroid\.os\.SystemClock\b"), "com.nendo.argosy.platform.PlatformSystemClock"),
+    (re.compile(r"^import android\.animation\.ValueAnimator$", re.M), "import com.nendo.argosy.platform.PlatformValueAnimator as ValueAnimator"),
     (re.compile(r"(?<!import )\bandroid\.content\.Context\b"), "com.nendo.argosy.platform.PlatformContext"),
     (
         re.compile(r"@dagger\.hilt\.android\.qualifiers\.ApplicationContext\b"),
@@ -300,7 +302,7 @@ COMPANION_IMPORTS = {
     "com.nendo.argosy.platform.PlatformContentObserver": [
         "com.nendo.argosy.platform.registerContentObserver", "com.nendo.argosy.platform.unregisterContentObserver",
     ],
-    "com.nendo.argosy.platform.PlatformInputMethod": ["com.nendo.argosy.platform.toggleSoftInput"],
+    "com.nendo.argosy.platform.PlatformInputMethod": ["com.nendo.argosy.platform.toggleSoftInput", "com.nendo.argosy.platform.isAcceptingText"],
     "com.nendo.argosy.platform.LocalPlatformConfiguration": [
         "com.nendo.argosy.platform.get", "com.nendo.argosy.platform.locales", "com.nendo.argosy.platform.orientation", "com.nendo.argosy.platform.screenHeightDp",
         "com.nendo.argosy.platform.screenWidthDp",

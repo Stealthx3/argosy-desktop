@@ -1,5 +1,6 @@
 package com.nendo.argosy.hardware
 
+import com.nendo.argosy.CompanionHost
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.hardware.display.DisplayManager
@@ -54,7 +55,7 @@ import kotlinx.coroutines.launch
 @dagger.hilt.android.AndroidEntryPoint
 class SecondaryHomeActivity :
     ComponentActivity(),
-    DualScreenManager.CompanionHost {
+    CompanionHost {
 
     private lateinit var dsm: DualScreenManager
 

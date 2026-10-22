@@ -395,4 +395,14 @@ actual class DualScreenManager @Inject constructor() {
     )
 
     actual suspend fun resolveScreenLayout(): ResolvedScreenLayout? = null
+
+    actual fun registerCompanionHost(displayId: Int, host: CompanionHost) {
+    }
+
+    actual fun unregisterCompanionHost(displayId: Int, host: CompanionHost) {
+    }
+
+    actual val controlCompanion: CompanionHost? = null
+
+    actual var isOverlayFocused: Boolean = false
 }

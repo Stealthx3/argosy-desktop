@@ -23,6 +23,8 @@ actual typealias PlatformInputMethodManager = InputMethodManager
 @Suppress("DEPRECATION")
 actual fun PlatformInputMethodManager.toggleSoftInput(showFlags: Int, hideFlags: Int) = toggleSoftInput(showFlags, hideFlags)
 
+actual val PlatformInputMethodManager.isAcceptingText: Boolean get() = isAcceptingText
+
 actual object PlatformInputMethod {
     actual val SHOW_FORCED: Int = InputMethodManager.SHOW_FORCED
 

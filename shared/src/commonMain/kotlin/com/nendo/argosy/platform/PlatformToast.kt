@@ -17,6 +17,8 @@ expect class PlatformInputMethodManager
 
 expect fun PlatformInputMethodManager.toggleSoftInput(showFlags: Int, hideFlags: Int)
 
+expect val PlatformInputMethodManager.isAcceptingText: Boolean
+
 expect object PlatformInputMethod {
     val SHOW_FORCED: Int
 

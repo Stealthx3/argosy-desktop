@@ -168,6 +168,12 @@ expect class DualScreenManager {
 
     var sessionRefocus: (() -> Unit)?
 
+    fun registerCompanionHost(displayId: Int, host: CompanionHost)
+
+    fun unregisterCompanionHost(displayId: Int, host: CompanionHost)
+
+    val controlCompanion: CompanionHost?
+
     fun holdsAppScreen(displayId: Int): Boolean
 
     fun focusableDisplays(): List<com.nendo.argosy.util.AttachedScreen>
@@ -251,6 +257,8 @@ expect class DualScreenManager {
     val keyboardToggleEvent: StateFlow<Long>
 
     var onOverlayFocusChanged: ((Boolean) -> Unit)?
+
+    var isOverlayFocused: Boolean
 
     val swappedIsGameActive: StateFlow<Boolean>
 

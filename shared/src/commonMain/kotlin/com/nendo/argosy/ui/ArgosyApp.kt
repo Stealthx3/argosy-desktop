@@ -5,8 +5,8 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.ui.res.stringResource
-import com.nendo.argosy.shared.R
+import com.nendo.argosy.res.stringResource
+import com.nendo.argosy.res.ArgosyR as R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -42,10 +42,33 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
-import android.content.Intent
 import com.nendo.argosy.ui.util.doubleTapNoFocus
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalContext
+import com.nendo.argosy.platform.LocalPlatformContext as LocalContext
+import com.nendo.argosy.platform.startActivity
+import com.nendo.argosy.platform.getApplicationInfo
+import com.nendo.argosy.platform.getApplicationLabel
+import com.nendo.argosy.platform.applicationContext
+import com.nendo.argosy.platform.packageName
+import com.nendo.argosy.platform.getSystemService
+import com.nendo.argosy.platform.getExternalFilesDir
+import com.nendo.argosy.platform.externalCacheDir
+import com.nendo.argosy.platform.dataDir
+import com.nendo.argosy.platform.packageManager
+import com.nendo.argosy.platform.getPackageInfo
+import com.nendo.argosy.platform.getLaunchIntentForPackage
+import com.nendo.argosy.platform.addFlags
+import com.nendo.argosy.platform.versionName
+import com.nendo.argosy.platform.assets
+import com.nendo.argosy.platform.contentResolver
+import com.nendo.argosy.platform.getSharedPreferences
+import com.nendo.argosy.platform.list
+import com.nendo.argosy.platform.open
+import com.nendo.argosy.platform.cacheDir
+import com.nendo.argosy.platform.filesDir
+import com.nendo.argosy.platform.getQuantityString
+import com.nendo.argosy.platform.getString
+import com.nendo.argosy.platform.resources
 import androidx.compose.ui.platform.LocalDensity
 import com.nendo.argosy.libretro.LibretroActivity
 import androidx.compose.ui.unit.dp
@@ -107,7 +130,7 @@ import com.nendo.argosy.ui.navigation.NavRing
 import com.nendo.argosy.ui.navigation.RouteRestore
 import com.nendo.argosy.ui.navigation.concreteRoute
 import com.nendo.argosy.ui.navigation.Screen
-import com.nendo.argosy.ui.screens.player.PlayerActivity
+import com.nendo.argosy.ui.screens.player.startPlayer
 import com.nendo.argosy.ui.screens.player.PlayerArgs
 import com.nendo.argosy.core.notification.NotificationHost
 import com.nendo.argosy.ui.quickmenu.QuickMenuInputHandler
@@ -131,6 +154,18 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
+import com.nendo.argosy.platform.show
+import com.nendo.argosy.platform.toggleSoftInput
+import com.nendo.argosy.platform.authority
+import com.nendo.argosy.platform.encodedPath
+import com.nendo.argosy.platform.getQueryParameter
+import com.nendo.argosy.platform.host
+import com.nendo.argosy.platform.lastPathSegment
+import com.nendo.argosy.platform.path
+import com.nendo.argosy.platform.pathSegments
+import com.nendo.argosy.platform.queryParameterNames
+import com.nendo.argosy.platform.scheme
+import com.nendo.argosy.platform.isAcceptingText
 
 private const val KEY_SINK_RECLAIM_GRACE_MS = 250L
 private const val NAV_READY_TIMEOUT_MS = 45_000L
@@ -224,17 +259,17 @@ fun ArgosyApp(
         navBackStackEntry?.let { dsm?.setPrimaryRoute(it.concreteRoute()) }
     }
 
-    val handleDeepLink: suspend (android.net.Uri) -> Unit = { uri ->
-        android.util.Log.d("ArgosyApp", "Handling deep link: $uri")
+    val handleDeepLink: suspend (com.nendo.argosy.platform.PlatformUri) -> Unit = { uri ->
+        com.nendo.argosy.util.PlatformLog.d("ArgosyApp", "Handling deep link: $uri")
         val showDeepLinkNotice: (Int) -> Unit = { messageRes ->
-            android.widget.Toast.makeText(context, messageRes, android.widget.Toast.LENGTH_LONG).show()
+            com.nendo.argosy.platform.PlatformToasts.makeText(context, messageRes, com.nendo.argosy.platform.PlatformToasts.LENGTH_LONG).show()
         }
         val awaitNavGraph: suspend () -> Boolean = {
             val ready = withTimeoutOrNull(NAV_READY_TIMEOUT_MS) {
                 navController.currentBackStackEntryFlow.first()
             } != null
             if (!ready) {
-                android.util.Log.w("ArgosyApp", "Nav graph not ready, dropping deep link $uri")
+                com.nendo.argosy.util.PlatformLog.w("ArgosyApp", "Nav graph not ready, dropping deep link $uri")
                 showDeepLinkNotice(R.string.ui_deep_link_startup_timeout)
             }
             ready
@@ -268,7 +303,7 @@ fun ArgosyApp(
                 "launch" -> {
                     val request = com.nendo.argosy.ui.deeplink.DeepLinkParser.parse(uri)
                     if (request == null) {
-                        android.util.Log.w("ArgosyApp", "Deep link carried no target: $uri")
+                        com.nendo.argosy.util.PlatformLog.w("ArgosyApp", "Deep link carried no target: $uri")
                     } else {
                         when (val outcome = viewModel.resolveDeepLinkLaunch(request)) {
                             is com.nendo.argosy.ui.deeplink.DeepLinkLaunch.Ready -> {
@@ -1120,7 +1155,7 @@ fun ArgosyApp(
         ) {
             var keySinkFocused by remember { mutableStateOf(false) }
             val imeManager = remember(context) {
-                context.getSystemService(android.view.inputmethod.InputMethodManager::class.java)
+                com.nendo.argosy.platform.PlatformInputMethod.manager(context)
             }
 
             val onRingDestination = navRingState.destinations.any { NavRing.routeMatches(it.route, currentRoute) }
@@ -1199,7 +1234,7 @@ fun ArgosyApp(
                     if (keyboardToggle == 0L) return@LaunchedEffect
                     delay(KEY_SINK_RECLAIM_GRACE_MS)
                     @Suppress("DEPRECATION")
-                    imeManager?.toggleSoftInput(android.view.inputmethod.InputMethodManager.SHOW_FORCED, 0)
+                    imeManager?.toggleSoftInput(com.nendo.argosy.platform.PlatformInputMethod.SHOW_FORCED, 0)
                 }
 
                 var drawerWidthPx by remember { mutableStateOf(0f) }
@@ -1282,7 +1317,7 @@ fun ArgosyApp(
                                 quickMenuState.isVisible || appPromptShowing || monthlyRecapShowing,
                             onPlayMedia = { itemId, startOver ->
                                 dsm?.playMediaItem(itemId, startOver)
-                                    ?: PlayerActivity.start(
+                                    ?: startPlayer(
                                         context = context,
                                         args = PlayerArgs(
                                             itemId = itemId,
@@ -1508,7 +1543,7 @@ private fun AppSplashScreen(@StringRes statusRes: Int?) {
             verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(Dimens.spacingLg)
         ) {
             androidx.compose.material3.Text(
-                text = androidx.compose.ui.res.stringResource(R.string.argosyapp_splash_title),
+                text = com.nendo.argosy.res.stringResource(R.string.argosyapp_splash_title),
                 style = androidx.compose.material3.MaterialTheme.typography.headlineLarge,
                 color = androidx.compose.material3.MaterialTheme.colorScheme.onBackground,
                 letterSpacing = 8.sp

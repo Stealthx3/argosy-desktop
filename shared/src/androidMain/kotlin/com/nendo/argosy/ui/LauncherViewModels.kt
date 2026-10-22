@@ -10,19 +10,20 @@ import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.VIEW_MODEL_STORE_OWNER_KEY
 import androidx.lifecycle.viewmodel.MutableCreationExtras
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+import kotlin.reflect.KClass
 
 object LauncherViewModelStore : ViewModelStoreOwner {
     override val viewModelStore = ViewModelStore()
 }
 
 @Composable
-inline fun <reified VM : ViewModel> launcherViewModel(): VM {
+actual fun <VM : ViewModel> launcherViewModelOf(modelClass: KClass<VM>): VM {
     val host = checkNotNull(LocalViewModelStoreOwner.current) as HasDefaultViewModelProviderFactory
     return remember {
         val extras = MutableCreationExtras(host.defaultViewModelCreationExtras).apply {
             set(VIEW_MODEL_STORE_OWNER_KEY, LauncherViewModelStore)
         }
         ViewModelProvider(LauncherViewModelStore.viewModelStore, host.defaultViewModelProviderFactory, extras)
-            .get(VM::class.java)
+            .get(modelClass.java)
     }
 }

@@ -24,6 +24,8 @@ actual class PlatformInputMethodManager
 actual fun PlatformInputMethodManager.toggleSoftInput(showFlags: Int, hideFlags: Int) {
 }
 
+actual val PlatformInputMethodManager.isAcceptingText: Boolean get() = false
+
 actual object PlatformInputMethod {
     actual val SHOW_FORCED: Int = 2
 
