@@ -133,7 +133,7 @@ actual class DualScreenManager @Inject constructor() {
 
     actual fun claimInput(signature: InputSignature): Boolean = false
 
-    actual val sessionControls: StateFlow<com.nendo.argosy.ui.dualscreen.dashboard.SessionControls> = TODO("desktop: sessionControls")
+    actual val sessionControls: StateFlow<com.nendo.argosy.ui.dualscreen.dashboard.SessionControls> = kotlinx.coroutines.flow.MutableStateFlow(com.nendo.argosy.ui.dualscreen.dashboard.SessionControls())
 
     actual fun updateSessionControls(controls: com.nendo.argosy.ui.dualscreen.dashboard.SessionControls) {
     }
@@ -172,11 +172,11 @@ actual class DualScreenManager @Inject constructor() {
 
     actual val presentationShowsHints: StateFlow<Boolean> = kotlinx.coroutines.flow.MutableStateFlow(false)
 
-    actual val presentationStyle: StateFlow<com.nendo.argosy.domain.model.PresentationStyle> = TODO("desktop: presentationStyle")
+    actual val presentationStyle: StateFlow<com.nendo.argosy.domain.model.PresentationStyle> = kotlinx.coroutines.flow.MutableStateFlow(com.nendo.argosy.domain.model.PresentationStyle())
 
     actual val presentationBackgroundBlur: StateFlow<Int> = kotlinx.coroutines.flow.MutableStateFlow(0)
 
-    actual val selectSwapMode: StateFlow<com.nendo.argosy.data.preferences.SelectSwapMode> = TODO("desktop: selectSwapMode")
+    actual val selectSwapMode: StateFlow<com.nendo.argosy.data.preferences.SelectSwapMode> = kotlinx.coroutines.flow.MutableStateFlow(com.nendo.argosy.data.preferences.SelectSwapMode.HOLD)
 
     actual val primaryOnHome: StateFlow<Boolean> = kotlinx.coroutines.flow.MutableStateFlow(false)
 
@@ -361,7 +361,7 @@ actual class DualScreenManager @Inject constructor() {
     actual fun saveDockReorder(token: Long) {
     }
 
-    actual val swappedCompanionState: StateFlow<com.nendo.argosy.hardware.CompanionInGameState> = TODO("desktop: swappedCompanionState")
+    actual val swappedCompanionState: StateFlow<com.nendo.argosy.hardware.CompanionInGameState> = kotlinx.coroutines.flow.MutableStateFlow(com.nendo.argosy.hardware.CompanionInGameState())
 
     actual fun startGame(request: com.nendo.argosy.ui.screens.common.GameLaunchRequest): Result<Unit> = kotlin.Result.failure(UnsupportedOperationException("not available on desktop"))
 
@@ -377,7 +377,7 @@ actual class DualScreenManager @Inject constructor() {
     actual fun releaseSlot(owner: com.nendo.argosy.ui.dualscreen.SlotOwner) {
     }
 
-    actual val presentationSlot: StateFlow<com.nendo.argosy.ui.dualscreen.PresentationSlot> = TODO("desktop: presentationSlot")
+    actual val presentationSlot: StateFlow<com.nendo.argosy.ui.dualscreen.PresentationSlot> = kotlinx.coroutines.flow.MutableStateFlow(com.nendo.argosy.ui.dualscreen.PresentationSlot.Fallback)
 
     actual val pendingDeepLink: StateFlow<com.nendo.argosy.platform.PlatformUri?> = kotlinx.coroutines.flow.MutableStateFlow(null)
 

@@ -1,6 +1,8 @@
 package com.nendo.argosy.ui.components
 
+import com.nendo.argosy.di.desktopComponent
 import com.nendo.argosy.platform.PlatformContext
+import com.nendo.argosy.platform.applicationContext
 
 actual fun launchProgressEntryPoint(context: PlatformContext): LaunchProgressEntryPoint =
-    TODO("desktop graph does not provide the launch progress tracker yet")
+    context.applicationContext.desktopComponent

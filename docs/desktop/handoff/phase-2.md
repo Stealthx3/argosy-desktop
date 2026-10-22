@@ -4,29 +4,27 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 History and reasoning live in `DEVLOG.md`; read only the parts this file points to. Earlier phases:
 `phase-0.md`, `phase-1.md` (closed summaries; carried-forward items are listed there).
 
-**Updated:** 2026-10-22, end of unit p3k
+**Updated:** 2026-10-22, end of unit p4a
 
 ## Where things stand
 
-- **Phase:** 2 · Desktop UI (third of six). **Seam stage done:** `ArgosyApp`, `NavGraph` and the main screens are in `shared/commonMain`. No desktop window shows the real app yet.
-- **Last committed batch:** p3k (`ArgosyApp` and 5 overlay files rehomed; seams `launcherViewModelOf`, `launchProgressEntryPoint`, `monthlyRecapController`, `startPlayer`, `PlatformValueAnimator`; `CompanionHost` hoisted), verified. See the p3k entry in `DEVLOG.md`.
-- **Counts:** app 30 files, commonMain 1,720, androidMain 243.
-- **Baseline for "Android unchanged":** plain upstream v2.24.0, `build/desktop-baseline/app-debug-upstream-v2.24.0.apk`. Plain save proof: `build/desktop-check/save-proof/v224-plain-1022a` (captured 2026-10-22 04:19; recapture once a candidate is more than 24 hours newer: `save-proof.sh build/desktop-baseline/app-debug-upstream-v2.24.0.apk <dir>`, about 8 min; it can run in the background during a compile).
+- **Phase:** 2 · Desktop UI (third of six). Seam stage done; **desktop shell done (p4a):** the desktop app builds the full Dagger graph (all 32 view models), hosts `ArgosyApp`, runs upstream startup and shows the first-run welcome screen. See the p4a entry in `DEVLOG.md`.
+- **Counts:** app 30 files, commonMain 1,720, androidMain 243 (unchanged by p4a; desktop-only work).
+- **Baseline for "Android unchanged":** plain upstream v2.24.0, `build/desktop-baseline/app-debug-upstream-v2.24.0.apk`. Plain save proof: `build/desktop-check/save-proof/v224-plain-1022a` (captured 2026-10-22 04:19; recapture once a candidate is more than 24 hours newer: `save-proof.sh build/desktop-baseline/app-debug-upstream-v2.24.0.apk <dir>`, about 8 min).
 - Nothing uncommitted.
 
 ## Next action
 
-The desktop shell (Phase 2 plan step 6, `DEVLOG.md` under "Phase 2 plan", line ~377). Plan it before writing: it is the first unit with desktop behaviour.
-1. Read `desktopApp/src/main/kotlin/com/nendo/argosy/desktop/Main.kt` (8-line stub), `desktopApp/build.gradle.kts`, `shared/src/desktopMain/kotlin/com/nendo/argosy/di/DesktopComponent.kt` (provides only `PlatformDao` and sync prefs), `DesktopDataModule.kt`, `ViewModels.desktop.kt` (`LocalViewModelProviders`) and `PlatformContext.desktop.kt`.
-2. Find what `ArgosyApp` needs at runtime: its parameters, the view models it and the start screen resolve (`ArgosyViewModel`, `QuickMenuViewModel`, `MusicPlayerViewModel`, `ThemeViewModel`, the first-run/Home ones), and every singleton they inject. That decides how much of the graph `DesktopComponent` must provide (plan step 3: a generated `@IntoMap` module from the `@HiltViewModel` classes, like the generated DAO module). Expect a long chain; bring up the smallest slice that renders (first run or Home), and say in the handoff what is still missing.
-3. Shell: Dagger graph with the XDG data dir, `LocalPlatformContext`, `LocalViewModelProviders`, theme, `ArgosyApp`; window windowed for development. Desktop actuals that must stop being `TODO` before the overlays compose: `launchProgressEntryPoint`, `monthlyRecapController` (add their provisions to `DesktopComponent`, which can then implement `LaunchProgressEntryPoint`), and QuayPass `runState`.
-4. Verify: desktop build and tests, the window launched and screenshotted; Android gate + A/B only if Android code moved.
+Plan step 7, **input**: SDL3 gamepad through JNA (hotplug, the SDL controller database) emitting Android key codes into upstream's `mapKeycodeToGamepadEvent`, plus keyboard mapped to the same actions, so the first-run flow can be driven past "Get Started". Plan it before writing (`DEVLOG.md` "Phase 2 plan", step 7; the seam is `LocalGamepadInputHandler` / `GamepadInputHandler` in commonMain, and `ConnectedControllerTracker.desktop.kt` is the tracker to feed). Keyboard first is the cheaper way to unblock screen bring-up (step 8); SDL can follow in the same or the next unit.
+Then step 8: walk first run → Home with `desktop-shot.sh`, fixing the desktop stubs each screen hits, and compare with Android at 1920×1080.
 
-Desktop stubs to give real implementations then or in Phase 3: `ClipboardTextReader` (returns null); the QR scanner (composes nothing, `deviceHasCamera` false); `PlatformMediaPlayer` (no audio backend) and `PlatformMediaMetadataRetriever` (no embedded art); `InlineTilePlayer`, `PageThemePlayer` (compose nothing) and `YouTubeVideoPlayer` (calls `onError`); `Box3dCover` (draws nothing; Skia `Canvas.concat` with a 4-point homography for `setPolyToPoly`); `OpenDocument` in `PlatformActivityResult.desktop.kt` (returns null; needs a file chooser); `getLaunchIntentForPackage` (null, so "restart app" does nothing); `SteamSettingsDelegate`, `ShaderStackSection` and `ShaderChainManager.shaderStack` (stubs; Steam and the in-app shader chain are Android-only for now); `SteamLaunchers.getMarkOptions` (empty), `SteamLauncher.isInstalled` (false), `AmbientLedManager` (no LEDs, `coverArtEnabled` false); QuayPass (`runState` is a `TODO`, so the check-in screen would throw on desktop: give it a `DISABLED` flow before that screen is brought up).
-Added in p3k: `startPlayer` (no-op; the media player is Android-only for now), `PlatformValueAnimator.areAnimatorsEnabled` (true), `PlatformInputMethodManager.isAcceptingText` (false), `launcherViewModelOf` (delegates to `hiltViewModelOf`).
+Where the desktop graph lives: `shared/src/desktopMain/.../di/` (`DesktopComponent`, `DesktopAppModule` hand-owned bindings, `DesktopDataModule`, `DesktopViewModelComponent`, `DesktopApplication`, `ViewModels.desktop.kt`); generated `DesktopDaoModule` and `DesktopViewModelModule` (Gradle tasks in `shared/build.gradle.kts`). A new Android-side `@Binds`/`@Provides` that commonMain code injects needs a desktop counterpart in `DesktopAppModule`; `di_closure.py <Root>...` lists the gaps, and the Dagger compile of `:shared` for desktop is the final check.
+
+**Desktop stubs.** 44 `TODO(...)` remain in desktopMain, all functions with typed returns on feature paths (Steam, netplay, save states, frames, music dirs, documents, QuayPass keys, ...): `grep -rn 'TODO(' shared/src/desktopMain`. Each throws when reached; replace with Android's do-nothing answer or a real desktop implementation as screens reach them. Others that compose nothing or report "unsupported": `ClipboardTextReader`, QR scanner, `PlatformMediaPlayer`/`PlatformMediaMetadataRetriever`, `InlineTilePlayer`, `PageThemePlayer`, `YouTubeVideoPlayer`, `Box3dCover` (Skia `Canvas.concat` homography for `setPolyToPoly`), `OpenDocument` (needs a file chooser), `getLaunchIntentForPackage`, Steam and shader-chain stubs, `AmbientLedManager`, `startPlayer`, `DesktopLEDController`, `DesktopFileAccessLayer` (plain `java.io`; fine for Linux).
 
 ## Commands and tools
 
+- Desktop run + screenshot: `scripts/desktop/check/desktop-shot.sh <out.png> [settle-s] [WxH]` (windowed, X window via `import`; prints exceptions from the app log). DI gaps: `scripts/desktop/restructure/di_closure.py <Root>... [--tree]`.
 - Restructure tools: `scripts/desktop/restructure/` (manifests `*.txt`, scripts `*.py`; `movable.py --path/--roots/--plan/--rank` for planning).
 - Verification: `scripts/desktop/check/verify.sh`, `ab-check.sh`, `save-proof.sh`; testbed: `scripts/desktop/testbed/` and `docs/desktop/testbed-runbook.md`.
 - Quiet runner for anything noisy: `scripts/desktop/quiet.sh <label> <command...>`.
@@ -34,6 +32,9 @@ Added in p3k: `startPlayer` (no-op; the media player is Android-only for now), `
 
 ## Gotchas worth remembering
 
+- Desktop: `kotlinx-coroutines-swing` must be on the runtime classpath (`Dispatchers.Main`). A `TODO` in a desktop property initializer throws at injection; one in a function throws when a coroutine reaches it, often off-screen (startup hangs on a spinner). Read the app log, not only the screenshot.
+- Gradle does not track `filter {}` lambdas: change `prepareDesktopComposeResources`'s `stringFilter` input property along with its filter.
+- `@HiltViewModel` scan: the Android task's pattern skips a class with an annotation argument between `@HiltViewModel` and `class` (e.g. `FirstRunViewModel`), yet Android still resolves it. Understand why before changing the Android task.
 - `slices.py` only carries members commonMain uses when it runs: after a rehome, run `slices.py` (then `rewrite_imports.py` twice) again, or the compile reports the newly used members. Its "left out" lines give the reason per member (`no declared type`: add the return type in `slices.txt`; a nested type: hoist it).
 - A Hilt `@EntryPoint` that commonMain needs: plain commonMain interface, Hilt interface in a `.android.kt` file extending it with the members redeclared (`LaunchProgressEntryPoint.android.kt`).
 - A nested enum or sealed class that commonMain code switches over or names cannot ride in a slice (expect enum: K2 wants `else`; sealed subclasses are not carried). List it in `nested-hoists.txt`; `hoist_nested.py` makes it a plain top-level commonMain declaration.

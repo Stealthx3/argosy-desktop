@@ -10,13 +10,13 @@ import com.nendo.argosy.platform.PlatformConfiguration as Configuration
 import java.util.Locale
 
 actual object LocaleHelper {
-    actual fun wrap(base: Context, languageTag: String): Context = TODO("desktop: wrap")
+    actual fun wrap(base: Context, languageTag: String): Context = base
 
     actual fun resolveLocale(languageTag: String): Locale? = null
 
     actual fun overrideConfiguration(base: Configuration?, languageTag: String): Configuration? = null
 
-    actual fun effectiveLocale(context: Context): Locale = TODO("desktop: effectiveLocale")
+    actual fun effectiveLocale(context: Context): Locale = Locale.getDefault()
 
     actual const val SYSTEM_LANGUAGE_TAG: String = "system"
 }

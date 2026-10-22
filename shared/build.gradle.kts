@@ -115,6 +115,47 @@ val generateDesktopDaoModule by tasks.registering {
     }
 }
 
+val generateDesktopViewModelModule by tasks.registering {
+    val commonSources = layout.projectDirectory.dir("src/commonMain/kotlin")
+    val outDir = layout.buildDirectory.dir("generated/desktopViewModelModule")
+    inputs.dir(commonSources)
+    outputs.dir(outDir)
+    doLast {
+        val annotated = Regex("""^@HiltViewModel\s*(?:\([^)]*\)\s*)?(?:@\w+(?:\([^)]*\))?\s*)*class (\w+)""", RegexOption.MULTILINE)
+        val viewModels = commonSources.asFile.walkTopDown()
+            .filter { it.isFile && it.extension == "kt" }
+            .flatMap { file ->
+                val source = file.readText()
+                val pkg = Regex("""^package ([\w.]+)""", RegexOption.MULTILINE).find(source)?.groupValues?.get(1)
+                annotated.findAll(source).map { "$pkg.${it.groupValues[1]}" }
+            }
+            .sorted()
+            .toList()
+        val lines = buildList {
+            add("package com.nendo.argosy.di")
+            add("")
+            add("import androidx.lifecycle.ViewModel")
+            add("import dagger.Binds")
+            add("import dagger.Module")
+            add("import dagger.multibindings.ClassKey")
+            add("import dagger.multibindings.IntoMap")
+            add("")
+            add("@Module")
+            add("abstract class DesktopViewModelModule {")
+            viewModels.forEachIndexed { index, fqName ->
+                add("    @Binds")
+                add("    @IntoMap")
+                add("    @ClassKey($fqName::class)")
+                add("    abstract fun viewModel$index(viewModel: $fqName): ViewModel")
+            }
+            add("}")
+        }
+        val dir = outDir.get().dir("desktopMain/com/nendo/argosy/di").asFile
+        dir.mkdirs()
+        dir.resolve("DesktopViewModelModule.kt").writeText(lines.joinToString("\n") + "\n")
+    }
+}
+
 val generateAndroidViewModelModules by tasks.registering {
     val commonSources = layout.projectDirectory.dir("src/commonMain/kotlin")
     val outDir = layout.buildDirectory.dir("generated/androidViewModelModules")
@@ -200,6 +241,7 @@ tasks.matching { it.name.matches(Regex("ksp(Debug|Release)KotlinAndroid")) }.con
 val androidResources = layout.projectDirectory.dir("src/androidMain/res")
 
 val prepareDesktopComposeResources by tasks.registering(Sync::class) {
+    inputs.property("stringFilter", "android-escapes-v1")
     from(androidResources) {
         include("values*/strings*.xml", "drawable/*.xml", "raw/*")
         eachFile {
@@ -207,6 +249,9 @@ val prepareDesktopComposeResources by tasks.registering(Sync::class) {
                 .replace(Regex("^values-b\\+zh\\+Hans/"), "values-zh/")
                 .replace(Regex("^values-b\\+zh\\+Hant/"), "values-zh-rTW/")
                 .replace(Regex("^raw/"), "files/raw/")
+        }
+        filesMatching("values*/strings*.xml") {
+            filter { line -> line.replace("\\'", "'").replace("\\\"", "\"") }
         }
     }
     includeEmptyDirs = false
@@ -333,6 +378,9 @@ kotlin {
         getByName("desktopMain").kotlin.srcDir(
             generateDesktopDaoModule.map { it.outputs.files.singleFile.resolve("desktopMain") }
         )
+        getByName("desktopMain").kotlin.srcDir(
+            generateDesktopViewModelModule.map { it.outputs.files.singleFile.resolve("desktopMain") }
+        )
         getByName("androidMain").kotlin.srcDir(
             generateAndroidViewModelModules.map { it.outputs.files.singleFile.resolve("androidMain") }
         )
@@ -406,6 +454,7 @@ kotlin {
         getByName("desktopTest").dependencies {
             implementation(libs.kotlin.test)
             implementation(compose.desktop.currentOs)
+            implementation(libs.kotlinx.coroutines.swing)
         }
     }
 }

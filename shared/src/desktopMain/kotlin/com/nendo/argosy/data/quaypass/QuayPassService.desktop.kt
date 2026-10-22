@@ -12,7 +12,7 @@ actual class QuayPassService @Inject constructor() {
         actual fun getInstance(): QuayPassService? = null
     }
 
-    actual val runState: StateFlow<QuayPassRunState> = TODO("desktop: runState")
+    actual val runState: StateFlow<QuayPassRunState> = kotlinx.coroutines.flow.MutableStateFlow(QuayPassRunState.DISABLED)
 
     actual fun isBleSupported(): Boolean = false
 

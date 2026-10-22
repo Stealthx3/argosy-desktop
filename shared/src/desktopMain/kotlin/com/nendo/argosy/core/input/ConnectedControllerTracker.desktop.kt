@@ -17,7 +17,7 @@ actual class ConnectedControllerTracker @Inject constructor() {
 
     actual fun activeDevice(): InputDevice? = null
 
-    actual fun detectActive(): DetectionResult = TODO("desktop: detectActive")
+    actual fun detectActive(): DetectionResult = ControllerDetector.detectFor(null)
 
     actual fun refresh() {
     }

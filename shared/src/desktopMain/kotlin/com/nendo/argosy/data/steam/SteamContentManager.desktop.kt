@@ -19,7 +19,7 @@ actual class SteamContentManager @Inject constructor() {
         actual val gameName: String?
     )
 
-    actual val downloadState: StateFlow<SteamDownloadState> = TODO("desktop: downloadState")
+    actual val downloadState: StateFlow<SteamDownloadState> = kotlinx.coroutines.flow.MutableStateFlow<SteamDownloadState>(SteamDownloadState.Idle)
 
     actual val activeDownload: StateFlow<SteamDownloadProgress?> = kotlinx.coroutines.flow.MutableStateFlow(null)
 

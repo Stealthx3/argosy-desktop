@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 @Singleton
 actual class ApkInstallManager @Inject constructor() {
-    actual val state: StateFlow<ApkInstallState> = TODO("desktop: state")
+    actual val state: StateFlow<ApkInstallState> = kotlinx.coroutines.flow.MutableStateFlow<ApkInstallState>(ApkInstallState.Idle)
 
     actual fun canInstallPackages(): Boolean = false
 

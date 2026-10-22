@@ -18,7 +18,7 @@ actual class VideoSettingsManager @Inject constructor() {
 
     actual var fastForwardSpeed: Int = 0
 
-    actual var fastForwardMode: com.nendo.argosy.data.local.entity.FastForwardMode = TODO("desktop: fastForwardMode")
+    actual var fastForwardMode: com.nendo.argosy.data.local.entity.FastForwardMode = com.nendo.argosy.data.local.entity.FastForwardMode.HOLD
 
     actual var fastForwardPreservePitch: Boolean = false
 
@@ -96,5 +96,5 @@ actual class VideoSettingsManager @Inject constructor() {
     actual fun persistFrame(frameId: String?) {
     }
 
-    actual var resolvedCustomShader: ShaderConfig = TODO("desktop: resolvedCustomShader")
+    actual var resolvedCustomShader: ShaderConfig = ShaderConfig.Default
 }

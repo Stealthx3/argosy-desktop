@@ -21,9 +21,9 @@ actual class StorageAttributionRepository @Inject constructor() {
     actual fun markDirty(category: StorageCategory) {
     }
 
-    actual fun refresh(force: Boolean, deep: Boolean): Job = TODO("desktop: refresh")
+    actual fun refresh(force: Boolean, deep: Boolean): Job = kotlinx.coroutines.Job().apply { complete() }
 
-    actual fun refreshOnOpen(): Job = TODO("desktop: refreshOnOpen")
+    actual fun refreshOnOpen(): Job = kotlinx.coroutines.Job().apply { complete() }
 
     actual fun isPathAvailable(path: String): Boolean = false
 

@@ -1,6 +1,9 @@
 package com.nendo.argosy.di
 
 import com.nendo.argosy.data.local.entity.PlatformEntity
+import com.nendo.argosy.platform.DesktopPlatformContext
+import com.nendo.argosy.platform.PlatformApplication
+import androidx.lifecycle.SavedStateHandle
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import java.io.File
@@ -15,7 +18,10 @@ import kotlin.test.assertTrue
 class DesktopComponentTest {
 
     private val dir: File = createTempDirectory("argosy-di-test").toFile()
-    private val component: DesktopComponent = DaggerDesktopComponent.factory().create(dir)
+    private val component: DesktopComponent = DaggerDesktopComponent.factory().create(
+        dir,
+        PlatformApplication(DesktopPlatformContext(platformFilesDir = dir.resolve("files"), platformCacheDir = dir.resolve("cache"))),
+    )
 
     @AfterTest
     fun tearDown() {
@@ -45,5 +51,26 @@ class DesktopComponentTest {
         prefs.setRommSnapshotSupport("server-a", true)
         assertEquals(true, prefs.getRommSnapshotSupport("server-a"))
         assertTrue(File(dir, "datastore/settings.preferences_pb").isFile)
+    }
+
+    @Test
+    fun everyViewModelIsBuiltFromTheGraph() {
+        val viewModels = component.viewModelComponentFactory().create(SavedStateHandle()).viewModels()
+        assertTrue(viewModels.keys.any { it.simpleName == "FirstRunViewModel" })
+        assertTrue(viewModels.size >= 32)
+        val failures = viewModels.mapNotNull { (key, provider) ->
+            runCatching { provider.get() }.exceptionOrNull()?.let { key.simpleName to it }
+        }.toMap()
+        assertEquals(ROUTE_ARGUMENT_VIEW_MODELS, failures.keys, failures.toString())
+        failures.values.forEach { assertTrue(it is IllegalStateException, it.toString()) }
+    }
+
+    private companion object {
+        val ROUTE_ARGUMENT_VIEW_MODELS = setOf(
+            "CollectionDetailViewModel",
+            "VirtualBrowserViewModel",
+            "VirtualCategoryViewModel",
+            "SaveTimelineViewModel",
+        )
     }
 }

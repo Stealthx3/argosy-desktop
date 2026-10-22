@@ -8,5 +8,5 @@ import kotlinx.coroutines.flow.StateFlow
 actual class DiscordPresenceManager @Inject constructor() {
     actual companion object {}
 
-    actual val state: StateFlow<DiscordPresenceState> = TODO("desktop: state")
+    actual val state: StateFlow<DiscordPresenceState> = kotlinx.coroutines.flow.MutableStateFlow<DiscordPresenceState>(DiscordPresenceState.Disconnected)
 }

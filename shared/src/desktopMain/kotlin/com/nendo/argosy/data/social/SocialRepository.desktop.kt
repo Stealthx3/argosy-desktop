@@ -14,7 +14,7 @@ actual class SocialRepository @Inject constructor() {
 
     actual companion object {}
 
-    actual val connectionState: StateFlow<SocialConnectionState> = TODO("desktop: connectionState")
+    actual val connectionState: StateFlow<SocialConnectionState> = kotlinx.coroutines.flow.MutableStateFlow<SocialConnectionState>(SocialConnectionState.Disconnected)
 
     actual val friendCode: StateFlow<FriendCode?> = kotlinx.coroutines.flow.MutableStateFlow(null)
 
@@ -72,9 +72,9 @@ actual class SocialRepository @Inject constructor() {
 
     actual val netplayInvites: SharedFlow<NetplayInvitePayload> = kotlinx.coroutines.flow.MutableSharedFlow()
 
-    actual val authState: StateFlow<SocialAuthManager.AuthState> = TODO("desktop: authState")
+    actual val authState: StateFlow<SocialAuthManager.AuthState> = kotlinx.coroutines.flow.MutableStateFlow<SocialAuthManager.AuthState>(SocialAuthManager.AuthState.Idle)
 
-    actual val serviceConnectionState: StateFlow<ArgosSocialService.ConnectionState> = TODO("desktop: serviceConnectionState")
+    actual val serviceConnectionState: StateFlow<ArgosSocialService.ConnectionState> = kotlinx.coroutines.flow.MutableStateFlow<ArgosSocialService.ConnectionState>(ArgosSocialService.ConnectionState.Disconnected)
 
     actual suspend fun startAuth(): SocialAuthManager.AuthResult = TODO("desktop: startAuth")
 

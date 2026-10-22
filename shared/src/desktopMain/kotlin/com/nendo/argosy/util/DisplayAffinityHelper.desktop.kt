@@ -44,7 +44,7 @@ actual class DisplayAffinityHelper @Inject constructor() {
 
     actual val hasSecondaryDisplay: Boolean = false
 
-    actual val secondaryDisplayType: SecondaryDisplayType = TODO("desktop: secondaryDisplayType")
+    actual val secondaryDisplayType: SecondaryDisplayType = SecondaryDisplayType.NONE
 
     actual var roleDisplayIds: Pair<Int, Int>? = null
 

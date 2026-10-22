@@ -6,11 +6,15 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.emptyPreferences
 import com.nendo.argosy.data.local.ALauncherDatabase
+import com.nendo.argosy.data.preferences.AccountPreferenceStoreRegistry
+import com.nendo.argosy.data.preferences.AccountScopedDataStore
+import com.nendo.argosy.platform.PlatformApplication
 import com.nendo.argosy.data.local.DesktopDatabaseFactory
 import com.nendo.argosy.util.Logger
 import dagger.Module
 import dagger.Provides
 import java.io.File
+import javax.inject.Qualifier
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -26,7 +30,8 @@ object DesktopDataModule {
 
     @Provides
     @Singleton
-    fun preferences(@DataDirectory dataDirectory: File): DataStore<Preferences> =
+    @GlobalPreferences
+    fun globalPreferences(@DataDirectory dataDirectory: File): DataStore<Preferences> =
         PreferenceDataStoreFactory.create(
             corruptionHandler = ReplaceFileCorruptionHandler { cause ->
                 Logger.error("DataStore", "preferences file unreadable, starting from empty", cause)
@@ -36,4 +41,26 @@ object DesktopDataModule {
         ) {
             File(dataDirectory, "datastore/settings.preferences_pb")
         }
+
+    @Provides
+    @Singleton
+    fun accountPreferenceStoreRegistry(
+        application: PlatformApplication,
+        @GlobalPreferences globalStore: DataStore<Preferences>,
+    ): AccountPreferenceStoreRegistry = AccountPreferenceStoreRegistry(
+        context = application,
+        globalStore = globalStore,
+        scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    )
+
+    @Provides
+    @Singleton
+    fun preferences(
+        @GlobalPreferences globalStore: DataStore<Preferences>,
+        registry: AccountPreferenceStoreRegistry,
+    ): DataStore<Preferences> = AccountScopedDataStore(globalStore, registry)
 }
+
+@Qualifier
+@Retention(AnnotationRetention.RUNTIME)
+annotation class GlobalPreferences

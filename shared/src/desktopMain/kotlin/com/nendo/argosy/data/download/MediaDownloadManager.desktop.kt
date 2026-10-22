@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 @Singleton
 actual class MediaDownloadManager @Inject constructor() {
-    actual val downloadState: StateFlow<MediaDownloadState> = TODO("desktop: downloadState")
+    actual val downloadState: StateFlow<MediaDownloadState> = kotlinx.coroutines.flow.MutableStateFlow<MediaDownloadState>(MediaDownloadState.Idle)
 
     actual val activeDownload: StateFlow<MediaDownloadProgress?> = kotlinx.coroutines.flow.MutableStateFlow(null)
 

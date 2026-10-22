@@ -6,5 +6,5 @@ import javax.inject.Singleton
 @Singleton
 actual class StorageVolumeHealth @Inject constructor() {
 
-    actual fun newProbe(): VolumeProbe = TODO("desktop: newProbe")
+    actual fun newProbe(): VolumeProbe = VolumeProbe()
 }

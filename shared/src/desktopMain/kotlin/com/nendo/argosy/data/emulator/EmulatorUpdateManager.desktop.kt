@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 actual class EmulatorUpdateManager @Inject constructor() {
     actual companion object {}
 
-    actual val checkState: StateFlow<UpdateCheckState> = TODO("desktop: checkState")
+    actual val checkState: StateFlow<UpdateCheckState> = kotlinx.coroutines.flow.MutableStateFlow<UpdateCheckState>(UpdateCheckState.Idle)
 
     actual val updateCount: Flow<Int> = kotlinx.coroutines.flow.emptyFlow()
 
@@ -26,7 +26,7 @@ actual class EmulatorUpdateManager @Inject constructor() {
     actual fun forceCheck() {
     }
 
-    actual suspend fun checkForUpdates(ignoreCache: Boolean): UpdateCheckState = TODO("desktop: checkForUpdates")
+    actual suspend fun checkForUpdates(ignoreCache: Boolean): UpdateCheckState = UpdateCheckState.Idle
 
     actual suspend fun getUpdateForEmulator(emulatorId: String): EmulatorUpdateEntity? = null
 

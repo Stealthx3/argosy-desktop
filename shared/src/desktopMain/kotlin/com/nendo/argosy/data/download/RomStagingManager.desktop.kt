@@ -1,12 +1,14 @@
 package com.nendo.argosy.data.download
 
+import com.nendo.argosy.platform.DesktopDirectories
+import com.nendo.argosy.util.AppPaths
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 actual class RomStagingManager @Inject constructor() {
-    actual val stagingRoot: File = TODO("desktop: stagingRoot")
+    actual val stagingRoot: File get() = AppPaths.romStagingRoot(DesktopDirectories.data.resolve("files"))
 
     actual fun claim(downloadId: Long): Boolean = false
 

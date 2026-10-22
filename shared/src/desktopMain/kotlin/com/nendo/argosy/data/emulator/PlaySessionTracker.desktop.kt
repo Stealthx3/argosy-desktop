@@ -34,7 +34,7 @@ actual class PlaySessionTracker @Inject constructor() {
     actual fun updateSessionHardcore(gameId: Long, isHardcore: Boolean) {
     }
 
-    actual suspend fun endSession(stopService: Boolean, skipSaveSync: Boolean): SessionEndResult = TODO("desktop: endSession")
+    actual suspend fun endSession(stopService: Boolean, skipSaveSync: Boolean): SessionEndResult = SessionEndResult.Skipped
 
     actual fun sawSaveActivity(): Boolean = false
 
@@ -51,7 +51,7 @@ actual class PlaySessionTracker @Inject constructor() {
     actual fun cancelSession() {
     }
 
-    actual fun endSessionInBackground(skipSaveSync: Boolean, stopService: Boolean): Job = TODO("desktop: endSessionInBackground")
+    actual fun endSessionInBackground(skipSaveSync: Boolean, stopService: Boolean): Job = kotlinx.coroutines.Job().apply { complete() }
 
     actual suspend fun cacheCurrentSessionForQuit(): SaveCacheManager.CacheResult? = null
 

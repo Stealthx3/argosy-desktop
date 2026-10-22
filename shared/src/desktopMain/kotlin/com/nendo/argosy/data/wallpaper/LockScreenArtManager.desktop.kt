@@ -20,5 +20,5 @@ actual class LockScreenArtManager @Inject constructor() {
     actual fun onLiveWallpaperBound() {
     }
 
-    actual fun prepareLivePreview(): Job = TODO("desktop: prepareLivePreview")
+    actual fun prepareLivePreview(): Job = kotlinx.coroutines.Job().apply { complete() }
 }
