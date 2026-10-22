@@ -37,7 +37,7 @@ data/launcher/SteamLauncher.kt: SteamLauncher
 data/launcher/SteamLaunchers.kt: SteamLaunchers
 data/launcher/GameNativeLauncher.kt: GameNativeLauncher
 data/launcher/DroidDeckLauncher.kt: DroidDeckLauncher
-core/input/ConnectedControllerTracker.kt: ConnectedControllerTracker(noteInput: Unit)
+core/input/ConnectedControllerTracker.kt: ConnectedControllerTracker(noteInput: Unit, holdActiveController: Unit)
 util/SystemSettings.kt: *
 data/storage/StorageAttributionRepository.kt: StorageAttributionRepository
 libretro/frame/FrameRegistry.kt: FrameRegistry
@@ -83,7 +83,7 @@ hardware/ScreenCaptureManager.kt: ScreenCaptureManager
 util/SecondaryHomeComponent.kt: SecondaryHomeComponent
 util/HomeAppComponent.kt: HomeAppComponent
 util/NetworkUtils.kt: NetworkUtils
-util/DisplayAffinityHelper.kt: DisplayAffinityHelper
+util/DisplayAffinityHelper.kt: DisplayAffinityHelper(rolesSwappedForPrimary: Boolean)
 data/social/SocialRepository.kt: SocialRepository(clearPresenceCovers: Unit)
 data/social/discord/DiscordPresenceManager.kt: DiscordPresenceManager
 data/wallpaper/LockScreenArtManager.kt: LockScreenArtManager
@@ -91,7 +91,7 @@ data/repository/GameDocumentLoader.kt: GameDocumentLoader
 data/emulator/GameLauncher.kt: GameLauncher(forceStopEmulator: Unit)
 data/emulator/PlaySessionTracker.kt: PlaySessionTracker
 libretro/shader/ShaderChainManager.kt: ShaderChainManager
-libretro/shader/ShaderPreviewRenderer.kt: ShaderPreviewRenderer
+libretro/shader/ShaderPreviewRenderer.kt: ShaderPreviewRenderer(constructor: ())
 data/download/DownloadThermalManager.kt: DownloadThermalManager
 data/download/RomStagingManager.kt: RomStagingManager(release: Unit)
 data/download/MediaDownloadManager.kt: MediaDownloadManager
@@ -107,6 +107,8 @@ ui/util/ClipboardTextReader.kt: ClipboardTextReader
 ui/components/QrScanner.kt: *
 ui/components/SystemStatusProbes.kt: *
 ui/components/Box3dCover.kt: *
+ui/screens/settings/sections/ShaderStackSection.kt: *
 ui/components/InlineTilePlayer.kt: *
 ui/components/PageThemePlayer.kt: *
 ui/components/YouTubeVideoPlayer.kt: *
+ui/screens/settings/delegates/SteamSettingsDelegate.kt: SteamSettingsDelegate(downloadProgress: kotlinx.coroutines.flow.Flow<com.nendo.argosy.data.emulator.EmulatorDownloadProgress?>)

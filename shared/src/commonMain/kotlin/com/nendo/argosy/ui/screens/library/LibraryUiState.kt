@@ -19,6 +19,8 @@ import com.nendo.argosy.data.model.SourceFilter
 import com.nendo.argosy.domain.model.PlayerCountBucket
 import com.nendo.argosy.ui.common.labelRes
 import com.nendo.argosy.platform.PlatformContext as Context
+import com.nendo.argosy.platform.getLaunchIntentForPackage
+import com.nendo.argosy.platform.addFlags
 import com.nendo.argosy.platform.externalCacheDir
 import com.nendo.argosy.platform.dataDir
 import com.nendo.argosy.platform.startActivity

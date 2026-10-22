@@ -25,6 +25,8 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.VisibilityOff
 import com.nendo.argosy.platform.PlatformContext as Context
+import com.nendo.argosy.platform.getLaunchIntentForPackage
+import com.nendo.argosy.platform.addFlags
 import com.nendo.argosy.platform.externalCacheDir
 import com.nendo.argosy.platform.dataDir
 import com.nendo.argosy.platform.startActivity

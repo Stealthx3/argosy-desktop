@@ -29,6 +29,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import com.nendo.argosy.platform.LocalPlatformContext as LocalContext
+import com.nendo.argosy.platform.getLaunchIntentForPackage
+import com.nendo.argosy.platform.addFlags
 import com.nendo.argosy.platform.externalCacheDir
 import com.nendo.argosy.platform.dataDir
 import com.nendo.argosy.platform.startActivity

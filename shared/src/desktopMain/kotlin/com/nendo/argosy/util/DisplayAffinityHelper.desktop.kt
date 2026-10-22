@@ -21,6 +21,7 @@ actual class DisplayAffinityHelper @Inject constructor() {
         actual fun dockedExternalDisplayId(context: Context): Int? = null
 
         actual const val BLANK_PANELS_ON_VIDEO_OUTPUT_SETTING: String = "close_screen_when_output_video"
+        actual internal fun rolesSwappedForPrimary(primaryDisplayId: Int): Boolean = false
     }
 
     actual val hasPhysicalSecondaryDisplay: Boolean = false

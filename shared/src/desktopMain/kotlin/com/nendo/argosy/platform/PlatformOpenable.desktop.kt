@@ -9,4 +9,6 @@ actual fun PlatformContentResolver.openInputStream(uri: PlatformUri): InputStrea
     return if (file.isFile) file.inputStream() else null
 }
 
+actual fun PlatformContentResolver.takePersistableUriPermission(uri: PlatformUri, modeFlags: Int) {}
+
 actual fun queryOpenableDisplayName(resolver: PlatformContentResolver, uri: PlatformUri): String? = null

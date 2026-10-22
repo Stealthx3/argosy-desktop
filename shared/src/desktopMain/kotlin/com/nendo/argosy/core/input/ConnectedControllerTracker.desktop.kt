@@ -24,4 +24,7 @@ actual class ConnectedControllerTracker @Inject constructor() {
 
     actual fun noteInput(event: InputEvent) {
     }
+
+    actual fun holdActiveController(held: Boolean) {
+    }
 }

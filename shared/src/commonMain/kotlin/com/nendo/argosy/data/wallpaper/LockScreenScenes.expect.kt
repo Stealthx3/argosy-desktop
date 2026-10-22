@@ -12,6 +12,8 @@ import com.nendo.argosy.platform.externalCacheDir
 import com.nendo.argosy.platform.dataDir
 import com.nendo.argosy.platform.packageManager
 import com.nendo.argosy.platform.getPackageInfo
+import com.nendo.argosy.platform.getLaunchIntentForPackage
+import com.nendo.argosy.platform.addFlags
 import com.nendo.argosy.platform.versionName
 import com.nendo.argosy.platform.assets
 import com.nendo.argosy.platform.contentResolver
@@ -25,7 +27,6 @@ import com.nendo.argosy.platform.getString
 import com.nendo.argosy.platform.resources
 import com.nendo.argosy.platform.PlatformIntentType as Intent
 import com.nendo.argosy.platform.action
-import com.nendo.argosy.platform.addFlags
 import com.nendo.argosy.platform.data
 import com.nendo.argosy.platform.flags
 import com.nendo.argosy.platform.putExtra

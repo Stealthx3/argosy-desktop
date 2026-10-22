@@ -55,7 +55,7 @@ actual class ConnectedControllerTracker @Inject constructor(
     /**
      * Freezes [activeController] against input while a mapping capture waits for its press.
      */
-    fun holdActiveController(held: Boolean) = activeState.setHeld(held)
+    actual fun holdActiveController(held: Boolean) = activeState.setHeld(held)
 
     actual fun activeDevice(): InputDevice? = deviceOf(activeController.value)
 

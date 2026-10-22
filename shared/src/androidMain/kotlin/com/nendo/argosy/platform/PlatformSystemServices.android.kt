@@ -28,6 +28,9 @@ actual fun PlatformPackageManager.getApplicationInfo(packageName: String, flags:
 
 actual fun PlatformPackageManager.getApplicationLabel(info: PlatformApplicationInfo): CharSequence = getApplicationLabel(info)
 
+actual fun PlatformPackageManager.getLaunchIntentForPackage(packageName: String): PlatformIntentType? =
+    getLaunchIntentForPackage(packageName)
+
 actual typealias PlatformApplicationInfo = android.content.pm.ApplicationInfo
 
 actual typealias PlatformPackageInfo = PackageInfo

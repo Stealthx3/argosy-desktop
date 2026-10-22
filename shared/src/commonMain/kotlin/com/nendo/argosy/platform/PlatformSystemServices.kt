@@ -26,6 +26,8 @@ expect fun PlatformPackageManager.getApplicationInfo(packageName: String, flags:
 
 expect fun PlatformPackageManager.getApplicationLabel(info: PlatformApplicationInfo): CharSequence
 
+expect fun PlatformPackageManager.getLaunchIntentForPackage(packageName: String): PlatformIntentType?
+
 expect open class PlatformApplicationInfo
 
 expect open class PlatformPackageInfo

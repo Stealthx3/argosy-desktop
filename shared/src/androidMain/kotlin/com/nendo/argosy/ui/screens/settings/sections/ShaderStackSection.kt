@@ -45,7 +45,6 @@ import com.nendo.argosy.ui.components.FocusedScroll
 import com.nendo.argosy.libretro.shader.ShaderChainManager
 import com.nendo.argosy.ui.screens.settings.ShaderParamDef
 import com.nendo.argosy.ui.screens.settings.ShaderStackEntry
-import com.nendo.argosy.ui.screens.settings.ShaderStackState
 import com.nendo.argosy.ui.screens.settings.components.LocalSettingsTouchFocus
 import com.nendo.argosy.ui.screens.settings.components.ShaderPickerModal
 import com.nendo.argosy.ui.primitives.StepperControl
@@ -55,7 +54,7 @@ import com.nendo.argosy.ui.theme.Motion
 import com.nendo.argosy.ui.util.clickableNoFocus
 
 @Composable
-fun ShaderStackSection(
+actual fun ShaderStackSection(
     manager: ShaderChainManager
 ) {
     val listState = rememberLazyListState()
@@ -390,6 +389,3 @@ private fun ShaderNoParamsState(shaderName: String) {
         )
     }
 }
-
-internal fun shaderStackMaxFocusIndex(state: ShaderStackState): Int =
-    (state.selectedShaderParams.size - 1).coerceAtLeast(0)

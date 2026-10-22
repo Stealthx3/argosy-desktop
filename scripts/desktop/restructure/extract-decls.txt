@@ -66,3 +66,4 @@ ui/components/QrScanner.kt -> common:PairingQr.kt: PairingQrResult parsePairingQ
 ui/components/SystemStatusBar.kt -> common:SystemStatusState.kt: BatteryState NetworkLink
 ui/components/SystemStatusBar.kt -> SystemStatusProbes.kt: rememberBatteryState rememberNetworkLink toNetworkLink
 libretro/touch/OnScreenControls.kt -> common:OnScreenSlotLayout.kt: computeFacePositions DpOffset SlotLayout layoutFaceSlots layoutShoulderSlots layoutSystemSlots
+ui/screens/settings/sections/ShaderStackSection.kt -> common:ShaderStackFocus.kt: shaderStackMaxFocusIndex

@@ -12,6 +12,8 @@ import com.nendo.argosy.platform.externalCacheDir
 import com.nendo.argosy.platform.dataDir
 import com.nendo.argosy.platform.packageManager
 import com.nendo.argosy.platform.getPackageInfo
+import com.nendo.argosy.platform.getLaunchIntentForPackage
+import com.nendo.argosy.platform.addFlags
 import com.nendo.argosy.platform.versionName
 import com.nendo.argosy.platform.assets
 import com.nendo.argosy.platform.contentResolver
@@ -35,6 +37,8 @@ expect class DisplayAffinityHelper {
         fun dockedExternalDisplayId(context: Context): Int?
 
         val BLANK_PANELS_ON_VIDEO_OUTPUT_SETTING: String
+
+        internal fun rolesSwappedForPrimary(primaryDisplayId: Int): Boolean
     }
 
     val hasPhysicalSecondaryDisplay: Boolean

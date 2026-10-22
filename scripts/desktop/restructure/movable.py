@@ -102,10 +102,10 @@ CONTEXT_REST = (
     r"\.resources\.(?!getQuantityString\b|getString\b)\w+"
     r"|LocalContext\.current\." + CONTEXT_MEMBERS
     + r"|\b(?:context|ctx|appContext|applicationContext|baseContext|current)\??\.assets\.(?!list\b|open\b)\w+"
-    r"|\bcontentResolver\.(?!openInputStream\b)\w+"
+    r"|\bcontentResolver\.(?!openInputStream\b|takePersistableUriPermission\b)\w+"
     r"|(?<![\w.])Context\.(?!MODE_PRIVATE\b|CONNECTIVITY_SERVICE\b|USER_SERVICE\b|DISPLAY_SERVICE\b)[A-Z]\w*"
-    r"|\bpackageManager\.(?!getPackageInfo\b|getApplicationInfo\b|getApplicationLabel\b)\w+"
-    r"|\bpm\.(?!getPackageInfo\b|getApplicationInfo\b|getApplicationLabel\b)\w+"
+    r"|\bpackageManager\.(?!getPackageInfo\b|getApplicationInfo\b|getApplicationLabel\b|getLaunchIntentForPackage\b)\w+"
+    r"|\bpm\.(?!getPackageInfo\b|getApplicationInfo\b|getApplicationLabel\b|getLaunchIntentForPackage\b)\w+"
     r"|\.getPackageInfo\([^)]*\)\.(?!versionName\b)\w+"
 )
 CONTEXT_BEYOND_STRINGS = (
@@ -249,6 +249,13 @@ GUARDED_REWRITES = {
     ),
     "coil.imageLoader": re.compile(r"\bimageLoader\.(?!enqueue\b)\w+"),
     "coil.request.CachePolicy": re.compile(r"\bCachePolicy\.(?!ENABLED\b|READ_ONLY\b|WRITE_ONLY\b|DISABLED\b)\w+"),
+    "android.Manifest": re.compile(
+        r"\bManifest\.permission\.(?!BLUETOOTH_ADVERTISE\b|BLUETOOTH_CONNECT\b|BLUETOOTH_SCAN\b|POST_NOTIFICATIONS\b|READ_MEDIA_IMAGES\b)\w+"
+    ),
+    "androidx.activity.compose.rememberLauncherForActivityResult": re.compile(r"(?!)"),
+    "androidx.activity.result.contract.ActivityResultContracts": re.compile(
+        r"\bActivityResultContracts\.(?!OpenDocument\(|RequestPermission\(|RequestMultiplePermissions\()\w+"
+    ),
     "android.view.InputDevice": re.compile(
         r"(?<!fun )\bInputDevice\.(?!getDevice\b|getDeviceIds\b|SOURCE_(?:CLASS_BUTTON|CLASS_JOYSTICK|DPAD|GAMEPAD|JOYSTICK|KEYBOARD)\b)\w+"
         r"|\.(?:motionRanges|getMotionRange|hasKeys|supportsSource|keyboardType|vibrator|vibratorManager|batteryState"
@@ -291,7 +298,7 @@ FQ_GUARDED = (
     "android.content.Context", "android.content.Intent", "android.os.SystemClock", "dagger.hilt.android.qualifiers.ApplicationContext",
     "android.graphics.Bitmap", "android.graphics.BitmapFactory", "android.util.Base64",
     "android.provider.Settings", "android.net.Uri", "android.os.Process", "android.graphics.Paint", "android.os.Bundle",
-    "coil.compose.AsyncImage", "androidx.core.graphics.ColorUtils",
+    "coil.compose.AsyncImage", "androidx.core.graphics.ColorUtils", "android.view.InputDevice", "android.Manifest",
 )
 STRINGS = re.compile(r'"(?:[^"\\\n]|\\.)*"')
 STAND_IN_GUARDS = {
@@ -338,6 +345,7 @@ STAND_IN_GUARDS = {
     "com.nendo.argosy.platform.image.ImageRequest": "coil.request.ImageRequest",
     "com.nendo.argosy.platform.image.CachePolicy": "coil.request.CachePolicy",
     "com.nendo.argosy.platform.PlatformInputDevice": "android.view.InputDevice",
+    "com.nendo.argosy.platform.PlatformActivityResultContracts": "androidx.activity.result.contract.ActivityResultContracts",
     "com.nendo.argosy.platform.PlatformApplication": "android.app.Application",
     "com.nendo.argosy.platform.PlatformHtml": "android.text.Html",
     "com.nendo.argosy.platform.PlatformBundle": "android.os.Bundle",

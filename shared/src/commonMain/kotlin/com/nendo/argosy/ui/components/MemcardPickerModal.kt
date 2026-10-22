@@ -17,6 +17,8 @@ import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.data.sync.platform.MemcardInfo
 import com.nendo.argosy.ui.screens.gamedetail.components.OptionItem
 import com.nendo.argosy.platform.PlatformContext as Context
+import com.nendo.argosy.platform.getLaunchIntentForPackage
+import com.nendo.argosy.platform.addFlags
 import com.nendo.argosy.platform.externalCacheDir
 import com.nendo.argosy.platform.dataDir
 import com.nendo.argosy.platform.startActivity

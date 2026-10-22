@@ -18,7 +18,7 @@ import java.nio.FloatBuffer
 import java.nio.IntBuffer
 import java.util.concurrent.Executors
 
-actual class ShaderPreviewRenderer {
+actual class ShaderPreviewRenderer actual constructor() {
 
     private val glDispatcher = Executors.newSingleThreadExecutor { r ->
         Thread(r, "ShaderPreviewGL").apply { isDaemon = true }

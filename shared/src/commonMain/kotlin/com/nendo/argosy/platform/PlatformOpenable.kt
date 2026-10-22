@@ -4,6 +4,8 @@ import java.io.InputStream
 
 expect fun PlatformContentResolver.openInputStream(uri: PlatformUri): InputStream?
 
+expect fun PlatformContentResolver.takePersistableUriPermission(uri: PlatformUri, modeFlags: Int)
+
 /**
  * The OpenableColumns.DISPLAY_NAME of [uri], or null when the resolver has no row for it (on
  * Android, any uri that is not a content uri).

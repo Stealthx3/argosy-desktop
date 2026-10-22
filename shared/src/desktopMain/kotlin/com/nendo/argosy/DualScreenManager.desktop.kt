@@ -385,4 +385,14 @@ actual class DualScreenManager @Inject constructor() {
     }
 
     actual fun consumeDeepLink(uri: com.nendo.argosy.platform.PlatformUri): Boolean = false
+
+    actual class ResolvedScreenLayout(
+        actual val attached: List<com.nendo.argosy.util.AttachedScreen>,
+        actual val setKey: String,
+        actual val stored: com.nendo.argosy.domain.model.ScreenLayouts,
+        actual val known: com.nendo.argosy.domain.model.ScreenLayout?,
+        actual val layout: com.nendo.argosy.domain.model.ScreenLayout
+    )
+
+    actual suspend fun resolveScreenLayout(): ResolvedScreenLayout? = null
 }

@@ -12,6 +12,8 @@ import com.nendo.argosy.platform.externalCacheDir
 import com.nendo.argosy.platform.dataDir
 import com.nendo.argosy.platform.packageManager
 import com.nendo.argosy.platform.getPackageInfo
+import com.nendo.argosy.platform.getLaunchIntentForPackage
+import com.nendo.argosy.platform.addFlags
 import com.nendo.argosy.platform.versionName
 import com.nendo.argosy.platform.assets
 import com.nendo.argosy.platform.contentResolver
@@ -42,6 +44,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 expect class DualScreenManager {
+    class ResolvedScreenLayout {
+        val attached: List<com.nendo.argosy.util.AttachedScreen>
+        val setKey: String
+        val stored: com.nendo.argosy.domain.model.ScreenLayouts
+        val known: com.nendo.argosy.domain.model.ScreenLayout?
+        val layout: com.nendo.argosy.domain.model.ScreenLayout
+    }
+
     companion object {
         val ACTION_WIZARD_STATE: String
 
@@ -93,6 +103,8 @@ expect class DualScreenManager {
     fun moveFocusPicker(delta: Int)
 
     fun confirmFocusPicker()
+
+    suspend fun resolveScreenLayout(): ResolvedScreenLayout?
 
     fun applyStoredScreenLayout(promptWhenUnknown: Boolean = false)
 

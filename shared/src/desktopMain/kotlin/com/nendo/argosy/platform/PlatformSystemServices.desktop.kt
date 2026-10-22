@@ -31,6 +31,8 @@ actual fun PlatformPackageManager.getApplicationInfo(packageName: String, flags:
 
 actual fun PlatformPackageManager.getApplicationLabel(info: PlatformApplicationInfo): CharSequence = ""
 
+actual fun PlatformPackageManager.getLaunchIntentForPackage(packageName: String): PlatformIntentType? = null
+
 actual open class PlatformApplicationInfo
 
 actual open class PlatformPackageInfo

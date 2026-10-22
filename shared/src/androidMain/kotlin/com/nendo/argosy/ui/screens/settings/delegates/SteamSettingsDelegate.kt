@@ -58,7 +58,7 @@ import javax.inject.Inject
 private const val GN_PACKAGE = "app.gamenative"
 private const val QR_CONNECT_TIMEOUT_MS = 75_000L
 
-class SteamSettingsDelegate @Inject constructor(
+actual class SteamSettingsDelegate @Inject constructor(
     private val steamRepository: SteamRepository,
     private val steamAuthManager: SteamAuthManager,
     private val steamLibraryManager: SteamLibraryManager,
@@ -76,7 +76,7 @@ class SteamSettingsDelegate @Inject constructor(
     private val gameNativeStoreSync: GameNativeStoreSync
 ) {
     private val _state = MutableStateFlow(SteamSettingsState())
-    val state: StateFlow<SteamSettingsState> = _state.asStateFlow()
+    actual val state: StateFlow<SteamSettingsState> = _state.asStateFlow()
 
     init {
         kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
@@ -94,18 +94,18 @@ class SteamSettingsDelegate @Inject constructor(
 
     // Legacy stubs for routers that still reference these
     private val _requestStoragePermissionEvent = MutableSharedFlow<Unit>()
-    val requestStoragePermissionEvent: SharedFlow<Unit> = _requestStoragePermissionEvent.asSharedFlow()
+    actual val requestStoragePermissionEvent: SharedFlow<Unit> = _requestStoragePermissionEvent.asSharedFlow()
     private val _openUrlEvent = MutableSharedFlow<String>()
-    val openUrlEvent: SharedFlow<String> = _openUrlEvent.asSharedFlow()
+    actual val openUrlEvent: SharedFlow<String> = _openUrlEvent.asSharedFlow()
 
     private val _openStoreSyncDirPicker = MutableSharedFlow<GameNativeSyncFolder>()
-    val openStoreSyncDirPicker: SharedFlow<GameNativeSyncFolder> = _openStoreSyncDirPicker.asSharedFlow()
+    actual val openStoreSyncDirPicker: SharedFlow<GameNativeSyncFolder> = _openStoreSyncDirPicker.asSharedFlow()
 
     /**
      * True only when the index actually moved, so a caller can hand an unmoved press back to the
      * global fallback instead of swallowing it.
      */
-    fun moveGameNativeActionFocus(delta: Int): Boolean {
+    actual fun moveGameNativeActionFocus(delta: Int): Boolean {
         if (_state.value.gameNativeSyncDirs.isEmpty()) return false
         val next = (_state.value.gameNativeActionIndex + delta).coerceIn(0, 1)
         if (next == _state.value.gameNativeActionIndex) return false
@@ -113,7 +113,7 @@ class SteamSettingsDelegate @Inject constructor(
         return true
     }
 
-    fun openGameNativeFoldersModal() {
+    actual fun openGameNativeFoldersModal() {
         _state.update {
             it.copy(
                 showGameNativeFoldersModal = true,
@@ -123,11 +123,11 @@ class SteamSettingsDelegate @Inject constructor(
         }
     }
 
-    fun dismissGameNativeFoldersModal() {
+    actual fun dismissGameNativeFoldersModal() {
         _state.update { it.copy(showGameNativeFoldersModal = false) }
     }
 
-    fun moveGameNativeFoldersFocus(delta: Int) {
+    actual fun moveGameNativeFoldersFocus(delta: Int) {
         val folders = GameNativeSyncFolder.entries
         val next = (_state.value.gameNativeFoldersFocusIndex + delta).mod(folders.size)
         _state.update {
@@ -138,7 +138,7 @@ class SteamSettingsDelegate @Inject constructor(
         }
     }
 
-    fun moveGameNativeFoldersActionFocus(delta: Int): Boolean {
+    actual fun moveGameNativeFoldersActionFocus(delta: Int): Boolean {
         val folder = focusedSyncFolder() ?: return false
         if (_state.value.gameNativeSyncDirs[folder] == null) return false
         val next = (_state.value.gameNativeFoldersActionIndex + delta).coerceIn(0, 1)
@@ -147,7 +147,7 @@ class SteamSettingsDelegate @Inject constructor(
         return true
     }
 
-    fun confirmGameNativeFoldersRow(scope: CoroutineScope) {
+    actual fun confirmGameNativeFoldersRow(scope: CoroutineScope) {
         val folder = focusedSyncFolder() ?: return
         if (_state.value.gameNativeFoldersActionIndex == 1) {
             clearStoreSyncDir(scope, folder)
@@ -156,7 +156,7 @@ class SteamSettingsDelegate @Inject constructor(
         }
     }
 
-    fun openStoreSyncDirPicker(scope: CoroutineScope, folder: GameNativeSyncFolder) {
+    actual fun openStoreSyncDirPicker(scope: CoroutineScope, folder: GameNativeSyncFolder) {
         focusSyncFolderRow(folder)
         scope.launch { _openStoreSyncDirPicker.emit(folder) }
     }
@@ -164,7 +164,7 @@ class SteamSettingsDelegate @Inject constructor(
     /**
      * Records the folder without scanning; running the whole pass is the Scan button's job.
      */
-    fun setStoreSyncDir(scope: CoroutineScope, folder: GameNativeSyncFolder, path: String) {
+    actual fun setStoreSyncDir(scope: CoroutineScope, folder: GameNativeSyncFolder, path: String) {
         scope.launch {
             storagePrefs.setGameNativeSyncDir(folder, path)
             _state.update {
@@ -176,7 +176,7 @@ class SteamSettingsDelegate @Inject constructor(
         }
     }
 
-    fun clearStoreSyncDir(scope: CoroutineScope, folder: GameNativeSyncFolder) {
+    actual fun clearStoreSyncDir(scope: CoroutineScope, folder: GameNativeSyncFolder) {
         focusSyncFolderRow(folder)
         scope.launch {
             storagePrefs.setGameNativeSyncDir(folder, null)
@@ -201,7 +201,7 @@ class SteamSettingsDelegate @Inject constructor(
         }
     }
 
-    fun rescanStoreSync(scope: CoroutineScope) {
+    actual fun rescanStoreSync(scope: CoroutineScope) {
         if (_state.value.isGameNativeScanning) return
         scope.launch {
             _state.update { it.copy(isGameNativeScanning = true) }
@@ -240,7 +240,7 @@ class SteamSettingsDelegate @Inject constructor(
                         "${result.notInLibrary} not in library"
             }
         }
-    val downloadProgress = flowOf<com.nendo.argosy.data.emulator.EmulatorDownloadProgress?>(null)
+    actual val downloadProgress = flowOf<com.nendo.argosy.data.emulator.EmulatorDownloadProgress?>(null)
 
     private var serviceRef: SteamService? = null
     private var observingService = false
@@ -260,11 +260,11 @@ class SteamSettingsDelegate @Inject constructor(
         }
     }
 
-    fun updateState(newState: SteamSettingsState) {
+    actual fun updateState(newState: SteamSettingsState) {
         _state.value = newState
     }
 
-    fun bindService(service: SteamService, scope: CoroutineScope) {
+    actual fun bindService(service: SteamService, scope: CoroutineScope) {
         serviceRef = service
         if (!observingService) {
             observingService = true
@@ -274,7 +274,7 @@ class SteamSettingsDelegate @Inject constructor(
         }
     }
 
-    fun loadSteamSettings(context: Context, scope: CoroutineScope) {
+    actual fun loadSteamSettings(context: Context, scope: CoroutineScope) {
         bindScope = scope
         scope.launch {
             val gnInstalled = isGnInstalled(context)
@@ -356,7 +356,7 @@ class SteamSettingsDelegate @Inject constructor(
         }
     }
 
-    fun cycleSteamInstallVolume(scope: CoroutineScope, direction: Int = 1) {
+    actual fun cycleSteamInstallVolume(scope: CoroutineScope, direction: Int) {
         val current = _state.value.steamInstallVolume
         val values = listOf<String?>(null) + _state.value.availableVolumes.map { it.target.toPreferenceValue() }
         if (values.size <= 1) return
@@ -385,7 +385,7 @@ class SteamSettingsDelegate @Inject constructor(
         }
     }
 
-    fun installSteamLauncher(emulatorId: String, scope: CoroutineScope) {
+    actual fun installSteamLauncher(emulatorId: String, scope: CoroutineScope) {
         val def = EmulatorRegistry.getById(emulatorId) ?: return
 
         if (def.releaseSource == null) {
@@ -447,7 +447,7 @@ class SteamSettingsDelegate @Inject constructor(
     private var qrConnectFailureMessage: String? = null
     private var qrConnectWatchdog: Job? = null
 
-    fun connectToSteam(context: Context, scope: CoroutineScope) {
+    actual fun connectToSteam(context: Context, scope: CoroutineScope) {
         bindScope = scope
         pendingQrAuth = true
         sawQrConnectAttempt = false
@@ -481,14 +481,14 @@ class SteamSettingsDelegate @Inject constructor(
         bound = context.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
     }
 
-    fun unbindService(context: Context) {
+    actual fun unbindService(context: Context) {
         if (bound) {
             context.unbindService(serviceConnection)
             bound = false
         }
     }
 
-    fun startQrAuth() {
+    actual fun startQrAuth() {
         // If connectToSteam was called, pendingQrAuth is already set and
         // observeServiceState will trigger startQrAuth once the client is
         // CONNECTED.  Calling steamAuthManager.startQrAuth() before the
@@ -498,13 +498,13 @@ class SteamSettingsDelegate @Inject constructor(
         steamAuthManager.startQrAuth()
     }
 
-    fun cancelQrAuth() {
+    actual fun cancelQrAuth() {
         pendingQrAuth = false
         qrConnectWatchdog?.cancel()
         steamAuthManager.cancelQrAuth()
     }
 
-    fun syncLibrary(context: Context, scope: CoroutineScope) {
+    actual fun syncLibrary(context: Context, scope: CoroutineScope) {
         scope.launch {
             _state.update { it.copy(syncState = LibrarySyncState.SyncingLicenses) }
 
@@ -545,7 +545,7 @@ class SteamSettingsDelegate @Inject constructor(
         }
     }
 
-    fun forceSyncLibraryWithOverwrite(context: Context, scope: CoroutineScope) {
+    actual fun forceSyncLibraryWithOverwrite(context: Context, scope: CoroutineScope) {
         scope.launch {
             _state.update { it.copy(syncState = LibrarySyncState.SyncingLicenses) }
 
@@ -586,7 +586,7 @@ class SteamSettingsDelegate @Inject constructor(
         }
     }
 
-    fun disconnectSteam(context: Context, scope: CoroutineScope) {
+    actual fun disconnectSteam(context: Context, scope: CoroutineScope) {
         scope.launch {
             if (steamContentManager.hasActiveSteamDownload()) {
                 steamContentManager.cancelDownload()
@@ -609,14 +609,14 @@ class SteamSettingsDelegate @Inject constructor(
         }
     }
 
-    fun resetLibrary(scope: CoroutineScope) {
+    actual fun resetLibrary(scope: CoroutineScope) {
         scope.launch {
             val count = steamLibraryManager.resetLibrary()
             notificationManager.show(NotificationText.Res(R.string.notif_steam_settings_library_reset, listOf(count)))
         }
     }
 
-    fun showAddSteamGameDialog() {
+    actual fun showAddSteamGameDialog() {
         _state.update {
             it.copy(
                 showAddGameDialog = true,
@@ -627,7 +627,7 @@ class SteamSettingsDelegate @Inject constructor(
         }
     }
 
-    fun dismissAddSteamGameDialog() {
+    actual fun dismissAddSteamGameDialog() {
         _state.update {
             it.copy(
                 showAddGameDialog = false,
@@ -638,7 +638,7 @@ class SteamSettingsDelegate @Inject constructor(
         }
     }
 
-    fun setAddGameAppId(appId: String) {
+    actual fun setAddGameAppId(appId: String) {
         _state.update { it.copy(addGameAppId = appId, addGameError = null) }
     }
 
@@ -649,11 +649,10 @@ class SteamSettingsDelegate @Inject constructor(
      * launcher string is stored in GameEntity.steamLauncher and drives the launch
      * intent as well as the Unlink-from-X affordance.
      */
-    fun confirmAddSteamGame(
+    actual fun confirmAddSteamGame(
         context: Context,
         scope: CoroutineScope,
-        launcherPackage: String = com.nendo.argosy.data.launcher.GameNativeLauncher.packageName
-    ) {
+        launcherPackage: String) {
         val appIdStr = _state.value.addGameAppId.trim()
         val appId = appIdStr.toLongOrNull()
 

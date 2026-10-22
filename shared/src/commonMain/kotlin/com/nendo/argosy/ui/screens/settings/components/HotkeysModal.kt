@@ -100,6 +100,8 @@ import com.nendo.argosy.platform.list
 import com.nendo.argosy.platform.open
 import com.nendo.argosy.platform.externalCacheDir
 import com.nendo.argosy.platform.dataDir
+import com.nendo.argosy.platform.getLaunchIntentForPackage
+import com.nendo.argosy.platform.addFlags
 
 private val HOTKEY_ACTIONS = listOf(
     HotkeyAction.IN_GAME_MENU,

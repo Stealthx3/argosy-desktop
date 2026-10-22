@@ -464,7 +464,7 @@ actual class DisplayAffinityHelper @Inject constructor(
             }
         }
 
-        internal fun rolesSwappedForPrimary(primaryDisplayId: Int): Boolean =
+        actual internal fun rolesSwappedForPrimary(primaryDisplayId: Int): Boolean =
             primaryDisplayId == Display.DEFAULT_DISPLAY
 
         internal fun rolesSwappedFor(

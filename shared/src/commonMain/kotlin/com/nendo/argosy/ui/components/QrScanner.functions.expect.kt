@@ -13,6 +13,8 @@ import com.nendo.argosy.platform.externalCacheDir
 import com.nendo.argosy.platform.dataDir
 import com.nendo.argosy.platform.packageManager
 import com.nendo.argosy.platform.getPackageInfo
+import com.nendo.argosy.platform.getLaunchIntentForPackage
+import com.nendo.argosy.platform.addFlags
 import com.nendo.argosy.platform.versionName
 import com.nendo.argosy.platform.assets
 import com.nendo.argosy.platform.contentResolver

@@ -27,6 +27,9 @@ RULES = [
     (re.compile(r"(?<!import )\bandroidx\.compose\.ui\.platform\.LocalConfiguration\b"), "com.nendo.argosy.platform.LocalPlatformConfiguration"),
     (re.compile(r"\bUri::(encode|decode)\b"), r"com.nendo.argosy.platform.PlatformUris::\1"),
     (re.compile(r"(?<!import )\bandroidx\.compose\.ui\.platform\.LocalContext\b"), "com.nendo.argosy.platform.LocalPlatformContext"),
+    (re.compile(r"(?<!import )\bandroid\.content\.Intent\.(?=[A-Z][A-Z0-9_]+\b)"), "com.nendo.argosy.platform.PlatformIntent."),
+    (re.compile(r"(?<!import )\bandroid\.Manifest\.permission\."), "com.nendo.argosy.platform.PlatformManifestPermission."),
+    (re.compile(r"(?<!import )\bandroid\.view\.InputDevice\.(getDevice|getDeviceIds)\("), r"com.nendo.argosy.platform.PlatformInputDevices.\1("),
     (re.compile(r"(?<!import )\bandroid\.content\.Intent\b(?!\s*\(|\.)"), "com.nendo.argosy.platform.PlatformIntentType"),
     (
         re.compile(r"\bandroid\.content\.Intent\((?!\s*(?:this|context|ctx|\w*[cC]ontext|applicationContext)\b)"),
@@ -191,6 +194,14 @@ RULES = [
         r"com.nendo.argosy.platform.setApplicationLocales(\2, if (\3) null else \4)",
     ),
     (re.compile(r"^import android\.view\.InputDevice$", re.M), "import com.nendo.argosy.platform.PlatformInputDevice as InputDevice"),
+    (
+        re.compile(r"^import androidx\.activity\.compose\.rememberLauncherForActivityResult$", re.M),
+        "import com.nendo.argosy.platform.rememberLauncherForActivityResult",
+    ),
+    (
+        re.compile(r"^import androidx\.activity\.result\.contract\.ActivityResultContracts$", re.M),
+        "import com.nendo.argosy.platform.PlatformActivityResultContracts as ActivityResultContracts",
+    ),
     (re.compile(r"\bandroid\.graphics\.BlurMaskFilter\.Blur\."), "com.nendo.argosy.platform.PlatformBlur."),
     (re.compile(r"\bandroid\.graphics\.BlurMaskFilter\("), "com.nendo.argosy.platform.PlatformBlurMaskFilter("),
     (re.compile(r"\bandroid\.graphics\.LinearGradient\("), "com.nendo.argosy.platform.PlatformLinearGradient("),
@@ -230,6 +241,7 @@ COMPANION_IMPORTS = {
         "com.nendo.argosy.platform.getSystemService", "com.nendo.argosy.platform.getExternalFilesDir",
         "com.nendo.argosy.platform.externalCacheDir", "com.nendo.argosy.platform.dataDir",
         "com.nendo.argosy.platform.packageManager", "com.nendo.argosy.platform.getPackageInfo",
+        "com.nendo.argosy.platform.getLaunchIntentForPackage", "com.nendo.argosy.platform.addFlags",
         "com.nendo.argosy.platform.versionName",
         "com.nendo.argosy.platform.assets", "com.nendo.argosy.platform.contentResolver", "com.nendo.argosy.platform.cacheDir", "com.nendo.argosy.platform.filesDir",
         "com.nendo.argosy.platform.getSharedPreferences",
@@ -243,6 +255,7 @@ COMPANION_IMPORTS = {
         "com.nendo.argosy.platform.getSystemService", "com.nendo.argosy.platform.getExternalFilesDir",
         "com.nendo.argosy.platform.externalCacheDir", "com.nendo.argosy.platform.dataDir",
         "com.nendo.argosy.platform.packageManager", "com.nendo.argosy.platform.getPackageInfo",
+        "com.nendo.argosy.platform.getLaunchIntentForPackage", "com.nendo.argosy.platform.addFlags",
         "com.nendo.argosy.platform.versionName",
         "com.nendo.argosy.platform.assets", "com.nendo.argosy.platform.contentResolver", "com.nendo.argosy.platform.cacheDir", "com.nendo.argosy.platform.filesDir",
         "com.nendo.argosy.platform.getSharedPreferences",
@@ -413,19 +426,23 @@ DISPLAY_NAME_QUERY = re.compile(
     r"(\w+)\.contentResolver\.query\((\w+), arrayOf\(OpenableColumns\.DISPLAY_NAME\), null, null, null\)\?\.use \{ (\w+) ->\n"
     r"\s*if \(\3\.moveToFirst\(\)\) \3\.getString\(0\) else null\n\s*\}"
 )
-OPEN_INPUT_STREAM = re.compile(r"\bcontentResolver\.openInputStream\(")
 
 
 def rewrite_display_name_query(text):
     return DISPLAY_NAME_QUERY.sub(r"com.nendo.argosy.platform.queryOpenableDisplayName(\1.contentResolver, \2)", text)
 
 
+RESOLVER_CALL = re.compile(r"\bcontentResolver\.(openInputStream|takePersistableUriPermission)\(")
+
+
 def import_open_input_stream(text):
-    if OPEN_INPUT_STREAM.search(text) and re.search(r"^import com\.nendo\.argosy\.platform\.contentResolver$", text, re.M):
-        if not re.search(r"^import com\.nendo\.argosy\.platform\.openInputStream$", text, re.M):
+    if not re.search(r"^import com\.nendo\.argosy\.platform\.contentResolver$", text, re.M):
+        return text
+    for name in sorted({m.group(1) for m in RESOLVER_CALL.finditer(text)}, reverse=True):
+        if not re.search(rf"^import com\.nendo\.argosy\.platform\.{name}$", text, re.M):
             text = re.sub(
                 r"^(import com\.nendo\.argosy\.platform\.contentResolver)$",
-                r"\1\nimport com.nendo.argosy.platform.openInputStream",
+                rf"\1\nimport com.nendo.argosy.platform.{name}",
                 text,
                 count=1,
                 flags=re.M,
@@ -453,10 +470,33 @@ def rewrite_uri_statics(text):
     return text
 
 
+CONTEXT_PROPERTY_USE = re.compile(
+    r"\.context\??\.(?:"
+    + "|".join(re.escape(c.rsplit(".", 1)[1]) for c in COMPANION_IMPORTS["com.nendo.argosy.platform.PlatformContext"])
+    + r")\b"
+)
+MEMBER_EXTENSIONS = [
+    (re.compile(r"\bshaderChainManager\??\.shaderStack\b"), "com.nendo.argosy.libretro.shader.shaderStack"),
+]
+
+
+def ensure_member_extensions(text):
+    for pattern, name in MEMBER_EXTENSIONS:
+        package = name.rsplit(".", 1)[0]
+        if not pattern.search(text) or re.search(rf"^package {re.escape(package)}$", text, re.M):
+            continue
+        if not re.search(rf"^import {re.escape(name)}$", text, re.M):
+            anchor = list(re.finditer(r"^(?:package|import) .*$", text, re.M))[-1]
+            text = text[:anchor.end()] + f"\nimport {name}" + text[anchor.end():]
+    return text
+
+
 def ensure_companions(text):
     for stand_in, companions in COMPANION_IMPORTS.items():
         anchor = re.search(rf"^import {re.escape(stand_in)}( as \w+)?$", text, re.M)
         if not anchor and re.search(rf"(?<!import ){re.escape(stand_in)}\b", text):
+            anchor = list(re.finditer(r"^(?:package|import) .*$", text, re.M))[-1]
+        if not anchor and stand_in == "com.nendo.argosy.platform.PlatformContext" and CONTEXT_PROPERTY_USE.search(text):
             anchor = list(re.finditer(r"^(?:package|import) .*$", text, re.M))[-1]
         if not anchor:
             continue
@@ -489,6 +529,7 @@ def main():
         new = rewrite_static_stand_ins(new)
         new = rewrite_uri_statics(new)
         new = ensure_companions(new)
+        new = ensure_member_extensions(new)
         new = import_open_input_stream(new)
         if new != text:
             path.write_text(new)

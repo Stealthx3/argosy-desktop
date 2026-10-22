@@ -65,6 +65,8 @@ import com.nendo.argosy.platform.getString
 import com.nendo.argosy.platform.resources
 import com.nendo.argosy.platform.externalCacheDir
 import com.nendo.argosy.platform.dataDir
+import com.nendo.argosy.platform.getLaunchIntentForPackage
+import com.nendo.argosy.platform.addFlags
 
 private const val SAVE_GAME_SCRIM = 0.82f
 private const val PANEL_ALPHA = 0.72f

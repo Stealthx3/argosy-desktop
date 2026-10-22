@@ -29,6 +29,8 @@ expect class ConnectedControllerTracker {
 
     fun noteInput(event: InputEvent)
 
+    fun holdActiveController(held: Boolean)
+
     fun activeDevice(): InputDevice?
 
     fun detectActive(): DetectionResult

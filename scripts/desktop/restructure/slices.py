@@ -339,7 +339,7 @@ def present(declaration, existing):
 
 
 def member_key(line):
-    m = re.match(r"\s*(?:(?:actual|expect|suspend|operator|infix|inline|override|open)\s+)*fun\s+(?:<[^>]*>\s*)?(?:[\w.<>?, ]+\.)?(\w+)\(", line)
+    m = re.match(r"\s*(?:(?:actual|expect|internal|suspend|operator|infix|inline|override|open)\s+)*fun\s+(?:<[^>]*>\s*)?(?:[\w.<>?, ]+\.)?(\w+)\(", line)
     if not m:
         return None
     try:
@@ -503,6 +503,9 @@ def main():
                 if "actual constructor" not in text[cls_match.end():open_at]:
                     ctor_edit = (open_at, open_at, " actual constructor")
                     ctor_defaults_edit = (open_at + 1, find_close(text, open_at), strip_defaults(raw_params))
+        if overrides.get("constructor") == "()" and not ctor_m:
+            ctor_params = ""
+            ctor_edit = (cls_match.end(), cls_match.end(), " actual constructor()")
         header_text = text[cls_match.end():body_start]
         while re.search(r"\([^()]*\)", header_text):
             header_text = re.sub(r"\([^()]*\)", "", header_text)
@@ -550,7 +553,11 @@ def main():
                     comp_end = find_close(text, brace)
                     for cstart, cm in list(members(text, brace, comp_end)):
                         cmods, ckind = cm.group(1), cm.group(2)
-                        if re.search(r"\b(private|protected|internal|override)\b", cmods):
+                        if re.search(r"\b(private|protected|override)\b", cmods):
+                            continue
+                        copt = re.match(r"fun\s+(?:<[^>]*>\s*)?(\w+)", text[cstart + cm.start(2):])
+                        cinternal = "internal " if re.search(r"\binternal\b", cmods) else ""
+                        if cinternal and not (copt and copt.group(1) in overrides):
                             continue
                         if ckind == "val" and re.search(r"\bconst\b", cmods):
                             km = re.match(r"val\s+(\w+)\s*(?::\s*(\w+))?\s*=\s*([^\n]+)", text[cstart + cm.start(2):].split("\n", 1)[0])
@@ -582,14 +589,14 @@ def main():
                             continue
                         csusp = "suspend " if re.search(r"\bsuspend\b", cmods) else ""
                         creturns = "" if crt == "Unit" else f": {crt}"
-                        cline = f"        {csusp}fun {cname}({cparams.strip()}){creturns}"
+                        cline = f"        {cinternal}{csusp}fun {cname}({cparams.strip()}){creturns}"
                         if "actual" in cmods and member_key(cline) in previous:
                             cline = previous[member_key(cline)]
                             cparams = cline[cline.index("(") + 1:find_close(cline, cline.index("("))]
                         inner_expect.append(cline)
                         cvalue = neutral(crt) if crt != "Unit" else None
                         cbody = " {\n        }" if crt == "Unit" else f" = {cvalue or 'TODO(\"desktop: ' + cname + '\")'}"
-                        inner_desktop.append(f"        actual {csusp}fun {cname}({strip_defaults(cparams).strip()}){creturns}{cbody}")
+                        inner_desktop.append(f"        actual {cinternal}{csusp}fun {cname}({strip_defaults(cparams).strip()}){creturns}{cbody}")
                         cpo = text.index("(", cdecl)
                         edits.append((cpo + 1, find_close(text, cpo), strip_defaults(text[cpo + 1:find_close(text, cpo)])))
                         edits.append((cstart + cm.start(1), cstart + cm.start(1), "" if "actual" in cmods else "actual "))
@@ -601,7 +608,12 @@ def main():
                     desktop_lines.append("    actual companion object {}")
                 edits.append((start + m.start(1), start + m.start(1), "" if "actual" in mods else "actual "))
                 continue
-            if kind == "class" and re.search(r"\bdata\b", mods):
+            plain_nested = (
+                kind == "class" and not re.search(r"\b(?:data|sealed|abstract|open|inner|enum|annotation|value)\b", mods)
+                and re.match(r"class\s+\w+\(", text[start + m.start(2):])
+                and not text[find_close(text, text.index("(", start + m.start(2))) + 1:].lstrip(" ").startswith("{")
+            )
+            if kind == "class" and (re.search(r"\bdata\b", mods) or plain_nested):
                 decl_start = start + m.start(2)
                 open_paren = text.index("(", decl_start)
                 close_paren = find_close(text, open_paren)
@@ -738,7 +750,7 @@ def main():
         for k, line_text in enumerate(desktop_lines):
             if line_text.startswith("__NESTED__:"):
                 nested_name = line_text.split(":", 1)[1]
-                nm = re.search(rf"^    actual data class {nested_name}\(", text, re.M)
+                nm = re.search(rf"^    actual (?:data )?class {nested_name}\(", text, re.M)
                 close_paren = find_close(text, nm.end() - 1)
                 after = text[close_paren + 1:close_paren + 3]
                 end = find_close(text, close_paren + 1 + (len(after) - len(after.lstrip()))) if after.lstrip().startswith("{") else close_paren

@@ -18,6 +18,8 @@ import com.nendo.argosy.platform.orientation
 import com.nendo.argosy.platform.screenHeightDp
 import com.nendo.argosy.platform.screenWidthDp
 import com.nendo.argosy.platform.LocalPlatformContext as LocalContext
+import com.nendo.argosy.platform.getLaunchIntentForPackage
+import com.nendo.argosy.platform.addFlags
 import com.nendo.argosy.platform.externalCacheDir
 import com.nendo.argosy.platform.dataDir
 import com.nendo.argosy.platform.startActivity
