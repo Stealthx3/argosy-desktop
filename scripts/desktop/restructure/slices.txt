@@ -107,3 +107,6 @@ ui/util/ClipboardTextReader.kt: ClipboardTextReader
 ui/components/QrScanner.kt: *
 ui/components/SystemStatusProbes.kt: *
 ui/components/Box3dCover.kt: *
+ui/components/InlineTilePlayer.kt: *
+ui/components/PageThemePlayer.kt: *
+ui/components/YouTubeVideoPlayer.kt: *

@@ -23,7 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.stringResource
+import com.nendo.argosy.res.stringResource
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.zIndex
 import com.nendo.argosy.domain.model.GridAxis
@@ -34,6 +34,14 @@ import com.nendo.argosy.domain.model.ResolvedGridShape
 import com.nendo.argosy.domain.model.SCROLL_AXIS_BOUND
 import com.nendo.argosy.ui.screens.home.GameDownloadIndicator
 import com.nendo.argosy.ui.theme.Dimens
+import com.nendo.argosy.platform.asImageBitmap
+import com.nendo.argosy.platform.config
+import com.nendo.argosy.platform.copy
+import com.nendo.argosy.platform.getPixel
+import com.nendo.argosy.platform.height
+import com.nendo.argosy.platform.recycle
+import com.nendo.argosy.platform.setPixels
+import com.nendo.argosy.platform.width
 
 /**
  * A scrolling custom grid: one canvas along [CustomGridState.scrollAxis], drawn as a lazy list of
@@ -63,8 +71,8 @@ fun CustomGridScrollCanvas(
     showCursor: Boolean = true,
     downloadIndicatorFor: (Long) -> GameDownloadIndicator = { GameDownloadIndicator.NONE },
     onCoverLoadFailed: ((Long, String) -> Unit)? = null,
-    onCoverLoaded: ((Long, android.graphics.Bitmap) -> Unit)? = null,
-    onPosterLoaded: ((String, android.graphics.Bitmap) -> Unit)? = null,
+    onCoverLoaded: ((Long, com.nendo.argosy.platform.PlatformBitmap) -> Unit)? = null,
+    onPosterLoaded: ((String, com.nendo.argosy.platform.PlatformBitmap) -> Unit)? = null,
     useBoxArt: Boolean = false
 ) {
     val axis = state.scrollAxis ?: return

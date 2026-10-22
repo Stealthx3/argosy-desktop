@@ -92,18 +92,17 @@ private const val SEEK_STEP_MS = 10_000L
  */
 @OptIn(UnstableApi::class)
 @Composable
-fun InlineTilePlayer(
+actual fun InlineTilePlayer(
     filePath: String,
     isPlaying: Boolean,
     isEngaged: Boolean,
-    modifier: Modifier = Modifier,
-    isPaused: Boolean = false,
-    seekTicks: Int = 0,
-    startPositionMs: Long = 0L,
-    onPositionChanged: (Long) -> Unit = {},
-    onTakeAudio: () -> Unit = {},
-    onReleaseAudio: () -> Unit = {}
-) {
+    modifier: Modifier,
+    isPaused: Boolean,
+    seekTicks: Int,
+    startPositionMs: Long,
+    onPositionChanged: (Long) -> Unit,
+    onTakeAudio: () -> Unit,
+    onReleaseAudio: () -> Unit) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
 

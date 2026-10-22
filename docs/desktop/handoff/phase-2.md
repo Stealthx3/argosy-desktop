@@ -4,27 +4,27 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 History and reasoning live in `DEVLOG.md`; read only the parts this file points to. Earlier phases:
 `phase-0.md`, `phase-1.md` (closed summaries; carried-forward items are listed there).
 
-**Updated:** 2026-10-22, end of unit p3g
+**Updated:** 2026-10-22, end of unit p3h
 
 ## Where things stand
 
 - **Phase:** 2 · Desktop UI (third of six). Still on the seam stage: moving upstream's UI into `shared/commonMain` behind Android seams. No desktop window shows the real app yet.
-- **Last committed batch:** p3g (`OnScreenControls`' pure slot-layout helpers extracted to commonMain `OnScreenSlotLayout.kt`; `TouchLayoutEditor`, `TouchLayoutEditorModal` rehomed; the overlay itself stays androidMain on `GLRetroView`), verified. See the p3g entry in `DEVLOG.md`.
-- **Counts:** app 30 files, commonMain 1,568, androidMain 367. Navigation-graph closure: 128 files, 6 Android roots.
+- **Last committed batch:** p3h (expect slices for `InlineTilePlayer`, `PageThemePlayer`, `YouTubeVideoPlayer`; 7 home-grid files rehomed), verified. See the p3h entry in `DEVLOG.md`.
+- **Counts:** app 30 files, commonMain 1,578, androidMain 360. Navigation-graph closure: 118 files, 3 Android roots.
 - **Baseline for "Android unchanged":** plain upstream v2.24.0, `build/desktop-baseline/app-debug-upstream-v2.24.0.apk`. Plain save proof: `build/desktop-check/save-proof/v224-plain-1021b` (recaptured 2026-10-21; recapture again when it is days older than the candidate).
 - Nothing uncommitted.
 
 ## Next action
 
-1. Run the tools from the repo root. List the remaining roots: `python3 -I scripts/desktop/restructure/movable.py --roots ui/navigation/NavGraph.kt` (6). Choose the next batch with `--plan <n> ui/navigation/NavGraph.kt` (`--services-only` for slices) or `--rank-android`.
-   Left: `SettingsScreen`/`ViewModel`, `SteamSettingsDelegate`, players (`InlineTilePlayer`, `PageThemePlayer` on Media3, `YouTubeVideoPlayer` WebView). Before slicing a root, run `--path ui/navigation/NavGraph.kt <root>` to see which declarations the graph actually reaches; p3g found only pure helpers were reached and extracted those instead. `--path` needs two arguments (start file, target prefix).
+1. Run the tools from the repo root. List the remaining roots: `python3 -I scripts/desktop/restructure/movable.py --roots ui/navigation/NavGraph.kt` (3). Choose the next batch with `--plan <n> ui/navigation/NavGraph.kt` (`--services-only` for slices) or `--rank-android`.
+   Left: `SettingsScreen`, `SettingsViewModel`, `SteamSettingsDelegate` (reached only via `SettingsViewModel`). `--plan 3` says slice `SettingsViewModel` first (closure 123); it is large, so check `--path` and the reasons (`InputDevice.getDevice`, Context) and consider extracting probes to androidMain files before slicing. Watch the `SettingsFontRouter` gotcha below. Before slicing a root, run `--path ui/navigation/NavGraph.kt <root>` to see which declarations the graph actually reaches; p3g found only pure helpers were reached and extracted those instead. `--path` needs two arguments (start file, target prefix).
    A composable that only wraps an Android probe: extract the probe to its own androidMain file and slice it with `*` (the p3e pattern); put the data types it returns in commonMain first, or the slice leaves the function out. `RomMConfigForm` uses `QrScannerWithPermission` too but did not rehome; check why with `--path`.
    A new stand-in for a class with listener interfaces: write the Android actual as a wrapper with Kotlin function-type parameters (see `PlatformMedia.kt`), not a typealias.
 2. Run the pipeline (`extract_decls.py --refresh`, `inline_constants.py`, `move_companion_functions.py`, `apply_moves.py`, `move_members.py`, `actualize.py`, `slices.py`, `rewrite_imports.py`, then `movable.py --check`; the list is in `reapply.sh`). Then `movable.py --rehome`, append its output to `moves.txt` as a new labelled `[commonMain]` section, and run `apply_moves.py` and `rewrite_imports.py` again.
 3. `git add -A app/src/main/kotlin shared/src`, compile first (`quiet.sh <label> ./gradlew :shared:compileKotlinDesktop :shared:compileDebugKotlinAndroid`, about 3 min), then verify with `scripts/desktop/check/verify.sh <label> build/desktop-check/save-proof/v224-plain-1021b` in the background (about 20 min).
 4. Commit, log in `DEVLOG.md`, rewrite this file, end the unit.
 
-After the roots are gone: the desktop shell, SDL3 input and screen bring-up (Phase 2 plan, steps 6–8, in `PORT_PLAN.md`). `ClipboardTextReader`'s desktop actual returns null; give it a real clipboard there. The QR scanner's desktop actual composes nothing and `deviceHasCamera` is false; revisit if desktop gets a camera path. `PlatformMediaPlayer`'s desktop actual has no audio backend (it reports an error) and `PlatformMediaMetadataRetriever` returns no embedded art; give both real implementations with Phase 3's audio work. `Box3dCover`'s desktop actual draws nothing and calls `onUnavailable` (callers fall back to the flat box art); give it a Skia renderer (`Canvas.concat` with a 4-point homography for `setPolyToPoly`).
+After the roots are gone: the desktop shell, SDL3 input and screen bring-up (Phase 2 plan, steps 6–8, in `PORT_PLAN.md`). `ClipboardTextReader`'s desktop actual returns null; give it a real clipboard there. The QR scanner's desktop actual composes nothing and `deviceHasCamera` is false; revisit if desktop gets a camera path. `PlatformMediaPlayer`'s desktop actual has no audio backend (it reports an error) and `PlatformMediaMetadataRetriever` returns no embedded art; give both real implementations with Phase 3's audio work. The player desktop actuals (`InlineTilePlayer`, `PageThemePlayer`) compose nothing and `YouTubeVideoPlayer`'s calls `onError`; give them real video/audio with Phase 3. `Box3dCover`'s desktop actual draws nothing and calls `onUnavailable` (callers fall back to the flat box art); give it a Skia renderer (`Canvas.concat` with a 4-point homography for `setPolyToPoly`).
 
 ## Commands and tools
 

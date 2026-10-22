@@ -35,7 +35,7 @@ private const val FADE_STEPS = 12
  */
 @OptIn(UnstableApi::class)
 @Composable
-fun PageThemePlayer(filePath: String?) {
+actual fun PageThemePlayer(filePath: String?) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     var player by remember { mutableStateOf<ExoPlayer?>(null) }

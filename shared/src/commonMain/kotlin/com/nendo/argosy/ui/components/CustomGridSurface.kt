@@ -29,11 +29,11 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.pluralStringResource
-import androidx.compose.ui.res.stringResource
+import com.nendo.argosy.res.pluralStringResource
+import com.nendo.argosy.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import com.nendo.argosy.shared.R
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.ui.theme.generated.ComponentDefaults
 import com.nendo.argosy.domain.model.GridAxis
 import com.nendo.argosy.domain.model.GridCell
@@ -44,6 +44,14 @@ import com.nendo.argosy.ui.theme.Dimens
 import com.nendo.argosy.ui.theme.LocalArgosyTheme
 import com.nendo.argosy.ui.theme.Motion
 import com.nendo.argosy.ui.util.clickableNoFocus
+import com.nendo.argosy.platform.asImageBitmap
+import com.nendo.argosy.platform.config
+import com.nendo.argosy.platform.copy
+import com.nendo.argosy.platform.getPixel
+import com.nendo.argosy.platform.height
+import com.nendo.argosy.platform.recycle
+import com.nendo.argosy.platform.setPixels
+import com.nendo.argosy.platform.width
 
 /**
  * The custom grid as a whole: the page being shown, the stub that adds another, and the dots that
@@ -76,8 +84,8 @@ fun CustomGridSurface(
     showCursor: Boolean = true,
     downloadIndicatorFor: (Long) -> GameDownloadIndicator = { GameDownloadIndicator.NONE },
     onCoverLoadFailed: ((Long, String) -> Unit)? = null,
-    onCoverLoaded: ((Long, android.graphics.Bitmap) -> Unit)? = null,
-    onPosterLoaded: ((String, android.graphics.Bitmap) -> Unit)? = null,
+    onCoverLoaded: ((Long, com.nendo.argosy.platform.PlatformBitmap) -> Unit)? = null,
+    onPosterLoaded: ((String, com.nendo.argosy.platform.PlatformBitmap) -> Unit)? = null,
     useBoxArt: Boolean = false
 ) {
     if (state.isScrolling) {

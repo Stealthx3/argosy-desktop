@@ -46,10 +46,10 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.stringResource
+import com.nendo.argosy.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
-import com.nendo.argosy.shared.R
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.domain.model.CustomGridShape
 import com.nendo.argosy.domain.model.DEFAULT_LANE_COUNT
 import com.nendo.argosy.domain.model.GridAxis
@@ -69,6 +69,17 @@ import com.nendo.argosy.ui.theme.generated.ComponentDefaults
 import com.nendo.argosy.ui.theme.generated.MotionTokens
 import kotlinx.coroutines.launch
 import com.nendo.argosy.ui.util.clickableNoFocus
+import com.nendo.argosy.platform.image.bitmap
+import com.nendo.argosy.platform.image.intrinsicHeight
+import com.nendo.argosy.platform.image.intrinsicWidth
+import com.nendo.argosy.platform.asImageBitmap
+import com.nendo.argosy.platform.config
+import com.nendo.argosy.platform.copy
+import com.nendo.argosy.platform.getPixel
+import com.nendo.argosy.platform.height
+import com.nendo.argosy.platform.recycle
+import com.nendo.argosy.platform.setPixels
+import com.nendo.argosy.platform.width
 
 /**
  * A page's geometry in pixels, the block centred with [offsetXPx] and [offsetYPx] of margin on each
@@ -194,8 +205,8 @@ fun HomeCustomGridPage(
         com.nendo.argosy.ui.screens.home.GameDownloadIndicator.NONE
     },
     onCoverLoadFailed: ((Long, String) -> Unit)? = null,
-    onCoverLoaded: ((Long, android.graphics.Bitmap) -> Unit)? = null,
-    onPosterLoaded: ((String, android.graphics.Bitmap) -> Unit)? = null,
+    onCoverLoaded: ((Long, com.nendo.argosy.platform.PlatformBitmap) -> Unit)? = null,
+    onPosterLoaded: ((String, com.nendo.argosy.platform.PlatformBitmap) -> Unit)? = null,
     useBoxArt: Boolean = false,
     overlappedTileIds: Set<Long> = emptySet(),
     editingTileId: Long? = null,
@@ -311,8 +322,8 @@ internal fun CustomGridCells(
     editModeLabel: String?,
     downloadIndicatorFor: (Long) -> com.nendo.argosy.ui.screens.home.GameDownloadIndicator,
     onCoverLoadFailed: ((Long, String) -> Unit)?,
-    onCoverLoaded: ((Long, android.graphics.Bitmap) -> Unit)?,
-    onPosterLoaded: ((String, android.graphics.Bitmap) -> Unit)?,
+    onCoverLoaded: ((Long, com.nendo.argosy.platform.PlatformBitmap) -> Unit)?,
+    onPosterLoaded: ((String, com.nendo.argosy.platform.PlatformBitmap) -> Unit)?,
     useBoxArt: Boolean,
     overlappedTileIds: Set<Long>,
     editingTileId: Long?,
@@ -438,8 +449,8 @@ private fun CustomGridCellBox(
     isOverlapped: Boolean,
     downloadIndicatorFor: (Long) -> com.nendo.argosy.ui.screens.home.GameDownloadIndicator,
     onCoverLoadFailed: ((Long, String) -> Unit)?,
-    onCoverLoaded: ((Long, android.graphics.Bitmap) -> Unit)?,
-    onPosterLoaded: ((String, android.graphics.Bitmap) -> Unit)?,
+    onCoverLoaded: ((Long, com.nendo.argosy.platform.PlatformBitmap) -> Unit)?,
+    onPosterLoaded: ((String, com.nendo.argosy.platform.PlatformBitmap) -> Unit)?,
     useBoxArt: Boolean,
     playbackPath: String? = null,
     isEngaged: Boolean = false,
@@ -724,12 +735,12 @@ private fun CustomGridCellBox(
                 }
                 val cover = com.nendo.argosy.ui.common.rememberFileImageModel(content.coverPath)
                 when {
-                    appIcon != null -> coil.compose.AsyncImage(
+                    appIcon != null -> com.nendo.argosy.platform.image.AsyncImage(
                         model = appIcon,
                         contentDescription = null,
                         modifier = Modifier.size(Dimens.iconXl)
                     )
-                    cover != null -> coil.compose.AsyncImage(
+                    cover != null -> com.nendo.argosy.platform.image.AsyncImage(
                         model = cover,
                         contentDescription = null,
                         contentScale = androidx.compose.ui.layout.ContentScale.Crop,
@@ -1042,7 +1053,7 @@ private fun WideTileBox(
     isOverlapped: Boolean,
     focusScale: Float,
     editModeLabel: String?,
-    onCoverLoaded: ((Long, android.graphics.Bitmap) -> Unit)?,
+    onCoverLoaded: ((Long, com.nendo.argosy.platform.PlatformBitmap) -> Unit)?,
     onClick: () -> Unit,
     onLongClick: (() -> Unit)?
 ) {
@@ -1102,18 +1113,18 @@ private fun WideTileBox(
                     .background(theme.surfaceBase)
             ) {
                 when {
-                    appIcon != null -> coil.compose.AsyncImage(
+                    appIcon != null -> com.nendo.argosy.platform.image.AsyncImage(
                         model = appIcon,
                         contentDescription = null,
                         modifier = Modifier.fillMaxSize().padding(Dimens.spacingSm)
                     )
-                    poster != null -> coil.compose.AsyncImage(
+                    poster != null -> com.nendo.argosy.platform.image.AsyncImage(
                         model = poster,
                         contentDescription = null,
                         contentScale = androidx.compose.ui.layout.ContentScale.Crop,
                         modifier = Modifier.fillMaxSize()
                     )
-                    cover != null -> coil.compose.AsyncImage(
+                    cover != null -> com.nendo.argosy.platform.image.AsyncImage(
                         model = cover,
                         contentDescription = null,
                         contentScale = if (coverScale == TileCoverScale.FIT) {
@@ -1124,7 +1135,7 @@ private fun WideTileBox(
                         modifier = Modifier.fillMaxSize(),
                         onSuccess = { state ->
                             val gameId = content.game?.id ?: return@AsyncImage
-                            val bitmap = (state.result.drawable as? android.graphics.drawable.BitmapDrawable)?.bitmap
+                            val bitmap = (state.result.drawable as? com.nendo.argosy.platform.image.PlatformBitmapDrawable)?.bitmap
                             if (bitmap != null) onCoverLoaded?.invoke(gameId, bitmap)
                         }
                     )

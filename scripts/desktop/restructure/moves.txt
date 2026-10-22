@@ -1992,3 +1992,13 @@
 [commonMain]
 + libretro/touch/TouchLayoutEditor.kt
 + ui/screens/touchlayout/TouchLayoutEditorModal.kt
+
+# Phase 2: portable since the player expect slices (InlineTilePlayer, PageThemePlayer, YouTubeVideoPlayer; was androidMain).
+[commonMain]
++ ui/components/CustomGridScrollCanvas.kt
++ ui/components/CustomGridSurface.kt
++ ui/components/HomeCustomGrid.kt
++ ui/components/HomeLayoutPreview.kt
++ ui/components/HomeLayoutPreviewGrids.kt
++ ui/components/PageBackdrop.kt
++ ui/components/RaSummaryTile.kt

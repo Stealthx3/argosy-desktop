@@ -23,13 +23,12 @@ import androidx.lifecycle.ProcessLifecycleOwner
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-fun YouTubeVideoPlayer(
+actual fun YouTubeVideoPlayer(
     videoId: String,
     muted: Boolean,
     onReady: () -> Unit,
     onError: () -> Unit,
-    modifier: Modifier = Modifier
-) {
+    modifier: Modifier) {
     if (!YOUTUBE_VIDEO_ID.matches(videoId)) {
         LaunchedEffect(videoId) { onError() }
         return
