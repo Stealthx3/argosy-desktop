@@ -12,13 +12,13 @@ actual class EmulatorUpdateManager @Inject constructor() {
 
     actual val checkState: StateFlow<UpdateCheckState> = kotlinx.coroutines.flow.MutableStateFlow<UpdateCheckState>(UpdateCheckState.Idle)
 
-    actual val updateCount: Flow<Int> = kotlinx.coroutines.flow.emptyFlow()
+    actual val updateCount: Flow<Int> = kotlinx.coroutines.flow.flowOf(0)
 
-    actual val availableUpdates: Flow<List<EmulatorUpdateEntity>> = kotlinx.coroutines.flow.emptyFlow()
+    actual val availableUpdates: Flow<List<EmulatorUpdateEntity>> = kotlinx.coroutines.flow.flowOf(emptyList())
 
-    actual val assignedUpdateCount: Flow<Int> = kotlinx.coroutines.flow.emptyFlow()
+    actual val assignedUpdateCount: Flow<Int> = kotlinx.coroutines.flow.flowOf(0)
 
-    actual val platformUpdateCounts: Flow<Map<String, Int>> = kotlinx.coroutines.flow.emptyFlow()
+    actual val platformUpdateCounts: Flow<Map<String, Int>> = kotlinx.coroutines.flow.flowOf(emptyMap())
 
     actual fun checkIfNeeded() {
     }

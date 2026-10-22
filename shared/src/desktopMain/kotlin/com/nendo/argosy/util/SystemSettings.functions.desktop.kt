@@ -1,12 +1,17 @@
 package com.nendo.argosy.util
 
 import com.nendo.argosy.platform.PlatformContext as Context
-import com.nendo.argosy.platform.cacheDir
-import com.nendo.argosy.platform.filesDir
-import com.nendo.argosy.platform.getQuantityString
-import com.nendo.argosy.platform.getString
-import com.nendo.argosy.platform.resources
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
-actual fun formatClockTime(context: Context, epochMillis: Long): String = ""
+private const val CLOCK_DATE_PATTERN = "MMM d"
 
-actual fun formatClockDateTime(context: Context, epochMillis: Long): String = ""
+actual fun formatClockTime(context: Context, epochMillis: Long): String =
+    DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault(Locale.Category.FORMAT)).format(Date(epochMillis))
+
+actual fun formatClockDateTime(context: Context, epochMillis: Long): String {
+    val date = SimpleDateFormat(CLOCK_DATE_PATTERN, Locale.getDefault()).format(Date(epochMillis))
+    return "$date, ${formatClockTime(context, epochMillis)}"
+}

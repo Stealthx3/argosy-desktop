@@ -104,5 +104,5 @@ actual class SteamSettingsDelegate @Inject constructor() {
     actual fun confirmAddSteamGame(context: Context, scope: CoroutineScope, launcherPackage: String) {
     }
 
-    actual val downloadProgress: kotlinx.coroutines.flow.Flow<com.nendo.argosy.data.emulator.EmulatorDownloadProgress?> = kotlinx.coroutines.flow.emptyFlow()
+    actual val downloadProgress: kotlinx.coroutines.flow.Flow<com.nendo.argosy.data.emulator.EmulatorDownloadProgress?> = kotlinx.coroutines.flow.flowOf(null)
 }

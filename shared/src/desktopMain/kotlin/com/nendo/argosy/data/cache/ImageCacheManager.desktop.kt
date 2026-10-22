@@ -17,7 +17,7 @@ actual class ImageCacheManager @Inject constructor() {
 
     actual suspend fun loadArt(gameId: Long): ResolvedGameArt = ResolvedGameArt()
 
-    actual fun observeArt(gameId: Long): Flow<ResolvedGameArt?> = kotlinx.coroutines.flow.emptyFlow()
+    actual fun observeArt(gameId: Long): Flow<ResolvedGameArt?> = kotlinx.coroutines.flow.flowOf(null)
 
     actual fun setCustomCachePath(path: String?) {
     }
