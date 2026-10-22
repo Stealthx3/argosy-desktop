@@ -128,4 +128,5 @@ def main():
     save(path, creds)
 
 
-main()
+if __name__ == "__main__":
+    main()

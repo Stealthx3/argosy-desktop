@@ -4,20 +4,21 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 History and reasoning live in `DEVLOG.md`; read only the parts this file points to. Earlier phases:
 `phase-0.md`, `phase-1.md` (closed summaries; carried-forward items are listed there).
 
-**Updated:** 2026-10-22, end of unit p4e
+**Updated:** 2026-10-22, end of unit p4f
 
 ## Where things stand
 
-- **Phase:** 2 · Desktop UI (third of six). Seam stage done; desktop shell (p4a); keyboard input (p4b); **SDL3 gamepad input done (p4c):** `platform/sdl/` (JNA binding `Sdl3`, `SdlGamepadSource` thread, `SdlVirtualPad`) and `ui/input/DesktopGamepadDispatcher` + `SdlGamepadMapping` feed upstream's `GamepadInputHandler` the same key codes and motion events Android does; pads register in `PlatformInputDevices`, and `ConnectedControllerTracker`/`TriggerAxisKeyEmitter` desktop actuals are now real. Plan step 7 is complete. See the p4c entry in `DEVLOG.md`. Plan step 8 in progress (p4d, p4e).
+- **Phase:** 2 · Desktop UI (third of six). Seam stage done; desktop shell (p4a); keyboard input (p4b); **SDL3 gamepad input done (p4c):** `platform/sdl/` (JNA binding `Sdl3`, `SdlGamepadSource` thread, `SdlVirtualPad`) and `ui/input/DesktopGamepadDispatcher` + `SdlGamepadMapping` feed upstream's `GamepadInputHandler` the same key codes and motion events Android does; pads register in `PlatformInputDevices`, and `ConnectedControllerTracker`/`TriggerAxisKeyEmitter` desktop actuals are now real. Plan step 7 is complete. See the p4c entry in `DEVLOG.md`. Plan step 8 in progress (p4d, p4e, p4f).
 - **Counts:** app 30 files, commonMain 1,720, androidMain 243 (unchanged; desktop-only work).
 - **Baseline for "Android unchanged":** plain upstream v2.24.0, `build/desktop-baseline/app-debug-upstream-v2.24.0.apk`. Plain save proof: `build/desktop-check/save-proof/v224-plain-1022a` (captured 2026-10-22 04:19; recapture once a candidate is more than 24 hours newer: `save-proof.sh build/desktop-baseline/app-debug-upstream-v2.24.0.apk <dir>`, about 8 min).
 - Nothing uncommitted.
 
 ## Next action
 
-Plan step 8: walk first run → Home with `desktop-drive.sh`, fixing desktop stubs each screen hits, and compare with Android at 1920×1080. Done so far: login-step input (p4d); **text entry (p4e):** `TYPE:<text>` in the key pipe, desktop `isAcceptingText` made real (Compose's content component answers `getInputMethodRequests()` only while a field has an input session), and keyboard Enter goes to an active field (recorded desktop divergence). Typing the testbed URL and Enter reaches RomM's "Scan to pair" screen. See the p4e entry in `DEVLOG.md`.
-Next, in order: (1) finish sign-in. The pairing screen offers "Sign in on this device" (opens a browser: check the desktop URL-opening actual), "Use a pairing code" (a text field: type a code), Back. Find how to approve a device code or mint a pairing code on the testbed RomM with the admin credentials in `build/desktop-testbed/credentials.env` (RomM API; never print the values), then drive on through storage/platform/core setup towards Home, fixing each desktop stub that throws. The runbook says the real wizard was never driven on Android either (seeding skipped it), so expect desktop-only gaps and compare with Android only where it matters. (2) Compare the login frame with Android at 1920×1080: the desktop layout looks small for that size, so check density/font scale first.
-Driven-run recipe to the pairing screen: `desktop-drive.sh <dir> 25 PAD:SOUTH wait:2 PAD:SOUTH wait:1 TYPE:http://localhost:8093 wait:1 ENTER wait:6 shot:<name>`.
+Plan step 8: walk first run → Home with `desktop-drive.sh`, fixing desktop stubs each screen hits, and compare with Android at 1920×1080. Done: login-step input (p4d), text entry (p4e), **sign-in (p4f):** a pairing code minted mid-run by `scripts/desktop/testbed/pair-code.py` connects ("16 games across 4 platforms"), and the next launch routes straight to Home, as seeded Android does. See the p4f entry in `DEVLOG.md`.
+Next, in order: (1) Home shows the platform tabs but only a "View All" card, no game cards, 25 s after launch (`build/desktop-check/p4f-e/s0.png`). Find out whether the library sync ran on desktop (app log, RomM server log, the desktop DB under `~/.local/share/argosy-desktop`), and whether cards are missing or only their art; compare with Android's populated Home (`build/desktop-baseline/populated-*.png`). Pad South from Home opened a Game Detail for "Argosy Eight Bit", so games exist in the DB. (2) Storage/platform/core setup was skipped by the post-sign-in routing; drive those screens later from Settings if needed. (3) Compare the login frame with Android at 1920×1080: the desktop layout looks small for that size, so check density/font scale first.
+Desktop state persists in `~/.local/share/argosy-desktop` (XDG data); runs now start at Home. To drive first run again, move that folder aside (never delete it without the owner).
+Driven-run recipe for first-run sign-in (from a fresh data dir): `desktop-drive.sh <dir> 25 PAD:SOUTH wait:2 PAD:SOUTH wait:1 TYPE:http://localhost:8093 wait:1 ENTER wait:6 DOWN wait:1 PAD:SOUTH wait:2 PAD:SOUTH wait:1 "RUN:build/desktop-testbed/venv/bin/python scripts/desktop/testbed/pair-code.py" TYPEFILE:build/desktop-testbed/pair-code.txt wait:1 ENTER wait:8 shot:<name>` (codes expire in 60 s, hence minting mid-run).
 Still unverified from p4c: a physical pad (none attached; Nintendo-layout pads especially), in-app stick navigation, key repeat feel against Android.
 Phase 3 question (record, do not fix now): while the window is hidden, vsync blocks the AWT thread about 1 s per frame, and SDL pad events are posted to that thread.
 
@@ -34,6 +35,9 @@ Where the desktop graph lives: `shared/src/desktopMain/.../di/` (`DesktopCompone
 - JDK: `JAVA_HOME=~/.jdks/jdk-21.0.12.1+1`.
 
 ## Gotchas worth remembering
+
+- Never `pkill -f` a pattern that also appears in the same shell command: it kills the calling shell (exit 144). `desktop-drive.sh` stops the app itself.
+- First-run pairing screen: Up/Down move focus, Left/Right do nothing; a code or URL field needs a confirm (pad South) before it takes text.
 
 - Timing in driven runs: `desktop-drive.sh` prints ms timestamps per key and shot; an EDT watchdog (a Swing timer heartbeat plus a thread that prints the AWT thread's stack when the heartbeat is >150 ms late) found the vsync stall where `jstack` was useless (about 5.7 s per sample here).
 - XTest/xdotool-style injection does not work here: KDE's Xwayland runs `-enable-ei-portal` (consent portal). Use `desktop-drive.sh` (in-process key pipe). No Xvfb installed; installing one needs the owner.

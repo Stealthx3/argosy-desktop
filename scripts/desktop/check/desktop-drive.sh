@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# usage: desktop-drive.sh <out-dir> <settle-s> <step>... [-- WxH]; step = shot:<name> | wait:<s> | <AWT VK name>[*n] | PAD:<SDL button>[*n] | PAD:<axis>=<value> | TYPE:<text>
+# usage: desktop-drive.sh <out-dir> <settle-s> <step>... [-- WxH]; step = shot:<name> | wait:<s> | <AWT VK name>[*n] | PAD:<SDL button>[*n] | PAD:<axis>=<value> | TYPE:<text> | TYPEFILE:<path> (types the file's first line, not echoed) | RUN:<command> (host command, run to completion)
 set -u
 outdir=$1
 settle=$2
@@ -42,6 +42,8 @@ for step in "${steps[@]}"; do
     shot:*) import -window "$win" "$outdir/${step#shot:}.png" && echo "screenshot $outdir/${step#shot:}.png t=$(date +%s%3N)" ;;
     wait:*) sleep "${step#wait:}" ;;
     TYPE:*) echo "$step" >&3; echo "type ${step#TYPE:} t=$(date +%s%3N)"; sleep 1 ;;
+    TYPEFILE:*) echo "TYPE:$(head -n1 "${step#TYPEFILE:}")" >&3; echo "type <${step#TYPEFILE:}> t=$(date +%s%3N)"; sleep 1 ;;
+    RUN:*) bash -c "${step#RUN:}"; echo "ran: exit $? t=$(date +%s%3N)" ;;
     *) key=${step%%\**}; n=1; [ "$key" != "$step" ] && n=${step#*\*}
        for _ in $(seq 1 "$n"); do echo "$key" >&3; echo "key $key t=$(date +%s%3N)"; sleep 0.6; done ;;
   esac
