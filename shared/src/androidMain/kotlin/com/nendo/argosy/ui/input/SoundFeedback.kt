@@ -199,7 +199,7 @@ actual class SoundFeedbackManager @Inject constructor(
         this.volume = linear * linear
     }
 
-    fun setSoundConfigs(configs: Map<SoundType, SoundConfig>) {
+    actual fun setSoundConfigs(configs: Map<SoundType, SoundConfig>) {
         soundConfigs = configs
         refreshCustomSounds()
     }

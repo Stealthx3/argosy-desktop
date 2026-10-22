@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nendo.argosy.DualScreenManagerHolder
-import com.nendo.argosy.shared.R
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.ui.components.APP_BAR_DRAWER_INDEX
 import com.nendo.argosy.ui.components.InputButton
 import com.nendo.argosy.data.local.entity.CollectionType
@@ -55,7 +55,7 @@ import com.nendo.argosy.ui.screens.home.delegates.HomeSyncDelegate
 import com.nendo.argosy.ui.screens.home.delegates.HomeTilePickerDelegate
 import com.nendo.argosy.ui.screens.home.delegates.HomeVideoPreviewDelegate
 import com.nendo.argosy.ui.screens.home.delegates.PlatformChangeResult
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.nendo.argosy.di.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -76,6 +76,39 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.nendo.argosy.platform.startActivity
+import com.nendo.argosy.platform.getApplicationInfo
+import com.nendo.argosy.platform.getApplicationLabel
+import com.nendo.argosy.platform.applicationContext
+import com.nendo.argosy.platform.packageName
+import com.nendo.argosy.platform.getSystemService
+import com.nendo.argosy.platform.getExternalFilesDir
+import com.nendo.argosy.platform.externalCacheDir
+import com.nendo.argosy.platform.dataDir
+import com.nendo.argosy.platform.packageManager
+import com.nendo.argosy.platform.getPackageInfo
+import com.nendo.argosy.platform.getLaunchIntentForPackage
+import com.nendo.argosy.platform.addFlags
+import com.nendo.argosy.platform.versionName
+import com.nendo.argosy.platform.assets
+import com.nendo.argosy.platform.contentResolver
+import com.nendo.argosy.platform.cacheDir
+import com.nendo.argosy.platform.filesDir
+import com.nendo.argosy.platform.getSharedPreferences
+import com.nendo.argosy.platform.list
+import com.nendo.argosy.platform.open
+import com.nendo.argosy.platform.getQuantityString
+import com.nendo.argosy.platform.getString
+import com.nendo.argosy.platform.resources
+import com.nendo.argosy.platform.asImageBitmap
+import com.nendo.argosy.platform.config
+import com.nendo.argosy.platform.copy
+import com.nendo.argosy.platform.getPixel
+import com.nendo.argosy.platform.height
+import com.nendo.argosy.platform.recycle
+import com.nendo.argosy.platform.setPixels
+import com.nendo.argosy.platform.width
+import com.nendo.argosy.hardware.coverArtEnabled
 
 /**
  * The widgets tab's rows in this surface's words. The list itself is written once in
@@ -94,7 +127,7 @@ private val HOME_FEATURE_TILE_PICKER_STRINGS = com.nendo.argosy.ui.common.Featur
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    @dagger.hilt.android.qualifiers.ApplicationContext private val context: android.content.Context,
+    @com.nendo.argosy.di.ApplicationContext private val context: com.nendo.argosy.platform.PlatformContext,
     private val savedStateHandle: SavedStateHandle,
     private val gameRepository: GameRepository,
     private val displayAffinityHelper: com.nendo.argosy.util.DisplayAffinityHelper,
@@ -149,7 +182,7 @@ class HomeViewModel @Inject constructor(
     private val selectDoubleTap = com.nendo.argosy.ui.screens.home.delegates.SelectDoubleTap(
         scope = viewModelScope,
         windowMs = com.nendo.argosy.ui.theme.generated.InputTokens.Debounce.selectDoubleTapMs,
-        clock = android.os.SystemClock::uptimeMillis
+        clock = com.nendo.argosy.platform.PlatformSystemClock::uptimeMillis
     )
 
     override fun pressSelect(onSingle: () -> Unit) {
@@ -2328,12 +2361,12 @@ class HomeViewModel @Inject constructor(
     fun refreshFavorites() { viewModelScope.launch { libraryDelegate.loadFavorites() } }
     fun refreshPlatforms() { viewModelScope.launch { libraryDelegate.loadPlatforms() } }
     fun regenerateRecommendations() = libraryDelegate.regenerateRecommendations(viewModelScope)
-    fun extractGradientForGame(gameId: Long, bitmap: android.graphics.Bitmap) {
+    fun extractGradientForGame(gameId: Long, bitmap: com.nendo.argosy.platform.PlatformBitmap) {
         val isFocused = _uiState.value.focusedGame?.id == gameId
         libraryDelegate.extractGradientForGame(viewModelScope, gameId, bitmap, isFocused)
     }
 
-    fun extractGradientForMedia(itemId: String, bitmap: android.graphics.Bitmap) {
+    fun extractGradientForMedia(itemId: String, bitmap: com.nendo.argosy.platform.PlatformBitmap) {
         val isFocused = _uiState.value.focusedMedia?.itemId == itemId
         gradientExtractionDelegate.extractForMedia(viewModelScope, itemId, bitmap, prioritize = isFocused)
     }

@@ -8,4 +8,13 @@ import javax.inject.Singleton
 actual class AmbientLedManager @Inject constructor() {
     actual fun setUiColors(primary: Color, secondary: Color?) {
     }
+
+    actual fun setContext(newContext: AmbientLedContext) {
+    }
+
+    actual fun setHoverColors(primary: Color, secondary: Color?) {
+    }
+
+    actual fun clearHoverColors() {
+    }
 }

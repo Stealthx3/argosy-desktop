@@ -200,7 +200,7 @@ GUARDED_REWRITES = {
     "android.os.Looper": re.compile(r"\bLooper\.(?!getMainLooper\(\))\w+|\.looper\b|\bLooper\(\)"),
     "android.os.Handler": re.compile(
         r"\.(?:post|postDelayed|postAtTime|postAtFrontOfQueue|removeCallbacks|removeCallbacksAndMessages|sendMessage\w*"
-        r"|sendEmptyMessage\w*|obtainMessage|hasMessages|hasCallbacks)\b|\bHandler\((?!Looper\.getMainLooper\(\)\))"
+        r"|sendEmptyMessage\w*|obtainMessage|hasMessages|hasCallbacks)\b|\bHandler\((?!(?:Platform)?Loopers?\.getMainLooper\(\)\))"
     ),
     "android.database.ContentObserver": re.compile(r"\.(?:dispatchChange|deliverSelfNotifications)\b|onChange\(\s*\w+\s*:\s*Boolean\s*,"),
     "android.graphics.Bitmap": re.compile(

@@ -17,4 +17,6 @@ expect class SoundFeedbackManager {
     fun setSoundConfig(type: SoundType, config: SoundConfig)
 
     fun clearSoundConfig(type: SoundType)
+
+    fun setSoundConfigs(configs: Map<SoundType, SoundConfig>)
 }

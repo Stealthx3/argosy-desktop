@@ -24,4 +24,6 @@ actual object SteamLaunchers {
     actual fun launchChoices(pinned: Boolean, reporting: List<String>, isInstalled: (String) -> Boolean): List<String> = emptyList()
 
     actual fun displayNameForPackage(launcherPackage: String?): String = ""
+
+    actual fun getMarkOptions(context: Context): List<MarkOption> = emptyList()
 }

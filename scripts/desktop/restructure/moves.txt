@@ -2109,3 +2109,24 @@
 + ui/screens/settings/sections/input/ThemeMusicSectionInput.kt
 + ui/screens/settings/sections/input/ThemeSectionInput.kt
 + ui/screens/settings/sections/input/ThemeSoundsSectionInput.kt
+
+# Phase 2: portable since QuayPassRunState became a plain commonMain enum (hoist_nested.py; was androidMain).
+[commonMain]
++ ui/screens/quaypass/QuayPassCheckInScreen.kt
+
+# Phase 2: portable since SteamLaunchers.MarkOption became a plain commonMain sealed class (hoist_nested.py); clears the NavGraph closure (was androidMain).
+[commonMain]
++ data/steam/SteamDownloadPromptController.kt
++ ui/ArgosyViewModel.kt
++ ui/components/FloatingNavBar.kt
++ ui/components/MainDrawer.kt
++ ui/navigation/NavGraph.kt
++ ui/screens/gamedetail/GameDetailScreen.kt
++ ui/screens/gamedetail/GameDetailViewModel.kt
++ ui/screens/gamedetail/components/GameDetailSections.kt
++ ui/screens/gamedetail/components/ReviewEditorOverlay.kt
++ ui/screens/home/HomeScreen.kt
++ ui/screens/home/HomeViewModel.kt
++ ui/screens/library/LibraryGameList.kt
++ ui/screens/library/LibraryScreen.kt
++ ui/screens/library/LibraryViewModel.kt

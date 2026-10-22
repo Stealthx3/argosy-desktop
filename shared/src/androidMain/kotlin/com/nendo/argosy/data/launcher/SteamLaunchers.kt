@@ -57,18 +57,7 @@ actual object SteamLaunchers {
         return if (installed.size > 1) installed else emptyList()
     }
 
-    /**
-     * User-facing grouping for the Mark-as-Installed modal. GameHub variants
-     * (proper + every GH Lite flavor) collapse into one option: the specific
-     * package stored is whichever variant is installed first.
-     */
-    sealed class MarkOption(val launcherPackage: String, val displayName: String) {
-        object GameNative : MarkOption(GameNativeLauncher.packageName, GameNativeLauncher.displayName)
-        class GameHub(launcherPackage: String) : MarkOption(launcherPackage, "GameHub")
-        object DroidDeck : MarkOption(DroidDeckLauncher.packageName, DroidDeckLauncher.displayName)
-    }
-
-    fun getMarkOptions(context: Context): List<MarkOption> = buildList {
+    actual fun getMarkOptions(context: Context): List<MarkOption> = buildList {
         if (GameNativeLauncher.isInstalled(context)) add(MarkOption.GameNative)
         gameHubVariants.firstOrNull { it.isInstalled(context) }?.let {
             add(MarkOption.GameHub(it.packageName))

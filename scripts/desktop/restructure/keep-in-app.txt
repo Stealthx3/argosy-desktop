@@ -6,6 +6,4 @@ libretro/InputConfigCoordinator.kt  # the in-app emulator's UI: smart casts on e
 libretro/KeyPressGate.kt  # as above
 libretro/ui/*  # as above
 core/service/ForegroundServiceStarter.kt  # extensions on Context that call Android members through the implicit receiver
-data/steam/SteamDownloadPromptController.kt  # uses SteamLaunchers.MarkOption, a nested sealed class with subclasses the slice cannot carry
-ui/screens/quaypass/QuayPassCheckInScreen.kt  # an exhaustive when over an expect enum (K2 requires else there)
 ui/screens/settings/sections/ShaderStackSection.kt  # reads ShaderChainManager's shaderStack and previewBitmap, vars with private setters that an expect slice cannot carry; the in-app emulator's shader chain is Android-only

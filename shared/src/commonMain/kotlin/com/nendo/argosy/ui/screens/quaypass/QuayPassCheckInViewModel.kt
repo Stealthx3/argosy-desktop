@@ -1,5 +1,6 @@
 package com.nendo.argosy.ui.screens.quaypass
 
+import com.nendo.argosy.data.quaypass.QuayPassRunState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nendo.argosy.data.local.entity.QuayPassEncounterEntity
@@ -110,7 +111,7 @@ class QuayPassCheckInViewModel @Inject constructor(
             .map { it.quayPassGreeting ?: "" }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), "")
 
-    val serviceState: StateFlow<QuayPassService.QuayPassRunState> = service.runState
+    val serviceState: StateFlow<QuayPassRunState> = service.runState
 
     fun setGreeting(text: String) {
         viewModelScope.launch {

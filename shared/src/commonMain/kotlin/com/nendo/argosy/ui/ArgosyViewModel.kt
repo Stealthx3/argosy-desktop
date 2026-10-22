@@ -1,13 +1,25 @@
 package com.nendo.argosy.ui
 
-import android.app.Application
-import android.database.ContentObserver
-import android.os.Handler
-import android.os.Looper
-import android.provider.Settings
-import android.util.Log
+import com.nendo.argosy.platform.PlatformApplication as Application
+import com.nendo.argosy.platform.applicationContext
+import com.nendo.argosy.platform.cacheDir
+import com.nendo.argosy.platform.contentResolver
+import com.nendo.argosy.platform.filesDir
+import com.nendo.argosy.platform.getSharedPreferences
+import com.nendo.argosy.platform.getString
+import com.nendo.argosy.platform.packageName
+import com.nendo.argosy.platform.resources
+import com.nendo.argosy.platform.startActivity
+import com.nendo.argosy.platform.PlatformContentObserver as ContentObserver
+import com.nendo.argosy.platform.registerContentObserver
+import com.nendo.argosy.platform.unregisterContentObserver
+import com.nendo.argosy.platform.PlatformHandler as Handler
+import com.nendo.argosy.platform.PlatformLooper as Looper
+import com.nendo.argosy.platform.PlatformLoopers
+import com.nendo.argosy.platform.PlatformSettings as Settings
+import com.nendo.argosy.util.PlatformLog as Log
 import androidx.annotation.StringRes
-import com.nendo.argosy.shared.R
+import com.nendo.argosy.res.ArgosyR as R
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nendo.argosy.data.download.DownloadManager
@@ -55,7 +67,7 @@ import com.nendo.argosy.ui.navigation.Screen
 import com.nendo.argosy.core.notification.DownloadNotificationObserver
 import com.nendo.argosy.core.notification.NotificationManager
 import com.nendo.argosy.core.notification.SyncNotificationObserver
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.nendo.argosy.di.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -70,6 +82,15 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.nendo.argosy.platform.action
+import com.nendo.argosy.platform.addFlags
+import com.nendo.argosy.platform.data
+import com.nendo.argosy.platform.flags
+import com.nendo.argosy.platform.putExtra
+import com.nendo.argosy.platform.component
+import com.nendo.argosy.platform.`package`
+import com.nendo.argosy.platform.getStringExtra
+import com.nendo.argosy.platform.className
 
 private const val RECONNECT_SETTLE_MS = 5_000L
 
@@ -202,7 +223,7 @@ class ArgosyViewModel @Inject constructor(
     val sessionEndOverlay: StateFlow<com.nendo.argosy.ui.screens.common.SyncOverlayState?> =
         sessionEndCoordinator.syncOverlayState
 
-    private val settingsObserver = object : ContentObserver(Handler(Looper.getMainLooper())) {
+    private val settingsObserver = object : ContentObserver(Handler(PlatformLoopers.getMainLooper())) {
         override fun onChange(selfChange: Boolean) {
             quickSettings.refreshDisplayLevels()
         }
@@ -658,7 +679,7 @@ class ArgosyViewModel @Inject constructor(
             }
             when (val result = launchGameUseCase(gameId = gameId, allowVariantPrompt = false)) {
                 is LaunchResult.Success -> {
-                    val decorated = android.content.Intent(result.intent).apply {
+                    val decorated = com.nendo.argosy.platform.PlatformIntentType(result.intent).apply {
                         putExtra(LibretroActivity.EXTRA_NETPLAY_JOIN_SESSION_ID, session.sessionId)
                         putExtra(LibretroActivity.EXTRA_NETPLAY_JOIN_HOST_USER_ID, friend.id)
                         if (preflight.resolvedCorePath != null) {
@@ -757,7 +778,7 @@ class ArgosyViewModel @Inject constructor(
             }
             when (val result = launchGameUseCase(gameId = game.id, allowVariantPrompt = false)) {
                 is LaunchResult.Success -> {
-                    val decorated = android.content.Intent(result.intent).apply {
+                    val decorated = com.nendo.argosy.platform.PlatformIntentType(result.intent).apply {
                         putExtra(LibretroActivity.EXTRA_NETPLAY_JOIN_SESSION_ID, invite.sessionId)
                         putExtra(LibretroActivity.EXTRA_NETPLAY_JOIN_HOST_USER_ID, invite.hostUserId)
                         if (preflight.resolvedCorePath != null) {

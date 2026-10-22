@@ -174,19 +174,6 @@ actual class QuayPassService @Inject constructor(
         val quayPassEnabled: Boolean
     )
 
-    actual enum class QuayPassRunState {
-        RUNNING,
-        DISABLED,
-        NOT_LINKED,
-        BLE_UNSUPPORTED,
-        BLUETOOTH_OFF,
-        PERMISSIONS_MISSING,
-        AWAITING_REGISTRATION,
-        AWAITING_CREDENTIAL,
-        KEY_EXPIRED,
-        CREDENTIAL_REJECTED
-    }
-
     private data class ProfileSnapshot(
         val socialUsername: String?,
         val socialDisplayName: String?,

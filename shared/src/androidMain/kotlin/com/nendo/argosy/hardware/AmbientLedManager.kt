@@ -170,7 +170,7 @@ actual class AmbientLedManager @Inject constructor(
         return true
     }
 
-    fun setContext(newContext: AmbientLedContext) {
+    actual fun setContext(newContext: AmbientLedContext) {
         Logger.debug(TAG, "setContext: $newContext, uiColorsInitialized=$uiColorsInitialized, hoverColors=${_state.value.hoverLeftColor != null}")
         _state.value = _state.value.copy(context = newContext)
         if (isEnabled && shouldUpdateLeds()) {
@@ -189,7 +189,7 @@ actual class AmbientLedManager @Inject constructor(
         }
     }
 
-    fun setHoverColors(primary: Color, secondary: Color?) {
+    actual fun setHoverColors(primary: Color, secondary: Color?) {
         val left = primary
         val right = secondary ?: primary
         targetHoverLeft = left
@@ -226,7 +226,7 @@ actual class AmbientLedManager @Inject constructor(
         }
     }
 
-    fun clearHoverColors() {
+    actual fun clearHoverColors() {
         hoverTransitionJob?.cancel()
         hoverTransitionJob = null
         targetHoverLeft = null

@@ -1,6 +1,11 @@
 package com.nendo.argosy.ui.screens.quaypass
 
+import com.nendo.argosy.data.quaypass.QuayPassRunState
 import com.nendo.argosy.platform.PlatformContext as Context
+import com.nendo.argosy.platform.externalCacheDir
+import com.nendo.argosy.platform.dataDir
+import com.nendo.argosy.platform.getLaunchIntentForPackage
+import com.nendo.argosy.platform.addFlags
 import com.nendo.argosy.platform.startActivity
 import com.nendo.argosy.platform.getApplicationInfo
 import com.nendo.argosy.platform.getApplicationLabel
@@ -105,7 +110,7 @@ fun QuayPassCheckInScreen(
 ) {
     val cards by viewModel.cards.collectAsState()
     val serviceState by viewModel.serviceState.collectAsState()
-    val running = serviceState == QuayPassService.QuayPassRunState.RUNNING
+    val running = serviceState == QuayPassRunState.RUNNING
     val ticketBalance by viewModel.ticketBalance.collectAsState()
     val greeting by viewModel.greeting.collectAsState()
     val uiState by viewModel.uiState.collectAsState()
@@ -177,25 +182,25 @@ fun QuayPassCheckInScreen(
                 }
                 Text(
                     text = when (serviceState) {
-                        QuayPassService.QuayPassRunState.RUNNING ->
+                        QuayPassRunState.RUNNING ->
                             stringResource(R.string.quaypass_checkin_state_running)
-                        QuayPassService.QuayPassRunState.DISABLED ->
+                        QuayPassRunState.DISABLED ->
                             stringResource(R.string.quaypass_checkin_state_disabled)
-                        QuayPassService.QuayPassRunState.NOT_LINKED ->
+                        QuayPassRunState.NOT_LINKED ->
                             stringResource(R.string.quaypass_checkin_state_not_linked)
-                        QuayPassService.QuayPassRunState.AWAITING_REGISTRATION ->
+                        QuayPassRunState.AWAITING_REGISTRATION ->
                             stringResource(R.string.quaypass_checkin_state_awaiting_registration)
-                        QuayPassService.QuayPassRunState.AWAITING_CREDENTIAL ->
+                        QuayPassRunState.AWAITING_CREDENTIAL ->
                             stringResource(R.string.quaypass_checkin_state_awaiting_credential)
-                        QuayPassService.QuayPassRunState.KEY_EXPIRED ->
+                        QuayPassRunState.KEY_EXPIRED ->
                             stringResource(R.string.quaypass_checkin_state_key_expired)
-                        QuayPassService.QuayPassRunState.CREDENTIAL_REJECTED ->
+                        QuayPassRunState.CREDENTIAL_REJECTED ->
                             stringResource(R.string.quaypass_checkin_state_credential_rejected)
-                        QuayPassService.QuayPassRunState.BLUETOOTH_OFF ->
+                        QuayPassRunState.BLUETOOTH_OFF ->
                             stringResource(R.string.quaypass_checkin_state_bluetooth_off)
-                        QuayPassService.QuayPassRunState.PERMISSIONS_MISSING ->
+                        QuayPassRunState.PERMISSIONS_MISSING ->
                             stringResource(R.string.quaypass_checkin_state_permissions_missing)
-                        QuayPassService.QuayPassRunState.BLE_UNSUPPORTED ->
+                        QuayPassRunState.BLE_UNSUPPORTED ->
                             stringResource(R.string.quaypass_checkin_state_ble_unsupported)
                     },
                     style = MaterialTheme.typography.bodySmall,

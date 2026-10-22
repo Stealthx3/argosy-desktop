@@ -27,4 +27,7 @@ actual class SoundFeedbackManager @Inject constructor() {
 
     actual fun clearSoundConfig(type: SoundType) {
     }
+
+    actual fun setSoundConfigs(configs: Map<SoundType, SoundConfig>) {
+    }
 }

@@ -42,5 +42,7 @@ expect object SteamLaunchers {
 
     fun launchChoices(pinned: Boolean, reporting: List<String>, isInstalled: (String) -> Boolean): List<String>
 
+    fun getMarkOptions(context: Context): List<MarkOption>
+
     fun displayNameForPackage(launcherPackage: String?): String
 }

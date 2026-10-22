@@ -477,6 +477,8 @@ CONTEXT_PROPERTY_USE = re.compile(
 )
 MEMBER_EXTENSIONS = [
     (re.compile(r"\bshaderChainManager\??\.shaderStack\b"), "com.nendo.argosy.libretro.shader.shaderStack"),
+    (re.compile(r"\b\w*[lL]auncher\??\.isInstalled\("), "com.nendo.argosy.data.launcher.isInstalled"),
+    (re.compile(r"\bambientLedManager\??\.coverArtEnabled\b"), "com.nendo.argosy.hardware.coverArtEnabled"),
 ]
 
 

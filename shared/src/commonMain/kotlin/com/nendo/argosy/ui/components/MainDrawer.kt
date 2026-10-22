@@ -43,10 +43,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
+import com.nendo.argosy.res.painterResource
+import com.nendo.argosy.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import com.nendo.argosy.shared.R
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.data.social.SocialUser
 import com.nendo.argosy.ui.ACCOUNTS_SECTION_NAME
 import com.nendo.argosy.ui.DRAWER_ACCOUNT_ROW_INDEX
@@ -57,6 +57,9 @@ import com.nendo.argosy.ui.components.friends.SocialAvatar
 import com.nendo.argosy.ui.theme.Dimens
 import com.nendo.argosy.ui.theme.LocalArgosyTheme
 import com.nendo.argosy.ui.navigation.Screen
+import com.nendo.argosy.platform.image.bitmap
+import com.nendo.argosy.platform.image.intrinsicHeight
+import com.nendo.argosy.platform.image.intrinsicWidth
 
 @Composable
 fun MainDrawer(
@@ -145,7 +148,7 @@ private fun NavigationContent(
                     isFocused = index == focusedIndex,
                     isSelected = com.nendo.argosy.ui.navigation.NavRing.routeMatches(item.route, currentRoute),
                     onClick = {
-                        android.util.Log.d("MainDrawer", "Menu item clicked: ${item.route}")
+                        com.nendo.argosy.util.PlatformLog.d("MainDrawer", "Menu item clicked: ${item.route}")
                         onNavigate(item.route)
                     },
                     modifier = Modifier.padding(end = Dimens.spacingMd),
@@ -230,7 +233,7 @@ private fun AccountAvatar(
 ) {
     val initial = name?.trim()?.firstOrNull()?.uppercaseChar()?.toString()
     if (!avatarUrl.isNullOrBlank()) {
-        coil.compose.AsyncImage(
+        com.nendo.argosy.platform.image.AsyncImage(
             model = avatarUrl,
             contentDescription = null,
             contentScale = androidx.compose.ui.layout.ContentScale.Crop,

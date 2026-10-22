@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.StateFlow
 
 @Singleton
 actual class QuayPassService @Inject constructor() {
-    actual enum class QuayPassRunState { RUNNING, DISABLED, NOT_LINKED, BLE_UNSUPPORTED, BLUETOOTH_OFF, PERMISSIONS_MISSING, AWAITING_REGISTRATION, AWAITING_CREDENTIAL, KEY_EXPIRED, CREDENTIAL_REJECTED }
 
     actual companion object {
         actual fun getInstance(): QuayPassService? = null

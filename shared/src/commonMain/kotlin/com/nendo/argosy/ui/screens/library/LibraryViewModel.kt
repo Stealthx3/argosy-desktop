@@ -1,12 +1,31 @@
 package com.nendo.argosy.ui.screens.library
 
-import android.content.Intent
-import android.net.Uri
-import android.util.Log
+import com.nendo.argosy.platform.PlatformIntentType as Intent
+import com.nendo.argosy.platform.action
+import com.nendo.argosy.platform.data
+import com.nendo.argosy.platform.flags
+import com.nendo.argosy.platform.putExtra
+import com.nendo.argosy.platform.component
+import com.nendo.argosy.platform.`package`
+import com.nendo.argosy.platform.getStringExtra
+import com.nendo.argosy.platform.className
+import com.nendo.argosy.platform.PlatformIntent
+import com.nendo.argosy.platform.PlatformUri as Uri
+import com.nendo.argosy.platform.authority
+import com.nendo.argosy.platform.encodedPath
+import com.nendo.argosy.platform.getQueryParameter
+import com.nendo.argosy.platform.host
+import com.nendo.argosy.platform.lastPathSegment
+import com.nendo.argosy.platform.path
+import com.nendo.argosy.platform.pathSegments
+import com.nendo.argosy.platform.queryParameterNames
+import com.nendo.argosy.platform.scheme
+import com.nendo.argosy.platform.PlatformUris
+import com.nendo.argosy.util.PlatformLog as Log
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nendo.argosy.shared.R
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.data.cache.ImageCacheManager
 import com.nendo.argosy.data.local.dao.MediaLibraryStats
 import com.nendo.argosy.data.local.dao.PlatformShowcaseStats
@@ -44,7 +63,31 @@ import com.nendo.argosy.domain.model.PlayerCount
 import com.nendo.argosy.domain.model.PlayerCountBucket
 import com.nendo.argosy.domain.usecase.cache.RepairImageCacheUseCase
 import com.nendo.argosy.domain.usecase.download.DownloadResult
-import android.content.Context
+import com.nendo.argosy.platform.PlatformContext as Context
+import com.nendo.argosy.platform.startActivity
+import com.nendo.argosy.platform.getApplicationInfo
+import com.nendo.argosy.platform.getApplicationLabel
+import com.nendo.argosy.platform.applicationContext
+import com.nendo.argosy.platform.packageName
+import com.nendo.argosy.platform.getSystemService
+import com.nendo.argosy.platform.getExternalFilesDir
+import com.nendo.argosy.platform.externalCacheDir
+import com.nendo.argosy.platform.dataDir
+import com.nendo.argosy.platform.packageManager
+import com.nendo.argosy.platform.getPackageInfo
+import com.nendo.argosy.platform.getLaunchIntentForPackage
+import com.nendo.argosy.platform.addFlags
+import com.nendo.argosy.platform.versionName
+import com.nendo.argosy.platform.assets
+import com.nendo.argosy.platform.contentResolver
+import com.nendo.argosy.platform.getSharedPreferences
+import com.nendo.argosy.platform.list
+import com.nendo.argosy.platform.open
+import com.nendo.argosy.platform.cacheDir
+import com.nendo.argosy.platform.filesDir
+import com.nendo.argosy.platform.getQuantityString
+import com.nendo.argosy.platform.getString
+import com.nendo.argosy.platform.resources
 import com.nendo.argosy.ui.common.GridDirection
 import com.nendo.argosy.ui.common.GridFocusNavigator
 import com.nendo.argosy.ui.components.ListReorder
@@ -72,7 +115,7 @@ import com.nendo.argosy.ui.ModalResetSignal
 import com.nendo.argosy.ui.dualscreen.CompanionFact
 import com.nendo.argosy.ui.dualscreen.PresentationSlot
 import com.nendo.argosy.ui.dualscreen.SlotOwner
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.nendo.argosy.di.HiltViewModel
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -105,7 +148,7 @@ sealed class LibraryEvent {
 
 @HiltViewModel
 class LibraryViewModel @Inject constructor(
-    @dagger.hilt.android.qualifiers.ApplicationContext private val context: android.content.Context,
+    @com.nendo.argosy.di.ApplicationContext private val context: com.nendo.argosy.platform.PlatformContext,
     private val platformRepository: PlatformRepository,
     private val gameRepository: GameRepository,
     private val mediaRepository: MediaRepository,
@@ -1785,9 +1828,9 @@ class LibraryViewModel @Inject constructor(
             val game = gameRepository.getById(gameId) ?: return@launch
             val packageName = game.packageName ?: return@launch
 
-            val intent = Intent(Intent.ACTION_DELETE).apply {
-                data = Uri.parse("package:$packageName")
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            val intent = Intent(PlatformIntent.ACTION_DELETE).apply {
+                data = PlatformUris.parse("package:$packageName")
+                addFlags(PlatformIntent.FLAG_ACTIVITY_NEW_TASK)
             }
             _events.emit(LibraryEvent.LaunchIntent(intent))
         }

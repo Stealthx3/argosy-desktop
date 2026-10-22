@@ -45,7 +45,7 @@ def main():
                 flags=re.M,
             )
             new = re.sub(
-                rf"^{indent}((?:public |override |open )*)(?<!actual )(val|var) {name}\b",
+                rf"^{indent}((?:@\w+ )*(?:public |override |open )*)(?<!actual )(val|var) {name}\b",
                 rf"\1\2actual \3 {name}",
                 new,
                 flags=re.M,

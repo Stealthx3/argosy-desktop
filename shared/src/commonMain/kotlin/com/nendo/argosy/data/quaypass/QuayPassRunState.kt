@@ -1,0 +1,14 @@
+package com.nendo.argosy.data.quaypass
+
+enum class QuayPassRunState {
+    RUNNING,
+    DISABLED,
+    NOT_LINKED,
+    BLE_UNSUPPORTED,
+    BLUETOOTH_OFF,
+    PERMISSIONS_MISSING,
+    AWAITING_REGISTRATION,
+    AWAITING_CREDENTIAL,
+    KEY_EXPIRED,
+    CREDENTIAL_REJECTED
+}
