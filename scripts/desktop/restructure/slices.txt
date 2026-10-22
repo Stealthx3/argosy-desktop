@@ -105,3 +105,4 @@ data/wallpaper/LockScreenScenes.kt: LockScreenScenes
 ui/screens/common/GameActivityStarter.kt: GameActivityStarter
 ui/util/ClipboardTextReader.kt: ClipboardTextReader
 ui/components/QrScanner.kt: *
+ui/components/SystemStatusProbes.kt: *

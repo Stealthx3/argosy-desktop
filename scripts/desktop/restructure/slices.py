@@ -26,6 +26,7 @@ PORTABLE_IMPORTS = (
     "kotlin.", "kotlinx.coroutines.", "java.lang.", "java.io.", "java.util.", "java.time.", "java.net.", "java.security.",
     "androidx.compose.ui.graphics.", "androidx.compose.ui.Modifier", "com.nendo.argosy.", "androidx.datastore.core.", "androidx.datastore.preferences.core.",
     "androidx.room.", "in.dragonbra.javasteam.", "com.swordfish.libretrodroid.Variable", "com.swordfish.libretrodroid.ShaderConfig",
+    "androidx.compose.runtime.State",
 )
 NOT_A_TYPE_STAND_IN = ()
 

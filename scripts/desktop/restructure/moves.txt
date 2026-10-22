@@ -1976,3 +1976,8 @@
 + ui/screens/musicbrowser/MusicBrowserViewModel.kt
 + ui/screens/settings/BgmPlaylistManagerScreen.kt
 + ui/screens/settings/BgmTrackArt.kt
+
+# Phase 2: portable since the SystemStatusProbes expect slice (was androidMain).
+[commonMain]
++ ui/components/QuickSettingsPanel.kt
++ ui/components/SystemStatusBar.kt

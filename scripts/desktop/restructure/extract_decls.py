@@ -22,7 +22,7 @@ MANIFEST = Path(__file__).with_name("extract-decls.txt")
 DECL = re.compile(
     r"^(?:(?:private|internal|public|data|enum|sealed|abstract|open|inline|value|const|annotation|fun|suspend|operator|infix"
     r"|actual|expect|tailrec|external)\s+)*"
-    r"(?:class|interface|object|fun|val|var|typealias)\s+(?:<[^>]*>\s*)?(?:[\w.]+\.)?(\w+)"
+    r"(?:class|interface|object|fun|val|var|typealias)\s+(?:<[^>]*>\s*)?(?:[\w.]+\??\.)?(\w+)"
 )
 
 

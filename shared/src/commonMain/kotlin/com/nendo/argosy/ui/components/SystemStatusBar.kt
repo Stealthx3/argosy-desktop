@@ -1,13 +1,5 @@
 package com.nendo.argosy.ui.components
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
-import android.net.ConnectivityManager
-import android.net.Network
-import android.net.NetworkCapabilities
-import android.os.BatteryManager
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -30,19 +22,38 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.nendo.argosy.ui.theme.generated.ComponentDefaults
-import androidx.compose.ui.platform.LocalContext
+import com.nendo.argosy.platform.LocalPlatformContext as LocalContext
+import com.nendo.argosy.platform.startActivity
+import com.nendo.argosy.platform.getApplicationInfo
+import com.nendo.argosy.platform.getApplicationLabel
+import com.nendo.argosy.platform.applicationContext
+import com.nendo.argosy.platform.packageName
+import com.nendo.argosy.platform.getSystemService
+import com.nendo.argosy.platform.getExternalFilesDir
+import com.nendo.argosy.platform.externalCacheDir
+import com.nendo.argosy.platform.dataDir
+import com.nendo.argosy.platform.packageManager
+import com.nendo.argosy.platform.getPackageInfo
+import com.nendo.argosy.platform.versionName
+import com.nendo.argosy.platform.assets
+import com.nendo.argosy.platform.contentResolver
+import com.nendo.argosy.platform.getSharedPreferences
+import com.nendo.argosy.platform.list
+import com.nendo.argosy.platform.open
+import com.nendo.argosy.platform.cacheDir
+import com.nendo.argosy.platform.filesDir
+import com.nendo.argosy.platform.getQuantityString
+import com.nendo.argosy.platform.getString
+import com.nendo.argosy.platform.resources
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -51,56 +62,6 @@ import com.nendo.argosy.ui.theme.LocalUiScale
 import com.nendo.argosy.ui.theme.generated.TypographyTokens
 import com.nendo.argosy.util.formatClockTime
 import kotlinx.coroutines.delay
-
-data class BatteryState(
-    val level: Int = 100,
-    val isCharging: Boolean = false
-)
-
-@Composable
-fun rememberBatteryState(): State<BatteryState> {
-    val context = LocalContext.current
-    val batteryState = remember { mutableStateOf(BatteryState()) }
-
-    DisposableEffect(context) {
-        val receiver = object : BroadcastReceiver() {
-            override fun onReceive(ctx: Context, intent: Intent) {
-                val level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
-                val scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, 100)
-                val status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1)
-                val isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
-                        status == BatteryManager.BATTERY_STATUS_FULL
-
-                batteryState.value = BatteryState(
-                    level = (level * 100) / scale,
-                    isCharging = isCharging
-                )
-            }
-        }
-
-        val filter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
-        val sticky = context.registerReceiver(receiver, filter)
-
-        sticky?.let { intent ->
-            val level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
-            val scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, 100)
-            val status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1)
-            val isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
-                    status == BatteryManager.BATTERY_STATUS_FULL
-
-            batteryState.value = BatteryState(
-                level = (level * 100) / scale,
-                isCharging = isCharging
-            )
-        }
-
-        onDispose {
-            context.unregisterReceiver(receiver)
-        }
-    }
-
-    return batteryState
-}
 
 /**
  * Whether artwork is still being fetched, for the status bar to show without every surface that
@@ -115,47 +76,6 @@ data class StatusBarItems(
     val battery: Boolean = true,
     val network: Boolean = false
 )
-
-enum class NetworkLink { OFFLINE, WIFI, ETHERNET, CELLULAR }
-
-@Composable
-fun rememberNetworkLink(): State<NetworkLink> {
-    val context = LocalContext.current
-    val link = remember { mutableStateOf(NetworkLink.OFFLINE) }
-
-    DisposableEffect(context) {
-        val manager = context.getSystemService(ConnectivityManager::class.java)
-        val callback = object : ConnectivityManager.NetworkCallback() {
-            override fun onCapabilitiesChanged(network: Network, caps: NetworkCapabilities) {
-                link.value = caps.toNetworkLink()
-            }
-
-            override fun onLost(network: Network) {
-                link.value = NetworkLink.OFFLINE
-            }
-        }
-        link.value = manager
-            ?.let { it.getNetworkCapabilities(it.activeNetwork) }
-            .toNetworkLink()
-        manager?.registerDefaultNetworkCallback(callback)
-
-        onDispose { manager?.unregisterNetworkCallback(callback) }
-    }
-
-    return link
-}
-
-private fun NetworkCapabilities?.toNetworkLink(): NetworkLink {
-    if (this == null || !hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
-        return NetworkLink.OFFLINE
-    }
-    return when {
-        hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> NetworkLink.ETHERNET
-        hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> NetworkLink.WIFI
-        hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> NetworkLink.CELLULAR
-        else -> NetworkLink.OFFLINE
-    }
-}
 
 val LocalStatusBarItems = androidx.compose.runtime.compositionLocalOf { StatusBarItems() }
 
