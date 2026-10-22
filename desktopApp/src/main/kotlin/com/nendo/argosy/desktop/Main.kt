@@ -65,9 +65,11 @@ fun main(args: Array<String>) {
                     LocalPlatformContext provides app,
                     LocalViewModelProviders provides viewModels,
                 ) {
-                    ALauncherTheme {
-                        Surface(modifier = Modifier.fillMaxSize()) {
-                            ArgosyApp()
+                    MultiResumeLifecycle {
+                        ALauncherTheme {
+                            Surface(modifier = Modifier.fillMaxSize()) {
+                                ArgosyApp()
+                            }
                         }
                     }
                 }
