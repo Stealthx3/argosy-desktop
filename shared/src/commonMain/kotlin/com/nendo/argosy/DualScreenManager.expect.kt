@@ -23,6 +23,16 @@ import com.nendo.argosy.platform.filesDir
 import com.nendo.argosy.platform.getQuantityString
 import com.nendo.argosy.platform.getString
 import com.nendo.argosy.platform.resources
+import com.nendo.argosy.platform.PlatformUri as Uri
+import com.nendo.argosy.platform.authority
+import com.nendo.argosy.platform.encodedPath
+import com.nendo.argosy.platform.getQueryParameter
+import com.nendo.argosy.platform.host
+import com.nendo.argosy.platform.lastPathSegment
+import com.nendo.argosy.platform.path
+import com.nendo.argosy.platform.pathSegments
+import com.nendo.argosy.platform.queryParameterNames
+import com.nendo.argosy.platform.scheme
 import com.nendo.argosy.data.preferences.DisplayRoleOverride
 import com.nendo.argosy.ui.input.InputSignature
 import com.nendo.argosy.core.game.AchievementUi
@@ -93,6 +103,12 @@ expect class DualScreenManager {
     val localeChangeToken: StateFlow<Int>
 
     fun notifyLocaleChanged()
+
+    val pendingDeepLink: StateFlow<com.nendo.argosy.platform.PlatformUri?>
+
+    fun publishDeepLink(uri: com.nendo.argosy.platform.PlatformUri)
+
+    fun consumeDeepLink(uri: com.nendo.argosy.platform.PlatformUri): Boolean
 
     fun interactiveDisplayId(): Int?
 

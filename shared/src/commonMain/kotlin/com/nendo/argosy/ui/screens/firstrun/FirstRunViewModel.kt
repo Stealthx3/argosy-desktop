@@ -1,15 +1,25 @@
 package com.nendo.argosy.ui.screens.firstrun
 
-import android.Manifest
-import android.os.Build
-import android.content.pm.PackageManager
-import android.provider.Settings
+import com.nendo.argosy.platform.PlatformManifest as Manifest
+import com.nendo.argosy.platform.PlatformBuild as Build
+import com.nendo.argosy.platform.PlatformPackageManagerConstants as PackageManager
+import com.nendo.argosy.platform.PlatformSettings as Settings
 import androidx.annotation.StringRes
-import androidx.core.content.ContextCompat
+import com.nendo.argosy.platform.PlatformContextCompat as ContextCompat
+import com.nendo.argosy.platform.displayId
 import androidx.lifecycle.ViewModel
-import com.nendo.argosy.shared.R
+import com.nendo.argosy.res.ArgosyR as R
 import androidx.lifecycle.viewModelScope
-import android.app.Application
+import com.nendo.argosy.platform.PlatformApplication as Application
+import com.nendo.argosy.platform.applicationContext
+import com.nendo.argosy.platform.cacheDir
+import com.nendo.argosy.platform.contentResolver
+import com.nendo.argosy.platform.filesDir
+import com.nendo.argosy.platform.getSharedPreferences
+import com.nendo.argosy.platform.getString
+import com.nendo.argosy.platform.packageName
+import com.nendo.argosy.platform.resources
+import com.nendo.argosy.platform.startActivity
 import com.nendo.argosy.data.repository.PlatformRepository
 import com.nendo.argosy.data.local.entity.PlatformEntity
 import com.nendo.argosy.data.preferences.UserPreferencesRepository
@@ -35,7 +45,7 @@ import com.nendo.argosy.ui.components.PLATFORM_HEADER_SORT
 import com.nendo.argosy.util.PermissionHelper
 import com.nendo.argosy.util.PlatformFilterLogic
 import com.nendo.argosy.util.StorageAccess
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.nendo.argosy.di.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

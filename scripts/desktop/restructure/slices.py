@@ -24,7 +24,7 @@ DESKTOP = Path("shared/src/desktopMain/kotlin")
 MANIFEST = Path(__file__).with_name("slices.txt")
 PORTABLE_IMPORTS = (
     "kotlin.", "kotlinx.coroutines.", "java.lang.", "java.io.", "java.util.", "java.time.", "java.net.", "java.security.",
-    "androidx.compose.ui.graphics.", "com.nendo.argosy.", "androidx.datastore.core.", "androidx.datastore.preferences.core.",
+    "androidx.compose.ui.graphics.", "androidx.compose.ui.Modifier", "com.nendo.argosy.", "androidx.datastore.core.", "androidx.datastore.preferences.core.",
     "androidx.room.", "in.dragonbra.javasteam.", "com.swordfish.libretrodroid.Variable", "com.swordfish.libretrodroid.ShaderConfig",
 )
 NOT_A_TYPE_STAND_IN = ()
@@ -78,12 +78,25 @@ def widen_imports(imported, text, pkg):
         if fq.startswith("com.nendo.argosy."):
             if short not in imported or not portable_import(fq):
                 imported[short] = fq
-        elif not fq.startswith(PORTABLE_IMPORTS):
+        elif not fq.startswith(PORTABLE_IMPORTS) and not rewritten_fq(fq):
             imported[short] = f"unrewritten:{fq}"
     for w in set(re.findall(r"\b[A-Z]\w*", code)):
         if w not in imported and android_only(pkg, w):
             imported[w] = f"{pkg}.{w}"
     return imported
+
+
+def rewritten(text):
+    for pattern, replacement in rewrite_imports.RULES:
+        text = pattern.sub(replacement, text)
+    return text
+
+
+def rewritten_fq(fq):
+    text = f"x: {fq}"
+    for pattern, replacement in rewrite_imports.RULES:
+        text = pattern.sub(replacement, text)
+    return text.startswith("x: com.nendo.argosy.")
 
 
 def portable_import(name):
@@ -378,7 +391,7 @@ def slice_top_level(rel):
         rtype = tail[1:].strip() if tail.startswith(":") else ("Unit" if text[end] == "{" else "")
         params = text[open_paren + 1:close]
         sig = f"{receiver}{name}({params}) {rtype}"
-        words = set(re.findall(r"\b[A-Z]\w*", sig))
+        words = set(re.findall(r"\b[A-Z]\w*", sig)) - {name}
         blocked = sorted(w for w in words if w in imported and not portable_import(imported[w]))
         if not rtype or blocked:
             skipped.append(f"{name}: {', '.join(blocked) or 'expression body without a declared return type'}")
@@ -411,9 +424,10 @@ def slice_top_level(rel):
     expect_path.parent.mkdir(parents=True, exist_ok=True)
     expect_path.write_text(f"package {pkg}\n\n" + (header + "\n\n" if header else "") + "\n\n".join(expect_lines) + "\n")
     desktop_path = (DESKTOP / ROOT / rel).parent / f"{stem}.functions.desktop.kt"
+    desktop_lines = [rewritten(d) for d in desktop_lines]
     if desktop_path.exists():
         existing = desktop_path.read_text()
-        missing = [d for d in desktop_lines if not present(d.split("\n")[-1] if d.startswith("@") else d, existing)]
+        missing = [d for d in desktop_lines if not present(d.split("\n")[1] if d.startswith("@") else d, existing)]
         if missing:
             existing = existing.rstrip() + "\n\n" + "\n\n".join(missing) + "\n"
             add = [l for l in header.splitlines() if l and not re.search(rf"^{re.escape(l)}$", existing, re.M)]
@@ -772,6 +786,7 @@ def main():
         out_dir.mkdir(parents=True, exist_ok=True)
         (out_dir / f"{cls}.expect.kt").write_text(expect_text)
         desktop_path = (DESKTOP / ROOT / rel).parent / f"{cls}.desktop.kt"
+        desktop_lines = [rewritten(d) for d in desktop_lines]
         if desktop_path.exists():
             existing = desktop_path.read_text()
             for d in desktop_lines:

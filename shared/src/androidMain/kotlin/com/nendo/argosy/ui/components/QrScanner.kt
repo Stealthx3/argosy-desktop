@@ -2,7 +2,6 @@ package com.nendo.argosy.ui.components
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
@@ -28,7 +27,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -47,33 +45,15 @@ import com.google.zxing.common.HybridBinarizer
 import com.nendo.argosy.ui.theme.Dimens
 import java.util.concurrent.Executors
 
-data class PairingQrResult(
-    val origin: String,
-    val code: String
-)
-
-fun parsePairingQrUrl(url: String): PairingQrResult? {
-    return try {
-        val uri = Uri.parse(url)
-        val code = uri.getQueryParameter("code") ?: return null
-        val origin = "${uri.scheme}://${uri.authority}"
-        if (origin.isBlank() || code.isBlank()) return null
-        PairingQrResult(origin, code.replace("-", "").uppercase())
-    } catch (_: Exception) {
-        null
-    }
-}
-
-fun deviceHasCamera(context: android.content.Context): Boolean {
+actual fun deviceHasCamera(context: android.content.Context): Boolean {
     return context.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
 }
 
 @Composable
-fun QrScannerWithPermission(
+actual fun QrScannerWithPermission(
     onResult: (PairingQrResult) -> Unit,
     onDismiss: () -> Unit,
-    modifier: Modifier = Modifier
-) {
+    modifier: Modifier) {
     val context = LocalContext.current
     var hasPermission by remember {
         mutableStateOf(

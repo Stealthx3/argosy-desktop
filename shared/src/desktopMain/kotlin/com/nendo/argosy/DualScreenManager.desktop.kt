@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.isActive
 import com.nendo.argosy.ui.dualscreen.CompanionDetail
+import com.nendo.argosy.platform.PlatformUri as Uri
 
 actual class DualScreenManager @Inject constructor() {
     actual companion object {
@@ -377,4 +378,11 @@ actual class DualScreenManager @Inject constructor() {
     }
 
     actual val presentationSlot: StateFlow<com.nendo.argosy.ui.dualscreen.PresentationSlot> = TODO("desktop: presentationSlot")
+
+    actual val pendingDeepLink: StateFlow<com.nendo.argosy.platform.PlatformUri?> = kotlinx.coroutines.flow.MutableStateFlow(null)
+
+    actual fun publishDeepLink(uri: com.nendo.argosy.platform.PlatformUri) {
+    }
+
+    actual fun consumeDeepLink(uri: com.nendo.argosy.platform.PlatformUri): Boolean = false
 }

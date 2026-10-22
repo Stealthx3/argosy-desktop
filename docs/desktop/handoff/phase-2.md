@@ -4,26 +4,26 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 History and reasoning live in `DEVLOG.md`; read only the parts this file points to. Earlier phases:
 `phase-0.md`, `phase-1.md` (closed summaries; carried-forward items are listed there).
 
-**Updated:** 2026-10-21, end of unit p3b
+**Updated:** 2026-10-21, end of unit p3c
 
 ## Where things stand
 
 - **Phase:** 2 · Desktop UI (third of six). Still on the seam stage: moving upstream's UI into `shared/commonMain` behind Android seams. No desktop window shows the real app yet.
-- **Last committed batch:** p3b (`PlatformTypeface` text-bounds and `PlatformOpenable` stand-ins, `CustomFontLoader.fontsDir/validate` in the expect; `SectionBreadcrumb` rehomed, `SettingsFontRouter` cleared but waits on `SettingsViewModel`), verified. See the p3b entry in `DEVLOG.md`.
-- **Counts:** app 30 files, commonMain 1,547, androidMain 379. Navigation-graph closure: 144 files, 12 Android roots.
+- **Last committed batch:** p3c (`QrScanner` expect slice, `PairingQr` extraction, `slices.py` fixes; `FirstRunInputHandler`/`Screen`/`ViewModel` rehomed), verified. See the p3c entry in `DEVLOG.md`.
+- **Counts:** app 30 files, commonMain 1,552, androidMain 376. Navigation-graph closure: 139 files, 11 Android roots.
 - **Baseline for "Android unchanged":** plain upstream v2.24.0, `build/desktop-baseline/app-debug-upstream-v2.24.0.apk`. Plain save proof: `build/desktop-check/save-proof/v224-plain-1021b` (recaptured 2026-10-21; recapture again when it is days older than the candidate).
 - Nothing uncommitted.
 
 ## Next action
 
-1. List the remaining roots: `python3 -I scripts/desktop/restructure/movable.py --roots ui/navigation/NavGraph.kt` (14). Choose the next batch with `--plan <n> ui/navigation/NavGraph.kt` (`--services-only` for slices) or `--rank-android`.
-   Smaller next: `QrScanner` (unblocks `FirstRunViewModel`, which is otherwise clear now), `BgmTrackArt`, `MusicBrowserViewModel`.
+1. List the remaining roots: `python3 -I scripts/desktop/restructure/movable.py --roots ui/navigation/NavGraph.kt` (11). Choose the next batch with `--plan <n> ui/navigation/NavGraph.kt` (`--services-only` for slices) or `--rank-android`.
+   Smaller next: `BgmTrackArt`, `MusicBrowserViewModel` (only `MediaPlayer`/`AudioAttributes`). `RomMConfigForm` uses `QrScannerWithPermission` too but did not rehome; check why with `--path`.
    Then `SettingsScreen`/`ViewModel`, `SteamSettingsDelegate`, players (Media3, YouTube WebView), `Box3dCover`, `SystemStatusBar`, `OnScreenControls`.
 2. Run the pipeline (`extract_decls.py --refresh`, `inline_constants.py`, `move_companion_functions.py`, `apply_moves.py`, `move_members.py`, `actualize.py`, `slices.py`, `rewrite_imports.py`, then `movable.py --check`; the list is in `reapply.sh`). Then `movable.py --rehome`, append its output to `moves.txt` as a new labelled `[commonMain]` section, and run `apply_moves.py` and `rewrite_imports.py` again.
 3. `git add -A app/src/main/kotlin shared/src`, compile first (`quiet.sh <label> ./gradlew :shared:compileKotlinDesktop :shared:compileDebugKotlinAndroid`, about 3 min), then verify with `scripts/desktop/check/verify.sh <label> build/desktop-check/save-proof/v224-plain-1021b` in the background (about 20 min).
 4. Commit, log in `DEVLOG.md`, rewrite this file, end the unit.
 
-After the roots are gone: the desktop shell, SDL3 input and screen bring-up (Phase 2 plan, steps 6–8, in `PORT_PLAN.md`). `ClipboardTextReader`'s desktop actual returns null; give it a real clipboard there.
+After the roots are gone: the desktop shell, SDL3 input and screen bring-up (Phase 2 plan, steps 6–8, in `PORT_PLAN.md`). `ClipboardTextReader`'s desktop actual returns null; give it a real clipboard there. The QR scanner's desktop actual composes nothing and `deviceHasCamera` is false; revisit if desktop gets a camera path.
 
 ## Commands and tools
 
@@ -33,6 +33,8 @@ After the roots are gone: the desktop shell, SDL3 input and screen bring-up (Pha
 - JDK: `JAVA_HOME=~/.jdks/jdk-21.0.12.1+1`.
 
 ## Gotchas worth remembering
+
+- After a `slices.py` change, run `slices.py` then `rewrite_imports.py` twice and check the second run adds nothing (`added to` lines); a spill-over into other slices shows in `git status`.
 
 - To see which line trips a guard, import `movable` and call the guard's `search` per line (the Context guard is `movable.ContextGuard()`); the `--roots` report truncates its reasons.
 

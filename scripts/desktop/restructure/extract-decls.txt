@@ -62,3 +62,4 @@ ui/ArgosyViewModel.kt -> common:DrawerItem.kt: DrawerItem
 ui/components/SystemStatusBar.kt -> common:BatteryIcon.kt: BATTERY_LOW_PERCENT BatteryIcon
 ui/screens/common/EmulatorLaunchTargetResolver.kt -> common:GameLaunchRequest.kt: GameLaunchRequest
 ui/components/HomeCustomGrid.kt -> common:HomeTilePlayTime.kt: ^formatPlayTime
+ui/components/QrScanner.kt -> common:PairingQr.kt: PairingQrResult parsePairingQrUrl

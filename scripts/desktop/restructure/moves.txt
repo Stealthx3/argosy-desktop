@@ -1963,3 +1963,9 @@
 # Phase 2: portable since the text-bounds and Typeface stand-ins (was androidMain).
 [commonMain]
 + ui/components/SectionBreadcrumb.kt
+
+# Phase 2: portable since the QrScanner expect slice and PairingQr extraction (was androidMain).
+[commonMain]
++ ui/screens/firstrun/FirstRunInputHandler.kt
++ ui/screens/firstrun/FirstRunScreen.kt
++ ui/screens/firstrun/FirstRunViewModel.kt
