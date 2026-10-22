@@ -1981,3 +1981,9 @@
 [commonMain]
 + ui/components/QuickSettingsPanel.kt
 + ui/components/SystemStatusBar.kt
+
+# Phase 2: portable since the Box3dCover expect slice (was androidMain).
+[commonMain]
++ ui/dualscreen/CompanionDetailScreen.kt
++ ui/dualscreen/GameShowcase.kt
++ ui/screens/gamedetail/components/CollapsingHeader.kt

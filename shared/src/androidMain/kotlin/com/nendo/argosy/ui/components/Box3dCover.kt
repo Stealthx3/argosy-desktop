@@ -60,14 +60,13 @@ private val loggedDecodeFailures = java.util.Collections.newSetFromMap(
  * Calls [onUnavailable] once and draws nothing when the front or spine scan cannot be decoded.
  */
 @Composable
-fun Box3dCover(
+actual fun Box3dCover(
     frontPath: String,
     spinePath: String,
-    backPath: String? = null,
-    modifier: Modifier = Modifier,
-    isInteractive: Boolean = true,
-    onUnavailable: () -> Unit = {}
-) {
+    backPath: String?,
+    modifier: Modifier,
+    isInteractive: Boolean,
+    onUnavailable: () -> Unit) {
     var faces by remember(frontPath, spinePath, backPath) { mutableStateOf<BoxFaces?>(null) }
     val reportUnavailable by androidx.compose.runtime.rememberUpdatedState(onUnavailable)
     androidx.compose.runtime.LaunchedEffect(frontPath, spinePath, backPath) {
