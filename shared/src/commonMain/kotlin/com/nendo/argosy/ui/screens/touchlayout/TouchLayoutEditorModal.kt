@@ -1,7 +1,9 @@
 package com.nendo.argosy.ui.screens.touchlayout
 
-import android.content.res.Configuration
-import androidx.activity.compose.BackHandler
+import com.nendo.argosy.platform.PlatformConfiguration as Configuration
+import com.nendo.argosy.platform.ORIENTATION_LANDSCAPE
+import com.nendo.argosy.platform.ORIENTATION_PORTRAIT
+import com.nendo.argosy.platform.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -27,12 +29,34 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
+import com.nendo.argosy.platform.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import com.nendo.argosy.platform.LocalPlatformContext as LocalContext
+import com.nendo.argosy.platform.startActivity
+import com.nendo.argosy.platform.getApplicationInfo
+import com.nendo.argosy.platform.getApplicationLabel
+import com.nendo.argosy.platform.applicationContext
+import com.nendo.argosy.platform.packageName
+import com.nendo.argosy.platform.getSystemService
+import com.nendo.argosy.platform.getExternalFilesDir
+import com.nendo.argosy.platform.externalCacheDir
+import com.nendo.argosy.platform.dataDir
+import com.nendo.argosy.platform.packageManager
+import com.nendo.argosy.platform.getPackageInfo
+import com.nendo.argosy.platform.versionName
+import com.nendo.argosy.platform.assets
+import com.nendo.argosy.platform.contentResolver
+import com.nendo.argosy.platform.getSharedPreferences
+import com.nendo.argosy.platform.list
+import com.nendo.argosy.platform.open
+import com.nendo.argosy.platform.cacheDir
+import com.nendo.argosy.platform.filesDir
+import com.nendo.argosy.platform.getQuantityString
+import com.nendo.argosy.platform.getString
+import com.nendo.argosy.platform.resources
+import com.nendo.argosy.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.nendo.argosy.shared.R
+import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.libretro.LibretroCoreRegistry
 import com.nendo.argosy.libretro.touch.LayoutDefaults
 import com.nendo.argosy.libretro.touch.ResolvedLayout
@@ -59,7 +83,7 @@ fun TouchLayoutEditorModal(
         return
     }
     var platformIndex by remember { mutableIntStateOf(0) }
-    var orientation by remember { mutableIntStateOf(Configuration.ORIENTATION_LANDSCAPE) }
+    var orientation by remember { mutableIntStateOf(ORIENTATION_LANDSCAPE) }
     val platformSlug = supported[platformIndex]
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -157,17 +181,17 @@ fun TouchLayoutEditorModal(
 
                 ActionButton(
                     label = stringResource(
-                        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+                        if (orientation == ORIENTATION_PORTRAIT) {
                             R.string.touchlayout_editor_orientation_portrait
                         } else {
                             R.string.touchlayout_editor_orientation_landscape
                         }
                     ),
                     onClick = {
-                        orientation = if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-                            Configuration.ORIENTATION_LANDSCAPE
+                        orientation = if (orientation == ORIENTATION_PORTRAIT) {
+                            ORIENTATION_LANDSCAPE
                         } else {
-                            Configuration.ORIENTATION_PORTRAIT
+                            ORIENTATION_PORTRAIT
                         }
                     }
                 )

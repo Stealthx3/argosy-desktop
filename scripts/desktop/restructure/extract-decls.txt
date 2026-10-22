@@ -65,3 +65,4 @@ ui/components/HomeCustomGrid.kt -> common:HomeTilePlayTime.kt: ^formatPlayTime
 ui/components/QrScanner.kt -> common:PairingQr.kt: PairingQrResult parsePairingQrUrl
 ui/components/SystemStatusBar.kt -> common:SystemStatusState.kt: BatteryState NetworkLink
 ui/components/SystemStatusBar.kt -> SystemStatusProbes.kt: rememberBatteryState rememberNetworkLink toNetworkLink
+libretro/touch/OnScreenControls.kt -> common:OnScreenSlotLayout.kt: computeFacePositions DpOffset SlotLayout layoutFaceSlots layoutShoulderSlots layoutSystemSlots

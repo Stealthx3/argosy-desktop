@@ -4,20 +4,20 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 History and reasoning live in `DEVLOG.md`; read only the parts this file points to. Earlier phases:
 `phase-0.md`, `phase-1.md` (closed summaries; carried-forward items are listed there).
 
-**Updated:** 2026-10-22, end of unit p3f
+**Updated:** 2026-10-22, end of unit p3g
 
 ## Where things stand
 
 - **Phase:** 2 · Desktop UI (third of six). Still on the seam stage: moving upstream's UI into `shared/commonMain` behind Android seams. No desktop window shows the real app yet.
-- **Last committed batch:** p3f (`Box3dCover` expect slice: the Android renderer stays in androidMain, the desktop actual reports unavailable so callers fall back; `GameShowcase`, `CompanionDetailScreen`, `CollapsingHeader` rehomed), verified. See the p3f entry in `DEVLOG.md`.
-- **Counts:** app 30 files, commonMain 1,565, androidMain 369. Navigation-graph closure: 131 files, 7 Android roots.
+- **Last committed batch:** p3g (`OnScreenControls`' pure slot-layout helpers extracted to commonMain `OnScreenSlotLayout.kt`; `TouchLayoutEditor`, `TouchLayoutEditorModal` rehomed; the overlay itself stays androidMain on `GLRetroView`), verified. See the p3g entry in `DEVLOG.md`.
+- **Counts:** app 30 files, commonMain 1,568, androidMain 367. Navigation-graph closure: 128 files, 6 Android roots.
 - **Baseline for "Android unchanged":** plain upstream v2.24.0, `build/desktop-baseline/app-debug-upstream-v2.24.0.apk`. Plain save proof: `build/desktop-check/save-proof/v224-plain-1021b` (recaptured 2026-10-21; recapture again when it is days older than the candidate).
 - Nothing uncommitted.
 
 ## Next action
 
-1. Run the tools from the repo root. List the remaining roots: `python3 -I scripts/desktop/restructure/movable.py --roots ui/navigation/NavGraph.kt` (7). Choose the next batch with `--plan <n> ui/navigation/NavGraph.kt` (`--services-only` for slices) or `--rank-android`.
-   Left: `SettingsScreen`/`ViewModel`, `SteamSettingsDelegate`, players (`InlineTilePlayer`, `PageThemePlayer` on Media3, `YouTubeVideoPlayer` WebView), `OnScreenControls` (vibrator; likely next: a haptics probe extraction in the p3e pattern). `--path` needs two arguments (start file, target prefix).
+1. Run the tools from the repo root. List the remaining roots: `python3 -I scripts/desktop/restructure/movable.py --roots ui/navigation/NavGraph.kt` (6). Choose the next batch with `--plan <n> ui/navigation/NavGraph.kt` (`--services-only` for slices) or `--rank-android`.
+   Left: `SettingsScreen`/`ViewModel`, `SteamSettingsDelegate`, players (`InlineTilePlayer`, `PageThemePlayer` on Media3, `YouTubeVideoPlayer` WebView). Before slicing a root, run `--path ui/navigation/NavGraph.kt <root>` to see which declarations the graph actually reaches; p3g found only pure helpers were reached and extracted those instead. `--path` needs two arguments (start file, target prefix).
    A composable that only wraps an Android probe: extract the probe to its own androidMain file and slice it with `*` (the p3e pattern); put the data types it returns in commonMain first, or the slice leaves the function out. `RomMConfigForm` uses `QrScannerWithPermission` too but did not rehome; check why with `--path`.
    A new stand-in for a class with listener interfaces: write the Android actual as a wrapper with Kotlin function-type parameters (see `PlatformMedia.kt`), not a typealias.
 2. Run the pipeline (`extract_decls.py --refresh`, `inline_constants.py`, `move_companion_functions.py`, `apply_moves.py`, `move_members.py`, `actualize.py`, `slices.py`, `rewrite_imports.py`, then `movable.py --check`; the list is in `reapply.sh`). Then `movable.py --rehome`, append its output to `moves.txt` as a new labelled `[commonMain]` section, and run `apply_moves.py` and `rewrite_imports.py` again.
@@ -44,6 +44,8 @@ After the roots are gone: the desktop shell, SDL3 input and screen bring-up (Pha
 - A stand-in extension property (like `className`) also needs an entry in `rewrite_imports.py`'s stand-in lists, or the moved files won't import it.
 - Check a new stand-in's name against `shared/src/commonMain/kotlin/com/nendo/argosy/platform/` first (`PlatformPackageManager` was taken; only the compile caught it).
 - Desktop actuals are generated once and hand-owned from then on; `slices.py` appends missing members to them.
+- `verify.sh`'s A/B step can fail silently: its output is filtered by `grep`, so no `home:`…`datastore:` lines means it did not finish. Check `<label>-en/` for `candidate-*.png` and rerun `ab-check.sh` alone (the command is in `verify.sh`, about 6 min).
+- `slices.py` slices only public top-level functions (no `internal`).
 - Never start a verification while files are still being edited (the race has happened twice).
 - A moved `@HiltViewModel` is proven only by a device run; generated-code evidence only from a build that ran the generating task.
 - Stand-ins must not add null checks upstream never had (unit tests run on `android.jar` stubs).
