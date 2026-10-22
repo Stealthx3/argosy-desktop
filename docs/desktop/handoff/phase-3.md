@@ -4,17 +4,23 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 History and reasoning live in `DEVLOG.md`; read only the parts this file points to. Earlier phases:
 `phase-0.md`, `phase-1.md`, `phase-2.md` (closed summaries).
 
-**Updated:** 2026-10-22. Owner approved Phase 3 ("Start Phase 3 now."). Parked for usage before any work: nothing uncommitted. Next action: First actions 1–3 below, starting at 1.
+**Updated:** 2026-10-22. The Phase 3 step plan (steps 1–11) is in `DEVLOG.md` under "Phase 3 · Linux services and alpha Flatpak" → "Phase 3 step plan". Nothing uncommitted. Next action: step 1.
 
 ## Scope and exit criterion (`PORT_PLAN.md`, Roadmap)
 
 Emulator registry, host launch, save paths, Apps tab, Quick Settings; Flatpak from the owner's own repo. Exit: emulators detected on a clean Fedora and a SteamOS install; a game launches, exits and returns to Argosy; saves sync to RomM; the alpha installs from the own Flatpak repo. Save sync is a fragile zone: live-data proof (GET /api/saves, negotiate `no_op` twice) for every door.
 
-## First actions
+## Next action: step 1 (Linux emulator registry and detection)
 
-1. Read `PORT_PLAN.md` sections "Architecture" and "Flatpak design" (line ranges via `grep -n '^## '`), `docs/desktop/save-sync-move-plan.md` (stages 2–4 with the `FilePaths` and `BackgroundJobs` interfaces) and Phase 0's sandbox-launch spike under `spikes/`.
-2. Write a numbered Phase 3 step plan in `DEVLOG.md` under a new "Phase 3" heading (as Phase 2's plan steps 1–8), ordered so a launch-and-return path works early.
-3. Start step 1; one verified, committed unit at a time.
+- Seams: `shared/src/commonMain/.../data/emulator/EmulatorDetector.expect.kt` (API keyed by Android `packageName`), desktop actual `EmulatorDetector.desktop.kt`, Android actual `androidMain/.../EmulatorDetector.kt` (209 lines) as the model; `EmulatorRegistry.kt` (`EmulatorDef` id/packageName/supportedPlatforms) in commonMain.
+- Approach: a desktop-only Linux table keyed by upstream `EmulatorDef.id` (Flatpak id, PATH names, AppImage patterns, RetroDECK/EmuDeck paths, launch template, save path); report `InstalledEmulator` under the upstream package names so both resolvers (`EmulatorResolver.getEmulatorPackageForGame`, `GameLauncher.resolveEmulator`) agree unchanged. Flatpak ids per emulator: verify against Flathub, never guess.
+- Host calls: `flatpak list --app --columns=application`, via `flatpak-spawn --host` when `/.flatpak-info` exists. Spike precedent: `spikes/flatpak-launch/launch-spike.sh`.
+- Check: Per-Game Settings shows the host's RetroArch Flatpak; desktop unit tests for the parsers.
+
+## Owner checkpoints already known (ask when reached, one question each)
+
+- Step 4: hand edits inside the save zone (replacing `Context` with `FilePaths`) break the move plan's renames-only rule; ask once for stages 2–4 before the first zone edit.
+- Step 10: where the own Flatpak repo is hosted. Step 11: which Fedora/SteamOS machines or VMs.
 
 ## Carried forward
 
