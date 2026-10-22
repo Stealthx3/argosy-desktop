@@ -1,10 +1,13 @@
 package com.nendo.argosy.desktop
 
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
@@ -51,19 +54,31 @@ fun main(args: Array<String>) {
                 window.addWindowFocusListener(focusListener)
                 onDispose { window.removeWindowFocusListener(focusListener) }
             }
-            CompositionLocalProvider(
-                LocalPlatformContext provides app,
-                LocalViewModelProviders provides viewModels,
-            ) {
-                ALauncherTheme {
-                    Surface(modifier = Modifier.fillMaxSize()) {
-                        ArgosyApp()
+            BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+                CompositionLocalProvider(
+                    LocalDensity provides tvDensity(constraints.maxHeight, LocalDensity.current.fontScale),
+                    LocalPlatformContext provides app,
+                    LocalViewModelProviders provides viewModels,
+                ) {
+                    ALauncherTheme {
+                        Surface(modifier = Modifier.fillMaxSize()) {
+                            ArgosyApp()
+                        }
                     }
                 }
             }
         }
     }
 }
+
+/**
+ * Android TV's density rule: the screen is 540dp tall at any resolution (720p is 1.33, 1080p is 2.0,
+ * 4K is 4.0), so a 1920x1080 window lays out exactly as a 320 dpi 1080p Android device does.
+ */
+fun tvDensity(heightPx: Int, fontScale: Float): Density =
+    Density(density = (heightPx / TV_HEIGHT_DP).coerceAtLeast(1f), fontScale = fontScale)
+
+private const val TV_HEIGHT_DP = 540f
 
 data class ShellOptions(val windowed: Boolean, val width: Int, val height: Int, val keyPipe: String?) {
     companion object {
