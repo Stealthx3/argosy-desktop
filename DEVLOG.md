@@ -776,3 +776,29 @@ Desktop `StorageAttributionRepository` is now Android's class, transformed: `Sta
 
 **Findings, no change:** Per-Game Settings on desktop shows only "Emulator: None detected" (Android: Emulator, Core, Save Path, GPU Driver), since desktop has no emulators or cores yet. Licenses (About header) is not reachable by D-pad on Android either. Pressing A on Play throws `NotImplementedError: desktop: launch` (game launch is Phase 3). Side effects of the exploratory first pass: Android launched Battery Bay once on the check AVD (save-proof restores its snapshot); desktop downloaded Rope and Anchor; desktop Beta Updates was switched back off (`p4q-beta.png`); both sides' library sort now reads User Rating.
 **Verification:** desktop rerun `p4q-c/cl/` follows Android's Changelog step for step (version list, RIGHT into the log pane, B back to the list, scrolling); no exceptions in the app logs of `p4q-c`. `:desktopApp:compileKotlin` green. desktopApp only (plus its `lifecycle-runtime-compose` dependency); Android untouched, so no Android gate or A/B. Desktop unit tests not run.
+
+### 2026-10-22 — Collection Detail, Virtual Browser; the screens left unreached (p4r)
+
+**Action:** plan step 8, the last screens. Entry points traced from `NavGraph.kt` and every caller first. One walk on both sides (`build/desktop-check/p4r-android/`, desktop `p4r-a/`, rerun of Create Collection `p4r-b/`; side-by-side `p4r-cmp-*.png`, `p4r-sheet1.png`, `p4r-sheet2.png`): Collections → Genres (Virtual Browser, empty state), Game Modes (same), New Collection → typed name → Create → Collection Detail (empty collection).
+**Outcome:** Virtual Browser's empty state ("No Genres found", "No Game Modes found"), its header and footer, Create Collection, and Collection Detail (title, "0 games", empty-state text, footer Options/Refresh/Pin/Search/Back/Open) match Android. No exceptions in the desktop log. The first desktop walk was out of step because desktop still had the "Tes" collection made in p4m (one row more); its shot of the name field came before the typed text landed, and `p4r-b` shows typing does land. Teal accent vs orange is the release/debug palette difference recorded in p4h.
+**Not reached, and why (no change made):**
+- **Sync Monitor** is the drawer's "Library Sync" (`syncmonitor_drawer_title`), compared in p4o.
+- **Search** and **Manage Pins** have routes in `NavGraph.kt` but nothing in v2.24.0 navigates to them (no caller of `Screen.Search`/`Screen.ManagePins` or their route tokens; Settings' `navigationEvents` only emit Game Detail and Save Sync). Unreachable on Android too.
+- **Media Library / Media Detail** appear only when signed in to Jellyfin (`isNavRouteAvailable`: `MediaLibrary` needs `isJellyfinSignedIn`); the testbed has no Jellyfin server.
+- **Social family** (Social, User Profile, Social Event Detail, Post Editor, Doodle, Avatar Doodle) needs a connected Argosy Social session; the testbed has none, and creating an account is not something to do unasked. Maintainer domain in any case.
+- **Save Timeline** opens from the save channel's snapshot view, which `SaveManagementDelegate.showSaveCacheDialog` opens only after an emulator resolves; desktop has no emulators until Phase 3.
+**Verification:** screenshots and app log only; no code changed.
+
+### Phase 2 close
+
+**Exit criterion:** every screen opens on the desktop and is fully navigable by gamepad; screenshots match an Android handheld at the same resolution.
+- Every screen reachable with the RomM testbed was walked with the same pad steps on the check AVD and on the desktop and matches in layout, rows, values, focus, footers and empty states (p4d–p4r): first run and sign-in, Home and drawer, Game Detail and its sheets, Library (both views, filters), Collections and Collection Detail, Virtual Browser, Downloads, Library Sync, Save Sync, Check-In, Apps, all 20 Settings subsections and their deeper pages, About, Changelog, the file browser.
+- Gamepad: SDL3 pad input through the app's own InputDispatcher, verified with virtual pads; keyboard through the same path.
+- Known, accepted differences: release palette (teal) vs the debug APK's orange; no soft keyboard on desktop.
+- **Not met in full, carried forward:** Media Library/Detail (needs a Jellyfin server in the testbed), the Social family (needs an Argosy Social session; maintainer domain), Save Timeline and Per-Game Settings' emulator rows (need Phase 3 emulators), Search and Manage Pins (unreachable on Android as well). A physical pad (Nintendo layouts), stick navigation and key-repeat feel are still unverified.
+
+**Where things are:** `shared/src/commonMain` 1,720 Kotlin files, `shared/src/androidMain` 243, `app` 30. `desktopApp` runs the whole UI. 40 `TODO(...)` remain in desktopMain on feature paths (Steam, netplay, save states, documents, ...), each replaced as a screen reaches it.
+
+**Verification at close:** `./gradlew testDebugUnitTest :shared:desktopTest` green, 4,454 tests, 0 failures (`build/desktop-logs/20261022-151225-p2close-tests.log`). The last commit touching `app`, `shared/src/androidMain` or `shared/src/commonMain` is `e0cfd7b40`, covered by the full verification `build/desktop-check/verify-p3k.log` (Android gate, A/B, save proof); every later Phase 2 commit changed desktop code only (`git log e0cfd7b40..HEAD -- app shared/src/androidMain shared/src/commonMain` is empty).
+
+**Action:** Rebuilt `README.md` (intro, Phase 2 status, full `PORT_PLAN.md`, upstream link), added a Phase 2 results note to `PORT_PLAN.md`, closed `docs/desktop/handoff/phase-2.md` and opened `phase-3.md`; committed and pushed `main` to `origin`.

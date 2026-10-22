@@ -1,89 +1,22 @@
-# Phase 2 · Desktop UI — handoff (current phase)
+# Phase 2 · Desktop UI — closed
 
-Rewritten (not appended) at the end of every work unit, so a fresh session can start from it alone.
-History and reasoning live in `DEVLOG.md`; read only the parts this file points to. Earlier phases:
-`phase-0.md`, `phase-1.md` (closed summaries; carried-forward items are listed there).
+**Closed:** 2026-10-22. `main` pushed. Exit criterion met for every screen the RomM testbed can reach; the rest is listed under "Carried forward".
 
-**Updated:** 2026-10-22, end of unit p4q
+## Outcome
 
-## Where things stand
+- Upstream's whole UI runs in the desktop window: `shared/src/commonMain` 1,720 Kotlin files, `androidMain` 243, `app` 30. Desktop DI is Dagger (`shared/src/desktopMain/.../di/`), Android stays on Hilt.
+- Input: SDL3 gamepads (JNA) and the keyboard feed upstream's own `InputDispatcher`; focus and navigation behave as on Android.
+- Compared with the same pad walk on the Android check AVD and on the desktop, and matching (units p4d–p4r): first run and sign-in, Home and drawer, Game Detail and its sheets, Library (both views, filters), Collections, Collection Detail, Virtual Browser, Downloads, Library Sync, Save Sync, Check-In, Apps, all Settings pages, About, Changelog, the file browser.
+- Desktop fixes on the way: Roboto via a Java shim over Compose 1.7.3 internals (recheck on any Compose upgrade), `MultiResumeLifecycle` (window STARTED counts as RESUMED, as Android multi-resume), real desktop music directory and storage volumes, `flowOf("")` where Android's flows emit on registration.
+- Accepted differences: release palette (teal) vs the debug APK's orange; no soft keyboard on desktop.
 
-- **Phase:** 2 · Desktop UI (third of six). Plan steps 1–7 done (seams, shell, keyboard, SDL3 pad input; see DEVLOG p4a–p4c). Plan step 8 (screens; the last Phase 2 step) is in progress, units p4d–p4q.
-- **Counts:** app 30 files, commonMain 1,720, androidMain 243 (unchanged; desktop-only work).
-- **Baseline for "Android unchanged":** plain upstream v2.24.0, `build/desktop-baseline/app-debug-upstream-v2.24.0.apk`. Plain save proof: `build/desktop-check/save-proof/v224-plain-1022a` (recapture once a candidate is more than 24 hours newer: `save-proof.sh build/desktop-baseline/app-debug-upstream-v2.24.0.apk <dir>`, about 8 min).
-- Nothing uncommitted.
-- **Compared and matching Android** (details per unit in `DEVLOG.md`): first run and sign-in (p4d–p4f), Home and drawer (p4g–p4h), Roboto (p4i; Java shim over Compose 1.7.3 internals, recheck on any Compose upgrade), Game Detail and Library views (p4j), Collections, Downloads, Settings and Detail menus (p4k), all 20 Settings subsections (p4l), New Collection and Apps (p4m), deeper Settings pages (p4n), drawer Check-In/Library Sync/Save Sync (p4o), About and the in-app file browser (p4p), **Library filter menu, Detail's Per-Game Settings/Details, Home quick menu, About's Changelog (p4q)**.
-- **p4q fix:** Compose Desktop resumes a window only while it has keyboard focus; upstream registers modal input handlers on `ON_RESUME` (34 files). `desktopApp/.../MultiResumeLifecycle.kt` maps the window's STARTED to RESUMED (Android multi-resume). Earlier walks may have been unfocused too; if a modal ever ignored input in old captures, that was the cause.
+## Carried forward
 
-## Next action
+- Screens not yet opened on the desktop: Media Library/Detail (needs Jellyfin in the testbed: owner decision), the Social family (needs an Argosy Social session; maintainer domain), Save Timeline and Per-Game Settings' emulator rows (Phase 3 emulators). Search and Manage Pins have no entry point in v2.24.0 on either platform.
+- Unverified: a physical pad (Nintendo layouts), stick navigation, key-repeat feel.
+- Phase 3 and 4 items: listed in `phase-3.md`.
+- 40 `TODO(...)` in desktopMain on feature paths: `grep -rn 'TODO(' shared/src/desktopMain`.
 
-Finish plan step 8 with the screens not yet compared: Search, Manage Pins, Sync Monitor, Collection Detail, Media Library / Media Detail, Save Timeline, Virtual Browser / Virtual Category, and the Social family (Social, User Profile, Social Event Detail, Post Editor, Doodle, Avatar Doodle; social is a maintainer domain: compare only, change nothing there without the owner). Find each entry point in `NavGraph.kt`/callers first. Same method: `pad-walk.sh android <dir> <steps>` into `build/desktop-check/<unit>-android/`, identical desktop walk, montage pairs (`montage ... -tile 2x`), grep the run log for exceptions. When those are done, step 8 and Phase 2's work are complete: then close Phase 2 per CLAUDE.md (README rebuild, handoff close, push, `phase-gate`, ask the owner).
+## Details
 
-## Records for later phases
-
-- Phase 4 parity questions: what "Android Settings" should do on Linux (open the desktop's settings app, or hide the row); About's "Stop Crashes on Heavy Emulators" (writes an Android root script).
-- Phase 3: when a launched emulator covers Argosy, lower `MultiResumeLifecycle` (STARTED/CREATED) for the session, as Android stops Argosy, or Home's video preview plays underneath. Game launch (`GameLauncher.launch`) is still a `TODO`. Per-Game Settings shows only "Emulator: None detected" until emulators/cores exist.
-- Phase 3: read `~/.config/user-dirs.dirs` for XDG Music/Download. `withUserCertTrust` asks for `AndroidCAStore` (absent on a JVM): an imported cert would replace system trust; desktop never calls `userCertStore.initialize()`. `OpenDocument` (Backdrop custom image, Fonts import) waits for the XDG FileChooser portal.
-- Phase 3: while the window is hidden, vsync blocks the AWT thread about 1 s per frame, and SDL pad events are posted to that thread.
-- Still unverified from p4c: a physical pad (Nintendo layouts especially), in-app stick navigation, key repeat feel.
-
-## Walk recipes
-
-- `scripts/desktop/check/pad-walk.sh android|desktop <dir> <step>...` (steps: `shot:`, `wait:`, `TYPE:`, A B X Y START SELECT UP DOWN LEFT RIGHT ENTER[*n]). Start desktop walks with `wait:5` (the first key can be lost). Buttons: X = context (Library filter, Home Details), Y = Favorite, SELECT = quick menu. Detail's menu does not wrap; row counts differ per game.
-- Drawer from Home (START, then DOWN×n): Check-In 1, Collections 2, Downloads 4, Library Sync 5, Save Sync 6, Apps 7, Settings 8. About = Settings DOWN×20; Changelog = RIGHT, A from Check for Updates.
-- Settings walks: `settings-walk.sh`, `deep-settings-walk.sh`. Captured desktop client area is 1910×1050 (compare at 0.97×).
-- The check AVD can be down after a pause: `~/Android/Sdk/emulator/emulator -avd argosy_handheld_check -port 5556 -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect`, wait for `sys.boot_completed`.
-- Desktop state persists in `~/.local/share/argosy-desktop`; runs start at Home. To drive first run again, move that folder aside (never delete it without the owner); the first-run sign-in recipe is in the p4f entry of `DEVLOG.md`.
-
-Where the desktop graph lives: `shared/src/desktopMain/.../di/` (`DesktopComponent`, `DesktopAppModule` hand-owned bindings, `DesktopDataModule`, `DesktopViewModelComponent`, `DesktopApplication`, `ViewModels.desktop.kt`); generated `DesktopDaoModule` and `DesktopViewModelModule` (Gradle tasks in `shared/build.gradle.kts`). A new Android-side `@Binds`/`@Provides` that commonMain code injects needs a desktop counterpart in `DesktopAppModule`; `di_closure.py <Root>...` lists the gaps, and the Dagger compile of `:shared` for desktop is the final check.
-
-**Desktop stubs.** (`isAcceptingText` is no longer one: p4e.) 40 `TODO(...)` remain in desktopMain, all functions with typed returns on feature paths (Steam, netplay, save states, frames, documents, QuayPass keys, ...): `grep -rn 'TODO(' shared/src/desktopMain`. Each throws when reached; replace with Android's do-nothing answer or a real desktop implementation as screens reach them. Others that compose nothing or report "unsupported": `ClipboardTextReader`, QR scanner, `PlatformMediaPlayer`/`PlatformMediaMetadataRetriever`, `InlineTilePlayer`, `PageThemePlayer`, `YouTubeVideoPlayer`, `Box3dCover` (Skia `Canvas.concat` homography for `setPolyToPoly`), `OpenDocument` (Phase 3: XDG FileChooser portal), `getLaunchIntentForPackage`, Steam and shader-chain stubs, `AmbientLedManager`, `startPlayer`, `DesktopLEDController`, `DesktopFileAccessLayer` (plain `java.io`; fine for Linux).
-
-## Commands and tools
-
-- Desktop run + screenshot: `scripts/desktop/check/desktop-shot.sh <out.png> [settle-s] [WxH]` (windowed, X window via `import`; prints exceptions from the app log). Driven run: `scripts/desktop/check/desktop-drive.sh <out-dir> <settle-s> shot:<name> wait:<s> ENTER DOWN*3 ESCAPE ... [-- WxH]` (AWT VK names through the app's `--key-pipe`). DI gaps: `scripts/desktop/restructure/di_closure.py <Root>... [--tree]`.
-- Restructure tools: `scripts/desktop/restructure/` (manifests `*.txt`, scripts `*.py`; `movable.py --path/--roots/--plan/--rank` for planning).
-- Verification: `scripts/desktop/check/verify.sh`, `ab-check.sh`, `save-proof.sh`; testbed: `scripts/desktop/testbed/` and `docs/desktop/testbed-runbook.md`.
-- Quiet runner for anything noisy: `scripts/desktop/quiet.sh <label> <command...>`.
-- JDK: `JAVA_HOME=~/.jdks/jdk-21.0.12.1+1`.
-
-## Gotchas worth remembering
-
-- Never `pkill -f` a pattern that also appears in the same shell command: it kills the calling shell (exit 144). `desktop-drive.sh` stops the app itself.
-- First-run pairing screen: Up/Down move focus, Left/Right do nothing; a code or URL field needs a confirm (pad South) before it takes text.
-
-- Timing in driven runs: `desktop-drive.sh` prints ms timestamps per key and shot; an EDT watchdog (a Swing timer heartbeat plus a thread that prints the AWT thread's stack when the heartbeat is >150 ms late) found the vsync stall where `jstack` was useless (about 5.7 s per sample here).
-- XTest/xdotool-style injection does not work here: KDE's Xwayland runs `-enable-ei-portal` (consent portal). Use `desktop-drive.sh` (in-process key pipe). No Xvfb installed; installing one needs the owner.
-- SDL: C `bool` returns are bound as `Byte` (JNA's `Boolean` reads 4 bytes). SDL sends an initial zero axis sample when a pad opens. A desktopApp class must not name `Sdl3Library` (JNA is `implementation` in `:shared`; the compile fails with "Cannot access com.sun.jna.Library"). This machine already has SDL joystick instance 1 (a non-gamepad device), so the first virtual pad is id 2 → device id 102.
-
-- Desktop: `kotlinx-coroutines-swing` must be on the runtime classpath (`Dispatchers.Main`). A `TODO` in a desktop property initializer throws at injection; one in a function throws when a coroutine reaches it, often off-screen (startup hangs on a spinner). Read the app log, not only the screenshot.
-- Gradle does not track `filter {}` lambdas: change `prepareDesktopComposeResources`'s `stringFilter` input property along with its filter.
-- `@HiltViewModel` scan: the Android task's pattern skips a class with an annotation argument between `@HiltViewModel` and `class` (e.g. `FirstRunViewModel`), yet Android still resolves it. Understand why before changing the Android task.
-- `slices.py` only carries members commonMain uses when it runs: after a rehome, run `slices.py` (then `rewrite_imports.py` twice) again, or the compile reports the newly used members. Its "left out" lines give the reason per member (`no declared type`: add the return type in `slices.txt`; a nested type: hoist it).
-- A Hilt `@EntryPoint` that commonMain needs: plain commonMain interface, Hilt interface in a `.android.kt` file extending it with the members redeclared (`LaunchProgressEntryPoint.android.kt`).
-- A nested enum or sealed class that commonMain code switches over or names cannot ride in a slice (expect enum: K2 wants `else`; sealed subclasses are not carried). List it in `nested-hoists.txt`; `hoist_nested.py` makes it a plain top-level commonMain declaration.
-- A member an expect class cannot carry (a `var` with `private set`, an interface member with a default body) goes through an expect extension of the same name whose Android actual calls the member (`AmbientLedManagerState.kt`, `SteamLauncherInstalled.kt`, `ShaderChainManagerState.kt`), plus a `MEMBER_EXTENSIONS` rule in `rewrite_imports.py`.
-- Hand-listed expect classes (`actuals.txt`, hand-owned commonMain file) need each new member added in three places: `actuals.txt`, the commonMain expect, the desktop actual.
-- After a `slices.py` change, run `slices.py` then `rewrite_imports.py` twice and check the second run adds nothing (`added to` lines); a spill-over into other slices shows in `git status`.
-
-- To see which line trips a guard, import `movable` and call the guard's `search` per line (the Context guard is `movable.ContextGuard()`); the `--roots` report truncates its reasons.
-
-- Block rewrites (`TEXT_BOUNDS_BLOCK`, `DISPLAY_NAME_QUERY`) run before unused imports are dropped, and `movable.py` imports `rewrite_imports` to strip the same blocks in its guards (`StrippedGuard`). When `SettingsViewModel` moves, check `SettingsFontRouter` compiles through `DISPLAY_NAME_QUERY` and the `openInputStream` import.
-- `movable.py --check` and `--rehome` do not prove that an expect slice (or a hand-listed expect class) carries every member a rehomed file calls. Only the compile catches that. An expression-bodied member needs its return type in `slices.txt`, or the slice leaves it out.
-- A stand-in extension property (like `className`) also needs an entry in `rewrite_imports.py`'s stand-in lists, or the moved files won't import it.
-- Check a new stand-in's name against `shared/src/commonMain/kotlin/com/nendo/argosy/platform/` first (`PlatformPackageManager` was taken; only the compile caught it).
-- Desktop actuals are generated once and hand-owned from then on; `slices.py` appends missing members to them.
-- `verify.sh`'s A/B step can fail silently: its output is filtered by `grep`, so no `home:`…`datastore:` lines means it did not finish. Check `<label>-en/` for `candidate-*.png` and rerun `ab-check.sh` alone (the command is in `verify.sh`, about 6 min).
-- `slices.py` slices only public top-level functions (no `internal`). Opt-ins in `slices.txt`'s member list: an `internal` companion function by name, `constructor: ()` for an implicit no-arg constructor. A plain nested class without a body slices; one with a body does not.
-- A `var` with a restricted setter cannot actualize an expect `val`. Give commonMain an expect extension property of the same name whose Android actual returns the member (`ShaderChainManagerState.kt`), and add a `MEMBER_EXTENSIONS` import rule in `rewrite_imports.py`.
-- An expect default argument that reads an inherited member of an expect object crashes the Kotlin backend ("no references to expect classes at this point"). Read it through the declaring type; `slices.py` keeps the edited expect line.
-- Adding a name to a `COMPANION_IMPORTS` list adds that import to every file carrying the list (~200 files). Expected; unused imports only warn.
-- Never start a verification while files are still being edited (the race has happened twice).
-- A comment on the `[commonMain]` line of `moves.txt` becomes part of the destination path (p3j moved a file into a folder named after it). Comments go on their own line.
-- A moved `@HiltViewModel` is proven only by a device run; generated-code evidence only from a build that ran the generating task.
-- Stand-ins must not add null checks upstream never had (unit tests run on `android.jar` stubs).
-- `DownloadManagerPlatformFolderTest` can fail in the full gate with "Dispatchers.Main is used concurrently with setting it" (test-ordering race, untouched by the port). Rerun the class alone, then the full verification.
-- A fully qualified rewrite rule must skip import lines (`(?<!import )`): `slices.py` runs imports through `rewrite_imports.RULES` to judge portability, so a rule that matches an import line makes that Android type look portable and widens slices.
-- If the testbed containers are gone (it happened while paused), `scripts/desktop/testbed/up.sh` recreates them on the kept volumes; the proof's snapshot restore does the rest. `adb` is not on PATH in a plain shell; the scripts find it.
-- The Battery Bay cached-copy count varies between runs of plain upstream (p3a: two plain proofs 25 minutes apart differed in 12 captures). If a proof differs only there with equal verdicts, recapture the plain proof (`save-proof.sh build/desktop-baseline/app-debug-upstream-v2.24.0.apk <dir>`, about 8 min) and compare again before calling it a regression.
-- The plain proof ages: once it is more than 24 hours older than a candidate, upstream's daily checks run again in the candidate. The masks now cover the two epoch-millisecond keys; a new unmasked difference of that kind means another clock key, not a regression, until shown otherwise.
+`DEVLOG.md`, section "Phase 2 · Desktop UI" (units p4a–p4r, "Phase 2 close"). Gotchas and walk recipes: `docs/desktop/gotchas.md`.

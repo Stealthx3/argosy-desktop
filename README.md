@@ -6,16 +6,19 @@ This repository is a fork of `rommapp/argosy-launcher`. It is GPL-3.0, like upst
 
 ## Status
 
-**Phase 1 (Kotlin Multiplatform restructure): complete (2026-10-16).**
+**Phase 2 (Desktop UI): complete (2026-10-22).**
 
-- New modules: `shared` (Kotlin Multiplatform: `commonMain`, `androidMain`, `desktopMain`) and `desktopApp`; the Android app stays in `app/` and builds from `shared`.
-- 560 Kotlin files now live in `shared/src/commonMain` with no Android imports: the Room database, preferences, network clients, domain logic, the first part of save sync and the Android-free UI. Strings, plurals, drawables and sounds moved to `shared`; desktop reads them through Compose Multiplatform resources.
-- The Android app is unchanged for users: same tests (4,359 passing), same dependency versions, identical resource table, pixel-identical screens against the pre-Phase-1 APK in English and German, and an identical live save-sync proof against a local RomM server.
-- The restructure is scripted (`scripts/desktop/restructure/`) and re-applies to upstream releases: rehearsed on v2.24.0.
+- Argosy's whole UI runs in a desktop window: 1,720 Kotlin files in `shared/src/commonMain`, 243 in `androidMain`, 30 left in `app`. Desktop dependency injection is Dagger; Android keeps Hilt.
+- SDL3 gamepads and the keyboard drive Argosy's own input dispatcher, so focus and navigation behave as on Android.
+- Every screen reachable with a RomM test server was walked with the same gamepad steps on an Android handheld emulator and on the desktop, and matches: first run and sign-in, Home and the drawer, Game Detail, Library, Collections, Downloads, Library Sync, Save Sync, Check-In, Apps, every Settings page, About and the file browser.
+- Not yet on the desktop: launching games, emulator detection and Save Timeline (Phase 3), Jellyfin media and the Social screens (they need services the test setup does not have yet).
+- The Android app is unchanged for users; it still builds from the same shared code.
+
+**Phase 1 (Kotlin Multiplatform restructure): complete (2026-10-16).** `shared` (Android + desktop) with no Android imports in `commonMain`; Android unchanged (same tests, identical resource table, pixel-identical screens, identical live save-sync proof); the restructure is scripted and re-applies to upstream releases.
 
 **Phase 0 (discovery and spikes): complete, gate passed.** Room KMP, upstream's Library UI on Compose desktop, and a sandboxed Flatpak starting RetroArch all worked; see the spikes under [`spikes/`](spikes).
 
-Next: Phase 2, every screen on the desktop. The development log is in [`DEVLOG.md`](DEVLOG.md).
+Next: Phase 3, Linux services (emulator detection, launching games, save paths) and an alpha Flatpak. The development log is in [`DEVLOG.md`](DEVLOG.md).
 
 ![Upstream's Library list rendered by Compose Multiplatform on the desktop](spikes/compose-desktop-library/library.png)
 
@@ -30,6 +33,8 @@ As of 2026-10-16 · Micaiah Fonken · Source of truth: the "Argosy Desktop — L
 > **Phase 0 results** (2026-10-16, details in `DEVLOG.md` and each spike's folder): gate **passed**. The Android app builds unchanged. Upstream's Room database (v214) runs on the JVM under Room KMP with no source edits and an identical schema hash. Upstream's Library list and theme render in a Compose desktop window with 71 files compiled unchanged; 15 Android APIs needed shims, and resources (6,254 strings) are the largest Phase 2 item. A sandboxed Flatpak starts the RetroArch Flatpak on a ROM in `~/Games/Argosy` and receives its exit status. Proposed change: `org.freedesktop.Platform` 24.08 is end-of-life, so build on 25.08 from Phase 1.
 
 > **Phase 1 results** (2026-10-16, details in `DEVLOG.md`): exit criteria **met**. `shared` (Kotlin Multiplatform, Android + desktop) holds 560 Kotlin files in `commonMain` and 10 in `androidMain`; `app` keeps 1,140 of the original 1,695. `commonMain` has no Android imports, enforced by compiling it for the desktop without `android.jar`. The Android app passes its 4,359 unit tests, its dependency versions are unchanged, its APK resource table is identical, and A/B screenshots against the pre-Phase-1 APK (English and German, populated RomM testbed) are pixel-identical. The save-sync zone moved its first stage with live proof (`no_op` twice, identical server and device state). Decisions made in the phase: no `jvmShared` set (both targets are JVMs); `app/` keeps its name; Dagger on desktop, Hilt on Android (Hilt also runs in `shared`); Compose Multiplatform 1.7.3 to match Android's Compose BOM; Android keeps native resources while desktop serves the same strings through Compose Multiplatform resources behind the same `R` API; `app` treats `shared` as a Kotlin friend module so upstream's smart casts and `internal` declarations keep working across the module boundary. Re-applying the restructure on upstream v2.24.0 was rehearsed: `scripts/desktop/restructure/reapply.sh` resolved both conflicts, and the merged tree builds and passes 4,426 tests. Phase 2 sizing: 636 UI files remain in `app`, 307 with direct blockers (`Context`/`LocalContext`, Coil 2, Hilt Android entry points, Android lifecycle, Media3, `Bitmap`).
+
+> **Phase 2 results** (2026-10-22, details in `DEVLOG.md`): upstream's whole UI runs in the desktop window. `commonMain` now holds 1,720 Kotlin files and `androidMain` 243; `app` keeps 30. SDL3 gamepad input and the keyboard drive upstream's own InputDispatcher, so focus and navigation behave as on Android. Every screen reachable with the RomM testbed was walked with the same pad steps on an Android handheld emulator and on the desktop and matches (first run, Home and drawer, Game Detail and its sheets, Library, Collections, Downloads, Library Sync, Save Sync, Check-In, Apps, every Settings page, About, Changelog, file browser). Not yet opened on the desktop: Media Library/Detail (needs a Jellyfin server in the testbed), the Social screens (need an Argosy Social session), Save Timeline and the emulator rows of Per-Game Settings (need Phase 3 emulators); Search and Manage Pins have no entry point in upstream v2.24.0 on either platform. Still to check: a physical pad, Nintendo layouts and stick navigation.
 
 ## Summary
 
@@ -252,8 +257,6 @@ Phase 0 tasks:
 - [x] Spike: Room KMP + bundled SQLite opening upstream's schema on the JVM
 - [x] Check what CameraX and BLE are used for, and whether `testbed/romm` gives a disposable RomM for tests
 - [ ] Open an issue or Discord thread with rommapp maintainers proposing the shared KMP codebase (draft in `docs/desktop/upstream-proposal.md`; posting is the owner's call)
-
----
 
 ## Upstream Argosy
 
