@@ -14,6 +14,9 @@ done
 root="$(cd "$(dirname "$0")/../../.." && pwd)"
 cd "$root"
 export JAVA_HOME=${JAVA_HOME:-$HOME/.jdks/jdk-21.0.12.1+1}
+# The test window is usually occluded; KWin then throttles its vsync to ~1 fps and Skiko's swapBuffers
+# blocks the AWT thread, delaying input and repaints by seconds. Unthrottled frames keep runs deterministic.
+export JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS:-} -Dskiko.vsync.enabled=false"
 mkdir -p build/desktop-logs "$outdir"
 log="build/desktop-logs/$(date +%Y%m%d-%H%M%S)-desktop-run.log"
 fifo="$outdir/key-pipe"
@@ -36,10 +39,10 @@ exec 3>"$fifo"
 sleep "$settle"
 for step in "${steps[@]}"; do
   case "$step" in
-    shot:*) import -window "$win" "$outdir/${step#shot:}.png" && echo "screenshot $outdir/${step#shot:}.png" ;;
+    shot:*) import -window "$win" "$outdir/${step#shot:}.png" && echo "screenshot $outdir/${step#shot:}.png t=$(date +%s%3N)" ;;
     wait:*) sleep "${step#wait:}" ;;
     *) key=${step%%\**}; n=1; [ "$key" != "$step" ] && n=${step#*\*}
-       for _ in $(seq 1 "$n"); do echo "$key" >&3; sleep 0.6; done ;;
+       for _ in $(seq 1 "$n"); do echo "$key" >&3; echo "key $key t=$(date +%s%3N)"; sleep 0.6; done ;;
   esac
 done
 exec 3>&-

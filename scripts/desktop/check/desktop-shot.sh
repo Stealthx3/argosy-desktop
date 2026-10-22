@@ -9,6 +9,9 @@ size=${3:-1920x1080}
 root="$(cd "$(dirname "$0")/../../.." && pwd)"
 cd "$root"
 export JAVA_HOME=${JAVA_HOME:-$HOME/.jdks/jdk-21.0.12.1+1}
+# The test window is usually occluded; KWin then throttles its vsync to ~1 fps and Skiko's swapBuffers
+# blocks the AWT thread, delaying input and repaints by seconds. Unthrottled frames keep runs deterministic.
+export JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS:-} -Dskiko.vsync.enabled=false"
 mkdir -p build/desktop-logs "$(dirname "$out")"
 log="build/desktop-logs/$(date +%Y%m%d-%H%M%S)-desktop-run.log"
 ./gradlew --console=plain :desktopApp:run --args="--windowed --size=$size" > "$log" 2>&1 &

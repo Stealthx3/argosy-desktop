@@ -4,7 +4,7 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 History and reasoning live in `DEVLOG.md`; read only the parts this file points to. Earlier phases:
 `phase-0.md`, `phase-1.md` (closed summaries; carried-forward items are listed there).
 
-**Updated:** 2026-10-22, end of unit p4c
+**Updated:** 2026-10-22, end of unit p4d
 
 ## Where things stand
 
@@ -15,8 +15,10 @@ History and reasoning live in `DEVLOG.md`; read only the parts this file points 
 
 ## Next action
 
-Plan step 8: walk first run → Home with `desktop-drive.sh` (keyboard keys and now `PAD:SOUTH`, `PAD:DPAD_DOWN`, `PAD:LEFTY=32767` ... steps), fixing desktop stubs each screen hits, and compare with Android at 1920×1080. First blocker: on the RomM login step, Escape, pad East and D-pad Down all leave the frame unchanged (the URL text field holds focus; p4b saw Escape take focus off it, p4c did not). Find what Android does there (soft-keyboard `FocusRequester`, the login step's `InputHandler`) before changing anything. Text entry (server URL) needs `KEY_TYPED` support in `KeyPipe` first.
+Plan step 8: walk first run → Home with `desktop-drive.sh`, fixing desktop stubs each screen hits, and compare with Android at 1920×1080. **p4d:** the login step works (input reaches `FirstRunInputHandler`; pad South/East, D-pad Down, Enter, Escape all behave). The earlier "unchanged frame" was the occluded test window throttled to ~1 fps under vsync, which blocked the AWT thread in Skiko `swapBuffers`. The scripts now run with vsync off. See the p4d entry in `DEVLOG.md`.
+Next, in order: (1) text entry. Make `KeyPipe` send `KEY_TYPED` (e.g. a `TYPE:<text>` line: per char, press/typed/release on the focus owner), then type the testbed URL (`http://localhost:8093`, see `docs/desktop/testbed-runbook.md`) and continue through login. (2) Compare the login frame with Android at 1920×1080: the desktop layout looks small for that size, so check density/font scale first.
 Still unverified from p4c: a physical pad (none attached; Nintendo-layout pads especially), in-app stick navigation, key repeat feel against Android.
+Phase 3 question (record, do not fix now): while the window is hidden, vsync blocks the AWT thread about 1 s per frame, and SDL pad events are posted to that thread.
 
 Where the desktop graph lives: `shared/src/desktopMain/.../di/` (`DesktopComponent`, `DesktopAppModule` hand-owned bindings, `DesktopDataModule`, `DesktopViewModelComponent`, `DesktopApplication`, `ViewModels.desktop.kt`); generated `DesktopDaoModule` and `DesktopViewModelModule` (Gradle tasks in `shared/build.gradle.kts`). A new Android-side `@Binds`/`@Provides` that commonMain code injects needs a desktop counterpart in `DesktopAppModule`; `di_closure.py <Root>...` lists the gaps, and the Dagger compile of `:shared` for desktop is the final check.
 
@@ -32,6 +34,7 @@ Where the desktop graph lives: `shared/src/desktopMain/.../di/` (`DesktopCompone
 
 ## Gotchas worth remembering
 
+- Timing in driven runs: `desktop-drive.sh` prints ms timestamps per key and shot; an EDT watchdog (a Swing timer heartbeat plus a thread that prints the AWT thread's stack when the heartbeat is >150 ms late) found the vsync stall where `jstack` was useless (about 5.7 s per sample here).
 - XTest/xdotool-style injection does not work here: KDE's Xwayland runs `-enable-ei-portal` (consent portal). Use `desktop-drive.sh` (in-process key pipe). No Xvfb installed; installing one needs the owner.
 - SDL: C `bool` returns are bound as `Byte` (JNA's `Boolean` reads 4 bytes). SDL sends an initial zero axis sample when a pad opens. A desktopApp class must not name `Sdl3Library` (JNA is `implementation` in `:shared`; the compile fails with "Cannot access com.sun.jna.Library"). This machine already has SDL joystick instance 1 (a non-gamepad device), so the first virtual pad is id 2 → device id 102.
 
