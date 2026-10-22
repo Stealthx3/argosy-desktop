@@ -41,6 +41,11 @@ actual object PlatformBitmapFactory {
             set(value) {
                 options.inJustDecodeBounds = value
             }
+        actual var inSampleSize: Int
+            get() = options.inSampleSize
+            set(value) {
+                options.inSampleSize = value
+            }
         actual val outWidth: Int get() = options.outWidth
         actual val outHeight: Int get() = options.outHeight
     }
@@ -52,4 +57,7 @@ actual object PlatformBitmapFactory {
 
     actual fun decodeByteArray(data: ByteArray, offset: Int, length: Int): PlatformBitmap? =
         BitmapFactory.decodeByteArray(data, offset, length)
+
+    actual fun decodeByteArray(data: ByteArray, offset: Int, length: Int, opts: Options?): PlatformBitmap? =
+        BitmapFactory.decodeByteArray(data, offset, length, opts?.options)
 }

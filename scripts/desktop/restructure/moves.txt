@@ -1969,3 +1969,10 @@
 + ui/screens/firstrun/FirstRunInputHandler.kt
 + ui/screens/firstrun/FirstRunScreen.kt
 + ui/screens/firstrun/FirstRunViewModel.kt
+
+# Phase 2: portable since the LruCache, MediaMetadataRetriever and MediaPlayer stand-ins (was androidMain).
+[commonMain]
++ ui/screens/musicbrowser/MusicBrowserScreen.kt
++ ui/screens/musicbrowser/MusicBrowserViewModel.kt
++ ui/screens/settings/BgmPlaylistManagerScreen.kt
++ ui/screens/settings/BgmTrackArt.kt

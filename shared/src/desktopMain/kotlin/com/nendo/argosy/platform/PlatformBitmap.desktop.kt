@@ -12,6 +12,7 @@ import org.jetbrains.skia.ImageInfo
 import org.jetbrains.skia.Codec
 import org.jetbrains.skia.Data
 import org.jetbrains.skia.Image
+import org.jetbrains.skia.Rect
 import java.io.File
 
 actual class PlatformBitmap(val skiaBitmap: Bitmap)
@@ -65,6 +66,7 @@ actual object PlatformBitmaps {
 actual object PlatformBitmapFactory {
     actual class Options actual constructor() {
         actual var inJustDecodeBounds: Boolean = false
+        actual var inSampleSize: Int = 1
         internal var decodedWidth: Int = -1
         internal var decodedHeight: Int = -1
 
@@ -74,9 +76,36 @@ actual object PlatformBitmapFactory {
 
     actual fun decodeFile(pathName: String): PlatformBitmap? = decodeFile(pathName, null)
 
-    actual fun decodeByteArray(data: ByteArray, offset: Int, length: Int): PlatformBitmap? {
-        val image = runCatching { Image.makeFromEncoded(data.copyOfRange(offset, offset + length)) }.getOrNull() ?: return null
-        return image.use { PlatformBitmap(Bitmap.makeFromImage(it)) }
+    actual fun decodeByteArray(data: ByteArray, offset: Int, length: Int): PlatformBitmap? =
+        decodeByteArray(data, offset, length, null)
+
+    actual fun decodeByteArray(data: ByteArray, offset: Int, length: Int, opts: Options?): PlatformBitmap? {
+        val bytes = data.copyOfRange(offset, offset + length)
+        if (opts?.inJustDecodeBounds == true) {
+            runCatching { Codec.makeFromData(Data.makeFromBytes(bytes)) }.getOrNull()?.use { codec ->
+                opts.decodedWidth = codec.width
+                opts.decodedHeight = codec.height
+            }
+            return null
+        }
+        val image = runCatching { Image.makeFromEncoded(bytes) }.getOrNull() ?: return null
+        return image.use { decoded ->
+            val sample = opts?.inSampleSize?.coerceAtLeast(1) ?: 1
+            val bitmap = if (sample == 1) {
+                Bitmap.makeFromImage(decoded)
+            } else {
+                Bitmap().apply {
+                    allocN32Pixels(maxOf(1, decoded.width / sample), maxOf(1, decoded.height / sample))
+                    Canvas(this).use { canvas ->
+                        canvas.drawImageRect(decoded, Rect.makeWH(width.toFloat(), height.toFloat()))
+                    }
+                }
+            }
+            PlatformBitmap(bitmap).also {
+                opts?.decodedWidth = bitmap.width
+                opts?.decodedHeight = bitmap.height
+            }
+        }
     }
 
     actual fun decodeFile(pathName: String, opts: Options?): PlatformBitmap? {

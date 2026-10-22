@@ -1,8 +1,8 @@
 package com.nendo.argosy.ui.screens.settings
 
-import android.graphics.BitmapFactory
-import android.media.MediaMetadataRetriever
-import android.util.LruCache
+import com.nendo.argosy.platform.PlatformBitmapFactory as BitmapFactory
+import com.nendo.argosy.platform.PlatformMediaMetadataRetriever as MediaMetadataRetriever
+import com.nendo.argosy.platform.PlatformLruCache as LruCache
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -19,10 +19,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
+import com.nendo.argosy.platform.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
-import coil.compose.AsyncImage
+import com.nendo.argosy.platform.image.AsyncImage
+import com.nendo.argosy.platform.image.bitmap
+import com.nendo.argosy.platform.image.intrinsicHeight
+import com.nendo.argosy.platform.image.intrinsicWidth
 import com.nendo.argosy.ui.common.rememberFileImageModel
 import com.nendo.argosy.ui.theme.Dimens
 import kotlinx.coroutines.Dispatchers

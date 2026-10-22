@@ -32,6 +32,7 @@ expect object PlatformBitmaps {
 expect object PlatformBitmapFactory {
     class Options() {
         var inJustDecodeBounds: Boolean
+        var inSampleSize: Int
         val outWidth: Int
         val outHeight: Int
     }
@@ -41,4 +42,6 @@ expect object PlatformBitmapFactory {
     fun decodeFile(pathName: String, opts: Options?): PlatformBitmap?
 
     fun decodeByteArray(data: ByteArray, offset: Int, length: Int): PlatformBitmap?
+
+    fun decodeByteArray(data: ByteArray, offset: Int, length: Int, opts: Options?): PlatformBitmap?
 }

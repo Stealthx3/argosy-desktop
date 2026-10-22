@@ -211,7 +211,7 @@ GUARDED_REWRITES = {
     ),
     "android.graphics.BitmapFactory": re.compile(
         r"\bBitmapFactory\.(?!decodeFile\b|decodeByteArray\b|Options\b)\w+"
-        r"|\b(?:inSampleSize|inPreferredConfig|inMutable|inScaled|inDensity|inTargetDensity|outMimeType|outConfig|inBitmap)\b"
+        r"|\b(?:inPreferredConfig|inMutable|inScaled|inDensity|inTargetDensity|outMimeType|outConfig|inBitmap)\b"
     ),
     "android.content.SharedPreferences": re.compile(
         r"\b(?:getStringSet|putStringSet|getFloat|putFloat|getAll|registerOnSharedPreferenceChangeListener"
@@ -275,6 +275,17 @@ GUARDED_REWRITES = {
     "androidx.core.content.ContextCompat": re.compile(r"\bContextCompat\.(?!getDisplayOrDefault\b|checkSelfPermission\b)\w+"),
     "android.content.pm.PackageManager": re.compile(r"(?<!\.pm\.)\bPackageManager\b(?!\.PERMISSION_(?:GRANTED|DENIED)\b)"),
     "android.Manifest": re.compile(r"(?<!android\.)\bManifest\.(?!permission\.(?:POST_NOTIFICATIONS|READ_MEDIA_IMAGES|READ_EXTERNAL_STORAGE|WRITE_EXTERNAL_STORAGE|CAMERA|BLUETOOTH_SCAN|BLUETOOTH_CONNECT|BLUETOOTH_ADVERTISE)\b)\w+(?:\.\w+)?"),
+    "android.util.LruCache": re.compile(r"\bLruCache\.\w+|:\s*LruCache<|override fun (?:sizeOf|entryRemoved|create)\b"),
+    "android.media.MediaMetadataRetriever": re.compile(
+        r"\bMediaMetadataRetriever\.\w+|\b(?:extractMetadata|getFrameAtTime|getScaledFrameAtTime|getFrameAtIndex|getImageAtIndex"
+        r"|getPrimaryImage)\b"
+    ),
+    "android.media.MediaPlayer": re.compile(
+        r"\bMediaPlayer\.\w+|\.(?:seekTo|isPlaying|currentPosition|duration|setLooping|isLooping|setOnInfoListener"
+        r"|setOnSeekCompleteListener|setOnBufferingUpdateListener|setSurface|setDisplay|playbackParams|audioSessionId"
+        r"|setWakeMode|setNextMediaPlayer|prepare)\b"
+    ),
+    "android.media.AudioAttributes": re.compile(r"\bAudioAttributes\.(?!Builder\b|USAGE_MEDIA\b|CONTENT_TYPE_MUSIC\b)\w+"),
 }
 FQ_GUARDED = (
     "android.content.Context", "android.content.Intent", "android.os.SystemClock", "dagger.hilt.android.qualifiers.ApplicationContext",
@@ -330,6 +341,10 @@ STAND_IN_GUARDS = {
     "com.nendo.argosy.platform.PlatformApplication": "android.app.Application",
     "com.nendo.argosy.platform.PlatformHtml": "android.text.Html",
     "com.nendo.argosy.platform.PlatformBundle": "android.os.Bundle",
+    "com.nendo.argosy.platform.PlatformLruCache": "android.util.LruCache",
+    "com.nendo.argosy.platform.PlatformMediaMetadataRetriever": "android.media.MediaMetadataRetriever",
+    "com.nendo.argosy.platform.PlatformMediaPlayer": "android.media.MediaPlayer",
+    "com.nendo.argosy.platform.PlatformAudioAttributes": "android.media.AudioAttributes",
 }
 COMMENTS = re.compile(r'("""[\s\S]*?"""|"(?:\\.|[^"\\\n])*")|/\*.*?\*/|^\s*//[^\n]*', re.S | re.M)
 ANDROID_FQ = re.compile(r"(?<![\w.])(?:android|androidx|com|org|io|net|dagger|coil|in|okhttp3|retrofit2)\.[a-z]\w*(?:\.\w+)+")
