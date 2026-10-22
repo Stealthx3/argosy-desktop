@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# usage: desktop-drive.sh <out-dir> <settle-s> <step>... [-- WxH]; step = shot:<name> | wait:<s> | <AWT VK name>[*n] | PAD:<SDL button>[*n] | PAD:<axis>=<value>
+# usage: desktop-drive.sh <out-dir> <settle-s> <step>... [-- WxH]; step = shot:<name> | wait:<s> | <AWT VK name>[*n] | PAD:<SDL button>[*n] | PAD:<axis>=<value> | TYPE:<text>
 set -u
 outdir=$1
 settle=$2
@@ -41,6 +41,7 @@ for step in "${steps[@]}"; do
   case "$step" in
     shot:*) import -window "$win" "$outdir/${step#shot:}.png" && echo "screenshot $outdir/${step#shot:}.png t=$(date +%s%3N)" ;;
     wait:*) sleep "${step#wait:}" ;;
+    TYPE:*) echo "$step" >&3; echo "type ${step#TYPE:} t=$(date +%s%3N)"; sleep 1 ;;
     *) key=${step%%\**}; n=1; [ "$key" != "$step" ] && n=${step#*\*}
        for _ in $(seq 1 "$n"); do echo "$key" >&3; echo "key $key t=$(date +%s%3N)"; sleep 0.6; done ;;
   esac

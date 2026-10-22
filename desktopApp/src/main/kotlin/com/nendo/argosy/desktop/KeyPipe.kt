@@ -16,7 +16,8 @@ import javax.swing.SwingUtilities
  * on the window's own component. A directly dispatched event is delivered to its source component,
  * so this works without the window holding OS focus. A line `PAD:<button>` presses a button of an
  * SDL virtual gamepad (`PAD:SOUTH`, `PAD:DPAD_DOWN`) and `PAD:<axis>=<value>` holds an axis
- * (`PAD:LEFTY=32767`, back to rest with `=0`), through the app's real SDL gamepad path.
+ * (`PAD:LEFTY=32767`, back to rest with `=0`), through the app's real SDL gamepad path. A line
+ * `TYPE:<text>` types the text as it stands (case kept), one press, typed and release per character.
  */
 class KeyPipe(private val pipe: File, private val gamepads: DesktopGamepadDispatcher) {
     @Volatile
@@ -37,6 +38,10 @@ class KeyPipe(private val pipe: File, private val gamepads: DesktopGamepadDispat
     }
 
     private fun press(line: String) {
+        if (line.startsWith(TYPE_PREFIX)) {
+            line.removePrefix(TYPE_PREFIX).forEach(::type)
+            return
+        }
         val name = line.trim().uppercase()
         if (name.isEmpty()) return
         if (name.startsWith(PAD_PREFIX)) {
@@ -51,6 +56,14 @@ class KeyPipe(private val pipe: File, private val gamepads: DesktopGamepadDispat
         send(KeyEvent.KEY_PRESSED, keyCode)
         Thread.sleep(HOLD_MS)
         send(KeyEvent.KEY_RELEASED, keyCode)
+    }
+
+    private fun type(char: Char) {
+        val keyCode = KeyEvent.getExtendedKeyCodeForChar(char.code)
+        send(KeyEvent.KEY_PRESSED, keyCode, char)
+        send(KeyEvent.KEY_TYPED, KeyEvent.VK_UNDEFINED, char)
+        send(KeyEvent.KEY_RELEASED, keyCode, char)
+        Thread.sleep(TYPE_GAP_MS)
     }
 
     private fun padInput(command: String) {
@@ -89,11 +102,11 @@ class KeyPipe(private val pipe: File, private val gamepads: DesktopGamepadDispat
         }
     }
 
-    private fun send(id: Int, keyCode: Int) {
+    private fun send(id: Int, keyCode: Int, char: Char = KeyEvent.CHAR_UNDEFINED) {
         SwingUtilities.invokeAndWait {
             val target = window?.let { it.mostRecentFocusOwner ?: deepestFocusable(it) } ?: return@invokeAndWait
             target.dispatchEvent(
-                KeyEvent(target, id, System.currentTimeMillis(), 0, keyCode, KeyEvent.CHAR_UNDEFINED),
+                KeyEvent(target, id, System.currentTimeMillis(), 0, keyCode, char),
             )
         }
     }
@@ -108,6 +121,8 @@ class KeyPipe(private val pipe: File, private val gamepads: DesktopGamepadDispat
     private companion object {
         const val HOLD_MS = 80L
         const val PAD_PREFIX = "PAD:"
+        const val TYPE_PREFIX = "TYPE:"
+        const val TYPE_GAP_MS = 20L
         const val PAD_READY_MS = 5_000L
         const val PAD_SETTLE_MS = 300L
         const val VIRTUAL_PAD_NAME = "Argosy Virtual Pad"

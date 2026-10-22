@@ -1,6 +1,7 @@
 package com.nendo.argosy.platform
 
 import com.nendo.argosy.util.Logger
+import java.awt.Window
 
 actual class PlatformToastType(internal val text: String)
 
@@ -24,10 +25,19 @@ actual class PlatformInputMethodManager
 actual fun PlatformInputMethodManager.toggleSoftInput(showFlags: Int, hideFlags: Int) {
 }
 
-actual val PlatformInputMethodManager.isAcceptingText: Boolean get() = false
+/**
+ * Compose's window content component answers `getInputMethodRequests()` only while a text field
+ * holds an input session, which is what Android's `isAcceptingText` reports.
+ */
+actual val PlatformInputMethodManager.isAcceptingText: Boolean get() = isDesktopTextInputActive()
+
+fun isDesktopTextInputActive(): Boolean =
+    Window.getWindows().any { it.isShowing && it.mostRecentFocusOwner?.inputMethodRequests != null }
 
 actual object PlatformInputMethod {
     actual val SHOW_FORCED: Int = 2
 
-    actual fun manager(context: PlatformContext): PlatformInputMethodManager? = null
+    private val desktopManager = PlatformInputMethodManager()
+
+    actual fun manager(context: PlatformContext): PlatformInputMethodManager? = desktopManager
 }

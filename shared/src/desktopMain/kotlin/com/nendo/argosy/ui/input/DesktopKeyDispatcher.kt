@@ -8,6 +8,7 @@ import com.nendo.argosy.core.input.AndroidKeyCodes
 import com.nendo.argosy.platform.PlatformKeyEvent
 import com.nendo.argosy.platform.SOURCE_KEYBOARD
 import com.nendo.argosy.platform.action
+import com.nendo.argosy.platform.isDesktopTextInputActive
 import com.nendo.argosy.platform.keyCode
 import com.nendo.argosy.ui.audio.AmbientAudioManager
 import javax.inject.Inject
@@ -18,6 +19,10 @@ import androidx.compose.ui.input.key.KeyEvent as ComposeKeyEvent
  * Desktop counterpart of ArgosyActivity.dispatchKeyEvent: translates a window key event into the
  * key code Android's Generic.kl layout gives the same physical key, then hands it to upstream's
  * GamepadInputHandler, so a keyboard behaves exactly as it does on Android.
+ *
+ * One divergence: while a text field holds an input session, Enter goes to the field. On Android
+ * the soft keyboard's action key submits a field; on desktop the physical keyboard is the input
+ * method, so its Enter has to reach the field's IME action rather than become a Confirm press.
  */
 @Singleton
 class DesktopKeyDispatcher @Inject constructor(
@@ -25,8 +30,10 @@ class DesktopKeyDispatcher @Inject constructor(
     private val ambientAudioManager: AmbientAudioManager,
 ) {
     private val held = mutableMapOf<Int, HeldKey>()
+    private val passedToTextField = mutableSetOf<Key>()
 
     fun dispatch(event: ComposeKeyEvent): Boolean {
+        if (passesToTextField(event)) return false
         val keyCode = KEYBOARD_KEYCODES[event.key] ?: return false
         val action = when (event.type) {
             KeyEventType.KeyDown -> AndroidKeyCodes.ACTION_DOWN
@@ -76,12 +83,22 @@ class DesktopKeyDispatcher @Inject constructor(
 
     fun releaseAll() {
         held.clear()
+        passedToTextField.clear()
+    }
+
+    private fun passesToTextField(event: ComposeKeyEvent): Boolean = when (event.type) {
+        KeyEventType.KeyDown -> (event.key in TEXT_FIELD_KEYS && isDesktopTextInputActive())
+            .also { if (it) passedToTextField += event.key }
+        KeyEventType.KeyUp -> passedToTextField.remove(event.key)
+        else -> false
     }
 
     private data class HeldKey(val downTime: Long, val repeatCount: Int)
 
     private companion object {
         const val KEYBOARD_DEVICE_ID = 1
+
+        val TEXT_FIELD_KEYS = setOf(Key.Enter, Key.NumPadEnter)
 
         val KEYBOARD_KEYCODES: Map<Key, Int> = buildMap {
             val letters = listOf(
