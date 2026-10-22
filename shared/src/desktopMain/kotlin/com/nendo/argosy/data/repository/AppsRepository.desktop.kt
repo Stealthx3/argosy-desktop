@@ -8,7 +8,7 @@ import com.nendo.argosy.platform.PlatformIntent
 
 @Singleton
 actual class AppsRepository @Inject constructor() {
-    actual val packageChanges: Flow<String> = kotlinx.coroutines.flow.emptyFlow()
+    actual val packageChanges: Flow<String> = kotlinx.coroutines.flow.flowOf("")
 
     actual suspend fun getInstalledApps(includeSystemApps: Boolean): List<InstalledApp> = emptyList()
 
