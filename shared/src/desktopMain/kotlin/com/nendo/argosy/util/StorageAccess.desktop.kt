@@ -10,9 +10,9 @@ import com.nendo.argosy.platform.PlatformIntentType as Intent
 import com.nendo.argosy.platform.PlatformIntent
 
 actual object StorageAccess {
-    actual fun isGranted(context: Context): Boolean = false
+    actual fun isGranted(context: Context): Boolean = true
 
-    actual fun isGranted(sdkInt: Int, isExternalStorageManager: () -> Boolean, isPermissionGranted: (String) -> Boolean): Boolean = false
+    actual fun isGranted(sdkInt: Int, isExternalStorageManager: () -> Boolean, isPermissionGranted: (String) -> Boolean): Boolean = true
 
     actual fun settingsIntent(context: Context): Intent = TODO("desktop: settingsIntent")
 }
