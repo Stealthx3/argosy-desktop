@@ -4,7 +4,7 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 History and reasoning live in `DEVLOG.md`; read only the parts this file points to. Earlier phases:
 `phase-0.md`, `phase-1.md` (closed summaries; carried-forward items are listed there).
 
-**Updated:** 2026-10-22, end of unit p4h
+**Updated:** 2026-10-22, end of unit p4i
 
 ## Where things stand
 
@@ -16,7 +16,8 @@ History and reasoning live in `DEVLOG.md`; read only the parts this file points 
 ## Next action
 
 Plan step 8: walk first run → Home with `desktop-drive.sh`, fixing desktop stubs each screen hits, and compare with Android at 1920×1080. Done: login-step input (p4d), text entry (p4e), sign-in (p4f), Home (p4g), **drawer account name and clock (p4h):** a desktop value-flow stub that never emits (`emptyFlow()`) silently blocks every `combine` downstream; such stubs now emit their empty value via `flowOf`. See the p4h entry in `DEVLOG.md` (it also explains why the accent and Home's start row differ from the baseline: debug APK and library age, not bugs).
-Next, in order: (1) **Font:** Compose Desktop 1.7.3 maps `FontFamily.SansSerif` on Linux to a hard-coded "Noto Sans"/"DejaVu Sans"/"Arial" list (`PlatformFont_skikoKt.GenericFontFamiliesMapping`; Android → "Roboto"), and commonMain names `SansSerif` in the generated `Typography.kt` plus ~15 other sites. Find a desktop-only way to make SansSerif and Default resolve to Roboto (bundled, Apache 2.0, so the Flatpak does not depend on host fonts): candidates are a wrapping `LocalFontFamilyResolver` provided in `Main.kt` (check whether Kotlin lets a desktop class implement `FontFamily.Resolver`, which may be sealed in metadata) or registering Roboto under the generic alias in Compose's `FontCache`. Do not touch commonMain typography. This should also fix the drawer's clipped "Apps" row (Noto's taller lines; geometry already matches). (2) Then Game Detail and Library against their baselines. Storage/platform/core setup was skipped by the post-sign-in routing; drive those from Settings later if needed.
+**Roboto on desktop (p4i):** Default/SansSerif resolve to bundled Roboto through a Java shim over Compose's internal resolver (`desktopApp/.../RobotoFontResolver.java`, `Roboto.kt`); it depends on Compose 1.7.3 internals, so recheck it on any Compose upgrade. See the p4i entry in `DEVLOG.md`.
+Next: Then Game Detail and Library against their baselines. Storage/platform/core setup was skipped by the post-sign-in routing; drive those from Settings later if needed.
 Drawer recipe: `desktop-drive.sh <dir> 40 shot:home PAD:START wait:2 shot:drawer` (the captured client area is 1910×1050, so compare at 0.97×). Builds cleanly through `desktop-drive.sh` (it runs `:desktopApp:run`, about 4 min).
 Desktop state persists in `~/.local/share/argosy-desktop` (XDG data); runs now start at Home. To drive first run again, move that folder aside (never delete it without the owner).
 Driven-run recipe for first-run sign-in (from a fresh data dir): `desktop-drive.sh <dir> 25 PAD:SOUTH wait:2 PAD:SOUTH wait:1 TYPE:http://localhost:8093 wait:1 ENTER wait:6 DOWN wait:1 PAD:SOUTH wait:2 PAD:SOUTH wait:1 "RUN:build/desktop-testbed/venv/bin/python scripts/desktop/testbed/pair-code.py" TYPEFILE:build/desktop-testbed/pair-code.txt wait:1 ENTER wait:8 shot:<name>` (codes expire in 60 s, hence minting mid-run).

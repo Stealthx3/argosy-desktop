@@ -7,6 +7,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
@@ -30,6 +31,7 @@ fun main(args: Array<String>) {
     val keyDispatcher = app.component.keyDispatcher()
     val gamepadDispatcher = app.component.gamepadDispatcher()
     gamepadDispatcher.start()
+    val fontFamilyResolver = robotoFontFamilyResolver()
     val keyPipe = options.keyPipe?.let { KeyPipe(java.io.File(it), gamepadDispatcher) }?.also { it.start() }
     application {
         val state = rememberWindowState(
@@ -57,6 +59,7 @@ fun main(args: Array<String>) {
             BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
                 CompositionLocalProvider(
                     LocalDensity provides tvDensity(constraints.maxHeight, LocalDensity.current.fontScale),
+                    LocalFontFamilyResolver provides fontFamilyResolver,
                     LocalPlatformContext provides app,
                     LocalViewModelProviders provides viewModels,
                 ) {
