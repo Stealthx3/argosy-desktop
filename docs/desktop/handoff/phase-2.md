@@ -4,19 +4,19 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 History and reasoning live in `DEVLOG.md`; read only the parts this file points to. Earlier phases:
 `phase-0.md`, `phase-1.md` (closed summaries; carried-forward items are listed there).
 
-**Updated:** 2026-10-22, end of unit p4a
+**Updated:** 2026-10-22, end of unit p4b
 
 ## Where things stand
 
-- **Phase:** 2 · Desktop UI (third of six). Seam stage done; **desktop shell done (p4a):** the desktop app builds the full Dagger graph (all 32 view models), hosts `ArgosyApp`, runs upstream startup and shows the first-run welcome screen. See the p4a entry in `DEVLOG.md`.
-- **Counts:** app 30 files, commonMain 1,720, androidMain 243 (unchanged by p4a; desktop-only work).
+- **Phase:** 2 · Desktop UI (third of six). Seam stage done; desktop shell done (p4a); **keyboard input done (p4b):** `DesktopKeyDispatcher` (desktopMain `ui/input/`) maps keys to Android `Generic.kl` key codes and feeds upstream's `GamepadInputHandler`, wired as the window's `onPreviewKeyEvent`. Enter on the welcome screen opens the RomM login step. See the p4b entry in `DEVLOG.md`.
+- **Counts:** app 30 files, commonMain 1,720, androidMain 243 (unchanged; desktop-only work).
 - **Baseline for "Android unchanged":** plain upstream v2.24.0, `build/desktop-baseline/app-debug-upstream-v2.24.0.apk`. Plain save proof: `build/desktop-check/save-proof/v224-plain-1022a` (captured 2026-10-22 04:19; recapture once a candidate is more than 24 hours newer: `save-proof.sh build/desktop-baseline/app-debug-upstream-v2.24.0.apk <dir>`, about 8 min).
 - Nothing uncommitted.
 
 ## Next action
 
-Plan step 7, **input**: SDL3 gamepad through JNA (hotplug, the SDL controller database) emitting Android key codes into upstream's `mapKeycodeToGamepadEvent`, plus keyboard mapped to the same actions, so the first-run flow can be driven past "Get Started". Plan it before writing (`DEVLOG.md` "Phase 2 plan", step 7; the seam is `LocalGamepadInputHandler` / `GamepadInputHandler` in commonMain, and `ConnectedControllerTracker.desktop.kt` is the tracker to feed). Keyboard first is the cheaper way to unblock screen bring-up (step 8); SDL can follow in the same or the next unit.
-Then step 8: walk first run → Home with `desktop-shot.sh`, fixing the desktop stubs each screen hits, and compare with Android at 1920×1080.
+Plan step 7, second half, **SDL3 gamepad** through JNA (hotplug, the SDL controller database) emitting Android key codes (`AndroidKeyCodes`) into `GamepadInputHandler.handleKeyEvent`, and stick/trigger axes as `PlatformMotionEvent`s into `handleMotionEvent`; feed `ConnectedControllerTracker.desktop.kt` (connected ids, active controller/layout) and `PlatformInputDevices`. Plan it first: check whether SDL3 is on the machine / in the Flatpak runtime plan (`PORT_PLAN.md`, search "SDL"), and how Android's `TriggerAxisKeyEmitter` and stick handling expect axes. Testing needs a real pad (none may be attached; say so if not) or SDL's virtual joystick API.
+Alternative if SDL is blocked: go to step 8 with the keyboard: walk first run → Home with `desktop-drive.sh`, fixing desktop stubs each screen hits, compare with Android at 1920×1080. Text entry (server URL) needs `KEY_TYPED` support in `KeyPipe` first.
 
 Where the desktop graph lives: `shared/src/desktopMain/.../di/` (`DesktopComponent`, `DesktopAppModule` hand-owned bindings, `DesktopDataModule`, `DesktopViewModelComponent`, `DesktopApplication`, `ViewModels.desktop.kt`); generated `DesktopDaoModule` and `DesktopViewModelModule` (Gradle tasks in `shared/build.gradle.kts`). A new Android-side `@Binds`/`@Provides` that commonMain code injects needs a desktop counterpart in `DesktopAppModule`; `di_closure.py <Root>...` lists the gaps, and the Dagger compile of `:shared` for desktop is the final check.
 
@@ -24,13 +24,15 @@ Where the desktop graph lives: `shared/src/desktopMain/.../di/` (`DesktopCompone
 
 ## Commands and tools
 
-- Desktop run + screenshot: `scripts/desktop/check/desktop-shot.sh <out.png> [settle-s] [WxH]` (windowed, X window via `import`; prints exceptions from the app log). DI gaps: `scripts/desktop/restructure/di_closure.py <Root>... [--tree]`.
+- Desktop run + screenshot: `scripts/desktop/check/desktop-shot.sh <out.png> [settle-s] [WxH]` (windowed, X window via `import`; prints exceptions from the app log). Driven run: `scripts/desktop/check/desktop-drive.sh <out-dir> <settle-s> shot:<name> wait:<s> ENTER DOWN*3 ESCAPE ... [-- WxH]` (AWT VK names through the app's `--key-pipe`). DI gaps: `scripts/desktop/restructure/di_closure.py <Root>... [--tree]`.
 - Restructure tools: `scripts/desktop/restructure/` (manifests `*.txt`, scripts `*.py`; `movable.py --path/--roots/--plan/--rank` for planning).
 - Verification: `scripts/desktop/check/verify.sh`, `ab-check.sh`, `save-proof.sh`; testbed: `scripts/desktop/testbed/` and `docs/desktop/testbed-runbook.md`.
 - Quiet runner for anything noisy: `scripts/desktop/quiet.sh <label> <command...>`.
 - JDK: `JAVA_HOME=~/.jdks/jdk-21.0.12.1+1`.
 
 ## Gotchas worth remembering
+
+- XTest/xdotool-style injection does not work here: KDE's Xwayland runs `-enable-ei-portal` (consent portal). Use `desktop-drive.sh` (in-process key pipe). No Xvfb installed; installing one needs the owner.
 
 - Desktop: `kotlinx-coroutines-swing` must be on the runtime classpath (`Dispatchers.Main`). A `TODO` in a desktop property initializer throws at injection; one in a function throws when a coroutine reaches it, often off-screen (startup hangs on a spinner). Read the app log, not only the screenshot.
 - Gradle does not track `filter {}` lambdas: change `prepareDesktopComposeResources`'s `stringFilter` input property along with its filter.

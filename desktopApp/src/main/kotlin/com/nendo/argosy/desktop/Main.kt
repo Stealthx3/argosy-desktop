@@ -3,6 +3,7 @@ package com.nendo.argosy.desktop
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
@@ -16,11 +17,15 @@ import com.nendo.argosy.di.viewModelFactory
 import com.nendo.argosy.platform.LocalPlatformContext
 import com.nendo.argosy.ui.ArgosyApp
 import com.nendo.argosy.ui.theme.ALauncherTheme
+import java.awt.event.WindowAdapter
+import java.awt.event.WindowEvent
 
 fun main(args: Array<String>) {
     val options = ShellOptions.parse(args)
     val app = DesktopApplication()
     val viewModels = app.component.viewModelFactory()
+    val keyDispatcher = app.component.keyDispatcher()
+    val keyPipe = options.keyPipe?.let { KeyPipe(java.io.File(it)) }?.also { it.start() }
     application {
         val state = rememberWindowState(
             placement = if (options.windowed) WindowPlacement.Floating else WindowPlacement.Fullscreen,
@@ -31,7 +36,16 @@ fun main(args: Array<String>) {
             title = "Argosy",
             state = state,
             undecorated = !options.windowed,
+            onPreviewKeyEvent = keyDispatcher::dispatch,
         ) {
+            DisposableEffect(window) {
+                keyPipe?.attach(window)
+                val focusListener = object : WindowAdapter() {
+                    override fun windowLostFocus(e: WindowEvent) = keyDispatcher.releaseAll()
+                }
+                window.addWindowFocusListener(focusListener)
+                onDispose { window.removeWindowFocusListener(focusListener) }
+            }
             CompositionLocalProvider(
                 LocalPlatformContext provides app,
                 LocalViewModelProviders provides viewModels,
@@ -46,7 +60,7 @@ fun main(args: Array<String>) {
     }
 }
 
-data class ShellOptions(val windowed: Boolean, val width: Int, val height: Int) {
+data class ShellOptions(val windowed: Boolean, val width: Int, val height: Int, val keyPipe: String?) {
     companion object {
         fun parse(args: Array<String>): ShellOptions {
             val size = args.firstOrNull { it.startsWith("--size=") }
@@ -58,6 +72,7 @@ data class ShellOptions(val windowed: Boolean, val width: Int, val height: Int) 
                 windowed = "--windowed" in args,
                 width = size?.get(0) ?: 1920,
                 height = size?.get(1) ?: 1080,
+                keyPipe = args.firstOrNull { it.startsWith("--key-pipe=") }?.removePrefix("--key-pipe="),
             )
         }
     }
