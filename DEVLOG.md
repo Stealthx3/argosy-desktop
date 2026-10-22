@@ -747,3 +747,11 @@ Desktop `StorageAttributionRepository` is now Android's class, transformed: `Sta
 **Outcome:** all eight pages match Android in layout, rows, values and focus. No code change was needed. Differences that are data, not bugs: desktop has no downloaded games (0 downloaded, so no Platforms block in Games Storage), and its sync and image caches are empty; the accent is the debug-APK difference recorded in p4h. The walk's final About step drifted on both sides (Android landed in Android's system Settings, desktop on the Platforms row), so it shows nothing; About itself was compared in p4l.
 
 **Verification:** driven desktop run (its build compiled desktopMain), no exception in the app log; montaged side by side against the Android captures. Android untouched.
+
+### 2026-10-22 — Drawer: Check-In, Library Sync, Save Sync (p4o)
+
+**Action:** plan step 8, the three drawer screens not yet walked. Drawer order comes from `NavRing.PAGES`; with Social, QuayPass-as-Social and Media hidden here, Check-In = DOWN×1, Library Sync = ×5, Save Sync = ×6 from Home. Walk: `pad-walk.sh android|desktop <dir> START wait:2 DOWN*n A wait:4 shot:<name> B ...`; Android in `build/desktop-check/p4o-android/`, desktop in `p4o-a/` (all three) and `p4o-b/` (Check-In after the fix).
+
+**Outcome:** Library Sync and Save Sync match Android in layout, rows and footer hints; differences are data only (desktop has no downloaded games and no local saves, so Save Sync shows its empty state and "0 saves", device row "desktop Linux"). Check-In's subtitle read "QuayPass is off" where Android reads "Link your Argosy account to check in": the desktop `QuayPassService` stub hard-coded `DISABLED`, while Android's service picks `NOT_LINKED` when there is no social session token. The desktop actual now derives the same idle state from `UserPreferencesRepository` (`DISABLED` when linked, `NOT_LINKED` otherwise). BLE stays absent on desktop (`isBleSupported()` false); a BlueZ implementation is Phase 4 parity work.
+
+**Verification:** two driven desktop runs (their builds compiled desktopMain), no exception in the app log; montage against the Android captures, Check-In header recaptured and matching. Android untouched (desktopMain only). Desktop unit tests not run for this change.
