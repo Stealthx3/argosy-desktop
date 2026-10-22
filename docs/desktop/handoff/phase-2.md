@@ -4,7 +4,7 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 History and reasoning live in `DEVLOG.md`; read only the parts this file points to. Earlier phases:
 `phase-0.md`, `phase-1.md` (closed summaries; carried-forward items are listed there).
 
-**Updated:** 2026-10-22, end of unit p4k
+**Updated:** 2026-10-22, end of unit p4l
 
 ## Where things stand
 
@@ -19,7 +19,9 @@ Plan step 8: walk first run → Home with `desktop-drive.sh`, fixing desktop stu
 **Roboto on desktop (p4i):** Default/SansSerif resolve to bundled Roboto through a Java shim over Compose's internal resolver (`desktopApp/.../RobotoFontResolver.java`); it depends on Compose 1.7.3 internals, so recheck it on any Compose upgrade.
 **Game Detail, drawer and both Library views (p4j)** match the baselines. Platform icons fixed: `main()` installs the desktop Coil loader (mirrors Android's `newImageLoader()`), and `prepareDesktopAssets` inlines the SVGs' `<style>` class rules as attributes (Skia ignores `<style>`). See the p4j entry in `DEVLOG.md`.
 **Collections, Downloads, Settings (main, Interface, Audio) and Detail's menu and More Options (p4k)** match Android baselines now in `build/desktop-check/p4k-android/` (walk script logic: see the p4k entry in `DEVLOG.md`; drawer from Home: Collections = START+DOWN×2, Downloads = ×4, Settings = ×8). Desktop `MusicDirectoryManager` is real now (XDG Music/RomM).
-Next: the remaining Settings subsections (Theme, Navigation, Displays, Built-in Emulator, Saves, Storage and below), Collections → New Collection, and the Apps screen, same method: Android walk with `adb shell input keyevent` on the check AVD into `build/desktop-check/<unit>-android/`, the identical pad walk via `desktop-drive.sh`, montage both, grep the app log for exceptions. Expected diffs, not bugs: Built-in Emulator's update badge (desktop has no cores yet), Detail's game (library order).
+**All 20 Settings subsections (p4l)** match Android (`build/desktop-check/p4l-android/` vs `p4l-a/`, walk: `scripts/desktop/check/settings-walk.sh android|desktop <dir>`). Storage's overview was empty: desktop `StorageAttributionRepository` is now Android's class minus the Android-apps/quota parts, and desktop `StorageVolumeDetector` reads home + `/proc/mounts` (`/run/media`, `/media`, `/mnt`). Expected diffs, not bugs (details in the p4l entry in `DEVLOG.md`): Saves sync off (first-run step skipped), Platforms "Not configured"/no Android row, Steam without GameHub rows, Built-in Emulator without the update badge, "Android Settings" does nothing on desktop.
+Next: Collections → New Collection, and the Apps screen (drawer), same method: Android walk with `adb shell input keyevent` on the check AVD into `build/desktop-check/<unit>-android/`, the identical pad walk via `desktop-drive.sh` (or a copy of `settings-walk.sh`), montage both, grep the app log for exceptions. Then deeper Settings rows not yet opened (Theme → Backdrop/Fonts/Sounds/Music, Interface → Home Screen/Controller Grip, Storage → Games/Caches, About).
+Phase 4 parity question (record): what "Android Settings" should do on Linux (open the desktop's settings app, or hide the row).
 Phase 3 follow-up (record, do not fix now): read `~/.config/user-dirs.dirs` for XDG Music/Download (env vars are rarely set). `withUserCertTrust` asks for `AndroidCAStore`, absent on a JVM, so on desktop an imported cert would replace system trust rather than widen it; desktop also never calls `userCertStore.initialize()`.
 Storage/platform/core setup was skipped by the post-sign-in routing; drive those from Settings later if needed.
 Drawer recipe: `desktop-drive.sh <dir> 40 shot:home PAD:START wait:2 shot:drawer` (the captured client area is 1910×1050, so compare at 0.97×). Builds cleanly through `desktop-drive.sh` (it runs `:desktopApp:run`, about 4 min).
