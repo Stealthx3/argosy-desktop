@@ -446,6 +446,7 @@ kotlin {
             implementation(project(":graphics-shim-desktop"))
             implementation(libs.sqlite.bundled)
             implementation(libs.zstd.jni)
+            implementation("net.java.dev.jna:jna:5.14.0")
             implementation(libs.org.json)
             implementation(libs.coil3.compose)
             implementation(libs.coil3.network.okhttp)

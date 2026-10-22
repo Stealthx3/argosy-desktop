@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# usage: desktop-drive.sh <out-dir> <settle-s> <step>... [-- WxH]; step = shot:<name> | wait:<s> | <AWT VK name>[*n]
+# usage: desktop-drive.sh <out-dir> <settle-s> <step>... [-- WxH]; step = shot:<name> | wait:<s> | <AWT VK name>[*n] | PAD:<SDL button>[*n] | PAD:<axis>=<value>
 set -u
 outdir=$1
 settle=$2

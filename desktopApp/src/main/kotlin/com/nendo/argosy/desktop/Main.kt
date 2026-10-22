@@ -25,7 +25,9 @@ fun main(args: Array<String>) {
     val app = DesktopApplication()
     val viewModels = app.component.viewModelFactory()
     val keyDispatcher = app.component.keyDispatcher()
-    val keyPipe = options.keyPipe?.let { KeyPipe(java.io.File(it)) }?.also { it.start() }
+    val gamepadDispatcher = app.component.gamepadDispatcher()
+    gamepadDispatcher.start()
+    val keyPipe = options.keyPipe?.let { KeyPipe(java.io.File(it), gamepadDispatcher) }?.also { it.start() }
     application {
         val state = rememberWindowState(
             placement = if (options.windowed) WindowPlacement.Floating else WindowPlacement.Fullscreen,
@@ -41,7 +43,10 @@ fun main(args: Array<String>) {
             DisposableEffect(window) {
                 keyPipe?.attach(window)
                 val focusListener = object : WindowAdapter() {
-                    override fun windowLostFocus(e: WindowEvent) = keyDispatcher.releaseAll()
+                    override fun windowLostFocus(e: WindowEvent) {
+                        keyDispatcher.releaseAll()
+                        gamepadDispatcher.releaseAll()
+                    }
                 }
                 window.addWindowFocusListener(focusListener)
                 onDispose { window.removeWindowFocusListener(focusListener) }

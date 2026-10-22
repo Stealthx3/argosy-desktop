@@ -4,19 +4,19 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 History and reasoning live in `DEVLOG.md`; read only the parts this file points to. Earlier phases:
 `phase-0.md`, `phase-1.md` (closed summaries; carried-forward items are listed there).
 
-**Updated:** 2026-10-22, end of unit p4b
+**Updated:** 2026-10-22, end of unit p4c
 
 ## Where things stand
 
-- **Phase:** 2 · Desktop UI (third of six). Seam stage done; desktop shell done (p4a); **keyboard input done (p4b):** `DesktopKeyDispatcher` (desktopMain `ui/input/`) maps keys to Android `Generic.kl` key codes and feeds upstream's `GamepadInputHandler`, wired as the window's `onPreviewKeyEvent`. Enter on the welcome screen opens the RomM login step. See the p4b entry in `DEVLOG.md`.
+- **Phase:** 2 · Desktop UI (third of six). Seam stage done; desktop shell (p4a); keyboard input (p4b); **SDL3 gamepad input done (p4c):** `platform/sdl/` (JNA binding `Sdl3`, `SdlGamepadSource` thread, `SdlVirtualPad`) and `ui/input/DesktopGamepadDispatcher` + `SdlGamepadMapping` feed upstream's `GamepadInputHandler` the same key codes and motion events Android does; pads register in `PlatformInputDevices`, and `ConnectedControllerTracker`/`TriggerAxisKeyEmitter` desktop actuals are now real. Plan step 7 is complete. See the p4c entry in `DEVLOG.md`.
 - **Counts:** app 30 files, commonMain 1,720, androidMain 243 (unchanged; desktop-only work).
 - **Baseline for "Android unchanged":** plain upstream v2.24.0, `build/desktop-baseline/app-debug-upstream-v2.24.0.apk`. Plain save proof: `build/desktop-check/save-proof/v224-plain-1022a` (captured 2026-10-22 04:19; recapture once a candidate is more than 24 hours newer: `save-proof.sh build/desktop-baseline/app-debug-upstream-v2.24.0.apk <dir>`, about 8 min).
 - Nothing uncommitted.
 
 ## Next action
 
-Plan step 7, second half, **SDL3 gamepad** through JNA (hotplug, the SDL controller database) emitting Android key codes (`AndroidKeyCodes`) into `GamepadInputHandler.handleKeyEvent`, and stick/trigger axes as `PlatformMotionEvent`s into `handleMotionEvent`; feed `ConnectedControllerTracker.desktop.kt` (connected ids, active controller/layout) and `PlatformInputDevices`. Plan it first: check whether SDL3 is on the machine / in the Flatpak runtime plan (`PORT_PLAN.md`, search "SDL"), and how Android's `TriggerAxisKeyEmitter` and stick handling expect axes. Testing needs a real pad (none may be attached; say so if not) or SDL's virtual joystick API.
-Alternative if SDL is blocked: go to step 8 with the keyboard: walk first run → Home with `desktop-drive.sh`, fixing desktop stubs each screen hits, compare with Android at 1920×1080. Text entry (server URL) needs `KEY_TYPED` support in `KeyPipe` first.
+Plan step 8: walk first run → Home with `desktop-drive.sh` (keyboard keys and now `PAD:SOUTH`, `PAD:DPAD_DOWN`, `PAD:LEFTY=32767` ... steps), fixing desktop stubs each screen hits, and compare with Android at 1920×1080. First blocker: on the RomM login step, Escape, pad East and D-pad Down all leave the frame unchanged (the URL text field holds focus; p4b saw Escape take focus off it, p4c did not). Find what Android does there (soft-keyboard `FocusRequester`, the login step's `InputHandler`) before changing anything. Text entry (server URL) needs `KEY_TYPED` support in `KeyPipe` first.
+Still unverified from p4c: a physical pad (none attached; Nintendo-layout pads especially), in-app stick navigation, key repeat feel against Android.
 
 Where the desktop graph lives: `shared/src/desktopMain/.../di/` (`DesktopComponent`, `DesktopAppModule` hand-owned bindings, `DesktopDataModule`, `DesktopViewModelComponent`, `DesktopApplication`, `ViewModels.desktop.kt`); generated `DesktopDaoModule` and `DesktopViewModelModule` (Gradle tasks in `shared/build.gradle.kts`). A new Android-side `@Binds`/`@Provides` that commonMain code injects needs a desktop counterpart in `DesktopAppModule`; `di_closure.py <Root>...` lists the gaps, and the Dagger compile of `:shared` for desktop is the final check.
 
@@ -33,6 +33,7 @@ Where the desktop graph lives: `shared/src/desktopMain/.../di/` (`DesktopCompone
 ## Gotchas worth remembering
 
 - XTest/xdotool-style injection does not work here: KDE's Xwayland runs `-enable-ei-portal` (consent portal). Use `desktop-drive.sh` (in-process key pipe). No Xvfb installed; installing one needs the owner.
+- SDL: C `bool` returns are bound as `Byte` (JNA's `Boolean` reads 4 bytes). SDL sends an initial zero axis sample when a pad opens. A desktopApp class must not name `Sdl3Library` (JNA is `implementation` in `:shared`; the compile fails with "Cannot access com.sun.jna.Library"). This machine already has SDL joystick instance 1 (a non-gamepad device), so the first virtual pad is id 2 → device id 102.
 
 - Desktop: `kotlinx-coroutines-swing` must be on the runtime classpath (`Dispatchers.Main`). A `TODO` in a desktop property initializer throws at injection; one in a function throws when a coroutine reaches it, often off-screen (startup hangs on a spinner). Read the app log, not only the screenshot.
 - Gradle does not track `filter {}` lambdas: change `prepareDesktopComposeResources`'s `stringFilter` input property along with its filter.

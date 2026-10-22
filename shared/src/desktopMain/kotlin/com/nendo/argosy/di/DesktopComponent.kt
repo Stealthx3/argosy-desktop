@@ -5,6 +5,7 @@ import com.nendo.argosy.data.preferences.SyncPreferencesRepository
 import com.nendo.argosy.platform.PlatformApplication
 import com.nendo.argosy.ui.components.LaunchProgressEntryPoint
 import com.nendo.argosy.ui.components.recap.MonthlyRecapController
+import com.nendo.argosy.ui.input.DesktopGamepadDispatcher
 import com.nendo.argosy.ui.input.DesktopKeyDispatcher
 import dagger.BindsInstance
 import dagger.Component
@@ -22,6 +23,8 @@ interface DesktopComponent : LaunchProgressEntryPoint {
     fun monthlyRecapController(): MonthlyRecapController
 
     fun keyDispatcher(): DesktopKeyDispatcher
+
+    fun gamepadDispatcher(): DesktopGamepadDispatcher
 
     fun viewModelComponentFactory(): DesktopViewModelComponent.Factory
 

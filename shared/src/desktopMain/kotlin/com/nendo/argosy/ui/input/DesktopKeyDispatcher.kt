@@ -7,6 +7,8 @@ import androidx.compose.ui.input.key.type
 import com.nendo.argosy.core.input.AndroidKeyCodes
 import com.nendo.argosy.platform.PlatformKeyEvent
 import com.nendo.argosy.platform.SOURCE_KEYBOARD
+import com.nendo.argosy.platform.action
+import com.nendo.argosy.platform.keyCode
 import com.nendo.argosy.ui.audio.AmbientAudioManager
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -53,14 +55,20 @@ class DesktopKeyDispatcher @Inject constructor(
             eventRepeatCount = repeatCount,
             eventDownTime = downTime,
         )
-        if (action == AndroidKeyCodes.ACTION_DOWN) {
+        return deliver(platformEvent)
+    }
+
+    fun deliver(event: PlatformKeyEvent): Boolean {
+        val keyCode = event.keyCode
+        val isDown = event.action == AndroidKeyCodes.ACTION_DOWN
+        if (isDown) {
             ambientAudioManager.resumeFromSuspend()
         }
-        if (gamepadInputHandler.handleKeyEvent(platformEvent)) {
+        if (gamepadInputHandler.handleKeyEvent(event)) {
             return true
         }
         if (keyCode == AndroidKeyCodes.KEYCODE_HOME || keyCode == AndroidKeyCodes.KEYCODE_BUTTON_MODE) {
-            if (action == AndroidKeyCodes.ACTION_DOWN) gamepadInputHandler.emitHomeEvent()
+            if (isDown) gamepadInputHandler.emitHomeEvent()
             return true
         }
         return false
