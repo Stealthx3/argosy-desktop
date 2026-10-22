@@ -258,15 +258,56 @@ val prepareDesktopComposeResources by tasks.registering(Sync::class) {
     into(layout.buildDirectory.dir("generated/desktopComposeResources"))
 }
 
+/**
+ * Skia's SVG renderer ignores `<style>` blocks, which AndroidSVG honours; the platform icons set
+ * every fill through `.cls-n` class rules. Each rule becomes presentation attributes on the
+ * elements of that class, replacing a same-named attribute as the CSS rule would.
+ */
+fun inlineSvgClassStyles(svg: String): String {
+    val styleBlock = Regex("<style[^>]*>(.*?)</style>", RegexOption.DOT_MATCHES_ALL)
+    val css = styleBlock.findAll(svg).joinToString("\n") { it.groupValues[1] }
+        .replace(Regex("/\\*.*?\\*/", RegexOption.DOT_MATCHES_ALL), "")
+    if (css.isBlank()) return svg
+    val rules = linkedMapOf<String, LinkedHashMap<String, String>>()
+    Regex("([^{}]+)\\{([^}]*)\\}").findAll(css).forEach { rule ->
+        val declarations = rule.groupValues[2].split(';').mapNotNull { declaration ->
+            val name = declaration.substringBefore(':', "").trim()
+            val value = declaration.substringAfter(':', "").trim()
+            if (name.isEmpty() || value.isEmpty()) null else name to value
+        }
+        rule.groupValues[1].split(',').map { it.trim() }.forEach { selector ->
+            require(Regex("\\.[\\w-]+").matches(selector)) { "unsupported SVG style selector: $selector" }
+            rules.getOrPut(selector.removePrefix(".")) { linkedMapOf() }.putAll(declarations)
+        }
+    }
+    val withoutStyle = styleBlock.replace(svg, "")
+    return Regex("<([\\w:-]+)([^<>]*?)(/?)>").replace(withoutStyle) { tag ->
+        val attributes = tag.groupValues[2]
+        val classes = Regex("\\sclass=\"([^\"]*)\"").find(attributes)?.groupValues?.get(1)
+            ?.split(' ')?.filter { it.isNotBlank() } ?: return@replace tag.value
+        val merged = linkedMapOf<String, String>()
+        classes.forEach { rules[it]?.let(merged::putAll) }
+        if (merged.isEmpty()) return@replace tag.value
+        var rewritten = attributes
+        merged.forEach { (name, value) ->
+            val existing = Regex("\\s${Regex.escape(name)}=\"[^\"]*\"")
+            rewritten = existing.replace(rewritten, "") + " $name=\"$value\""
+        }
+        "<${tag.groupValues[1]}$rewritten${tag.groupValues[3]}>"
+    }
+}
+
 val prepareDesktopAssets by tasks.registering {
     val assets = layout.projectDirectory.dir("src/androidMain/assets")
     val outDir = layout.buildDirectory.dir("generated/desktopAssets")
     inputs.dir(assets)
+    inputs.property("svgStyleInlining", 1)
     outputs.dir(outDir)
     doLast {
         val root = outDir.get().asFile.resolve("argosy-assets")
         root.deleteRecursively()
         assets.asFile.copyRecursively(root)
+        root.walkTopDown().filter { it.isFile && it.extension == "svg" }.forEach { it.writeText(inlineSvgClassStyles(it.readText())) }
         val index = root.walkTopDown().filter { it.isFile }.map { it.relativeTo(root).invariantSeparatorsPath }.sorted()
         root.resolve("index.txt").writeText(index.joinToString("\n") + "\n")
     }

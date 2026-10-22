@@ -19,6 +19,7 @@ import com.nendo.argosy.di.DesktopApplication
 import com.nendo.argosy.di.LocalViewModelProviders
 import com.nendo.argosy.di.viewModelFactory
 import com.nendo.argosy.platform.LocalPlatformContext
+import com.nendo.argosy.platform.image.installDesktopImageLoader
 import com.nendo.argosy.ui.ArgosyApp
 import com.nendo.argosy.ui.theme.ALauncherTheme
 import java.awt.event.WindowAdapter
@@ -27,6 +28,7 @@ import java.awt.event.WindowEvent
 fun main(args: Array<String>) {
     val options = ShellOptions.parse(args)
     val app = DesktopApplication()
+    installDesktopImageLoader(app.component.rommConnectionManager(), app.component.userCertStore())
     val viewModels = app.component.viewModelFactory()
     val keyDispatcher = app.component.keyDispatcher()
     val gamepadDispatcher = app.component.gamepadDispatcher()

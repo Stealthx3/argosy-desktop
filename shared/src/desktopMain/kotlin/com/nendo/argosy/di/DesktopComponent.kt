@@ -2,6 +2,8 @@ package com.nendo.argosy.di
 
 import com.nendo.argosy.data.local.dao.PlatformDao
 import com.nendo.argosy.data.preferences.SyncPreferencesRepository
+import com.nendo.argosy.data.remote.romm.RomMConnectionManager
+import com.nendo.argosy.data.remote.ssl.UserCertStore
 import com.nendo.argosy.platform.PlatformApplication
 import com.nendo.argosy.ui.components.LaunchProgressEntryPoint
 import com.nendo.argosy.ui.components.recap.MonthlyRecapController
@@ -21,6 +23,10 @@ interface DesktopComponent : LaunchProgressEntryPoint {
     fun syncPreferences(): SyncPreferencesRepository
 
     fun monthlyRecapController(): MonthlyRecapController
+
+    fun rommConnectionManager(): RomMConnectionManager
+
+    fun userCertStore(): UserCertStore
 
     fun keyDispatcher(): DesktopKeyDispatcher
 
