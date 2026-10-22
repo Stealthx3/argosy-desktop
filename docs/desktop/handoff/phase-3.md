@@ -4,7 +4,7 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 History and reasoning live in `DEVLOG.md`; read only the parts this file points to. Earlier phases:
 `phase-0.md`, `phase-1.md`, `phase-2.md` (closed summaries).
 
-**Updated:** 2026-10-22, Phase 2 close. Phase 3 has **not started**: it starts only on the owner's go-ahead.
+**Updated:** 2026-10-22. Owner approved Phase 3 ("Start Phase 3 now."). Parked for usage before any work: nothing uncommitted. Next action: First actions 1–3 below, starting at 1.
 
 ## Scope and exit criterion (`PORT_PLAN.md`, Roadmap)
 

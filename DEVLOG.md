@@ -802,3 +802,13 @@ Desktop `StorageAttributionRepository` is now Android's class, transformed: `Sta
 **Verification at close:** `./gradlew testDebugUnitTest :shared:desktopTest` green, 4,454 tests, 0 failures (`build/desktop-logs/20261022-151225-p2close-tests.log`). The last commit touching `app`, `shared/src/androidMain` or `shared/src/commonMain` is `e0cfd7b40`, covered by the full verification `build/desktop-check/verify-p3k.log` (Android gate, A/B, save proof); every later Phase 2 commit changed desktop code only (`git log e0cfd7b40..HEAD -- app shared/src/androidMain shared/src/commonMain` is empty).
 
 **Action:** Rebuilt `README.md` (intro, Phase 2 status, full `PORT_PLAN.md`, upstream link), added a Phase 2 results note to `PORT_PLAN.md`, closed `docs/desktop/handoff/phase-2.md` and opened `phase-3.md`; committed and pushed `main` to `origin`.
+
+---
+
+## Phase 3 · Linux services and alpha Flatpak
+
+**Status:** started 2026-10-22 (owner: "Start Phase 3 now."). Exit criterion (`PORT_PLAN.md`): emulators detected on a clean Fedora and a SteamOS install; a game launches, exits and returns to Argosy; saves sync to RomM; the alpha installs from the owner's own Flatpak repo.
+
+### 2026-10-22 — Start; parked for usage
+
+**Action:** recorded the owner's go-ahead and opened this section. The 5-hour usage window stood at 47%, too close to the 50% cap for the planning read, so the unit was parked before any Phase 3 work; the pacer resumes it after the window resets. Next: the first actions in `docs/desktop/handoff/phase-3.md` (read the design sources, write the numbered Phase 3 step plan here).
