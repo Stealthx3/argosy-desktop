@@ -32,6 +32,20 @@ class InputDispatcherPendingKeepTest {
     }
 
     @Test
+    fun `a handler parked for a bare route survives a reset that keeps its destination pattern`() {
+        val dispatcher = InputDispatcher()
+        val gameDetail = Recorder()
+        dispatcher.subscribeView(gameDetail, forRoute = "game")
+
+        dispatcher.clearPendingViewSubscription(keepRoute = "game/{gameId}")
+        dispatcher.setCurrentRoute("game/{gameId}")
+        val result = dispatcher.dispatch(down)
+
+        assertTrue(result.handled)
+        assertEquals(1, gameDetail.downs)
+    }
+
+    @Test
     fun `a handler parked for another route is dropped by the topology reset`() {
         val dispatcher = InputDispatcher()
         val settings = Recorder()
@@ -56,7 +70,6 @@ class InputDispatcherPendingKeepTest {
         dispatcher.clearPendingViewSubscription()
         dispatcher.setCurrentRoute("home")
         val homeResult = dispatcher.dispatch(down)
-        dispatcher.clearPendingViewSubscription(keepRoute = null)
         dispatcher.setCurrentRoute("settings")
         val settingsResult = dispatcher.dispatch(down)
 

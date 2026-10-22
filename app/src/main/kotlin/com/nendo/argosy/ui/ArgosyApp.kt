@@ -372,13 +372,14 @@ fun ArgosyApp(
     }
 
     // When dual-screen topology changes (role swap, companion attach/detach, game moves
-    // between displays), drop any lingering modal/drawer state and clear the deferred
-    // view subscription so the newly-active screen's input handler gets a clean slot.
+    // between displays), drop any lingering modal/drawer state and every deferred view
+    // subscription except the live route's, which keeps its parked input handler.
     if (dsm != null) {
         val swappedGameActive by dsm.swappedIsGameActive.collectAsState()
         LaunchedEffect(isRolesSwapped, companionActive, swappedGameActive) {
             inputDispatcher.resetToMainView()
-            inputDispatcher.clearPendingViewSubscription(keepRoute = navController.currentBackStackEntry?.destination?.route)
+            val liveRoute = navController.currentBackStackEntry?.destination?.route
+            inputDispatcher.clearPendingViewSubscription(keepRoute = liveRoute)
             if (dsm.isOverlayFocused) {
                 dsm.isOverlayFocused = false
                 dsm.controlCompanion?.onOverlayClosed()
