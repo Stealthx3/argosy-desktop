@@ -4,7 +4,7 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 History and reasoning live in `DEVLOG.md`; read only the parts this file points to. Earlier phases:
 `phase-0.md`, `phase-1.md`, `phase-2.md` (closed summaries).
 
-**Updated:** 2026-10-23 (step 8, step 8 closed). Steps 1–8 done (commits "Phase 3 step 1" … "Phase 3 step 8"; step 6's standalone-emulator proof waits on the owner's answer, below). The Phase 3 step plan (steps 1–11) is in `DEVLOG.md` under "Phase 3 · Linux services and alpha Flatpak" → "Phase 3 step plan". Step 6 history: DEVLOG "Step 6, part 0" … "part 8"; step 7: "Step 7, part 1" … "part 3"; step 8: "Step 8". Nothing uncommitted. Next action: step 9 (first-run and file access), see below.
+**Updated:** 2026-10-23 (step 9, part 1). Steps 1–8 done (commits "Phase 3 step 1" … "Phase 3 step 8"; step 6's standalone-emulator proof waits on the owner's answer, below). The Phase 3 step plan (steps 1–11) is in `DEVLOG.md` under "Phase 3 · Linux services and alpha Flatpak" → "Phase 3 step plan". Step 6 history: DEVLOG "Step 6, part 0" … "part 8"; step 7: "Step 7, part 1" … "part 3"; step 8: "Step 8"; step 9: "Step 9, part 1". Nothing uncommitted. Next action: step 9 part 2 (desktop Permissions step with emulator folder access), see below.
 
 ## Scope and exit criterion (`PORT_PLAN.md`, Roadmap)
 
@@ -22,11 +22,13 @@ Emulator registry, host launch, save paths, Apps tab, Quick Settings; Flatpak fr
 
 - Step 5: `SaveSyncWorker.doWork` → commonMain `SaveSyncPass` (worker maps outcome to `Result`); `SaveSyncDownloadObserver` → commonMain. Desktop `data/sync/DesktopBackgroundJobs` (started in `Main.kt`): download observer, `SaveSyncPass` every 6 h, `processQueue()` every 15 min, RA patch backfill (desktop `RAPatchBackfillWorker` actual calls it). Each job waits for a RomM connection. Android-only by reason: foreground service/notification trio, `SocialSyncWorker` (social), `AchievementSubmissionWorker` (built-in libretro, Phase 4). Save proof `save-proof/p3s5` identical to baseline. Desktop pass against the connected testbed proven in step 6 part 0 (`build/desktop-check/p3s6-jobs/`: negotiate 200, reconcile, queue drain).
 
-## Step 9 (first-run and file access): next
+## Step 9 (first-run and file access): in progress
 
 - Plan text (DEVLOG step plan, 9): emulator folder-access step (with consent, `flatpak override --user --filesystem=~/Games/Argosy <id>` on the host), XDG user dirs (`~/.config/user-dirs.dirs`), the FileChooser portal for `OpenDocument`. Check: the wizard on a fresh data dir.
-- **First actions:** (1) find the first-run wizard's steps in commonMain (grep `FirstRun`/`Quickstart`/`Onboarding` under `ui/screens`) and the desktop actuals they reach (storage permission, folder pickers); list which are Android-only. (2) Read the desktop `OpenDocument` stub and the XDG Music/Download carry-forward below. (3) ROMs move from `~/.local/share/argosy-desktop/external/downloads` to `~/Games/Argosy` here: plan the move for existing rows (recovery before rejection) before coding.
-- **Fresh data dir without touching the owner's:** never delete or move `~/.local/share/argosy-desktop`. Run the wizard against a separate dir (check `DesktopDirectories` for an override such as `XDG_DATA_HOME`; add one if missing) and remove only that temporary dir afterwards.
+- **Part 1 done:** `defaultRomStorageBase` expect/actual (desktop `~/Games/Argosy`) behind `PlatformFolderResolver.defaultStorageBase`. Owner's six testbed ROM rows stay at their old absolute paths (still valid; no move). `fresh-walk.sh <name> <steps>` runs against `build/desktop-fresh/<name>/` (state `a` is paired with the testbed; delete only that folder when step 9 closes).
+- **Wizard walk recipe** (fresh, DEVLOG "Step 9, part 1"): `PAD:SOUTH wait:3 PAD:SOUTH TYPE:http://localhost:8093 PAD:DPAD_DOWN PAD:SOUTH wait:5 PAD:DPAD_DOWN PAD:SOUTH wait:2 PAD:SOUTH RUN:<pair-code.py> TYPEFILE:build/desktop-testbed/pair-code.txt wait:2 PAD:SOUTH wait:12` → Connected; `PAD:SOUTH` → Permissions; `DOWN*4 SOUTH` → Games Path; `SOUTH` → folder browser. **Never press A at focus 0 on the QR screen**: it opens the testbed URL in the owner's browser.
+- **Next action (part 2):** the Permissions step on the desktop. Today it lists Android grants (Usage Access not granted, its button a no-op intent). Design: on the desktop the step shows the detected emulator Flatpaks (`LinuxEmulators`/`EmulatorDetector`) and, with consent, runs `flatpak override --user --filesystem=~/Games/Argosy <id>` via `HostShell` (read current state with `flatpak override --user --show <id>`); keep Android's step unchanged (expect/actual for the permission set or a capability flag that names what the desktop lacks). New labels: find how earlier desktop-only strings were added (grep DEVLOG "string") before adding any. Then Games Path: offer `~/Games/Argosy` (create it) as the first choice on the desktop.
+- **Then:** XDG user dirs (`~/.config/user-dirs.dirs` for Music/Download), FileChooser portal for `OpenDocument` (Backdrop image, Fonts import), finish the wizard to Home on the fresh dir.
 
 ## Step 8 closed: what carries
 

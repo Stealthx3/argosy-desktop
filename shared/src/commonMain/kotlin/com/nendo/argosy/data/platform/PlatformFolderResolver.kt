@@ -42,7 +42,7 @@ class PlatformFolderResolver @Inject constructor(
     private val preferencesRepository: UserPreferencesRepository
 ) {
     val defaultStorageBase: File by lazy {
-        File(context.getExternalFilesDir(null), "downloads")
+        defaultRomStorageBase(context)
     }
 
     suspend fun storageBase(): File =
