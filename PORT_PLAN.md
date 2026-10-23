@@ -10,7 +10,7 @@ As of 2026-10-16 · Micaiah Fonken · Source of truth: the "Argosy Desktop — L
 
 > **Phase 2 results** (2026-10-22, details in `DEVLOG.md`): upstream's whole UI runs in the desktop window. `commonMain` now holds 1,720 Kotlin files and `androidMain` 243; `app` keeps 30. SDL3 gamepad input and the keyboard drive upstream's own InputDispatcher, so focus and navigation behave as on Android. Every screen reachable with the RomM testbed was walked with the same pad steps on an Android handheld emulator and on the desktop and matches (first run, Home and drawer, Game Detail and its sheets, Library, Collections, Downloads, Library Sync, Save Sync, Check-In, Apps, every Settings page, About, Changelog, file browser). Not yet opened on the desktop: Media Library/Detail (needs a Jellyfin server in the testbed), the Social screens (need an Argosy Social session), Save Timeline and the emulator rows of Per-Game Settings (need Phase 3 emulators); Search and Manage Pins have no entry point in upstream v2.24.0 on either platform. Still to check: a physical pad, Nintendo layouts and stick navigation.
 
-> **Desktop divergences** (owner decision, 2026-10-23, after a first look at the alpha): Argosy Desktop no longer aims to match Android feature for feature. Steam, Jellyfin, Argosy Social and the "Android Settings" row are removed from the desktop app; built-in emulation, netplay and dual-screen are not part of this version; Android-only screens (emulator suggestions, managed installers, GPU drivers, permissions) become Linux screens; the desktop gains a system title bar, windowed dark first launch, a full-screen setting, a Steam Input controller option, per-button navigation mapping and handheld/TV layout options. Details: "Desktop divergences" below; Phase 4 in the Roadmap now carries this work. The Android app is unchanged: every removal is a desktop-only gate, not a deletion from shared code.
+> **Desktop divergences** (owner decision, 2026-10-23, after a first look at the alpha): Argosy Desktop no longer aims to match Android feature for feature. Steam, Jellyfin, Argosy Social and the "Android Settings" row are removed from the desktop app; built-in emulation, netplay and dual-screen are not part of this version; Android-only screens (emulator suggestions, managed installers, GPU drivers, permissions) become Linux screens; the desktop gains a system title bar, windowed dark first launch, a full-screen setting, a controller input mode (Auto / Steam Input / SDL3), per-button navigation mapping, display profiles (Handheld/Desktop/TV) and a Display setup step in the first-run wizard. Details: "Desktop divergences" below; Phase 4 in the Roadmap now carries this work. The Android app is unchanged: every removal is a desktop-only gate, not a deletion from shared code.
 
 ## Summary
 
@@ -166,20 +166,18 @@ Not part of Phase 4. Adds Steam's glyphs, action sets and Steam's controller con
 7. **Native layer:** implement the loading above; test on Steam Deck/SteamOS and Bazzite Game Mode with the private branch (the app ID is now real); confirm the Flatpak build also initialises when launched by Steam with `SteamAppId` set for an owner of the app, or document that native Steam Input is a Steam-build feature.
 8. **Store review and release (owner):** store page, Valve's build and store review, then release; the Flatpak and Flathub builds keep working without Steam.
 
-### Handheld and TV layout options (to choose from)
+### Display profiles and wizard display setup (owner decision, 2026-10-23)
 
-Proposed; the owner picks which ones go into Phase 4.
+Chosen from the ten proposed options: 1, 2, 5 and 9, plus a new first-run step. Not chosen for this version: interface scale, text size, grid density, focus visibility, navigation speed and handheld performance options.
 
-1. **Display profile:** Handheld (7–8.8", 800p–1600p: Steam Deck, ROG Ally, Legion Go), Desktop monitor, TV (10-foot). Auto-detected from DMI product name, gamescope session and the display's physical size/EDID, overridable in Interface.
-2. **Reuse upstream's TV layout:** map the desktop window to upstream's `AspectRatioClass` so large screens get the layout Android TV already uses (no touch, controller-only paths), instead of a new layout.
-3. **Interface scale:** Auto or 75–200 % in Interface, applied as a Compose density override; Auto picks per profile (e.g. 1280×800 handheld at 100 %, 4K TV at 200 %).
-4. **Text size** independent of interface scale, for reading at couch distance.
-5. **TV safe area:** an overscan margin (0–5 %) so edges are not cut off on TVs.
-6. **Grid density:** cards per row on Home and Library (compact / standard / large), defaulting per profile.
-7. **Focus visibility:** a larger, higher-contrast focus ring and optional focus zoom for TV distance.
-8. **Navigation speed:** key-repeat delay and acceleration, stick dead zone and stick-to-D-pad threshold, per profile; trigger page jumps and letter jumps in long lists.
-9. **Touch on handhelds:** keep touch targets on touchscreen handhelds (Deck, Ally) and hide the mouse cursor while a pad is in use.
-10. **Performance on handhelds:** frame-rate cap and an option to turn off backdrop blur and animated backgrounds to save battery.
+| Piece | Behaviour |
+| --- | --- |
+| Display profile (option 1) | **Handheld** (7–8.8" built-in screens, 800p–1600p: Steam Deck, ROG Ally, Legion Go and similar), **Desktop** (monitor, mouse and keyboard nearby), **TV** (10-foot, controller only). Auto-detected from the DMI product name, a gamescope session (SteamOS/Bazzite Game Mode) and the display's physical size from EDID; changeable later in Settings → Interface → Display profile. Stored as a desktop preference through the full settings chain (DataStore key → prefs → UserPreferences → SettingsModels → hydrate → router → section → consumption) |
+| TV layout reuse (option 2) | The TV profile maps the window to upstream's existing TV `AspectRatioClass`, so large screens get the controller-only layout Android TV already has (every action reachable without touch) instead of a new layout. Handheld and Desktop keep the handheld class chosen by window size, as today |
+| TV safe area (option 5) | An overscan margin of 0–5 % around the whole UI, on by default for TV (proposed default 3 %, adjustable in Interface) and 0 % for the other profiles, so edges are not cut off on TVs |
+| Touch on handhelds (option 9) | Handheld keeps touch targets active on touchscreen devices (Deck, Ally) and hides the mouse cursor while a controller is in use; it reappears on mouse movement. Desktop shows the cursor; TV hides it unless the mouse moves |
+| Wizard: Display setup step | A new first-run step, first after the welcome screen (so every later step already uses the chosen layout): three cards, Handheld / Desktop / TV, each with a thumbnail preview of the Home screen in that profile, the detected profile preselected and tagged "Recommended", one line on what the profile changes. Controller (left/right, A to choose) and touch/mouse both work; sound feedback and footer hints as on the other wizard steps. Thumbnails are live miniatures rendered from the Home composable with sample cards and the current theme (so they follow theme and language), at the profile's layout class and safe area, scaled down. Choosing a profile applies it immediately; Back returns to the welcome screen. Desktop divergence: Android's wizard has no such step |
+| Thumbnails elsewhere | Settings → Interface → Display profile reuses the same three preview cards |
 
 ## Feature parity matrix
 
@@ -208,7 +206,8 @@ Port means the shared code runs as is, Adapt means the same screen and behaviour
 | GPU drivers screen | Linux | 4 | Host GPU and API capabilities, read-only |
 | Permissions screen | Linux | 4 | Flatpak permissions and their live state |
 | Android Settings row | Remove | 4 | Desktop divergence |
-| Window, full-screen setting, Steam Input, button mapping, handheld/TV layout | Linux | 4 | New desktop features |
+| Window, full-screen setting, controller input mode, button mapping, display profiles | Linux | 4 | New desktop features |
+| First-run wizard: Display setup step | Linux | 4 | Profile choice with thumbnail previews |
 | Apps tab | Adapt | 3 | Host .desktop apps, launched on the host |
 | Jellyfin media with offline downloads | Remove | 4 | Desktop divergence |
 | Video wallpaper | Adapt | 4 | Same libmpv surface |
@@ -283,7 +282,7 @@ Six phases over about 32 weeks; restructure first, then get every screen on the 
 | 1 · Kotlin Multiplatform restructure | 3–8 | Shared modules, DI, Room and DataStore KMP, shared resources; Android app unchanged for users | — |
 | 2 · Desktop UI | 9–13 | Every screen runs on the desktop; SDL3 gamepad input; identical focus feel | — |
 | 3 · Linux services and alpha Flatpak | 14–19 | Emulator registry, host launch, save paths, Apps tab, Quick Settings; Flatpak from your own repo | Alpha: sync, download, play, save sync |
-| 4 · Linux adaptation | 20–28 | libmpv video wallpaper; Desktop removals (Steam Jellyfin Social Android Settings); Linux emulator suggestions and managed installers; Host GPU screen; Flatpak permissions screen; Window title bar and full-screen setting; Controller input mode (Auto Steam Input SDL3); Navigation button mapping; Handheld and TV layout | — |
+| 4 · Linux adaptation | 20–28 | libmpv video wallpaper; Desktop removals (Steam Jellyfin Social Android Settings); Linux emulator suggestions and managed installers; Host GPU screen; Flatpak permissions screen; Window title bar and full-screen setting; Controller input mode (Auto Steam Input SDL3); Navigation button mapping; Display profiles and wizard display setup | — |
 | 5 · Beta and Flathub | 29–32 | Side-by-side checks against Android; GNOME, KDE and SteamOS testing; Flathub submission | 1.0 live on Flathub |
 
 Exit criteria per phase:
@@ -292,7 +291,7 @@ Exit criteria per phase:
 2. **Phase 1:** `shared` builds for Android and desktop with no Android imports in `commonMain`; the Android app passes its existing tests and looks unchanged.
 3. **Phase 2:** every screen opens on the desktop and is fully navigable by gamepad; screenshots match an Android handheld at the same resolution.
 4. **Phase 3:** emulators detected on a clean Fedora and a SteamOS install; a game launches, exits and returns to Argosy; saves sync to RomM; alpha installs from your own Flatpak repo.
-5. **Phase 4:** every Port, Adapt and Linux row of the parity matrix works on the desktop; every Remove row has no entry point left on the desktop and the Android app is unchanged (A/B screenshots and unit tests); the chosen handheld/TV options work on a handheld and on a TV-sized screen.
+5. **Phase 4:** every Port, Adapt and Linux row of the parity matrix works on the desktop; every Remove row has no entry point left on the desktop and the Android app is unchanged (A/B screenshots and unit tests); the display profiles and the wizard's Display setup step work on a handheld, a desktop monitor and a TV-sized screen.
 6. **Phase 5:** testers using both apps cannot name a behavioural difference outside the listed desktop divergences; `flatpak-builder-lint` clean; offline build green in CI for x86_64 and aarch64; Flathub PR merged.
 
 ## Risks and mitigations
@@ -322,7 +321,7 @@ Four decisions shape everything after Phase 0; settle them in the first two week
 - **Java runtime.** Stock OpenJDK on XWayland for 1.0, or JetBrains Runtime with native Wayland from the start.
 - **Built-in emulation timing.** Decided 2026-10-23: not in this version; external emulators only.
 - **Steam Input approach.** Decided 2026-10-23: Phase 4 builds input mode Auto / Steam Input / SDL3 on SDL3 (Steam Input listed only when available). Native `ISteamInput` is a planned revisit after 1.0 with the load-at-runtime workaround, gated on a Steam app ID (steps under "Native Steam Input: planned revisit").
-- **Handheld/TV options** (open): which of the ten options under Desktop divergences go into Phase 4.
+- **Handheld/TV options.** Decided 2026-10-23: display profiles (Handheld/Desktop/TV), TV layout reuse, TV safe area, touch on handhelds, and a Display setup step with thumbnail previews in the first-run wizard.
 - **Managed installer seeds** (open): which AppImage emulators to seed (candidates: Cemu, RPCS3, PCSX2, Azahar and other emulators that publish AppImages on GitHub).
 
 Phase 0 tasks:
