@@ -4,7 +4,7 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 History and reasoning live in `DEVLOG.md`; read only the parts this file points to. Earlier phases:
 `phase-0.md`, `phase-1.md`, `phase-2.md` (closed summaries).
 
-**Updated:** 2026-10-22. Steps 1–5 done (commits "Phase 3 step 1" … "Phase 3 step 5 (part 1)"; stage 4 was already in commonMain). The Phase 3 step plan (steps 1–11) is in `DEVLOG.md` under "Phase 3 · Linux services and alpha Flatpak" → "Phase 3 step plan". Step 6 part 0 (re-pair, background jobs proven) committed. Nothing uncommitted. Next action: step 6 proper (emulator save paths and desktop save sync).
+**Updated:** 2026-10-22. Steps 1–5 done (commits "Phase 3 step 1" … "Phase 3 step 5 (part 1)"; stage 4 was already in commonMain). The Phase 3 step plan (steps 1–11) is in `DEVLOG.md` under "Phase 3 · Linux services and alpha Flatpak" → "Phase 3 step plan". Step 6 parts 0 (re-pair, background jobs proven) and 1 (desktop file accessor, RetroArch config on Linux) committed. Nothing uncommitted. Next action: step 6 part 2 (session-end save sync in the desktop tracker, then a played save reaching RomM).
 
 ## Scope and exit criterion (`PORT_PLAN.md`, Roadmap)
 
@@ -22,18 +22,20 @@ Emulator registry, host launch, save paths, Apps tab, Quick Settings; Flatpak fr
 
 - Step 5: `SaveSyncWorker.doWork` → commonMain `SaveSyncPass` (worker maps outcome to `Result`); `SaveSyncDownloadObserver` → commonMain. Desktop `data/sync/DesktopBackgroundJobs` (started in `Main.kt`): download observer, `SaveSyncPass` every 6 h, `processQueue()` every 15 min, RA patch backfill (desktop `RAPatchBackfillWorker` actual calls it). Each job waits for a RomM connection. Android-only by reason: foreground service/notification trio, `SocialSyncWorker` (social), `AchievementSubmissionWorker` (built-in libretro, Phase 4). Save proof `save-proof/p3s5` identical to baseline. Desktop pass against the connected testbed proven in step 6 part 0 (`build/desktop-check/p3s6-jobs/`: negotiate 200, reconcile, queue drain).
 
-## Next action: step 6 (emulator save paths and desktop save sync)
+## Next action: step 6 part 2 (session-end save sync on desktop)
 
 - The desktop is paired and connected (device `badb0686…`). **After every `save-proof.sh`** (its snapshot restore drops both the desktop's token and its device row) run `scripts/desktop/testbed/desktop-repair.sh [out-dir]`: pairing walk with a fresh code, then `desktop-device.sh` restores the device row (without it every negotiate answers 404). Check `connect: success` in the newest `build/desktop-logs/*-desktop-run.log`.
 - `pair-code.py` runs only under `build/desktop-testbed/venv/bin/python` (never `python3 -I`). The pairing form connects via Down → Connect → South, not Enter.
-- Then work the step 6 notes below. Plan text: DEVLOG "Phase 3 step plan", item 6; part 0 details: DEVLOG "Step 6, part 0".
-- Open small item: after pairing, the form showed a bare "Error code:" although the connect succeeded; compare with Android when convenient.
+- Then work the step 6 notes below. Plan text: DEVLOG "Phase 3 step plan", item 6; parts 0–1: DEVLOG "Step 6, part 0" / "part 1".
+- Save proof diff: `scripts/desktop/testbed/proof-diff.sh <baseline> <candidate>` (state tables are excluded by design).
 
 ## Step 6 notes (desktop save sync)
 
-- `AndroidDataAccessor.desktop` is all no-ops; `SaveArchiver` calls `moveDirectory` unconditionally for staged multi-root saves (~line 480), so those archives would fail on desktop: give it a plain `java.io` actual (Linux has no restricted paths). `SaveStateManager.desktop` paths are `TODO`s.
-- Android storage assumptions (`/storage/emulated`, `Environment`) in `SavePathResolver`, `SavePathRegistry`, `FolderSaveHandler`, `SigilSaveHandler`, `N3dsSaveCaseRepair`; desktop `getExternalStorageDirectory()` is `$HOME`.
-- Also step 6: the Save Timeline comparison (Manage Saves needs `saveSyncEnabled`, off on desktop; do not turn it on before desktop save paths exist), the Save Path row showing Android's `Internal/RetroArch/saves`, and the session-end save sync in the desktop tracker.
+- Done in part 1 (DEVLOG "Step 6, part 1"): desktop `AndroidDataAccessor` is plain `java.io` (identity path transform); `RetroArchHostLayout` expect (Android actual = the former hard-coded list, byte-identical; desktop = Flatpak tree, `$XDG_CONFIG_HOME/retroarch`, `~/.config/retroarch`, Snap; `~/` expansion). The desktop reads this host's `~/.var/app/org.libretro.RetroArch/config/retroarch/retroarch.cfg`; its `savefile_directory` is the owner's EmuDeck folder `~/Emulation/saves/retroarch/saves` (a symlink into the Flatpak tree, currently empty). **Real owner data: test with testbed ROMs only, never delete there.**
+- Part 2: desktop `PlaySessionTracker.endSession` returns `Skipped` for save sync (~line 148–174); wire it like Android's (`SessionEndCoordinator` / session-end archiving) and prove: play a testbed ROM in RetroArch, in-game save, quit → `.srm` in the save folder → upload reaches RomM (GET /api/saves), then negotiate `no_op` twice. Then a second device's save comes down (Android emulator as the other device).
+- Still open: `SaveStateManager.desktop` paths are `TODO`s (built-in libretro, Phase 4). Android storage assumptions (`/storage/emulated`, `Environment`) in `SavePathResolver`, `SavePathRegistry` (standalone `{extStorage}` templates), `FolderSaveHandler`, `SigilSaveHandler`, `N3dsSaveCaseRepair`; desktop `getExternalStorageDirectory()` is `$HOME`. Standalone emulators (Dolphin, PPSSPP, …) need Linux save-path templates.
+- Also step 6: the Save Timeline comparison (Manage Saves needs `saveSyncEnabled`, off on desktop; turn it on only once a desktop save round-trips), the Save Path row showing Android's `Internal/RetroArch/saves`, the bare "Error code:" line after pairing.
+- RA login on desktop writes cheevos credentials into the host RetroArch cfg (Android parity; other keys kept).
 - ROMs live under `~/.local/share/argosy-desktop/external/downloads` (inside the Flatpak `~/.var/app/<id>/data/...`); step 9 moves them to `~/Games/Argosy`.
 
 ## Owner checkpoints already known (ask when reached, one question each)

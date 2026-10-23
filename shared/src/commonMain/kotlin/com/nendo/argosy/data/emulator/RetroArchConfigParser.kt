@@ -48,49 +48,18 @@ class RetroArchConfigParser @Inject constructor(
 
     private val primaryRoot: String get() = StoragePathUtils.primaryExternalRoot
 
-    /**
-     * Every location a RetroArch build is known to keep `retroarch.cfg`, most likely first.
-     *
-     * The first four are the canonical ones and their order is load-bearing: an install whose
-     * config is found today must keep resolving to the same file. Entries after them are the
-     * layouts that only apply when those are absent.
-     *
-     * Upstream sources:
-     * - `UserPreferences.getDefaultConfigPath` writes `getExternalFilesDir(null)/retroarch.cfg`,
-     *   which is `Android/data/<package>/files/` on primary external storage.
-     * - `platform_unix.c` (`frontend_android_get_env`) builds every default directory under a
-     *   parent path, and places saved configurations in its `config` subdirectory.
-     * - That parent path is `<external root>/RetroArch` when external storage is writable, and
-     *   `MainMenuActivity.startRetroActivity` supplies `getExternalMediaDirs()[0]` as the
-     *   external root for Play Store builds and for any build without all-files access, which
-     *   puts the tree under `Android/media/<package>/`.
-     */
     private val configPaths: List<String>
-        get() = buildList {
-            RETROARCH_PACKAGES.forEach { add("$primaryRoot/Android/data/$it/files/retroarch.cfg") }
-            add("$primaryRoot/RetroArch/retroarch.cfg")
-            add("$primaryRoot/RetroArch/config/retroarch.cfg")
-            RETROARCH_PACKAGES.forEach { pkg ->
-                add("$primaryRoot/Android/media/$pkg/RetroArch/retroarch.cfg")
-                add("$primaryRoot/Android/media/$pkg/RetroArch/config/retroarch.cfg")
-                add("$primaryRoot/Android/data/$pkg/files/config/retroarch.cfg")
-            }
-        }
+        get() = RetroArchHostLayout.configPaths(primaryRoot, RETROARCH_PACKAGES)
 
     fun findConfigPath(packageName: String): String? {
-        val packageSpecificPath = when (packageName) {
-            "com.retroarch" -> "$primaryRoot/Android/data/com.retroarch/files/retroarch.cfg"
-            "com.retroarch.aarch64" -> "$primaryRoot/Android/data/com.retroarch.aarch64/files/retroarch.cfg"
-            "com.retroarch.ra32" -> "$primaryRoot/Android/data/com.retroarch.ra32/files/retroarch.cfg"
-            else -> null
-        }
+        val packageSpecificPath = RetroArchHostLayout.packageConfigPath(primaryRoot, packageName)
 
         if (packageSpecificPath != null && fileAccessLayer.exists(packageSpecificPath)) {
             return packageSpecificPath
         }
 
-        val portableConfig = "$primaryRoot/RetroArch/retroarch.cfg"
-        if (fileAccessLayer.exists(portableConfig)) return portableConfig
+        val portableConfig = RetroArchHostLayout.portableConfigPath(primaryRoot)
+        if (portableConfig != null && fileAccessLayer.exists(portableConfig)) return portableConfig
 
         return configPaths.firstOrNull { fileAccessLayer.exists(it) }
     }
@@ -197,7 +166,7 @@ class RetroArchConfigParser @Inject constructor(
     private fun Map<String, String>.toSaveConfig(): RetroArchSaveConfig {
         val savefileDirectory = this["savefile_directory"]?.takeIf {
             it != "default" && it.isNotBlank()
-        }
+        }?.let(RetroArchHostLayout::expandPath)
         val savefilesInContentDir = this["savefiles_in_content_dir"] == "true"
         val sortByCore = this["sort_savefiles_enable"]?.equals("true", ignoreCase = true) ?: false
         val sortByContentDir = this["sort_savefiles_by_content_enable"]?.equals("true", ignoreCase = true) ?: false
@@ -217,7 +186,7 @@ class RetroArchConfigParser @Inject constructor(
     private fun Map<String, String>.toStateConfig(): RetroArchStateConfig {
         val savestateDirectory = this["savestate_directory"]?.takeIf {
             it != "default" && it.isNotBlank()
-        }
+        }?.let(RetroArchHostLayout::expandPath)
         val savestatesInContentDir = this["savestates_in_content_dir"] == "true"
         val sortByCore = this["sort_savestates_enable"]?.equals("true", ignoreCase = true) ?: true
         val sortByContentDir = this["sort_savestates_by_content_enable"]?.equals("true", ignoreCase = true) ?: false
@@ -296,7 +265,7 @@ class RetroArchConfigParser @Inject constructor(
 
         val baseDir = basePathOverride
             ?: config?.savefileDirectory
-            ?: "$primaryRoot/RetroArch/saves"
+            ?: RetroArchHostLayout.defaultDirectory(primaryRoot, "saves")
 
         val baseDirs = getBasePathAlternatives(baseDir)
 
@@ -457,7 +426,7 @@ class RetroArchConfigParser @Inject constructor(
 
         val baseDir = basePathOverride
             ?: config?.savestateDirectory
-            ?: "$primaryRoot/RetroArch/states"
+            ?: RetroArchHostLayout.defaultDirectory(primaryRoot, "states")
 
         val baseDirs = getBasePathAlternatives(baseDir)
 
