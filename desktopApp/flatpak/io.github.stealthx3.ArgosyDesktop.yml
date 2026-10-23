@@ -1,0 +1,70 @@
+# Alpha manifest: packages the jlink distributable that `./gradlew :desktopApp:createDistributable`
+# builds on the host (scripts/desktop/flatpak/build-alpha.sh). The offline, from-source build
+# Flathub needs is Phase 5. SDL3, libdbus and libsecret come from the 25.08 runtime.
+app-id: io.github.stealthx3.ArgosyDesktop
+runtime: org.freedesktop.Platform
+runtime-version: '25.08'
+sdk: org.freedesktop.Sdk
+command: argosy-desktop
+finish-args:
+  - --share=network
+  - --share=ipc
+  - --socket=wayland
+  - --socket=x11
+  - --device=dri
+  - --device=all
+  - --socket=pulseaudio
+  - --filesystem=~/Games/Argosy:create
+  - --talk-name=org.freedesktop.Flatpak
+  # Emulator save and state folders save sync reads and writes in place (HostSavePaths,
+  # RetroArchHostLayout): EmuDeck links, each mapped emulator's Flatpak tree, then native folders.
+  - --filesystem=~/Emulation
+  - --filesystem=~/.var/app/org.libretro.RetroArch
+  - --filesystem=~/.var/app/org.DolphinEmu.dolphin-emu
+  - --filesystem=~/.var/app/info.cemu.Cemu
+  - --filesystem=~/.var/app/org.azahar_emu.Azahar
+  - --filesystem=~/.var/app/io.github.ryubing.Ryujinx
+  - --filesystem=~/.var/app/dev.eden_emu.eden
+  - --filesystem=~/.var/app/org.duckstation.DuckStation
+  - --filesystem=~/.var/app/net.pcsx2.PCSX2
+  - --filesystem=~/.var/app/org.ppsspp.PPSSPP
+  - --filesystem=~/.var/app/net.rpcs3.RPCS3
+  - --filesystem=xdg-config/retroarch
+  - --filesystem=xdg-config/Ryujinx
+  - --filesystem=xdg-config/PCSX2
+  - --filesystem=xdg-config/ppsspp
+  - --filesystem=xdg-config/rpcs3
+  - --filesystem=xdg-data/Cemu
+  - --filesystem=xdg-data/azahar-emu
+  - --filesystem=xdg-data/eden
+  - --filesystem=xdg-data/duckstation
+  - --filesystem=xdg-data/Vita3K
+  - --filesystem=xdg-data/dolphin-emu
+  - --filesystem=~/.dolphin-emu
+modules:
+  - name: argosy-desktop
+    buildsystem: simple
+    build-commands:
+      - mkdir -p /app/lib/argosy-desktop
+      - cp -a distributable/. /app/lib/argosy-desktop/
+      - install -Dm755 argosy-desktop.sh /app/bin/argosy-desktop
+      - install -Dm644 io.github.stealthx3.ArgosyDesktop.desktop -t /app/share/applications
+      - install -Dm644 io.github.stealthx3.ArgosyDesktop.metainfo.xml -t /app/share/metainfo
+      - install -Dm644 argosy_icon.svg /app/share/icons/hicolor/scalable/apps/io.github.stealthx3.ArgosyDesktop.svg
+      - for size in 128 256; do
+          mkdir -p /app/share/icons/hicolor/${size}x${size}/apps;
+          rsvg-convert -w $size -h $size argosy_icon.svg
+            -o /app/share/icons/hicolor/${size}x${size}/apps/io.github.stealthx3.ArgosyDesktop.png;
+        done
+    sources:
+      - type: dir
+        path: ../build/compose/binaries/main/app/argosy-desktop
+        dest: distributable
+      - type: file
+        path: argosy-desktop.sh
+      - type: file
+        path: io.github.stealthx3.ArgosyDesktop.desktop
+      - type: file
+        path: io.github.stealthx3.ArgosyDesktop.metainfo.xml
+      - type: file
+        path: ../../argosy_icon.svg

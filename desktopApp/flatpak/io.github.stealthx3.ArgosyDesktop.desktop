@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Argosy
+GenericName=Game Launcher
+Comment=Controller-first game launcher for your RomM library
+Exec=argosy-desktop
+Icon=io.github.stealthx3.ArgosyDesktop
+Terminal=false
+Categories=Game;
+Keywords=RomM;emulator;retro;launcher;
+StartupWMClass=com-nendo-argosy-desktop-MainKt

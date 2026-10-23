@@ -4,7 +4,7 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 History and reasoning live in `DEVLOG.md`; read only the parts this file points to. Earlier phases:
 `phase-0.md`, `phase-1.md`, `phase-2.md` (closed summaries).
 
-**Updated:** 2026-10-23 (step 9 closed). Steps 1–9 done (commits "Phase 3 step 1" … "Phase 3 step 9"; step 6's standalone-emulator proof waits on the owner's answer, below). The Phase 3 step plan (steps 1–11) is in `DEVLOG.md` under "Phase 3 · Linux services and alpha Flatpak" → "Phase 3 step plan". Step 6 history: DEVLOG "Step 6, part 0" … "part 8"; step 7: "Step 7, part 1" … "part 3"; step 8: "Step 8"; step 9: "Step 9, part 1" … "Step 9 closed". Nothing uncommitted. Next action: start step 10 (alpha Flatpak), see below.
+**Updated:** 2026-10-23 (step 10 part 1: alpha Flatpak built and installed locally). Steps 1–9 done (commits "Phase 3 step 1" … "Phase 3 step 9"; step 6's standalone-emulator proof waits on the owner's answer, below). The Phase 3 step plan (steps 1–11) is in `DEVLOG.md` under "Phase 3 · Linux services and alpha Flatpak" → "Phase 3 step plan". Step 6 history: DEVLOG "Step 6, part 0" … "part 8"; step 7: "Step 7, part 1" … "part 3"; step 8: "Step 8"; step 9: "Step 9, part 1" … "Step 9 closed"; step 10: "Step 10, part 1". Nothing uncommitted. Next action: step 10 part 2 (walk the installed Flatpak), see below.
 
 ## Scope and exit criterion (`PORT_PLAN.md`, Roadmap)
 
@@ -22,10 +22,12 @@ Emulator registry, host launch, save paths, Apps tab, Quick Settings; Flatpak fr
 
 - Step 5: `SaveSyncWorker.doWork` → commonMain `SaveSyncPass` (worker maps outcome to `Result`); `SaveSyncDownloadObserver` → commonMain. Desktop `data/sync/DesktopBackgroundJobs` (started in `Main.kt`): download observer, `SaveSyncPass` every 6 h, `processQueue()` every 15 min, RA patch backfill (desktop `RAPatchBackfillWorker` actual calls it). Each job waits for a RomM connection. Android-only by reason: foreground service/notification trio, `SocialSyncWorker` (social), `AchievementSubmissionWorker` (built-in libretro, Phase 4). Save proof `save-proof/p3s5` identical to baseline. Desktop pass against the connected testbed proven in step 6 part 0 (`build/desktop-check/p3s6-jobs/`: negotiate 200, reconcile, queue drain).
 
-## Step 10 (alpha Flatpak): next
+## Step 10 (alpha Flatpak): in progress
 
-- **Next action:** start step 10 (DEVLOG step plan, 10): manifest `io.github.stealthx3.ArgosyDesktop` on `org.freedesktop.Platform` 25.08, jlink-trimmed JRE (JDK 21 at `~/.jdks/jdk-21.0.12.1+1`), SDL3, finish-args per `PORT_PLAN.md` (search "finish-args"), .desktop file, metainfo, icons; build locally and install it as a user Flatpak next to (not over) the dev run. **Owner checkpoint when publishing:** where the own Flatpak repo is hosted (ask once, then park as `waiting-owner` if no answer; the local build/install can go first).
-- The Flatpak must reach host emulators through `flatpak-spawn --host` (`HostShell.kt`), so it needs `--talk-name=org.freedesktop.Flatpak`; ROMs default to `~/Games/Argosy` (needs a filesystem grant for it); RetroArch cfg/saves are read on the host paths in step 6 notes.
+- Done (part 1): `desktopApp/flatpak/` (manifest `io.github.stealthx3.ArgosyDesktop.yml`, wrapper, .desktop, metainfo; icons from `argosy_icon.svg`), jlink modules in `desktopApp/build.gradle.kts`. `scripts/desktop/flatpak/build-alpha.sh [--no-gradle]` (Gradle `createDistributable` → `flatpak run org.flatpak.Builder` into `build/flatpak/repo` → user install → lint), about 2 min; run it through `quiet.sh`. `flatpak-shot.sh <out.png> [settle] [WxH]` runs the installed app and screenshots it. Installed for the user; its data is `~/.var/app/io.github.stealthx3.ArgosyDesktop` (fresh: wizard), separate from the dev run. Lint errors are Flathub-only (DEVLOG "Step 10, part 1").
+- Save-folder grants are explicit (`~/Emulation`, each mapped emulator's `~/.var/app/<id>`, native xdg folders); `PORT_PLAN.md` updated. SD-card EmuDeck links stay unreadable (step 11 note).
+- **Next action (part 2):** walk the installed Flatpak like the step 9 fresh walk: wizard (pair with the testbed, `~/Games/Argosy`, Permissions step: every emulator Flatpak here already has `host`/`home`, so expect no override) to Home; then from inside the sandbox: emulator detection lists RetroArch, download one testbed GB game to `~/Games/Argosy`, Play (RetroArch via `flatpak-spawn --host`), `pkill -x retroarch`, return, session recorded; one save upload with GET /api/saves and negotiate `no_op` twice (Battery Bay recipe in Step 6 notes). `pad-walk.sh desktop` drives the dev run only: add a Flatpak target (run `flatpak run ... --key-pipe=<fifo>`; the fifo must be under a granted path or the app's own dir) or adapt `fresh-walk.sh`. The Flatpak's RomM pairing makes a second device row in the testbed (fine). Stop the app with `flatpak kill io.github.stealthx3.ArgosyDesktop`.
+- **Owner questions (asked 2026-10-23, record answers here):** (1) where the own Flatpak repo is hosted (e.g. GitHub Pages of `Stealthx3/argosy-desktop`, or another host); (2) app id: Flathub derives the repo `github.com/stealthx3/argosydesktop` from `io.github.stealthx3.ArgosyDesktop`; keep it (and rename/alias the repo for Flathub later) or switch now to `io.github.stealthx3.argosy_desktop` (a later switch moves the sandbox data dir). Publishing waits on (1); park `waiting-owner` only when nothing else is left.
 
 ## Step 9 closed: what carries
 
@@ -68,7 +70,7 @@ Emulator registry, host launch, save paths, Apps tab, Quick Settings; Flatpak fr
 
 ## Owner checkpoints already known (ask when reached, one question each)
 
-- Step 10: where the own Flatpak repo is hosted. Step 11: which Fedora/SteamOS machines or VMs.
+- Step 10: repo hosting and app id (asked, see Step 10). Step 11: which Fedora/SteamOS machines or VMs.
 
 ## Carried forward
 

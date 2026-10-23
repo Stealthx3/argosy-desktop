@@ -147,8 +147,9 @@ The package is one Flatpak holding a trimmed Java runtime, Argosy Desktop and it
 | `--socket=pulseaudio` | UI sounds, BGM, video |
 | `--filesystem=~/Games/Argosy:create` | Shared ROM and BIOS library at a host path both Argosy and emulators can see |
 | `--talk-name=org.freedesktop.Flatpak` | `flatpak-spawn --host` to start emulators and list installed Flatpaks |
+| Emulator save folders (`~/Emulation`, each mapped emulator's `~/.var/app/<id>`, its native `xdg-config`/`xdg-data` folder) | Save sync reads and writes saves and states where the emulators keep them (alpha, Phase 3 step 10); Flathub needs an exception or a portal-free alternative (Phase 5) |
 
-No `--filesystem=home`. Secrets use libsecret, which falls back to the Secret portal inside the sandbox. Database, settings and cache live under `~/.var/app/<app-id>/`.
+No `--filesystem=home`; the emulator save folders are granted one by one. Secrets use libsecret, which falls back to the Secret portal inside the sandbox. Database, settings and cache live under `~/.var/app/<app-id>/`.
 
 ### Launching emulators from the sandbox
 

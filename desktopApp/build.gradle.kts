@@ -28,5 +28,24 @@ dependencies {
 compose.desktop {
     application {
         mainClass = "com.nendo.argosy.desktop.MainKt"
+
+        nativeDistributions {
+            packageName = "argosy-desktop"
+            packageVersion = "0.3.0"
+            modules(
+                "java.instrument",
+                "java.management",
+                "java.naming",
+                "java.sql",
+                "jdk.accessibility",
+                "jdk.charsets",
+                "jdk.crypto.ec",
+                "jdk.localedata",
+                "jdk.net",
+                "jdk.security.auth",
+                "jdk.unsupported",
+                "jdk.zipfs",
+            )
+        }
     }
 }

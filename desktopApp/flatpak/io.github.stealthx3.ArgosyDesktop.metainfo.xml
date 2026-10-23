@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.stealthx3.ArgosyDesktop</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-only</project_license>
+  <name>Argosy</name>
+  <summary>Controller-first game launcher for your RomM library</summary>
+  <developer id="io.github.stealthx3">
+    <name>Argosy Desktop contributors</name>
+  </developer>
+  <description>
+    <p>
+      Argosy Desktop is the Linux port of the Argosy launcher. It browses and downloads games
+      from a RomM server, launches them in the emulators installed on your system, and keeps
+      saves, play time and achievements in sync with RomM.
+    </p>
+    <p>This is an alpha build.</p>
+  </description>
+  <launchable type="desktop-id">io.github.stealthx3.ArgosyDesktop.desktop</launchable>
+  <url type="homepage">https://github.com/Stealthx3/argosy-desktop</url>
+  <url type="bugtracker">https://github.com/Stealthx3/argosy-desktop/issues</url>
+  <categories>
+    <category>Game</category>
+  </categories>
+  <supports>
+    <control>gamepad</control>
+    <control>keyboard</control>
+  </supports>
+  <content_rating type="oars-1.1"/>
+  <releases>
+    <release version="0.3.0" date="2026-10-23" type="development">
+      <description>
+        <p>First alpha: emulator detection, host launch, play sessions and save sync on Linux.</p>
+      </description>
+    </release>
+  </releases>
+</component>
