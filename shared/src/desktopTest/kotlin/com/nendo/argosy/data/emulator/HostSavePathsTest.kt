@@ -63,4 +63,27 @@ class HostSavePathsTest {
         val ryujinx = SavePathRegistry.getConfig("ryujinx")!!
         assertTrue(SavePathRegistry.resolvePathWithPackage(ryujinx, null).none { "{package}" in it })
     }
+
+    @Test
+    fun registryResolvesLinuxStateFolders() {
+        val ppsspp = StatePathRegistry.getConfig("ppsspp")!!
+        assertEquals(
+            listOf(
+                "${home.path}/Emulation/saves/ppsspp/states",
+                "${home.path}/.var/app/org.ppsspp.PPSSPP/config/ppsspp/PSP/PPSSPP_STATE",
+                "${home.path}/.config/ppsspp/PSP/PPSSPP_STATE"
+            ),
+            StatePathRegistry.resolvePath(ppsspp, "psp")
+        )
+        val native = File(home, ".local/share/duckstation/savestates").apply { mkdirs() }
+        val duckstation = StatePathRegistry.getConfig("duckstation")!!
+        assertEquals(native.path, StatePathRegistry.resolvePath(duckstation, "psx").first())
+        assertTrue(HostSavePaths.stateDirectories("dolphin")!!.all { it.endsWith("StateSaves") })
+    }
+
+    @Test
+    fun unmappedStateConfigsKeepTheirTemplates() {
+        assertNull(HostSavePaths.stateDirectories("melonds"))
+        assertNull(HostSavePaths.stateDirectories("retroarch"))
+    }
 }

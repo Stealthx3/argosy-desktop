@@ -9,7 +9,8 @@ import java.io.File
  * EmuDeck's `~/Emulation/saves/<emu>` links follow the folders EmuDeck configured, so they come
  * first, then the Flatpak tree (detection's Flatpak > AppImage > PATH order), then the native one.
  * Folders that exist come before ones that do not, keeping that order within each.
- * melonDS (saves beside the ROM) and Rosalie's Mupen GUI (no GameData tree) are left out.
+ * melonDS (saves and states beside the ROM) and Rosalie's Mupen GUI (no GameData tree) are left
+ * out. State folders cover the [StatePathRegistry] configs whose emulator runs on Linux.
  */
 actual object HostSavePaths {
     private val home: String get() = System.getProperty("user.home")
@@ -65,6 +66,21 @@ actual object HostSavePaths {
         else -> null
     }
 
+    private fun stateTemplates(configId: String): List<String>? = when (configId) {
+        "dolphin" -> dolphin("StateSaves")
+        "duckstation" -> folders(
+            "duckstation/states",
+            "org.duckstation.DuckStation", "data/duckstation/savestates",
+            ".local/share/duckstation/savestates"
+        )
+        "ppsspp" -> folders(
+            "ppsspp/states",
+            "org.ppsspp.PPSSPP", "config/ppsspp/PSP/PPSSPP_STATE",
+            ".config/ppsspp/PSP/PPSSPP_STATE"
+        )
+        else -> null
+    }
+
     private fun dolphin(tree: String) = folders(
         "dolphin/$tree",
         "org.DolphinEmu.dolphin-emu", "data/dolphin-emu/$tree",
@@ -78,9 +94,12 @@ actual object HostSavePaths {
             native.forEach { add("$home/$it") }
         }
 
-    actual fun saveDirectories(configId: String): List<String>? =
-        templates(configId)?.let { paths ->
-            val (present, absent) = paths.partition { File(it).isDirectory }
-            present + absent
-        }
+    private fun existingFirst(paths: List<String>): List<String> {
+        val (present, absent) = paths.partition { File(it).isDirectory }
+        return present + absent
+    }
+
+    actual fun saveDirectories(configId: String): List<String>? = templates(configId)?.let(::existingFirst)
+
+    actual fun stateDirectories(configId: String): List<String>? = stateTemplates(configId)?.let(::existingFirst)
 }

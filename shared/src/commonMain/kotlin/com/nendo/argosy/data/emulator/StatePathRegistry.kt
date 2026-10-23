@@ -387,12 +387,13 @@ object StatePathRegistry {
             null
         }
 
-        val paths = config.defaultPaths.map { path ->
+        val templates = HostSavePaths.stateDirectories(config.emulatorId) ?: config.defaultPaths
+        val paths = templates.map { path ->
             expandPath(path, core)
         }
 
         if (core != null) {
-            val withoutCore = config.defaultPaths.map { path ->
+            val withoutCore = templates.map { path ->
                 expandPath(path.replace("/{core}", "").replace("{core}", ""))
             }
             return paths + withoutCore
