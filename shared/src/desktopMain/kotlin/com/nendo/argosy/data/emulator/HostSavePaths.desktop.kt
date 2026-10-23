@@ -1,5 +1,6 @@
 package com.nendo.argosy.data.emulator
 
+import com.nendo.argosy.data.storage.DesktopFileAccessLayer
 import java.io.File
 
 /**
@@ -11,6 +12,10 @@ import java.io.File
  * Folders that exist come before ones that do not, keeping that order within each.
  * melonDS (saves and states beside the ROM) and Rosalie's Mupen GUI (no GameData tree) are left
  * out. State folders cover the [StatePathRegistry] configs whose emulator runs on Linux.
+ * Any other config keeps only its app-private templates (`{filesDir}`, `{builtinSaves}`) and its
+ * RetroArch ones, whose `RetroArch/saves` and `RetroArch/states` roots become the host RetroArch's
+ * own folders; a phone folder (`~/Android/data/...`, `~/DraStic/...`, `/data/data/...`) names nothing here,
+ * and a save download would otherwise create it in the home folder.
  */
 actual object HostSavePaths {
     private val home: String get() = System.getProperty("user.home")
@@ -99,7 +104,34 @@ actual object HostSavePaths {
         return present + absent
     }
 
-    actual fun saveDirectories(configId: String): List<String>? = templates(configId)?.let(::existingFirst)
+    private fun retroArchDirectory(name: String): String {
+        val cfg = RetroArchHostLayout.configPaths("", emptyList()).map(::File).firstOrNull { it.isFile }
+        val parser = RetroArchConfigParser(DesktopFileAccessLayer())
+        val configured = when (name) {
+            "saves" -> cfg?.let { parser.parseFile(it).savefileDirectory }
+            else -> cfg?.let { parser.parseStateConfigFromFile(it).savestateDirectory }
+        }
+        return configured ?: RetroArchHostLayout.defaultDirectory("", name)
+    }
 
-    actual fun stateDirectories(configId: String): List<String>? = stateTemplates(configId)?.let(::existingFirst)
+    private fun hostTemplates(templates: List<String>): List<String> = templates.mapNotNull { template ->
+        RETROARCH_ROOTS.firstNotNullOfOrNull { name ->
+            val root = "$EXT_STORAGE/RetroArch/$name"
+            if (template == root || template.startsWith("$root/")) {
+                retroArchDirectory(name) + template.removePrefix(root)
+            } else {
+                null
+            }
+        } ?: template.takeIf { t -> APP_PRIVATE.any { t.startsWith(it) } }
+    }.distinct()
+
+    actual fun saveDirectories(configId: String, templates: List<String>): List<String> =
+        templates(configId)?.let(::existingFirst) ?: hostTemplates(templates)
+
+    actual fun stateDirectories(configId: String, templates: List<String>): List<String> =
+        stateTemplates(configId)?.let(::existingFirst) ?: hostTemplates(templates)
+
+    private const val EXT_STORAGE = "{extStorage}"
+    private val APP_PRIVATE = listOf("{filesDir}", BUILTIN_SAVES_TOKEN)
+    private val RETROARCH_ROOTS = listOf("saves", "states")
 }
