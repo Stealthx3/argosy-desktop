@@ -58,9 +58,13 @@ actual fun PlatformResources.getQuantityString(id: Int, quantity: Int, vararg fo
 actual val LocalPlatformContext: ProvidableCompositionLocal<PlatformContext> =
     staticCompositionLocalOf { DesktopPlatformContext() }
 
-actual val PlatformContext.filesDir: java.io.File get() = platformFilesDir
+/**
+ * Like Android's `Context.getFilesDir()` and `getCacheDir()`, both create the directory when it is
+ * missing: callers write temp and state files straight into them.
+ */
+actual val PlatformContext.filesDir: java.io.File get() = platformFilesDir.also { it.mkdirs() }
 
-actual val PlatformContext.cacheDir: java.io.File get() = platformCacheDir
+actual val PlatformContext.cacheDir: java.io.File get() = platformCacheDir.also { it.mkdirs() }
 
 actual class PlatformAssets(private val root: String = ASSET_ROOT) {
     private val index: List<String> by lazy {

@@ -2,6 +2,7 @@ package com.nendo.argosy.data.local
 
 import androidx.room.useReaderConnection
 import com.nendo.argosy.data.local.entity.PlatformEntity
+import com.nendo.argosy.data.local.entity.SaveOwnershipEntity
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import java.io.File
@@ -49,5 +50,24 @@ class DesktopDatabaseFactoryTest {
             conn.usePrepared("PRAGMA user_version") { it.step(); it.getLong(0) }
         }
         assertEquals(214L, version)
+    }
+
+    @Test
+    fun upsertOfAnExistingRowUpdatesIt() = runBlocking {
+        val dao = db.saveOwnershipDao()
+        val path = "/saves/Save Point Harbor (Homebrew).srm"
+        val first = SaveOwnershipEntity(
+            savePath = path,
+            emulatorId = "retroarch",
+            ownerUserId = 1,
+            contentHash = "a",
+            updatedAt = Instant.parse("2026-10-22T00:00:00Z"),
+        )
+        dao.upsert(first)
+        val stored = dao.get(path, "retroarch")!!
+
+        dao.upsert(stored.copy(contentHash = "b"))
+
+        assertEquals("b", dao.get(path, "retroarch")?.contentHash)
     }
 }
