@@ -34,6 +34,7 @@ fun main(args: Array<String>) {
     val gamepadDispatcher = app.component.gamepadDispatcher()
     gamepadDispatcher.start()
     app.component.hostSessionWatcher().start()
+    app.component.backgroundJobs().start()
     val fontFamilyResolver = robotoFontFamilyResolver()
     val keyPipe = options.keyPipe?.let { KeyPipe(java.io.File(it), gamepadDispatcher) }?.also { it.start() }
     application {
