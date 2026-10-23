@@ -10,6 +10,8 @@ As of 2026-10-16 · Micaiah Fonken · Source of truth: the "Argosy Desktop — L
 
 > **Phase 2 results** (2026-10-22, details in `DEVLOG.md`): upstream's whole UI runs in the desktop window. `commonMain` now holds 1,720 Kotlin files and `androidMain` 243; `app` keeps 30. SDL3 gamepad input and the keyboard drive upstream's own InputDispatcher, so focus and navigation behave as on Android. Every screen reachable with the RomM testbed was walked with the same pad steps on an Android handheld emulator and on the desktop and matches (first run, Home and drawer, Game Detail and its sheets, Library, Collections, Downloads, Library Sync, Save Sync, Check-In, Apps, every Settings page, About, Changelog, file browser). Not yet opened on the desktop: Media Library/Detail (needs a Jellyfin server in the testbed), the Social screens (need an Argosy Social session), Save Timeline and the emulator rows of Per-Game Settings (need Phase 3 emulators); Search and Manage Pins have no entry point in upstream v2.24.0 on either platform. Still to check: a physical pad, Nintendo layouts and stick navigation.
 
+> **Desktop divergences** (owner decision, 2026-10-23, after a first look at the alpha): Argosy Desktop no longer aims to match Android feature for feature. Steam, Jellyfin, Argosy Social and the "Android Settings" row are removed from the desktop app; built-in emulation, netplay and dual-screen are not part of this version; Android-only screens (emulator suggestions, managed installers, GPU drivers, permissions) become Linux screens; the desktop gains a system title bar, windowed dark first launch, a full-screen setting, a Steam Input controller option, per-button navigation mapping and handheld/TV layout options. Details: "Desktop divergences" below; Phase 4 in the Roadmap now carries this work. The Android app is unchanged: every removal is a desktop-only gate, not a deletion from shared code.
+
 ## Summary
 
 Ship Argosy Desktop for Linux as a Flathub Flatpak that a user cannot tell apart from the Android app, by running Argosy's own Jetpack Compose UI on the desktop through Compose Multiplatform. Alpha from a self-hosted Flatpak repo at about week 19; 1.0 on Flathub at about week 32.
@@ -35,12 +37,12 @@ Upstream is a single-module Android app, but nearly all of it is Kotlin and Comp
 | Settings | DataStore Preferences 1.1.1 | DataStore KMP |
 | Network | Retrofit 2.9, OkHttp 4.12, Moshi, Socket.IO | Unchanged: both targets are JVM, so these stay in a shared JVM source set |
 | Images | Coil 2.7 | Coil 3 (multiplatform) |
-| Media | Media3/ExoPlayer (Jellyfin, video wallpaper) | libmpv rendered into a Compose surface |
+| Media | Media3/ExoPlayer (Jellyfin, video wallpaper) | libmpv rendered into a Compose surface (video wallpaper only; Jellyfin removed on desktop) |
 | Colour extraction | Palette | Multiplatform port of Palette |
 | Background work | WorkManager 2.10 | Interface; WorkManager on Android, persistent coroutine queue on desktop |
 | Archives | commons-compress, xz, zstd-jni | Unchanged (plain JVM) |
-| Steam | JavaSteam fork + DepotDownloader | Unchanged libraries; Linux Steam library integration |
-| Built-in emulation | `libretrodroid` module | Desktop libretro frontend loading Linux cores |
+| Steam | JavaSteam fork + DepotDownloader | Removed on desktop (2026-10-23) |
+| Built-in emulation | `libretrodroid` module | Not in this version; external emulators only |
 | Resources | Android `R.*` strings and drawables | Compose Multiplatform resources |
 | Device | CameraX (QR scanner only), BLE (QuayPass only), haptics | Webcam, BlueZ, SDL rumble behind interfaces |
 
@@ -85,11 +87,78 @@ Look-alike is guaranteed by construction: the pixels come from the same composab
 
 **Media.** Jellyfin playback, trailers and video wallpaper use libmpv rendered into a Compose surface, with Argosy's existing player controls on top.
 
-**Built-in emulator.** A desktop counterpart to `libretrodroid`: a small native libretro frontend (C via JNI) that loads Linux cores, renders through OpenGL into the Compose window and reuses Argosy's in-game menu, so the built-in experience matches Android.
+**Built-in emulator.** ~~A desktop counterpart to `libretrodroid`~~ Not in this version (owner decision, 2026-10-23): the desktop launches external emulators only.
+
+## Desktop divergences (owner decision, 2026-10-23)
+
+Where Argosy Desktop deliberately differs from Android. Every item is desktop-only: shared code keeps the Android behaviour, and the desktop turns a feature off through a desktop capability (an `expect`/`actual` flag or a desktop DI binding), so the Android app, its tests and the upstream re-apply script are unaffected. Each divergence is recorded in `DEVLOG.md` when it lands.
+
+### Removed from the desktop app
+
+| Feature | What goes | How |
+| --- | --- | --- |
+| Steam | Settings → Steam (`SteamSection`), the Steam account login, Steam library import and launch, Steam rows in launch targets | Entry points hidden on desktop; JavaSteam/DepotDownloader stay out of the desktop dependency graph; Steam stubs deleted from `desktopMain` |
+| Jellyfin | Settings → Jellyfin (`JellyfinSection`), Media Library and Media Detail, offline media downloads, Storage → Media | Entry points and the media tab hidden; Jellyfin network client not bound on desktop |
+| Argosy Social | Settings → Social (`SocialSection`), the Social screens, presence and friends, social events from play sessions | Entry points hidden; the social WebSocket never connects on desktop (now-playing to RomM stays) |
+| "Android Settings" | The main Settings row that opens the device's settings (`settings_main_device_title`) | Row hidden on desktop |
+
+### Not in this version
+
+| Feature | Note |
+| --- | --- |
+| Built-in emulation (desktop libretro frontend) | External emulators only. Built-in emulator settings, core downloads and the first-run cores step are hidden on desktop |
+| Netplay | Depends on built-in emulation |
+| Dual-screen | Single window |
+
+### Linux replacements for Android-only screens
+
+| Screen | Android | Desktop |
+| --- | --- | --- |
+| Emulator suggestions | Play Store and APK suggestions per platform | Linux emulators from the desktop registry: Flathub app id first, then AppImage or native package; "Install" runs `flatpak install --user flathub <id>` on the host with the user's consent, or opens the project page for an AppImage |
+| Managed installers | Seeded APK installers (Handheld Keyboard, GameNative, DroidDeck) updated from GitHub releases | Linux-only seeds: AppImage emulators updated from their GitHub releases into `~/Applications` (marked executable, picked up by detection), and Flathub emulators shown with their installed/updatable state; the Android seeds never appear on desktop |
+| GPU drivers | Downloads and selects custom Android GPU drivers (Turnip etc.) | Read-only host GPU page: GPU name and vendor, kernel driver, Mesa/NVIDIA driver version, VRAM, OpenGL version and renderer, Vulkan API version, device type and key features, and the display(s) in use. Sources: `/sys/class/drm`, the app's own GL context, and `vulkaninfo --summary`/`glxinfo -B` on the host when present |
+| Permissions | Android runtime permissions (storage, usage stats, notifications, write settings, screen capture, overlay, live wallpaper) | Flatpak permissions, read live from the sandbox's `/.flatpak-info` (including user overrides). Each row names the Flatpak permission, shows granted or missing, explains what it is for in Flatpak terms, and offers the fix (a consented `flatpak override --user`, or the exact command / Flatseal) |
+
+Android → Flatpak permission mapping:
+
+| Android permission | Flatpak equivalent | Desktop row |
+| --- | --- | --- |
+| All files access (storage) | `--filesystem=~/Games/Argosy:create` plus each emulator save folder | ROM library folder; emulator save folders (one row per grant) |
+| Usage stats (play-session detection) | `--talk-name=org.freedesktop.Flatpak` (`flatpak-spawn --host` supervises the emulator process) | Launch and supervise host emulators |
+| Notifications | Notification portal (`org.freedesktop.portal.Notification`) | Notifications (portal; always available) |
+| Write system settings (brightness) | System bus `org.freedesktop.login1` (`SetBrightness`) and `/sys/class/backlight` | Screen brightness (only with a backlight) |
+| Screen capture | Screenshot / ScreenCast portals | Screenshots (portal) |
+| Display over other apps | none (no overlay concept) | not shown |
+| Live wallpaper | none | not shown |
+| (no Android row) | `--device=all` (gamepads), `--share=network`, `--socket=pulseaudio`, `--device=dri`, `--socket=wayland`/`x11` | Controllers, network, audio, GPU, display: shown for completeness |
+
+### New desktop features
+
+| Feature | Behaviour |
+| --- | --- |
+| Window | System title bar (decorated window) in windowed mode. First launch opens windowed and in the dark theme; later launches restore the user's choice |
+| Start in full screen | New Interface setting, off by default; consumed by `desktopApp` `Main.kt` at window creation. `--windowed`/`--fullscreen` on the command line override it; F11 toggles at runtime. Under gamescope (SteamOS/Bazzite Game Mode) the window is always full screen |
+| Steam Input | Navigation → Controller → "Steam Input" option. Default approach: use the virtual gamepad Steam Input creates (SDL3 reports it as Steam's virtual controller) and ignore the raw device behind it so input is not doubled, with Steam's layout and glyphs. Native `ISteamInput` (Steamworks SDK) only if the licence question is settled (see Open decisions) |
+| Button mapping | Navigation → "Button mapping" sub-section: one row per navigation action (Confirm, Back, Context, Secondary, Menu, Select, L1/R1, L2/R2, L3/R3, D-pad directions), each remappable to any button of the active controller, stored per controller (SDL GUID), with "Reset to default". The existing Swap A/B, X/Y and Start/Select toggles become presets over the same mapping. Keyboard bindings get the same list |
+
+### Handheld and TV layout options (to choose from)
+
+Proposed; the owner picks which ones go into Phase 4.
+
+1. **Display profile:** Handheld (7–8.8", 800p–1600p: Steam Deck, ROG Ally, Legion Go), Desktop monitor, TV (10-foot). Auto-detected from DMI product name, gamescope session and the display's physical size/EDID, overridable in Interface.
+2. **Reuse upstream's TV layout:** map the desktop window to upstream's `AspectRatioClass` so large screens get the layout Android TV already uses (no touch, controller-only paths), instead of a new layout.
+3. **Interface scale:** Auto or 75–200 % in Interface, applied as a Compose density override; Auto picks per profile (e.g. 1280×800 handheld at 100 %, 4K TV at 200 %).
+4. **Text size** independent of interface scale, for reading at couch distance.
+5. **TV safe area:** an overscan margin (0–5 %) so edges are not cut off on TVs.
+6. **Grid density:** cards per row on Home and Library (compact / standard / large), defaulting per profile.
+7. **Focus visibility:** a larger, higher-contrast focus ring and optional focus zoom for TV distance.
+8. **Navigation speed:** key-repeat delay and acceleration, stick dead zone and stick-to-D-pad threshold, per profile; trigger page jumps and letter jumps in long lists.
+9. **Touch on handhelds:** keep touch targets on touchscreen handhelds (Deck, Ally) and hide the mouse cursor while a pad is in use.
+10. **Performance on handhelds:** frame-rate cap and an option to turn off backdrop blur and animated backgrounds to save battery.
 
 ## Feature parity matrix
 
-Nothing is dropped: Port means the shared code runs as is, Adapt means the same screen and behaviour sit on a Linux implementation, and the two Defer items need a sandbox permission or a fact-finding step first.
+Port means the shared code runs as is, Adapt means the same screen and behaviour sit on a Linux implementation, Linux means the screen is replaced by a Linux one, Remove means the feature is gone from the desktop app, Later means not in this version, and the two Defer items need a sandbox permission or a fact-finding step first (owner decisions of 2026-10-23: see Desktop divergences).
 
 | Feature | Decision | Phase | Linux notes |
 | --- | --- | --- | --- |
@@ -104,24 +173,30 @@ Nothing is dropped: Port means the shared code runs as is, Adapt means the same 
 | RetroAchievements | Port | 2 | Shared code, including offline support |
 | Restart from Settings > About | Port | 2 | Relaunches the Flatpak |
 | Save sync and save channels | Port | 3 | Argosy points emulator save folders into the shared folder, as it configures RetroArch on Android |
-| Now-playing to RomM, Argosy Social | Port | 3 | Fired on launch and process exit |
+| Now-playing to RomM | Port | 3 | Fired on launch and process exit |
+| Argosy Social | Remove | 4 | Desktop divergence |
 | First-run wizard | Adapt | 3 | Same screens plus an emulator folder-access step |
 | Quick Settings (R3) | Adapt | 3 | Brightness and volume via the host; performance and fan on supported Linux handhelds |
 | Haptics | Adapt | 3 | SDL controller rumble |
 | Emulator detection, assignment, autoconfig, RetroArch cores, multi-disc | Adapt | 3 | Linux registry: Flatpak, native and AppImage emulators |
+| Emulator suggestions, managed installers | Linux | 4 | Flathub and AppImage instead of Play Store and APKs |
+| GPU drivers screen | Linux | 4 | Host GPU and API capabilities, read-only |
+| Permissions screen | Linux | 4 | Flatpak permissions and their live state |
+| Android Settings row | Remove | 4 | Desktop divergence |
+| Window, full-screen setting, Steam Input, button mapping, handheld/TV layout | Linux | 4 | New desktop features |
 | Apps tab | Adapt | 3 | Host .desktop apps, launched on the host |
-| Jellyfin media with offline downloads | Adapt | 4 | libmpv player behind Argosy's own controls |
+| Jellyfin media with offline downloads | Remove | 4 | Desktop divergence |
 | Video wallpaper | Adapt | 4 | Same libmpv surface |
-| Built-in emulation and netplay | Adapt | 4 | Desktop libretro frontend, Linux cores |
-| Steam integration | Adapt | 4 | Reads the host Steam library; launches via `steam://rungameid/` |
-| Dual-screen | Adapt | 4 | Second window on a second display |
+| Built-in emulation and netplay | Later | — | Not in this version |
+| Steam integration | Remove | 4 | Desktop divergence |
+| Dual-screen | Later | — | Not in this version |
 | In-app updater | Adapt | 5 | Same About screen; Flatpak performs the update |
 | QuayPass (BLE) | Defer | 1.1 | Needs Bluetooth access through BlueZ; decide after 1.0 |
 | Camera features (QR scanner) | Defer | 1.1 | Webcam QR scanning; manual code entry covers 1.0 |
 
 ## Flatpak design
 
-The package is one Flatpak holding a trimmed Java runtime, Argosy Desktop and its native helpers (SDL3, libmpv, the libretro frontend); it launches external emulators on the host through `flatpak-spawn --host`, the only supported way for one Flatpak to start another.
+The package is one Flatpak holding a trimmed Java runtime, Argosy Desktop and its native helpers (SDL3, libmpv); it launches external emulators on the host through `flatpak-spawn --host`, the only supported way for one Flatpak to start another.
 
 ### Manifest basics
 
@@ -131,8 +206,8 @@ The package is one Flatpak holding a trimmed Java runtime, Argosy Desktop and it
 | Runtime | `org.freedesktop.Platform` + `org.freedesktop.Sdk`, current branch |
 | SDK extensions | `openjdk` for the build and the bundled runtime |
 | Java runtime | `jlink`-trimmed JRE in `/app/jre`; JetBrains Runtime later for native Wayland |
-| Bundled modules | SDL3 and libmpv if the runtime lacks them; the libretro frontend built from source |
-| Libretro cores | Downloaded at runtime into the app's data folder, as Android downloads cores |
+| Bundled modules | SDL3 and libmpv if the runtime lacks them |
+| Libretro cores | None shipped or downloaded (no built-in emulation in this version); host RetroArch uses its own cores |
 | Architectures | x86_64 and aarch64 |
 | Updates | Flatpak updates the app; About screen keeps its look |
 
@@ -140,7 +215,7 @@ The package is one Flatpak holding a trimmed Java runtime, Argosy Desktop and it
 
 | Permission | Why |
 | --- | --- |
-| `--share=network` | RomM, Jellyfin, artwork |
+| `--share=network` | RomM, artwork |
 | `--share=ipc`, `--socket=wayland`, `--socket=x11` | Display; Java's desktop toolkit runs on X11 or XWayland until native Wayland lands |
 | `--device=dri` | GPU acceleration |
 | `--device=all` | Gamepads in `/dev/input`; switch to `--device=input` once Flathub builders and target distros all run Flatpak 1.16+ |
@@ -164,7 +239,7 @@ No `--filesystem=home`; the emulator save folders are granted one by one. Secret
 Flathub builds without network, so every dependency is pre-declared as a source:
 
 - Gradle: generate `gradle-sources.json` with [jwharm/flatpak-gradle-generator](https://github.com/jwharm/flatpak-gradle-generator) or the [meshtastic gradle-flatpak-sources](https://plugins.gradle.org/plugin/org.meshtastic.flatpak.sources) plugin, then build with `--offline` against the local Maven folder.
-- Native modules (SDL3, libmpv, the libretro frontend): pinned source archives or git commits with checksums in the manifest.
+- Native modules (SDL3, libmpv): pinned source archives or git commits with checksums in the manifest.
 - Regenerate the Gradle sources in CI on every dependency change; a stale sources file is the most common Flathub build failure.
 
 ### Store listing
@@ -175,7 +250,7 @@ Sources: [Flathub forum on launching Flatpaks from Flatpaks](https://discourse.f
 
 ## Roadmap
 
-Six phases over about 32 weeks; restructure first, then get every screen on the desktop, then replace Android services one by one, so a playable alpha exists at week 19.
+Six phases over about 32 weeks; restructure first, then get every screen on the desktop, then replace Android services one by one, so a playable alpha exists at week 19. Phase 4 was re-scoped on 2026-10-23 (Desktop divergences).
 
 | Phase | Weeks | Scope | Gate after |
 | --- | --- | --- | --- |
@@ -183,7 +258,7 @@ Six phases over about 32 weeks; restructure first, then get every screen on the 
 | 1 · Kotlin Multiplatform restructure | 3–8 | Shared modules, DI, Room and DataStore KMP, shared resources; Android app unchanged for users | — |
 | 2 · Desktop UI | 9–13 | Every screen runs on the desktop; SDL3 gamepad input; identical focus feel | — |
 | 3 · Linux services and alpha Flatpak | 14–19 | Emulator registry, host launch, save paths, Apps tab, Quick Settings; Flatpak from your own repo | Alpha: sync, download, play, save sync |
-| 4 · Remaining parity | 20–28 | libmpv media and video wallpaper, Steam, dual-screen, desktop libretro frontend and netplay | — |
+| 4 · Linux adaptation | 20–28 | libmpv video wallpaper; Desktop removals (Steam Jellyfin Social Android Settings); Linux emulator suggestions and managed installers; Host GPU screen; Flatpak permissions screen; Window title bar and full-screen setting; Steam Input controller option; Navigation button mapping; Handheld and TV layout | — |
 | 5 · Beta and Flathub | 29–32 | Side-by-side checks against Android; GNOME, KDE and SteamOS testing; Flathub submission | 1.0 live on Flathub |
 
 Exit criteria per phase:
@@ -192,8 +267,8 @@ Exit criteria per phase:
 2. **Phase 1:** `shared` builds for Android and desktop with no Android imports in `commonMain`; the Android app passes its existing tests and looks unchanged.
 3. **Phase 2:** every screen opens on the desktop and is fully navigable by gamepad; screenshots match an Android handheld at the same resolution.
 4. **Phase 3:** emulators detected on a clean Fedora and a SteamOS install; a game launches, exits and returns to Argosy; saves sync to RomM; alpha installs from your own Flatpak repo.
-5. **Phase 4:** every Port and Adapt row of the parity matrix works; built-in emulation runs at least the cores Android ships, or is moved to 1.1 by decision.
-6. **Phase 5:** testers using both apps cannot name a behavioural difference; `flatpak-builder-lint` clean; offline build green in CI for x86_64 and aarch64; Flathub PR merged.
+5. **Phase 4:** every Port, Adapt and Linux row of the parity matrix works on the desktop; every Remove row has no entry point left on the desktop and the Android app is unchanged (A/B screenshots and unit tests); the chosen handheld/TV options work on a handheld and on a TV-sized screen.
+6. **Phase 5:** testers using both apps cannot name a behavioural difference outside the listed desktop divergences; `flatpak-builder-lint` clean; offline build green in CI for x86_64 and aarch64; Flathub PR merged.
 
 ## Risks and mitigations
 
@@ -207,7 +282,8 @@ The two risks that decide the project are upstream drift and the sandbox; both a
 | Android-only calls scattered through screens (Context, toasts, R.*) | UI phase slips | Phase 0 counted them (see survey); compatibility shims in `desktopMain` for the common ones |
 | Focus feel differs on desktop | App feels different on a gamepad | Side-by-side video tests of every screen against an Android handheld before alpha |
 | Gamepad edge cases (hotplug, Steam Input remapping, handheld built-in pads) | Wrong buttons or none | SDL3 controller database; test on Steam Deck, an Xbox pad and a DualSense |
-| Desktop libretro frontend effort (video, audio sync, input, save states) | Built-in emulation slips | Scheduled last in Phase 4; may ship in 1.1 while external emulators cover 1.0 |
+| Steam Input through the Steamworks SDK | `libsteam_api` is proprietary: GPL-3.0 and Flathub conflict; only works when Steam launches Argosy | Default to Steam's virtual gamepad through SDL3; native `ISteamInput` only after the licence decision |
+| Desktop-only gates drift from upstream | A removed feature reappears after an upstream re-apply | Gates live in desktop source sets and a desktop capability; the re-apply check lists new Steam/Jellyfin/Social entry points |
 | Java toolkit on XWayland (fractional scaling, frame pacing) | Blurry or stuttery UI on Wayland desktops | Test GNOME and KDE at 125% and 150%; move to JetBrains Runtime's native Wayland toolkit if needed |
 | `--device=all` flagged potentially unsafe | Lower trust on the store page | Move to `--device=input` once Flatpak 1.16+ is universal |
 | Naming, icon and GPL-3.0 obligations | Confusion with upstream; legal exposure | Agree name and icon with rommapp; whole port GPL-3.0 with a source link in About |
@@ -219,7 +295,10 @@ Four decisions shape everything after Phase 0; settle them in the first two week
 - **Upstream or fork.** Contribute the KMP restructure to rommapp so both apps share one codebase (recommended), or keep a fork with a re-apply script.
 - **Name and app ID.** "Argosy Desktop" with upstream's blessing, under rommapp or your own GitHub account.
 - **Java runtime.** Stock OpenJDK on XWayland for 1.0, or JetBrains Runtime with native Wayland from the start.
-- **Built-in emulation timing.** In 1.0, or 1.1 with external emulators only at launch.
+- **Built-in emulation timing.** Decided 2026-10-23: not in this version; external emulators only.
+- **Steam Input approach** (open): Steam's virtual gamepad through SDL3 (recommended), or native `ISteamInput` via the Steamworks SDK (licence and Flathub implications).
+- **Handheld/TV options** (open): which of the ten options under Desktop divergences go into Phase 4.
+- **Managed installer seeds** (open): which AppImage emulators to seed (candidates: Cemu, RPCS3, PCSX2, Azahar and other emulators that publish AppImages on GitHub).
 
 Phase 0 tasks:
 
