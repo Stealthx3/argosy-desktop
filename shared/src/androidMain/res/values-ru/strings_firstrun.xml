@@ -65,6 +65,8 @@
     <string name="firstrun_permissions_usage_description">Включает точный учёт времени в игре и возобновление.</string>
     <string name="firstrun_permissions_button_continue">Продолжить</string>
     <string name="firstrun_permissions_note_optional">Остальные разрешения можно предоставить позже в настройках.</string>
+    <string name="firstrun_permissions_folder_description">Позволяет этому эмулятору открывать игры из %1$s.</string>
+    <string name="firstrun_permissions_no_flatpak_emulators">Эмуляторы во Flatpak не найдены. Эмуляторы, установленные иначе, уже могут открывать ваши игры.</string>
     <string name="firstrun_permissions_note_storage_required">Предоставьте доступ к хранилищу, чтобы продолжить. Остальные разрешения необязательны и могут быть предоставлены позже в настройках.</string>
 
     <string name="firstrun_rom_path_title">Путь к играм</string>

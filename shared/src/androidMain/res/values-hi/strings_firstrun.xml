@@ -73,6 +73,8 @@
     <string name="firstrun_permissions_usage_description">सटीक खेलने के समय की ट्रैकिंग और रिज़्यूम सक्षम करता है।</string>
     <string name="firstrun_permissions_button_continue">जारी रखें</string>
     <string name="firstrun_permissions_note_optional">आप बाकी अनुमतियां बाद में सेटिंग्स से दे सकते हैं।</string>
+    <string name="firstrun_permissions_folder_description">इस एमुलेटर को %1$s में मौजूद गेम खोलने देता है।</string>
+    <string name="firstrun_permissions_no_flatpak_emulators">कोई एमुलेटर Flatpak नहीं मिला। दूसरे तरीके से इंस्टॉल किए गए एमुलेटर आपके गेम पहले से खोल सकते हैं।</string>
     <string name="firstrun_permissions_note_storage_required">जारी रखने के लिए स्टोरेज एक्सेस दें। बाकी वैकल्पिक हैं और बाद में सेटिंग्स से दी जा सकती हैं।</string>
 
     <!-- ===== Step 5: where downloaded games are kept ===== -->

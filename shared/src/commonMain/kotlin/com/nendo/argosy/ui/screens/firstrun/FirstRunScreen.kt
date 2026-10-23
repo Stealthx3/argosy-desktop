@@ -128,6 +128,7 @@ import androidx.compose.material3.TextField
 import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.data.local.entity.PlatformEntity
 import com.nendo.argosy.ui.common.rememberStorageAccessRequest
+import com.nendo.argosy.data.model.EmulatorFolderAccess
 import com.nendo.argosy.ui.components.PermissionCard
 import com.nendo.argosy.ui.components.PlatformFilterHeader
 import com.nendo.argosy.ui.components.SwitchPreference
@@ -307,18 +308,28 @@ fun FirstRunScreen(
                     isFocused = true,
                     onContinue = { viewModel.nextStep() }
                 )
-                FirstRunStep.PERMISSIONS -> PermissionsStep(
-                    hasStorage = uiState.hasStoragePermission,
-                    hasNotifications = uiState.hasNotificationPermission,
-                    hasOverlay = uiState.hasOverlayPermission,
-                    hasUsageStats = uiState.hasUsageStatsPermission,
-                    focusedIndex = uiState.focusedIndex,
-                    onRequestStorage = requestStorage,
-                    onRequestNotifications = requestNotifications,
-                    onRequestOverlay = requestOverlay,
-                    onRequestUsageStats = requestUsageStats,
-                    onContinue = { viewModel.proceedFromPermissions() }
-                )
+                FirstRunStep.PERMISSIONS -> if (uiState.hostFolderAccessSupported) {
+                    EmulatorFolderAccessStep(
+                        emulators = uiState.emulatorFolderAccess,
+                        gamesFolder = uiState.gamesFolder,
+                        focusedIndex = uiState.focusedIndex,
+                        onGrant = { viewModel.grantEmulatorFolderAccess(it) },
+                        onContinue = { viewModel.proceedFromPermissions() }
+                    )
+                } else {
+                    PermissionsStep(
+                        hasStorage = uiState.hasStoragePermission,
+                        hasNotifications = uiState.hasNotificationPermission,
+                        hasOverlay = uiState.hasOverlayPermission,
+                        hasUsageStats = uiState.hasUsageStatsPermission,
+                        focusedIndex = uiState.focusedIndex,
+                        onRequestStorage = requestStorage,
+                        onRequestNotifications = requestNotifications,
+                        onRequestOverlay = requestOverlay,
+                        onRequestUsageStats = requestUsageStats,
+                        onContinue = { viewModel.proceedFromPermissions() }
+                    )
+                }
                 FirstRunStep.ROM_PATH -> RomPathStep(
                     currentPath = uiState.romStoragePath,
                     folderSelected = uiState.folderSelected,
@@ -977,6 +988,60 @@ private fun PermissionsStep(
             } else {
                 MaterialTheme.colorScheme.error
             }
+        )
+    }
+}
+
+@Composable
+private fun EmulatorFolderAccessStep(
+    emulators: List<EmulatorFolderAccess>,
+    gamesFolder: String,
+    focusedIndex: Int,
+    onGrant: (Int) -> Unit,
+    onContinue: () -> Unit
+) {
+    StepColumn {
+        StepHeader(title = stringResource(R.string.firstrun_permissions_title))
+        Spacer(modifier = Modifier.height(Dimens.spacingSm))
+        Text(
+            text = stringResource(R.string.firstrun_permissions_intro),
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.fillMaxWidth(0.9f)
+        )
+        Spacer(modifier = Modifier.height(Dimens.spacingMd))
+
+        Column(
+            verticalArrangement = Arrangement.spacedBy(Dimens.spacingSm),
+            modifier = Modifier.fillMaxWidth(0.9f)
+        ) {
+            if (emulators.isEmpty()) {
+                Text(
+                    text = stringResource(R.string.firstrun_permissions_no_flatpak_emulators),
+                    style = MaterialTheme.typography.bodySmall,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+            emulators.forEachIndexed { index, emulator ->
+                PermissionCard(
+                    icon = Icons.Default.Folder,
+                    title = emulator.displayName,
+                    description = stringResource(R.string.firstrun_permissions_folder_description, gamesFolder),
+                    isGranted = emulator.granted,
+                    isFocused = focusedIndex == index,
+                    onClick = { onGrant(index) }
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(Dimens.spacingLg))
+        FocusableButton(
+            text = stringResource(R.string.firstrun_permissions_button_continue),
+            isFocused = focusedIndex == emulators.size,
+            onClick = onContinue
         )
     }
 }

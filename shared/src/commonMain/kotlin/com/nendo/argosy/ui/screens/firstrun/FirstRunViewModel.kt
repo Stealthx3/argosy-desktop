@@ -20,6 +20,9 @@ import com.nendo.argosy.platform.getString
 import com.nendo.argosy.platform.packageName
 import com.nendo.argosy.platform.resources
 import com.nendo.argosy.platform.startActivity
+import com.nendo.argosy.data.emulator.HostFolderAccess
+import com.nendo.argosy.data.model.EmulatorFolderAccess
+import com.nendo.argosy.data.platform.defaultRomStorageBase
 import com.nendo.argosy.data.repository.PlatformRepository
 import com.nendo.argosy.data.local.entity.PlatformEntity
 import com.nendo.argosy.data.preferences.UserPreferencesRepository
@@ -132,6 +135,9 @@ data class FirstRunUiState(
     val hasNotificationPermission: Boolean = false,
     val hasOverlayPermission: Boolean = false,
     val hasUsageStatsPermission: Boolean = false,
+    val hostFolderAccessSupported: Boolean = false,
+    val gamesFolder: String = "",
+    val emulatorFolderAccess: List<EmulatorFolderAccess> = emptyList(),
     val rommFocusField: Int? = null,
     val platforms: List<PlatformEntity> = emptyList(),
     val platformsAll: List<PlatformEntity> = emptyList(),
@@ -160,12 +166,15 @@ class FirstRunViewModel @Inject constructor(
     private val coreManager: LibretroCoreManager,
     private val gamepadInputHandler: GamepadInputHandler,
     private val hapticManager: HapticFeedbackManager,
-    private val userCertStore: UserCertStore
+    private val userCertStore: UserCertStore,
+    private val hostFolderAccess: HostFolderAccess
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
         FirstRunUiState(
-            rommHasCamera = com.nendo.argosy.ui.components.deviceHasCamera(application)
+            rommHasCamera = com.nendo.argosy.ui.components.deviceHasCamera(application),
+            hostFolderAccessSupported = hostFolderAccess.isSupported,
+            gamesFolder = if (hostFolderAccess.isSupported) defaultRomStorageBase(application).absolutePath else ""
         )
     )
     val uiState: StateFlow<FirstRunUiState> = _uiState.asStateFlow()
@@ -470,7 +479,7 @@ class FirstRunViewModel @Inject constructor(
                     (if (state.rommSupportsDeviceAuth) 1 else 0)
             }
             FirstRunStep.ROMM_SUCCESS -> 0
-            FirstRunStep.PERMISSIONS -> 4
+            FirstRunStep.PERMISSIONS -> if (state.hostFolderAccessSupported) state.emulatorFolderAccess.size else 4
             FirstRunStep.ROM_PATH -> if (state.folderSelected) 1 else 0
             FirstRunStep.IMAGE_CACHE -> 1
             FirstRunStep.PLATFORM_SELECT -> state.platforms.size
@@ -930,6 +939,26 @@ class FirstRunViewModel @Inject constructor(
                 hasUsageStatsPermission = hasUsageStats
             )
         }
+        if (hostFolderAccess.isSupported) refreshEmulatorFolderAccess()
+    }
+
+    private fun refreshEmulatorFolderAccess() {
+        viewModelScope.launch {
+            val emulators = hostFolderAccess.emulators(_uiState.value.gamesFolder)
+            _uiState.update { it.copy(emulatorFolderAccess = emulators) }
+        }
+    }
+
+    fun grantEmulatorFolderAccess(index: Int) {
+        val state = _uiState.value
+        val emulator = state.emulatorFolderAccess.getOrNull(index) ?: return
+        if (emulator.granted) return
+        viewModelScope.launch {
+            if (!hostFolderAccess.grant(emulator.appId, state.gamesFolder)) {
+                hapticManager.vibrate(HapticPattern.BOUNDARY_HIT)
+            }
+            refreshEmulatorFolderAccess()
+        }
     }
 
     fun proceedFromPermissions() {
@@ -1004,7 +1033,13 @@ class FirstRunViewModel @Inject constructor(
                 }
             }
             FirstRunStep.ROMM_SUCCESS -> nextStep()
-            FirstRunStep.PERMISSIONS -> {
+            FirstRunStep.PERMISSIONS -> if (state.hostFolderAccessSupported) {
+                if (state.focusedIndex < state.emulatorFolderAccess.size) {
+                    grantEmulatorFolderAccess(state.focusedIndex)
+                } else {
+                    proceedFromPermissions()
+                }
+            } else {
                 when (state.focusedIndex) {
                     0 -> if (!state.hasStoragePermission) onRequestStorage()
                     1 -> if (!state.hasNotificationPermission) onRequestNotifications()

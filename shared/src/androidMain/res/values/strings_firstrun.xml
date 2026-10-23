@@ -179,6 +179,8 @@
     <!-- Note under the button once storage access has been granted. "Settings" names this app's
          own Settings screen, not the Android system settings. -->
     <string name="firstrun_permissions_note_optional">You can grant the other permissions later in Settings.</string>
+    <string name="firstrun_permissions_folder_description">Lets this emulator open the games in %1$s.</string>
+    <string name="firstrun_permissions_no_flatpak_emulators">No emulator Flatpaks found. Emulators installed another way can already open your games.</string>
     <!-- Note under the button while storage access is still missing, shown in the error colour.
          First sentence is an imperative; "The others" are the three optional permissions.
          "Settings" names this app's own Settings screen. -->

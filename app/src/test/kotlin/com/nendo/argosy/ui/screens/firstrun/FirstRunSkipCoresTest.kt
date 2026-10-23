@@ -1,6 +1,7 @@
 package com.nendo.argosy.ui.screens.firstrun
 
 import android.app.Application
+import com.nendo.argosy.data.emulator.HostFolderAccess
 import com.nendo.argosy.data.preferences.UserPreferencesRepository
 import com.nendo.argosy.data.remote.ssl.UserCertStore
 import com.nendo.argosy.libretro.LibretroCoreManager
@@ -49,7 +50,8 @@ class FirstRunSkipCoresTest {
             coreManager = coreManager,
             gamepadInputHandler = mockk(relaxed = true),
             hapticManager = mockk(relaxed = true),
-            userCertStore = certStore
+            userCertStore = certStore,
+            hostFolderAccess = HostFolderAccess()
         )
         repeat(6) { viewModel.nextStep() }
         assertEquals(FirstRunStep.CORE_PROMPT, viewModel.uiState.value.currentStep)

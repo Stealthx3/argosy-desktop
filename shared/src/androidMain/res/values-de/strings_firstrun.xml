@@ -61,6 +61,8 @@
     <string name="firstrun_permissions_usage_description">Aktiviert die genaue Erfassung der Spielzeit und die Fortsetzung.</string>
     <string name="firstrun_permissions_button_continue">Weiter</string>
     <string name="firstrun_permissions_note_optional">Die anderen Berechtigungen können Sie später in den Einstellungen erteilen.</string>
+    <string name="firstrun_permissions_folder_description">Erlaubt diesem Emulator, die Spiele in %1$s zu öffnen.</string>
+    <string name="firstrun_permissions_no_flatpak_emulators">Keine Emulator-Flatpaks gefunden. Anders installierte Emulatoren können Ihre Spiele bereits öffnen.</string>
     <string name="firstrun_permissions_note_storage_required">Erteilen Sie den Speicherzugriff, um fortzufahren. Die anderen sind optional und können später in den Einstellungen erteilt werden.</string>
 
     <string name="firstrun_rom_path_title">Spielepfad</string>

@@ -63,6 +63,8 @@
     <string name="firstrun_permissions_usage_description">Habilita el seguimiento preciso del tiempo de juego y la reanudación.</string>
     <string name="firstrun_permissions_button_continue">Continuar</string>
     <string name="firstrun_permissions_note_optional">Puedes conceder los demás permisos más tarde desde Ajustes.</string>
+    <string name="firstrun_permissions_folder_description">Permite que este emulador abra los juegos de %1$s.</string>
+    <string name="firstrun_permissions_no_flatpak_emulators">No se encontraron emuladores Flatpak. Los emuladores instalados de otra forma ya pueden abrir tus juegos.</string>
     <string name="firstrun_permissions_note_storage_required">Concede acceso al almacenamiento para continuar. Los demás son opcionales y se pueden conceder más tarde desde Ajustes.</string>
 
     <string name="firstrun_rom_path_title">Ruta de los juegos</string>
