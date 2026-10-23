@@ -4,13 +4,13 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 History and reasoning live in `DEVLOG.md`; read only the parts this file points to. Earlier phases:
 `phase-0.md`, `phase-1.md`, `phase-2.md` (closed summaries).
 
-**Updated:** 2026-10-22. Steps 1–3 done (commits "Phase 3 step 1", "Phase 3 step 2", "Phase 3 step 3"). The Phase 3 step plan (steps 1–11) is in `DEVLOG.md` under "Phase 3 · Linux services and alpha Flatpak" → "Phase 3 step plan". Nothing uncommitted. Next action: step 4 (owner checkpoint first).
+**Updated:** 2026-10-22. Steps 1–4 done (commits "Phase 3 step 1" … "Phase 3 step 4"). The Phase 3 step plan (steps 1–11) is in `DEVLOG.md` under "Phase 3 · Linux services and alpha Flatpak" → "Phase 3 step plan". Nothing uncommitted. Next action: step 5 (`BackgroundJobs` and stage 3).
 
 ## Scope and exit criterion (`PORT_PLAN.md`, Roadmap)
 
 Emulator registry, host launch, save paths, Apps tab, Quick Settings; Flatpak from the owner's own repo. Exit: emulators detected on a clean Fedora and a SteamOS install; a game launches, exits and returns to Argosy; saves sync to RomM; the alpha installs from the own Flatpak repo. Save sync is a fragile zone: live-data proof (GET /api/saves, negotiate `no_op` twice) for every door.
 
-## Done: steps 1–3 (detection, host launch, play sessions)
+## Done: steps 1–4 (detection, host launch, play sessions, save-zone inventory)
 
 - Detection: `shared/src/desktopMain/.../data/emulator/LinuxEmulators.kt` (table keyed by upstream `EmulatorDef.id`, Flatpak > AppImage > EmuDeck folder > PATH), `platform/HostShell.kt` (`flatpak-spawn --host` when sandboxed). `EmulatorDetector.linuxInstall(packageName)`. No built-in emulator on desktop (Phase 4). RetroDECK not mapped.
 - Launch: `GameLauncher.desktop.kt` → `LinuxLaunch.kt` argv (RetroArch `-L <core> <rom>`, Dolphin `-b -e`, PPSSPP, Cemu `-g`, DOSBox-X) in an intent extra → `GameActivityStarter.desktop.kt` → `platform/HostGameProcess.kt` (one supervised process, `running` StateFlow, log `~/.local/share/argosy-desktop/logs/emulator.log`). `MultiResumeLifecycle` holds the window at CREATED while it runs.
@@ -18,16 +18,23 @@ Emulator registry, host launch, save paths, Apps tab, Quick Settings; Flatpak fr
 - Walk: `pad-walk.sh desktop <dir> wait:5 X wait:4 A wait:12 ... "RUN:pkill -x retroarch" wait:6 shot:returned` (Home → Detail → Play; evidence in `build/desktop-check/p3s2-c/`).
 - Play sessions: desktop `PlaySessionTracker.desktop.kt` records the play session row, play time, RA recap facts and RomM "incomplete" (queued; `RomMConnectionManager` drains it on connect) as Android does; `HostSessionWatcher` ends the session via `SessionEndCoordinator.endClosedSession()` when `HostGameProcess` exits. Desktop differences: active play = whole session, no social events, session-end save sync reports exempt (`Skipped`) until step 6, an orphaned session is cleared without play time. Evidence `build/desktop-check/p3s3/` (`db.py`, `romm.sh`, before/after).
 
-## Next action: step 4 (`FilePaths` and save-sync stage 2)
+- Step 4 (no code change; DEVLOG "Step 4"): Phase 2's rehome passes already moved stages 2 and 4 of the save zone into `commonMain`; the `PlatformContext` stand-ins (`filesDir`, `cacheDir`, `packageManager`) are the `FilePaths` seam (Android: `Context`'s own members; desktop: `DesktopDirectories`, XDG). No separate `FilePaths` interface. **Owner approved (2026-10-22) hand edits inside the save zone for stages 2–4, each as its own change with its own live save proof** (`save-proof.sh`, GET /api/saves, negotiate `no_op` twice).
 
-- Owner checkpoint first (below): ask once whether hand edits inside the save zone are allowed for stages 2–4, then wait. Set the state file to `waiting-owner` while asking.
-- Then per the step plan in `DEVLOG.md` and `docs/desktop/save-sync-move-plan.md`: the `FilePaths` interface (Android: today's `Context` directories byte-for-byte; desktop: XDG plus the shared folder), then the stage-2 moves under the move plan's rules, with live save proof (`save-proof.sh`).
-- Moved to step 6: the Save Timeline comparison (Manage Saves needs `saveSyncEnabled`, off on the desktop; do not turn it on before desktop save paths exist), the Save Path row showing Android's `Internal/RetroArch/saves`, and the session-end save sync in the desktop tracker. Step 5 note: the pending sync queue drains on RomM connect today; a periodic drain comes with `BackgroundJobs`.
-- ROMs live under `~/.local/share/argosy-desktop/external/downloads` (host-visible unsandboxed; inside the Flatpak `~/.var/app/<id>/data/...`); step 9 moves them to `~/Games/Argosy`.
+## Next action: step 5 (`BackgroundJobs` and stage 3)
+
+- Stage 3 = the eight zone files still outside `commonMain`: `SaveSyncWorker`, `SocialSyncWorker`, `SyncForegroundService`, `SyncServiceController`, `SaveSyncDownloadObserver` (app), `RAPatchBackfillWorker`, `AchievementSubmissionWorker`, `SyncNotificationChannel` (androidMain). Start by listing their WorkManager/service uses and the commonMain callers (`RAPatchBackfillWorker.expect.kt` exists already).
+- `BackgroundJobs`: WorkManager on Android (unchanged bytecode where possible), a coroutine scheduler on desktop; add a periodic drain of the pending sync queue on desktop (it drains only on RomM connect today). Social stays out (maintainer domain); keep `SocialSyncWorker` Android-only if moving it would touch social code.
+- Any zone hand edit: its own commit and its own save proof against the plain baseline (Android gate: `testDebugUnitTest`, `assembleDebug`, `save-proof.sh`).
+
+## Step 6 notes (desktop save sync)
+
+- `AndroidDataAccessor.desktop` is all no-ops; `SaveArchiver` calls `moveDirectory` unconditionally for staged multi-root saves (~line 480), so those archives would fail on desktop: give it a plain `java.io` actual (Linux has no restricted paths). `SaveStateManager.desktop` paths are `TODO`s.
+- Android storage assumptions (`/storage/emulated`, `Environment`) in `SavePathResolver`, `SavePathRegistry`, `FolderSaveHandler`, `SigilSaveHandler`, `N3dsSaveCaseRepair`; desktop `getExternalStorageDirectory()` is `$HOME`.
+- Also step 6: the Save Timeline comparison (Manage Saves needs `saveSyncEnabled`, off on desktop; do not turn it on before desktop save paths exist), the Save Path row showing Android's `Internal/RetroArch/saves`, and the session-end save sync in the desktop tracker.
+- ROMs live under `~/.local/share/argosy-desktop/external/downloads` (inside the Flatpak `~/.var/app/<id>/data/...`); step 9 moves them to `~/Games/Argosy`.
 
 ## Owner checkpoints already known (ask when reached, one question each)
 
-- Step 4: hand edits inside the save zone (replacing `Context` with `FilePaths`) break the move plan's renames-only rule; ask once for stages 2–4 before the first zone edit.
 - Step 10: where the own Flatpak repo is hosted. Step 11: which Fedora/SteamOS machines or VMs.
 
 ## Carried forward

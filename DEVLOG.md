@@ -867,3 +867,15 @@ Mapped ids: retroarch, dolphin, cemu, azahar, ryujinx (Ryubing), eden, melonds, 
 
 **Not done here:** Save Timeline stays hidden on the desktop because `saveSyncEnabled` is off there (default false; Manage Saves needs it). Turning it on before step 6 would open pre-launch save negotiation on the desktop, so the Save Timeline comparison moves to step 6.
 
+
+### 2026-10-22 — Step 4: `FilePaths` and stage 2 were already covered by Phase 2
+
+**Owner decision:** hand edits inside the save zone are allowed for stages 2–4, each as its own change with its own live save proof (`save-proof.sh`, GET /api/saves, negotiate `no_op` twice). Recorded in `docs/desktop/save-sync-move-plan.md` (rule 1).
+
+**Finding, no code change:** the step plan was written from the Phase 1 move plan, before Phase 2's rehome passes. Those passes (commits "Phase 2: rehome mode ...", "Phase 2: externalCacheDir/dataDir stand-ins ...", "Phase 2: settings roots cleared ...") already moved the zone into `commonMain` as renames plus scripted import rewrites, each with a live save proof equal to plain v2.24.0 (`no_op=3` twice; see the Phase 2 entries). The `PlatformContext` stand-ins are the `FilePaths` seam the plan asked for: zone files use only `context.filesDir` (24), `context.cacheDir` (23) and `packageManager` (3 files), which on Android are `Context`'s own members (the extensions are shadowed, so the bytecode is unchanged) and on desktop resolve to `DesktopDirectories` (XDG data `argosy-desktop/files`, XDG cache `argosy-desktop`). Sigil-bound handlers and `Build` checks (stage 4) moved the same way. A separate `FilePaths` interface would only re-edit 25 zone files for no behaviour change, so it is not added.
+
+**What is left of the zone outside `commonMain`:** eight files, all stage 3 (WorkManager/foreground service): `SaveSyncWorker`, `SocialSyncWorker`, `SyncForegroundService`, `SyncServiceController`, `SaveSyncDownloadObserver` (app), `RAPatchBackfillWorker`, `AchievementSubmissionWorker`, `SyncNotificationChannel` (androidMain). They go with `BackgroundJobs` in step 5.
+
+**Desktop gaps found for step 6 (desktop save sync), not changed here:** `AndroidDataAccessor.desktop` is all no-ops, and `SaveArchiver` calls `moveDirectory` unconditionally for staged multi-root saves (about line 480), so archiving those would fail on the desktop; a plain `java.io` desktop actual (no restricted paths on Linux) is the fix. `SaveStateManager.desktop` paths are `TODO`s. `SavePathResolver`, `SavePathRegistry`, `FolderSaveHandler`, `SigilSaveHandler` and `N3dsSaveCaseRepair` assume Android storage paths (`/storage/emulated`, `Environment`); desktop `PlatformEnvironment.getExternalStorageDirectory()` is the home folder.
+
+**Check:** inventory by `find`/`grep` over `app`, `shared/src/{commonMain,androidMain,desktopMain}`. No source changed, so no build, test or save proof ran for this step.

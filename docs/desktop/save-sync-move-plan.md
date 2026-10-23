@@ -1,6 +1,6 @@
 # Save-sync move plan (Phase 1 and later)
 
-Status: approved by the owner 2026-10-16. Stage 1 done and live-proven (see `DEVLOG.md`). Measured 2026-10-16 on `main` after the
+Status: approved by the owner 2026-10-16. Stage 1 done and live-proven (see `DEVLOG.md`). Stages 2 and 4 were done by Phase 2's rehome passes (renames and scripted import rewrites through the `PlatformContext` stand-ins, each live-proven); stage 3 (the eight worker and foreground-service files) remains, with `BackgroundJobs` in Phase 3 step 5. Measured 2026-10-16 on `main` after the
 Phase 1 data-layer catch-up.
 
 Upstream treats save sync as a fragile zone: "every door into it (pre-launch negotiation,
@@ -46,7 +46,8 @@ memory-card parsers, `ReconcilePlan`, `SyncQueueManager`, `SaveRecoveryGate`, ..
 1. **Renames only.** Files move with `git mv` and keep their package; the only content changes are
    the existing scripted import rewrites (`PlatformLog`, `AppBuildConfig`, ...). No hand edit inside
    the zone. If a stage needs one, it becomes its own change with its own proof and the owner's
-   approval.
+   approval. The owner approved such hand edits for stages 2–4 on 2026-10-22, each as its own
+   change with its own live save proof.
 2. **One stage, one proof.** Each stage below is built, A/B-checked and live-proven before the next.
 3. **The baseline is the previous stage's APK**, plus the pre-Phase-1 APK for the first stage.
 
