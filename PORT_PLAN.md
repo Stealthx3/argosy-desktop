@@ -114,8 +114,8 @@ Where Argosy Desktop deliberately differs from Android. Every item is desktop-on
 
 | Screen | Android | Desktop |
 | --- | --- | --- |
-| Emulator suggestions | Play Store and APK suggestions per platform | Linux emulators from the desktop registry: Flathub app id first, then AppImage or native package; "Install" runs `flatpak install --user flathub <id>` on the host with the user's consent, or opens the project page for an AppImage |
-| Managed installers | Seeded APK installers (Handheld Keyboard, GameNative, DroidDeck) updated from GitHub releases | Linux-only seeds: AppImage emulators updated from their GitHub releases into `~/Applications` (marked executable, picked up by detection), and Flathub emulators shown with their installed/updatable state; the Android seeds never appear on desktop |
+| Emulator suggestions | Play Store and APK suggestions per platform | Linux emulators from the emulator compatibility database (per platform: Flathub app id, AppImage or native package, launch support, save paths): "Install" runs `flatpak install --user flathub <id>` on the host with the user's consent, or opens the project page for an AppImage |
+| Managed installers | Seeded APK installers (Handheld Keyboard, GameNative, DroidDeck) updated from GitHub releases | Linux-only, driven by the emulator compatibility database (owner decision 2026-10-23): AppImage emulators updated from their releases into `~/Applications` (marked executable, picked up by detection) and Flathub emulators shown with their installed/updatable state; the Android seeds never appear on desktop. The initial emulator list and the execution are decided in Phase 4 |
 | GPU drivers | Downloads and selects custom Android GPU drivers (Turnip etc.) | Read-only host GPU page: GPU name and vendor, kernel driver, Mesa/NVIDIA driver version, VRAM, OpenGL version and renderer, Vulkan API version, device type and key features, and the display(s) in use. Sources: `/sys/class/drm`, the app's own GL context, and `vulkaninfo --summary`/`glxinfo -B` on the host when present |
 | Permissions | Android runtime permissions (storage, usage stats, notifications, write settings, screen capture, overlay, live wallpaper) | Flatpak permissions, read live from the sandbox's `/.flatpak-info` (including user overrides). Each row names the Flatpak permission, shows granted or missing, explains what it is for in Flatpak terms, and offers the fix (a consented `flatpak override --user`, or the exact command / Flatseal) |
 
@@ -322,7 +322,7 @@ Four decisions shape everything after Phase 0; settle them in the first two week
 - **Built-in emulation timing.** Decided 2026-10-23: not in this version; external emulators only.
 - **Steam Input approach.** Decided 2026-10-23: Phase 4 builds input mode Auto / Steam Input / SDL3 on SDL3 (Steam Input listed only when available). Native `ISteamInput` is a planned revisit after 1.0 with the load-at-runtime workaround, gated on a Steam app ID (steps under "Native Steam Input: planned revisit").
 - **Handheld/TV options.** Decided 2026-10-23: display profiles (Handheld/Desktop/TV), TV layout reuse, TV safe area, touch on handhelds, and a Display setup step with thumbnail previews in the first-run wizard.
-- **Managed installer seeds** (open): which AppImage emulators to seed (candidates: Cemu, RPCS3, PCSX2, Azahar and other emulators that publish AppImages on GitHub).
+- **Emulator catalogue and managed installers.** Decided 2026-10-23: a database approach for emulator compatibility (a data-driven Linux emulator catalogue that emulator suggestions, managed installers and detection read from, instead of hard-coded seeds). Which emulators it starts with, its schema, where it lives and how it is updated are decided while planning Phase 4.
 
 Phase 0 tasks:
 

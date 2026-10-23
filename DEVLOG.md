@@ -1088,3 +1088,9 @@ Mapped ids: retroarch, dolphin, cemu, azahar, ryujinx (Ryubing), eden, melonds, 
 **Owner decision:** of the ten handheld/TV options, take 1 (display profile Handheld/Desktop/TV, auto-detected), 2 (TV profile reuses upstream's TV `AspectRatioClass` layout), 5 (TV safe area) and 9 (touch on handhelds, cursor hidden while a pad is in use); add a Display setup step to the first-run wizard where the user picks the profile from thumbnail previews.
 **Action:** `PORT_PLAN.md` "Handheld and TV layout options" replaced by "Display profiles and wizard display setup" (one row per piece, unchosen options listed as not in this version); parity rows, Phase 4 scope and exit criterion, the summary note and the open-decision entry updated.
 **Design choices to confirm when Phase 4 is planned:** the step comes first after the welcome screen so later steps already use the chosen layout; thumbnails are live miniatures of the Home composable with sample cards and the current theme rather than bundled screenshots (they follow theme and language and need no upkeep); TV safe area default 3 %; Settings → Interface → Display profile reuses the same cards.
+
+### 2026-10-23 — Plan change: emulator compatibility database (owner decision)
+
+**Owner decision:** emulator suggestions and managed installers use a database approach for emulator compatibility; the initial emulators, the schema and the overall execution are decided during Phase 4 planning.
+**Action:** `PORT_PLAN.md` emulator-suggestions and managed-installers rows and the open-decision entry (now decided in principle).
+**Note for Phase 4 planning:** today the Linux emulator facts sit in code (`LinuxEmulators.kt`, keyed by upstream `EmulatorDef.id`); the database should absorb that table so detection, suggestions and installers share one source, and must keep upstream ids and core ids exact (upstream mandate).
