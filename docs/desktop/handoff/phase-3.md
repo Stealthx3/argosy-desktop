@@ -4,24 +4,25 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 History and reasoning live in `DEVLOG.md`; read only the parts this file points to. Earlier phases:
 `phase-0.md`, `phase-1.md`, `phase-2.md` (closed summaries).
 
-**Updated:** 2026-10-22. Step 1 done (commit "Phase 3 step 1"). The Phase 3 step plan (steps 1–11) is in `DEVLOG.md` under "Phase 3 · Linux services and alpha Flatpak" → "Phase 3 step plan". Nothing uncommitted. Next action: step 2.
+**Updated:** 2026-10-22. Steps 1–2 done (commits "Phase 3 step 1", "Phase 3 step 2"). The Phase 3 step plan (steps 1–11) is in `DEVLOG.md` under "Phase 3 · Linux services and alpha Flatpak" → "Phase 3 step plan". Nothing uncommitted. Next action: step 3.
 
 ## Scope and exit criterion (`PORT_PLAN.md`, Roadmap)
 
 Emulator registry, host launch, save paths, Apps tab, Quick Settings; Flatpak from the owner's own repo. Exit: emulators detected on a clean Fedora and a SteamOS install; a game launches, exits and returns to Argosy; saves sync to RomM; the alpha installs from the own Flatpak repo. Save sync is a fragile zone: live-data proof (GET /api/saves, negotiate `no_op` twice) for every door.
 
-## Done: step 1 (detection)
+## Done: steps 1–2 (detection, host launch)
 
-- `shared/src/desktopMain/.../data/emulator/LinuxEmulators.kt`: table keyed by upstream `EmulatorDef.id` (Flathub ids verified via `https://flathub.org/api/v2/appstream/<id>`), inventory script + parsers, `findInstall` (Flatpak > AppImage > EmuDeck folder > PATH). `platform/HostShell.kt`: host commands, `flatpak-spawn --host` when sandboxed.
-- Desktop `EmulatorDetector` reports upstream defs with the Linux `displayName`; `linuxInstall(packageName): LinuxInstall?` (kind FLATPAK/APPIMAGE/NATIVE, target, version) is for the launcher. No built-in emulator on desktop (Phase 4). RetroDECK not mapped yet.
-- This host: RetroArch, Dolphin, PPSSPP, ScummVM, DOSBox-X as Flatpaks; Cemu, DuckStation, PCSX2, RPCS3, Azahar AppImages and Vita3K folder in `~/Applications` (EmuDeck layout). Per-Game Settings now shows RetroArch / Gambatte / Save Path for a GBC game (`build/desktop-check/p3s1/`). Walk: `pad-walk.sh desktop <dir> wait:5 X wait:3 DOWN*2 A` (Home → Detail → Per-Game Settings).
+- Detection: `shared/src/desktopMain/.../data/emulator/LinuxEmulators.kt` (table keyed by upstream `EmulatorDef.id`, Flatpak > AppImage > EmuDeck folder > PATH), `platform/HostShell.kt` (`flatpak-spawn --host` when sandboxed). `EmulatorDetector.linuxInstall(packageName)`. No built-in emulator on desktop (Phase 4). RetroDECK not mapped.
+- Launch: `GameLauncher.desktop.kt` → `LinuxLaunch.kt` argv (RetroArch `-L <core> <rom>`, Dolphin `-b -e`, PPSSPP, Cemu `-g`, DOSBox-X) in an intent extra → `GameActivityStarter.desktop.kt` → `platform/HostGameProcess.kt` (one supervised process, `running` StateFlow, log `~/.local/share/argosy-desktop/logs/emulator.log`). `MultiResumeLifecycle` holds the window at CREATED while it runs.
+- Not launched yet (return `LaunchResult.Error`): DuckStation, PCSX2, RPCS3, Azahar (help aborts headless: verify their CLI with a display), Vita3K (title id), ScummVM (game id), dosbox-staging; variants, multi-disc, Steam, GameNative, Android apps.
+- Walk: `pad-walk.sh desktop <dir> wait:5 X wait:4 A wait:12 ... "RUN:pkill -x retroarch" wait:6 shot:returned` (Home → Detail → Play; evidence in `build/desktop-check/p3s2-c/`).
 
-## Next action: step 2 (host launch)
+## Next action: step 3 (play sessions)
 
-- Desktop `GameLauncher.launch` (`shared/src/desktopMain/.../GameLauncher.desktop.kt`, currently `TODO`) → a `LaunchStrategy` from `EmulatorDetector.linuxInstall(def.packageName)`: Flatpak `flatpak run <id> <args>`, AppImage/native exec, all via `HostShell.hostCommand`. RetroArch: `-L <core path> <rom>`; Flatpak core dir is `~/.var/app/org.libretro.RetroArch/config/retroarch/cores/<core>_libretro.so` (verify on host). Standalone argument templates per emulator: verify each against the emulator's own docs/`--help`, never guess.
-- ROM paths must be host-visible; supervise the process until exit; lower `MultiResumeLifecycle` (`desktopApp`) to STARTED for the session, restore on exit.
-- Check: A on Play starts RetroArch on a testbed ROM, quitting returns to Argosy (screenshots of both); Home's preview does not play underneath.
-- Gaps to decide while there: RetroDECK mapping; Save Path row shows Android's `Internal/RetroArch/saves` (step 6).
+- Desktop counterparts of `PlaySessionTracker` / `GameSessionService` hooks (`grep -rn "PlaySessionTracker" shared/src/desktopMain shared/src/commonMain`): session start when `HostGameProcess` starts, end on exit; play time; now-playing to RomM. Android side: `shared/src/androidMain/.../PlaySessionTracker*`, compare what it records on return.
+- Save Timeline becomes reachable now that an emulator resolves (`SaveManagementDelegate.showSaveCacheDialog`): open it and compare with Android.
+- Check: play time and RomM now-playing on the testbed (`docs/desktop/testbed-runbook.md`).
+- Gaps to decide while there: Save Path row shows Android's `Internal/RetroArch/saves` (step 6); ROMs live under `~/.local/share/argosy-desktop/external/downloads` (host-visible unsandboxed; inside the Flatpak that becomes `~/.var/app/<id>/data/...`, still a real host path, but step 9 moves them to `~/Games/Argosy`).
 
 ## Owner checkpoints already known (ask when reached, one question each)
 
@@ -31,7 +32,6 @@ Emulator registry, host launch, save paths, Apps tab, Quick Settings; Flatpak fr
 ## Carried forward
 
 - From Phase 1: save-sync stages 2–4; Flatpak runtime `org.freedesktop.Platform` 25.08; when a move takes a generated file, update its generator in the same step (Node is not installed, so `scripts/gen-tokens.mjs` has not been run).
-- Game launch: `GameLauncher.launch` is a desktop `TODO` (A on Play throws `NotImplementedError: desktop: launch`). Save Timeline becomes reachable once an emulator resolves (`SaveManagementDelegate.showSaveCacheDialog`): compare it with Android then.
 - Read `~/.config/user-dirs.dirs` for XDG Music/Download. `OpenDocument` (Backdrop custom image, Fonts import) waits for the XDG FileChooser portal. `withUserCertTrust` asks for `AndroidCAStore` (absent on a JVM): an imported cert would replace system trust; desktop never calls `userCertStore.initialize()`.
 - While the window is hidden, vsync blocks the AWT thread about 1 s per frame, and SDL pad events are posted to that thread.
 - Unverified from Phase 2: a physical pad (Nintendo layouts), stick navigation, key-repeat feel.
@@ -49,4 +49,5 @@ Emulator registry, host launch, save paths, Apps tab, Quick Settings; Flatpak fr
 - Desktop run + screenshot: `scripts/desktop/check/desktop-shot.sh`; driven run `desktop-drive.sh`; pad walks on both sides `pad-walk.sh android|desktop <dir> <steps>`.
 - Verification: `scripts/desktop/check/verify.sh`, `ab-check.sh`, `save-proof.sh`; testbed `scripts/desktop/testbed/` and `docs/desktop/testbed-runbook.md`.
 - Quiet runner: `scripts/desktop/quiet.sh <label> <command...>`. JDK: `JAVA_HOME=~/.jdks/jdk-21.0.12.1+1`.
+- Screenshots: window captures only (`shot:`). Never full-screen (`spectacle -f`, `import -window root`): this host's other monitors show the owner's private apps. `pkill -f <pattern>` inside a walk step kills the walk itself (its argv contains the pattern): use `pkill -x <name>`.
 - Gotchas (restructure scripts, DI, desktop runtime, input injection, walk recipes): `docs/desktop/gotchas.md`. Read the relevant part before touching that area.
