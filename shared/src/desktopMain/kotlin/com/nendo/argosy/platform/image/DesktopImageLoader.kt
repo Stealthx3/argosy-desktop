@@ -21,6 +21,7 @@ fun installDesktopImageLoader(rommConnectionManager: RomMConnectionManager, user
         ImageLoader.Builder(context)
             .components {
                 add(AndroidAssetFetcher.Factory())
+                add(HostAppIconFetcher.Factory())
                 add(OkHttpNetworkFetcherFactory(callFactory = { okHttpClient }))
             }
             .crossfade(true)

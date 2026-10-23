@@ -18,6 +18,33 @@ object HostShell {
     fun runScript(script: String, args: List<String> = emptyList()): String? =
         run(listOf("sh", "-c", script, "sh") + args)
 
+    fun readBytes(path: String): ByteArray? = try {
+        if (!isSandboxed) {
+            File(path).readBytes()
+        } else {
+            val process = ProcessBuilder(hostCommand(listOf("cat", path)))
+                .redirectError(ProcessBuilder.Redirect.DISCARD)
+                .start()
+            val bytes = process.inputStream.use { it.readBytes() }
+            if (process.waitFor(TIMEOUT_SECONDS, TimeUnit.SECONDS) && process.exitValue() == 0) bytes else null
+        }
+    } catch (_: Exception) {
+        null
+    }
+
+    fun spawn(args: List<String>, workingDirectory: String?) {
+        val command = if (workingDirectory != null && isSandboxed) {
+            listOf("flatpak-spawn", "--host", "--directory=$workingDirectory") + args
+        } else {
+            hostCommand(args)
+        }
+        ProcessBuilder(command)
+            .apply { if (workingDirectory != null && !isSandboxed) directory(File(workingDirectory)) }
+            .redirectOutput(ProcessBuilder.Redirect.DISCARD)
+            .redirectError(ProcessBuilder.Redirect.DISCARD)
+            .start()
+    }
+
     fun run(args: List<String>): String? = try {
         val process = ProcessBuilder(hostCommand(args))
             .redirectError(ProcessBuilder.Redirect.DISCARD)

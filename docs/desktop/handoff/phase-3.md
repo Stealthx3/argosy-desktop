@@ -4,7 +4,7 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 History and reasoning live in `DEVLOG.md`; read only the parts this file points to. Earlier phases:
 `phase-0.md`, `phase-1.md`, `phase-2.md` (closed summaries).
 
-**Updated:** 2026-10-23 (part 8). Steps 1–6 done (commits "Phase 3 step 1" … "Phase 3 step 6 (part 8)"; step 6's standalone-emulator proof waits on the owner's answer, below). The Phase 3 step plan (steps 1–11) is in `DEVLOG.md` under "Phase 3 · Linux services and alpha Flatpak" → "Phase 3 step plan". Step 6 history: DEVLOG "Step 6, part 0" … "part 8". Nothing uncommitted. Next action: step 7 (Apps tab), see below.
+**Updated:** 2026-10-23 (step 7 part 1). Steps 1–6 done (commits "Phase 3 step 1" … "Phase 3 step 6 (part 8)"; step 6's standalone-emulator proof waits on the owner's answer, below). Step 7 part 1 done (commit "Phase 3 step 7 (part 1)"). The Phase 3 step plan (steps 1–11) is in `DEVLOG.md` under "Phase 3 · Linux services and alpha Flatpak" → "Phase 3 step plan". Step 6 history: DEVLOG "Step 6, part 0" … "part 8"; step 7: "Step 7, part 1". Nothing uncommitted. Next action: step 7 part 2, see below.
 
 ## Scope and exit criterion (`PORT_PLAN.md`, Roadmap)
 
@@ -22,11 +22,11 @@ Emulator registry, host launch, save paths, Apps tab, Quick Settings; Flatpak fr
 
 - Step 5: `SaveSyncWorker.doWork` → commonMain `SaveSyncPass` (worker maps outcome to `Result`); `SaveSyncDownloadObserver` → commonMain. Desktop `data/sync/DesktopBackgroundJobs` (started in `Main.kt`): download observer, `SaveSyncPass` every 6 h, `processQueue()` every 15 min, RA patch backfill (desktop `RAPatchBackfillWorker` actual calls it). Each job waits for a RomM connection. Android-only by reason: foreground service/notification trio, `SocialSyncWorker` (social), `AchievementSubmissionWorker` (built-in libretro, Phase 4). Save proof `save-proof/p3s5` identical to baseline. Desktop pass against the connected testbed proven in step 6 part 0 (`build/desktop-check/p3s6-jobs/`: negotiate 200, reconcile, queue drain).
 
-## Next action: step 7 (Apps tab)
+## Step 7 (Apps tab): part 1 done, next part 2
 
-- Plan text (DEVLOG step plan, 7): host `.desktop` entries (XDG data dirs and Flatpak exports, read through the host when sandboxed), icons, launch on the host. Check: Apps lists and launches host apps by pad.
-- Start: `ui/screens/apps/AppsScreen.kt` + `AppsViewModel.kt` (commonMain) read `data/repository/AppsRepository` / `InstalledApp`; find its desktop actual or stub (`grep -rn 'AppsRepository\|InstalledApp' shared/src/desktopMain shared/src/commonMain/kotlin/com/nendo/argosy/data/repository`), and the `getLaunchIntentForPackage` stub (reports unsupported today). Load the code-quality skill before writing code. Compare with Android's Apps tab by A/B walk (`pad-walk.sh android|desktop`).
-- Launch through `platform/HostShell.kt` (`flatpak-spawn --host` when sandboxed); `gtk-launch <id>` or `Exec=` with field codes stripped. Hidden/NoDisplay/OnlyShowIn entries follow the desktop spec.
+- Done (DEVLOG "Step 7, part 1"): desktop `data/apps/` (`HostApplications` desktop-entry scan with spec precedence/visibility, `DesktopEntryValues` Exec decoding, `HostIcons`, `HostAppLaunch`), `AppsRepository.desktop` (system = distro `/usr` entries; Flatpak/`~/.local`/snap = user apps; `Terminal=true` left out), `HostAppIconFetcher` in `DesktopImageLoader`, desktop `startActivity` spawns the app detached; App Info/Uninstall open `appstream://<id>` (not triggered yet). Apps tab: drawer START, DOWN×7, A. On Apps: X = Show Hidden, SELECT = Options menu, A = Open.
+- **Next action (part 2):** Home tiles for apps. `GameLauncher.desktop.kt` returns `LaunchResult.NoAndroidApp` for `GameSource.ANDROID_APP`; route it through `HostApplications.find(packageName)` / `HostAppLaunch` (check how Android's launcher and `AppShortcutActions` launch an app game, and whether a play session is recorded for it). Then `InstalledAppResolver.desktop` (`getLaunchableApps`, `isAppInstalled`: stubs) and Settings → Launch Targets' app picker (`AppPickerModal`, `SettingsLaunchTargetsRouter`). Check: add an app to Home from Apps (Options → Add to Home), launch it from Home by pad.
+- Live launch walks: use a temporary probe entry in `~/.local/share/applications` named `0 Argosy Probe` (sorts first; Exec writes a marker under `build/`), remove it afterwards; never launch the owner's real apps or Steam games.
 
 ## Step 6 closed: what carries
 
