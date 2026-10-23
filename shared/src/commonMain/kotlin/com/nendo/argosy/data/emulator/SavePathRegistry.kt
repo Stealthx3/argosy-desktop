@@ -933,7 +933,8 @@ object SavePathRegistry {
             null
         }
 
-        val paths = config.defaultPaths.flatMap { path ->
+        val templates = HostSavePaths.saveDirectories(config.emulatorId) ?: config.defaultPaths
+        val paths = templates.flatMap { path ->
             expandPath(
                 path,
                 core = core,
@@ -944,7 +945,7 @@ object SavePathRegistry {
         }
 
         if (core != null) {
-            val withoutCore = config.defaultPaths.flatMap { path ->
+            val withoutCore = templates.flatMap { path ->
                 expandPath(
                     path.replace("/{core}", "").replace("{core}", ""),
                     filesDir = filesDir,
@@ -969,7 +970,8 @@ object SavePathRegistry {
             emulatorPackage ?: EmulatorRegistry.getById(config.emulatorId)?.packageName
         } else null
 
-        return config.defaultPaths.flatMap { path ->
+        val templates = HostSavePaths.saveDirectories(config.emulatorId) ?: config.defaultPaths
+        return templates.flatMap { path ->
             expandPath(
                 path,
                 packageName = packageName,
