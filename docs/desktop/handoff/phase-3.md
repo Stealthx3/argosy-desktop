@@ -4,13 +4,13 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 History and reasoning live in `DEVLOG.md`; read only the parts this file points to. Earlier phases:
 `phase-0.md`, `phase-1.md`, `phase-2.md` (closed summaries).
 
-**Updated:** 2026-10-22. Steps 1–4 done (commits "Phase 3 step 1" … "Phase 3 step 4"). The Phase 3 step plan (steps 1–11) is in `DEVLOG.md` under "Phase 3 · Linux services and alpha Flatpak" → "Phase 3 step plan". Nothing uncommitted. Next action: step 5 (`BackgroundJobs` and stage 3).
+**Updated:** 2026-10-22. Steps 1–5 done (commits "Phase 3 step 1" … "Phase 3 step 5 (part 1)"; stage 4 was already in commonMain). The Phase 3 step plan (steps 1–11) is in `DEVLOG.md` under "Phase 3 · Linux services and alpha Flatpak" → "Phase 3 step plan". Nothing uncommitted. Next action: step 6 (emulator save paths and desktop save sync).
 
 ## Scope and exit criterion (`PORT_PLAN.md`, Roadmap)
 
 Emulator registry, host launch, save paths, Apps tab, Quick Settings; Flatpak from the owner's own repo. Exit: emulators detected on a clean Fedora and a SteamOS install; a game launches, exits and returns to Argosy; saves sync to RomM; the alpha installs from the own Flatpak repo. Save sync is a fragile zone: live-data proof (GET /api/saves, negotiate `no_op` twice) for every door.
 
-## Done: steps 1–4 (detection, host launch, play sessions, save-zone inventory)
+## Done: steps 1–5 (detection, host launch, play sessions, save-zone inventory, background jobs)
 
 - Detection: `shared/src/desktopMain/.../data/emulator/LinuxEmulators.kt` (table keyed by upstream `EmulatorDef.id`, Flatpak > AppImage > EmuDeck folder > PATH), `platform/HostShell.kt` (`flatpak-spawn --host` when sandboxed). `EmulatorDetector.linuxInstall(packageName)`. No built-in emulator on desktop (Phase 4). RetroDECK not mapped.
 - Launch: `GameLauncher.desktop.kt` → `LinuxLaunch.kt` argv (RetroArch `-L <core> <rom>`, Dolphin `-b -e`, PPSSPP, Cemu `-g`, DOSBox-X) in an intent extra → `GameActivityStarter.desktop.kt` → `platform/HostGameProcess.kt` (one supervised process, `running` StateFlow, log `~/.local/share/argosy-desktop/logs/emulator.log`). `MultiResumeLifecycle` holds the window at CREATED while it runs.
@@ -20,11 +20,12 @@ Emulator registry, host launch, save paths, Apps tab, Quick Settings; Flatpak fr
 
 - Step 4 (no code change; DEVLOG "Step 4"): Phase 2's rehome passes already moved stages 2 and 4 of the save zone into `commonMain`; the `PlatformContext` stand-ins (`filesDir`, `cacheDir`, `packageManager`) are the `FilePaths` seam (Android: `Context`'s own members; desktop: `DesktopDirectories`, XDG). No separate `FilePaths` interface. **Owner approved (2026-10-22) hand edits inside the save zone for stages 2–4, each as its own change with its own live save proof** (`save-proof.sh`, GET /api/saves, negotiate `no_op` twice).
 
-## Next action: step 5 (`BackgroundJobs` and stage 3)
+- Step 5: `SaveSyncWorker.doWork` → commonMain `SaveSyncPass` (worker maps outcome to `Result`); `SaveSyncDownloadObserver` → commonMain. Desktop `data/sync/DesktopBackgroundJobs` (started in `Main.kt`): download observer, `SaveSyncPass` every 6 h, `processQueue()` every 15 min, RA patch backfill (desktop `RAPatchBackfillWorker` actual calls it). Each job waits for a RomM connection. Android-only by reason: foreground service/notification trio, `SocialSyncWorker` (social), `AchievementSubmissionWorker` (built-in libretro, Phase 4). Save proof `save-proof/p3s5` identical to baseline. Not yet seen: a desktop pass against a connected RomM.
 
-- Stage 3 = the eight zone files still outside `commonMain`: `SaveSyncWorker`, `SocialSyncWorker`, `SyncForegroundService`, `SyncServiceController`, `SaveSyncDownloadObserver` (app), `RAPatchBackfillWorker`, `AchievementSubmissionWorker`, `SyncNotificationChannel` (androidMain). Start by listing their WorkManager/service uses and the commonMain callers (`RAPatchBackfillWorker.expect.kt` exists already).
-- `BackgroundJobs`: WorkManager on Android (unchanged bytecode where possible), a coroutine scheduler on desktop; add a periodic drain of the pending sync queue on desktop (it drains only on RomM connect today). Social stays out (maintainer domain); keep `SocialSyncWorker` Android-only if moving it would touch social code.
-- Any zone hand edit: its own commit and its own save proof against the plain baseline (Android gate: `testDebugUnitTest`, `assembleDebug`, `save-proof.sh`).
+## Next action: step 6 (emulator save paths and desktop save sync)
+
+- **First re-pair the desktop:** `save-proof.sh` restores a testbed snapshot, which left the desktop's stored RomM token rejected ("Sign in again"). Re-pair with the Phase 2 p4f recipe (`pair-code.py` + `desktop-drive.sh` `RUN:`/`TYPEFILE:`; DEVLOG "Sign-in with a pairing code"). Expect this again after every save proof.
+- Then confirm `DesktopBackgroundJobs` against the connected testbed (log lines `[SaveSync] WORKER`, `Queue drain`), and work the step 6 notes below. Plan text: DEVLOG "Phase 3 step plan", item 6.
 
 ## Step 6 notes (desktop save sync)
 
