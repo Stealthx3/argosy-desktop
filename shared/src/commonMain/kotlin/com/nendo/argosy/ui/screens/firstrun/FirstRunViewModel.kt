@@ -34,6 +34,7 @@ import com.nendo.argosy.data.remote.romm.RomMResult
 import com.nendo.argosy.data.remote.ssl.UserCertStore
 import com.nendo.argosy.data.remote.romm.pollDeviceAuthUntilResolved
 import com.nendo.argosy.ui.screens.settings.RomMAuthMethod
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.isActive
@@ -55,6 +56,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
 import javax.inject.Inject
 
 enum class FirstRunStep {
@@ -171,11 +174,18 @@ class FirstRunViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
-        FirstRunUiState(
-            rommHasCamera = com.nendo.argosy.ui.components.deviceHasCamera(application),
-            hostFolderAccessSupported = hostFolderAccess.isSupported,
-            gamesFolder = if (hostFolderAccess.isSupported) defaultRomStorageBase(application).absolutePath else ""
-        )
+        if (hostFolderAccess.isSupported) {
+            val defaultFolder = defaultRomStorageBase(application).absolutePath
+            FirstRunUiState(
+                rommHasCamera = com.nendo.argosy.ui.components.deviceHasCamera(application),
+                hostFolderAccessSupported = true,
+                gamesFolder = defaultFolder,
+                romStoragePath = defaultFolder,
+                folderSelected = true
+            )
+        } else {
+            FirstRunUiState(rommHasCamera = com.nendo.argosy.ui.components.deviceHasCamera(application))
+        }
     )
     val uiState: StateFlow<FirstRunUiState> = _uiState.asStateFlow()
 
@@ -194,9 +204,12 @@ class FirstRunViewModel @Inject constructor(
             val nextStep = when (state.currentStep) {
                 FirstRunStep.WELCOME -> FirstRunStep.ROMM_LOGIN
                 FirstRunStep.ROMM_LOGIN -> FirstRunStep.ROMM_SUCCESS
-                FirstRunStep.ROMM_SUCCESS -> FirstRunStep.PERMISSIONS
-                FirstRunStep.PERMISSIONS -> FirstRunStep.ROM_PATH
-                FirstRunStep.ROM_PATH -> FirstRunStep.IMAGE_CACHE
+                FirstRunStep.ROMM_SUCCESS ->
+                    if (state.hostFolderAccessSupported) FirstRunStep.ROM_PATH else FirstRunStep.PERMISSIONS
+                FirstRunStep.PERMISSIONS ->
+                    if (state.hostFolderAccessSupported) FirstRunStep.IMAGE_CACHE else FirstRunStep.ROM_PATH
+                FirstRunStep.ROM_PATH ->
+                    if (state.hostFolderAccessSupported) FirstRunStep.PERMISSIONS else FirstRunStep.IMAGE_CACHE
                 FirstRunStep.IMAGE_CACHE -> {
                     if (state.rommPlatformCount > 10) FirstRunStep.PLATFORM_SELECT
                     else FirstRunStep.CORE_PROMPT
@@ -213,6 +226,7 @@ class FirstRunViewModel @Inject constructor(
             FirstRunStep.PLATFORM_SELECT -> loadPlatformsForSelection()
             FirstRunStep.CORE_PROMPT -> checkMissingCores()
             FirstRunStep.CORE_DOWNLOAD -> prepareCoreDownloads()
+            FirstRunStep.PERMISSIONS -> if (hostFolderAccess.isSupported) refreshEmulatorFolderAccess()
             else -> {}
         }
     }
@@ -226,9 +240,12 @@ class FirstRunViewModel @Inject constructor(
                 FirstRunStep.WELCOME -> FirstRunStep.WELCOME
                 FirstRunStep.ROMM_LOGIN -> FirstRunStep.WELCOME
                 FirstRunStep.ROMM_SUCCESS -> FirstRunStep.ROMM_LOGIN
-                FirstRunStep.PERMISSIONS -> FirstRunStep.ROMM_SUCCESS
-                FirstRunStep.ROM_PATH -> FirstRunStep.PERMISSIONS
-                FirstRunStep.IMAGE_CACHE -> FirstRunStep.ROM_PATH
+                FirstRunStep.PERMISSIONS ->
+                    if (state.hostFolderAccessSupported) FirstRunStep.ROM_PATH else FirstRunStep.ROMM_SUCCESS
+                FirstRunStep.ROM_PATH ->
+                    if (state.hostFolderAccessSupported) FirstRunStep.ROMM_SUCCESS else FirstRunStep.PERMISSIONS
+                FirstRunStep.IMAGE_CACHE ->
+                    if (state.hostFolderAccessSupported) FirstRunStep.PERMISSIONS else FirstRunStep.ROM_PATH
                 FirstRunStep.PLATFORM_SELECT -> FirstRunStep.IMAGE_CACHE
                 FirstRunStep.CORE_PROMPT -> {
                     if (state.rommPlatformCount > 10) FirstRunStep.PLATFORM_SELECT
@@ -880,14 +897,21 @@ class FirstRunViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 romStoragePath = path,
-                folderSelected = true
+                folderSelected = true,
+                gamesFolder = if (it.hostFolderAccessSupported) path else it.gamesFolder
             )
         }
     }
 
     fun proceedFromRomPath() {
         val state = _uiState.value
-        if (state.folderSelected) {
+        if (!state.folderSelected) return
+        if (state.hostFolderAccessSupported) {
+            viewModelScope.launch {
+                withContext(Dispatchers.IO) { state.romStoragePath?.let { File(it).mkdirs() } }
+                nextStep()
+            }
+        } else {
             nextStep()
         }
     }
