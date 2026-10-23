@@ -64,7 +64,7 @@ Argosy Desktop is a single JVM app whose screens, view models and data layer are
 │ Android app          │            Argosy Desktop platform layer (desktopMain)
 │ androidMain          │          │ SDL3 gamepad input, fullscreen window              │
 │ Intents, ExoPlayer   │            flatpak-spawn launcher, emulator registry
-│ WorkManager          │          │ libmpv media, libretro frontend                    │
+│ WorkManager          │          │ libmpv media                                       │
 │ libretrodroid        │            brightness, volume, rumble via the host
 └──────────────────────┘          │ Secret portal, XDG paths                           │
                                    ─ ─ ─ ─ ─ ┬ ─ ─ ─ ─ ─ ─ ┬ ─ ─ ─ ─ ─ ─ ┬ ─ ─ ─ ─ ─ ─ ─
@@ -83,11 +83,11 @@ Look-alike is guaranteed by construction: the pixels come from the same composab
 
 **Input.** Compose desktop has no gamepad support, so `desktopMain` reads controllers through SDL3 (via JNA or Java's foreign function API) and feeds the same button actions Argosy's input handling expects: D-pad, A/B/X/Y, shoulders, L3/R3, Start/Select. Keyboard maps to the same actions. Phase 0 finding: upstream already maps Android key codes to a platform-free `GamepadEvent` / `InputHandler` layer (`ui/input/GamepadInputHandler.kt`), so SDL3 only has to emit the same key codes.
 
-**Window.** Undecorated fullscreen by default (the Android app is always fullscreen), with a windowed mode for desktop use. Handheld targets such as Steam Deck Game Mode get the same layout as an Android handheld of that resolution.
+**Window.** Undecorated fullscreen by default (the Android app is always fullscreen), with a windowed mode for desktop use. Handheld targets such as Steam Deck Game Mode get the same layout as an Android handheld of that resolution. *Changed 2026-10-23 (Desktop divergences):* first launch is windowed with the system title bar and the dark theme, "Start in full screen" is a setting, and display profiles (Handheld/Desktop/TV) pick the layout.
 
-**Media.** Jellyfin playback, trailers and video wallpaper use libmpv rendered into a Compose surface, with Argosy's existing player controls on top.
+**Media.** Trailers and video wallpaper use libmpv rendered into a Compose surface, with Argosy's existing player controls on top (Jellyfin playback removed on desktop, 2026-10-23).
 
-**Built-in emulator.** ~~A desktop counterpart to `libretrodroid`~~ Not in this version (owner decision, 2026-10-23): the desktop launches external emulators only.
+**Built-in emulator.** Not in this version (owner decision, 2026-10-23): the earlier plan for a desktop counterpart to `libretrodroid` is dropped, and the desktop launches external emulators only.
 
 ## Desktop divergences (owner decision, 2026-10-23)
 
@@ -282,7 +282,7 @@ Six phases over about 32 weeks; restructure first, then get every screen on the 
 | 1 · Kotlin Multiplatform restructure | 3–8 | Shared modules, DI, Room and DataStore KMP, shared resources; Android app unchanged for users | — |
 | 2 · Desktop UI | 9–13 | Every screen runs on the desktop; SDL3 gamepad input; identical focus feel | — |
 | 3 · Linux services and alpha Flatpak | 14–19 | Emulator registry, host launch, save paths, Apps tab, Quick Settings; Flatpak from your own repo | Alpha: sync, download, play, save sync |
-| 4 · Linux adaptation | 20–28 | libmpv video wallpaper; Desktop removals (Steam Jellyfin Social Android Settings); Linux emulator suggestions and managed installers; Host GPU screen; Flatpak permissions screen; Window title bar and full-screen setting; Controller input mode (Auto Steam Input SDL3); Navigation button mapping; Display profiles and wizard display setup | — |
+| 4 · Linux adaptation | 20–28 | libmpv video wallpaper; Desktop removals (Steam / Jellyfin / Social / Android Settings); Linux emulator suggestions and managed installers; Host GPU screen; Flatpak permissions screen; Window title bar and full-screen setting; Controller input mode (Auto / Steam Input / SDL3); Navigation button mapping; Display profiles and wizard display setup | — |
 | 5 · Beta and Flathub | 29–32 | Side-by-side checks against Android; GNOME, KDE and SteamOS testing; Flathub submission | 1.0 live on Flathub |
 
 Exit criteria per phase:
