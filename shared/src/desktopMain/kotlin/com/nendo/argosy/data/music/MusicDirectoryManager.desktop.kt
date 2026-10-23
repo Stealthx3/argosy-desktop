@@ -1,6 +1,7 @@
 package com.nendo.argosy.data.music
 
 import com.nendo.argosy.data.preferences.StoragePreferencesRepository
+import com.nendo.argosy.platform.XdgUserDirs
 import com.nendo.argosy.util.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -23,9 +24,7 @@ actual class MusicDirectoryManager @Inject constructor(
     }
 
     actual fun defaultMusicDir(): File {
-        val music = System.getenv("XDG_MUSIC_DIR")?.takeIf { it.isNotBlank() }?.let(::File)
-            ?: File(System.getProperty("user.home"), "Music")
-        return File(music, "RomM")
+        return File(XdgUserDirs.music(), "RomM")
     }
 
     actual suspend fun targetFileFor(

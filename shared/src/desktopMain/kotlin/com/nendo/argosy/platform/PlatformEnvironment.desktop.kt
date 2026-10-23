@@ -10,8 +10,7 @@ actual object PlatformEnvironment {
     actual fun getExternalStorageDirectory(): File = File(System.getProperty("user.home"))
     actual fun getExternalStoragePublicDirectory(type: String): File =
         if (type == DIRECTORY_DOWNLOADS) {
-            System.getenv("XDG_DOWNLOAD_DIR")?.takeIf { it.isNotBlank() }?.let(::File)
-                ?: getExternalStorageDirectory().resolve("Downloads")
+            XdgUserDirs.download()
         } else {
             getExternalStorageDirectory().resolve(type)
         }
