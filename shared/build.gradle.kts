@@ -486,6 +486,8 @@ kotlin {
             implementation(project(":libretrodroid-api"))
             implementation(project(":graphics-shim-desktop"))
             implementation(libs.sqlite.bundled)
+            implementation(libs.dbus.java.core)
+            implementation(libs.dbus.java.transport.unixsocket)
             implementation(libs.zstd.jni)
             implementation("net.java.dev.jna:jna:5.14.0")
             implementation(libs.org.json)

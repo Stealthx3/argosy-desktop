@@ -3,9 +3,11 @@ package com.nendo.argosy.platform
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import kotlinx.coroutines.launch
 
-actual class PlatformActivityResultContract<I, O>(internal val resolve: (I) -> O)
+actual class PlatformActivityResultContract<I, O>(internal val resolve: suspend (I) -> O)
 
 actual class PlatformActivityResultLauncher<I>(private val onLaunch: (I) -> Unit) {
     actual fun launch(input: I) = onLaunch(input)
@@ -13,7 +15,7 @@ actual class PlatformActivityResultLauncher<I>(private val onLaunch: (I) -> Unit
 
 actual object PlatformActivityResultContracts {
     actual fun OpenDocument(): PlatformActivityResultContract<Array<String>, PlatformUri?> =
-        PlatformActivityResultContract { null }
+        PlatformActivityResultContract { mimeTypes -> PortalFileChooser.openFile(mimeTypes) }
 
     actual fun RequestPermission(): PlatformActivityResultContract<String, Boolean> =
         PlatformActivityResultContract { true }
@@ -29,5 +31,8 @@ actual fun <I, O> rememberLauncherForActivityResult(
 ): PlatformActivityResultLauncher<I> {
     val currentContract by rememberUpdatedState(contract)
     val currentOnResult by rememberUpdatedState(onResult)
-    return remember { PlatformActivityResultLauncher { input -> currentOnResult(currentContract.resolve(input)) } }
+    val scope = rememberCoroutineScope()
+    return remember(scope) {
+        PlatformActivityResultLauncher { input -> scope.launch { currentOnResult(currentContract.resolve(input)) } }
+    }
 }
