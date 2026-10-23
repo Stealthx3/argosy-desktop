@@ -50,6 +50,7 @@ class PlayStoreService @Inject constructor() {
     private var lastRequestTime = 0L
 
     suspend fun getAppDetails(packageName: String): Result<PlayStoreAppDetails?> = withContext(Dispatchers.IO) {
+        if (!PlayStoreAccess.available) return@withContext Result.success(null)
         throttleMutex.withLock {
             val now = System.currentTimeMillis()
             val elapsed = now - lastRequestTime
@@ -210,6 +211,7 @@ class PlayStoreService @Inject constructor() {
     }
 
     suspend fun findGameByTitle(appLabel: String): Result<PlayStoreAppDetails?> = withContext(Dispatchers.IO) {
+        if (!PlayStoreAccess.available) return@withContext Result.success(null)
         try {
             val packageIds = searchByTitle(appLabel)
             if (packageIds.isEmpty()) {

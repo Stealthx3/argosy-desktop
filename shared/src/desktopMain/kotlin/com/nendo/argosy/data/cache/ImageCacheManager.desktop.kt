@@ -1,16 +1,30 @@
 package com.nendo.argosy.data.cache
 
+import com.nendo.argosy.data.apps.HostApplications
+import com.nendo.argosy.data.apps.HostIcons
+import com.nendo.argosy.data.local.dao.GameArtDao
 import com.nendo.argosy.data.model.ArtSlot
 import com.nendo.argosy.platform.DesktopDirectories
 import com.nendo.argosy.data.model.ResolvedGameArt
+import com.nendo.argosy.platform.HostShell
+import com.nendo.argosy.util.PlatformLog as Log
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 @Singleton
-actual class ImageCacheManager @Inject constructor() {
+actual class ImageCacheManager @Inject constructor(
+    private val gameArtDao: GameArtDao
+) {
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
     actual val gameArt: StateFlow<Map<Long, ResolvedGameArt>> = kotlinx.coroutines.flow.MutableStateFlow(emptyMap())
 
     actual fun artFor(gameId: Long): ResolvedGameArt? = null
@@ -161,9 +175,26 @@ actual class ImageCacheManager @Inject constructor() {
     actual suspend fun setScreenshotAsBackground(gameId: Long, screenshotPath: String): Boolean = false
 
     actual fun queueAppIconCache(gameId: Long, packageName: String) {
+        scope.launch {
+            val path = runCatching { cacheAppIconSync(packageName) }
+                .onFailure { Log.e(TAG, "Failed to cache app icon for $packageName: ${it.message}") }
+                .getOrNull() ?: return@launch
+            gameArtDao.setCached(gameId, ArtSlot.COVER, path, null)
+        }
     }
 
-    actual suspend fun cacheAppIconSync(packageName: String): String? = null
+    actual suspend fun cacheAppIconSync(packageName: String): String? = withContext(Dispatchers.IO) {
+        val icon = HostApplications.find(packageName)?.icon ?: return@withContext null
+        val source = HostIcons.pathFor(icon) ?: return@withContext null
+        val extension = if (source.endsWith(".svg")) "svg" else "png"
+        val cached = DesktopDirectories.cache.resolve("icons").also { it.mkdirs() }
+            .resolve("appicon_${packageName.hashCode()}.$extension")
+        if (cached.length() == 0L) {
+            val bytes = HostShell.readBytes(source)?.takeIf { it.isNotEmpty() } ?: return@withContext null
+            cached.writeBytes(bytes)
+        }
+        cached.absolutePath
+    }
 
     actual suspend fun validateAndCleanCache(force: Boolean, onProgress: (suspend (phase: String, current: Int, total: Int) -> Unit)?): CacheValidationResult = CacheValidationResult(deletedFiles = 0, clearedPaths = 0)
 
@@ -172,5 +203,7 @@ actual class ImageCacheManager @Inject constructor() {
     actual suspend fun migrateFlatToSharded(onProgress: (suspend (current: Int, total: Int) -> Unit)?) {
     }
 
-    actual companion object {}
+    actual companion object {
+        private const val TAG = "ImageCacheManager"
+    }
 }
