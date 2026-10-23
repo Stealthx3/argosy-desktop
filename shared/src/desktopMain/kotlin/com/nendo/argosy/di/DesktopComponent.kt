@@ -1,5 +1,6 @@
 package com.nendo.argosy.di
 
+import com.nendo.argosy.data.emulator.HostSessionWatcher
 import com.nendo.argosy.data.local.dao.PlatformDao
 import com.nendo.argosy.data.preferences.SyncPreferencesRepository
 import com.nendo.argosy.data.remote.romm.RomMConnectionManager
@@ -33,6 +34,8 @@ interface DesktopComponent : LaunchProgressEntryPoint {
     fun gamepadDispatcher(): DesktopGamepadDispatcher
 
     fun viewModelComponentFactory(): DesktopViewModelComponent.Factory
+
+    fun hostSessionWatcher(): HostSessionWatcher
 
     @Component.Factory
     interface Factory {

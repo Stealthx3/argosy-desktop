@@ -33,6 +33,7 @@ fun main(args: Array<String>) {
     val keyDispatcher = app.component.keyDispatcher()
     val gamepadDispatcher = app.component.gamepadDispatcher()
     gamepadDispatcher.start()
+    app.component.hostSessionWatcher().start()
     val fontFamilyResolver = robotoFontFamilyResolver()
     val keyPipe = options.keyPipe?.let { KeyPipe(java.io.File(it), gamepadDispatcher) }?.also { it.start() }
     application {
