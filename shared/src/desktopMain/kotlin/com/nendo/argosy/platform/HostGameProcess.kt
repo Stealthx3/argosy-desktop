@@ -21,13 +21,14 @@ object HostGameProcess {
     private var process: Process? = null
 
     @Synchronized
-    fun start(packageName: String?, command: List<String>): Result<Unit> {
+    fun start(packageName: String?, command: List<String>, workingDirectory: String? = null): Result<Unit> {
         if (process?.isAlive == true) {
             return Result.failure(IllegalStateException("A game is already running"))
         }
         val log = DesktopDirectories.data.resolve("logs").apply { mkdirs() }.resolve("emulator.log")
         return try {
-            val started = ProcessBuilder(HostShell.hostCommand(command))
+            val started = ProcessBuilder(HostShell.hostCommand(command, workingDirectory))
+                .apply { if (workingDirectory != null && !HostShell.isSandboxed) directory(java.io.File(workingDirectory)) }
                 .redirectErrorStream(true)
                 .redirectOutput(ProcessBuilder.Redirect.to(log))
                 .start()

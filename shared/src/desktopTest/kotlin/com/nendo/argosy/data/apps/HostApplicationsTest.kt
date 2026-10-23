@@ -125,6 +125,18 @@ class HostApplicationsTest {
     }
 
     @Test
+    fun file_field_codes_take_the_given_files() {
+        val files = listOf("/roms/a b.iso", "/roms/c.iso")
+        assertEquals(
+            listOf("app", "/roms/a b.iso", "--all", "/roms/a b.iso", "/roms/c.iso", "file:///roms/a%20b.iso"),
+            DesktopEntryValues.execArguments("app %f --all %F %u", null, "App", "/x.desktop", files)
+        )
+        assertEquals(listOf("app"), DesktopEntryValues.execArguments("app %U", null, "App", "/x.desktop"))
+        assertEquals(true, DesktopEntryValues.takesFiles("app %U"))
+        assertEquals(false, DesktopEntryValues.takesFiles("app \"%f\" --flag"))
+    }
+
+    @Test
     fun icon_choice_prefers_large_hicolor_png() {
         val best = HostIcons.bestByName(
             listOf(

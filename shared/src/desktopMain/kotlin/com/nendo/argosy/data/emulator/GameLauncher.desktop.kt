@@ -1,5 +1,6 @@
 package com.nendo.argosy.data.emulator
 
+import com.nendo.argosy.data.apps.HostApplications
 import com.nendo.argosy.data.local.dao.EmulatorConfigDao
 import com.nendo.argosy.data.local.dao.GameDao
 import com.nendo.argosy.data.local.entity.GameEntity
@@ -53,8 +54,7 @@ actual class GameLauncher @Inject constructor(
         when {
             game.source == GameSource.STEAM -> return LaunchResult.Error("Steam games cannot be launched on desktop yet")
             game.source == GameSource.GAMENATIVE -> return LaunchResult.Error("GameNative games cannot be launched on desktop")
-            game.source == GameSource.ANDROID_APP || game.platformSlug == "android" ->
-                return LaunchResult.NoAndroidApp(game.packageName ?: game.title)
+            game.source == GameSource.ANDROID_APP || game.platformSlug == "android" -> return launchHostApp(game)
             game.isMultiDisc -> return LaunchResult.Error("Multi-disc games cannot be launched on desktop yet")
         }
 
@@ -71,6 +71,15 @@ actual class GameLauncher @Inject constructor(
         val packageName = emulatorResolver.getEmulatorPackageForGame(game.id, game.platformId, game.platformSlug)
         val emulator = packageName?.let { emulatorDetector.getByPackage(it) }
         val install = packageName?.let { emulatorDetector.linuxInstall(it) }
+        if (emulator == null && packageName != null && !EmulatorRegistry.isKnownPackage(packageName)) {
+            HostApplications.find(packageName)?.let { app ->
+                if (!forResume) overlayWriter.recordPlayStart(gameId, Instant.now())
+                Logger.info(TAG, "[Launch] ${romFile.name} via host app ${app.id} | gameId=$gameId | platform=${game.platformSlug}")
+                return LaunchResult.Success(
+                    LinuxLaunch.intent(app.id, HostApplications.commandFor(app, romFile.absolutePath), app.workingDirectory)
+                )
+            }
+        }
         if (emulator == null || install == null) {
             Logger.warn(TAG, "launch() failed: no host emulator for platform=${game.platformSlug} (package=$packageName)")
             return LaunchResult.NoEmulator(game.platformSlug)
@@ -93,6 +102,20 @@ actual class GameLauncher @Inject constructor(
         }
         Logger.info(TAG, "[Launch] ${romFile.name} via ${emulator.displayName} | gameId=$gameId | platform=${game.platformSlug} | ${install.kind} ${install.target}")
         return LaunchResult.Success(LinuxLaunch.intent(emulator.packageName, command))
+    }
+
+    private suspend fun launchHostApp(game: GameEntity): LaunchResult {
+        val packageName = game.packageName
+            ?: return LaunchResult.Error("Android game missing package name").also {
+                Logger.warn(TAG, "launchHostApp() failed: missing packageName")
+            }
+        val app = HostApplications.find(packageName)
+            ?: return LaunchResult.NoAndroidApp(packageName).also {
+                Logger.warn(TAG, "launchHostApp() failed: no desktop entry for $packageName")
+            }
+        overlayWriter.recordPlayStart(game.id, Instant.now())
+        Logger.info(TAG, "Launching host app: $packageName")
+        return LaunchResult.Success(LinuxLaunch.intent(app.id, app.exec, app.workingDirectory))
     }
 
     private fun findRetroArchCore(install: LinuxInstall, coreName: String): String? {

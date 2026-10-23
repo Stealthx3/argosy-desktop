@@ -7,6 +7,7 @@ data class HostApplication(
     val id: String,
     val name: String,
     val exec: List<String>,
+    val execLine: String,
     val workingDirectory: String?,
     val icon: String?,
     val path: String,
@@ -70,6 +71,13 @@ object HostApplications {
         cached = visible.associateBy { it.id }
         return visible
     }
+
+    fun commandFor(app: HostApplication, file: String): List<String> =
+        if (DesktopEntryValues.takesFiles(app.execLine)) {
+            DesktopEntryValues.execArguments(app.execLine, app.icon, app.name, app.path, listOf(file))
+        } else {
+            app.exec + file
+        }
 
     fun find(id: String): HostApplication? = cached.ifEmpty { all().associateBy { it.id } }[id]
 
@@ -163,13 +171,14 @@ object HostApplications {
     private fun Candidate.toApplication(locale: Locale): HostApplication? {
         val name = localized("Name", locale) ?: return null
         val icon = keys["Icon"]?.let(DesktopEntryValues::unescape)?.takeIf { it.isNotBlank() }
-        val exec = keys["Exec"]?.let { DesktopEntryValues.execArguments(it, icon, name, path) }
-            ?.takeIf { it.isNotEmpty() }
+        val execLine = keys["Exec"] ?: return null
+        val exec = DesktopEntryValues.execArguments(execLine, icon, name, path).takeIf { it.isNotEmpty() }
             ?: return null
         return HostApplication(
             id = id,
             name = name,
             exec = exec,
+            execLine = execLine,
             workingDirectory = keys["Path"]?.let(DesktopEntryValues::unescape)?.takeIf { it.isNotBlank() },
             icon = icon,
             path = path,

@@ -15,6 +15,13 @@ object HostShell {
     fun hostCommand(args: List<String>): List<String> =
         if (isSandboxed) listOf("flatpak-spawn", "--host") + args else args
 
+    fun hostCommand(args: List<String>, workingDirectory: String?): List<String> =
+        if (workingDirectory != null && isSandboxed) {
+            listOf("flatpak-spawn", "--host", "--directory=$workingDirectory") + args
+        } else {
+            hostCommand(args)
+        }
+
     fun runScript(script: String, args: List<String> = emptyList()): String? =
         run(listOf("sh", "-c", script, "sh") + args)
 
@@ -33,12 +40,7 @@ object HostShell {
     }
 
     fun spawn(args: List<String>, workingDirectory: String?) {
-        val command = if (workingDirectory != null && isSandboxed) {
-            listOf("flatpak-spawn", "--host", "--directory=$workingDirectory") + args
-        } else {
-            hostCommand(args)
-        }
-        ProcessBuilder(command)
+        ProcessBuilder(hostCommand(args, workingDirectory))
             .apply { if (workingDirectory != null && !isSandboxed) directory(File(workingDirectory)) }
             .redirectOutput(ProcessBuilder.Redirect.DISCARD)
             .redirectError(ProcessBuilder.Redirect.DISCARD)

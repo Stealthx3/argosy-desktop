@@ -2,7 +2,8 @@ package com.nendo.argosy.data.apps
 
 /**
  * Value decoding from the Desktop Entry Specification: string escapes, and the `Exec` key's
- * quoting and field codes. File and URL field codes expand to nothing; `%i`, `%c` and `%k` expand
+ * quoting and field codes. File and URL field codes expand to the given files (`%f`/`%u` to the
+ * first, `%F`/`%U` to all; URL codes as `file://` URIs) or to nothing; `%i`, `%c` and `%k` expand
  * to the icon, the name and the entry's own path.
  */
 object DesktopEntryValues {
@@ -29,8 +30,17 @@ object DesktopEntryValues {
         return out.toString()
     }
 
-    fun execArguments(exec: String, icon: String?, name: String, entryPath: String): List<String> =
-        splitQuoted(unescape(exec)).flatMap { expandFieldCodes(it, icon, name, entryPath) }
+    fun execArguments(
+        exec: String,
+        icon: String?,
+        name: String,
+        entryPath: String,
+        files: List<String> = emptyList()
+    ): List<String> =
+        splitQuoted(unescape(exec)).flatMap { expandFieldCodes(it, icon, name, entryPath, files) }
+
+    fun takesFiles(exec: String): Boolean =
+        splitQuoted(unescape(exec)).any { !it.quoted && it.text in FILE_CODES }
 
     private fun splitQuoted(command: String): List<Token> {
         val tokens = mutableListOf<Token>()
@@ -68,10 +78,20 @@ object DesktopEntryValues {
         return tokens
     }
 
-    private fun expandFieldCodes(token: Token, icon: String?, name: String, entryPath: String): List<String> {
+    private fun expandFieldCodes(
+        token: Token,
+        icon: String?,
+        name: String,
+        entryPath: String,
+        files: List<String>
+    ): List<String> {
         if (!token.quoted) {
             when (token.text) {
-                "%f", "%F", "%u", "%U", "%d", "%D", "%n", "%N", "%v", "%m" -> return emptyList()
+                "%f" -> return files.take(1)
+                "%F" -> return files
+                "%u" -> return files.take(1).map(::fileUri)
+                "%U" -> return files.map(::fileUri)
+                "%d", "%D", "%n", "%N", "%v", "%m" -> return emptyList()
                 "%i" -> return icon?.let { listOf("--icon", it) }.orEmpty()
             }
         }
@@ -95,7 +115,11 @@ object DesktopEntryValues {
         return listOf(out.toString())
     }
 
+    private fun fileUri(path: String): String = java.nio.file.Path.of(path).toUri().toASCIIString()
+
     private data class Token(val text: String, val quoted: Boolean)
 
     private val QUOTE_ESCAPES = setOf('"', '`', '$', '\\')
+
+    private val FILE_CODES = setOf("%f", "%F", "%u", "%U")
 }

@@ -9,6 +9,6 @@ actual class GameActivityStarter actual constructor(appContext: Context, activit
     actual fun start(request: GameLaunchRequest): Result<Unit> {
         val command = LinuxLaunch.commandOf(request.intent)
             ?: return Result.failure(UnsupportedOperationException("not available on desktop"))
-        return HostGameProcess.start(request.intent.`package`, command)
+        return HostGameProcess.start(request.intent.`package`, command, LinuxLaunch.directoryOf(request.intent))
     }
 }

@@ -9,6 +9,7 @@ import com.nendo.argosy.platform.PlatformIntentType as Intent
  */
 object LinuxLaunch {
     const val EXTRA_HOST_COMMAND = "argosy.desktop.host_command"
+    const val EXTRA_HOST_DIRECTORY = "argosy.desktop.host_directory"
 
     private const val RETROARCH_FLATPAK = "org.libretro.RetroArch"
 
@@ -69,11 +70,14 @@ object LinuxLaunch {
             ?.let { if (it.startsWith("~/")) home + it.substring(1) else it }
             ?.trimEnd('/')
 
-    fun intent(packageName: String, command: List<String>): Intent = Intent().apply {
+    fun intent(packageName: String, command: List<String>, workingDirectory: String? = null): Intent = Intent().apply {
         intentPackage = packageName
         extras[EXTRA_HOST_COMMAND] = command
+        workingDirectory?.let { extras[EXTRA_HOST_DIRECTORY] = it }
     }
 
     @Suppress("UNCHECKED_CAST")
     fun commandOf(intent: Intent): List<String>? = intent.extras[EXTRA_HOST_COMMAND] as? List<String>
+
+    fun directoryOf(intent: Intent): String? = intent.extras[EXTRA_HOST_DIRECTORY] as? String
 }
