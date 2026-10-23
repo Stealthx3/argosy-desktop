@@ -30,7 +30,7 @@ Emulator registry, host launch, save paths, Apps tab, Quick Settings; Flatpak fr
 - Done (part 3, DEVLOG "Step 10, part 3"): `scripts/desktop/flatpak/publish-repo.sh <repo-url> [gpg-key-id]` (static deltas, prune, optional signing; writes `build/flatpak/argosy-desktop.flatpakrepo` and `io.github.stealthx3.ArgosyDesktop.flatpakref`). Proven over local HTTP: install via `remote-add` of the `.flatpakrepo` and via `install --from` the `.flatpakref`; app opened Home with its sandbox data intact (`build/desktop-check/p3s10-repo/`). The app is back on the builder origin `argosydesktop-origin`; test remotes deleted. Gotchas in `docs/desktop/gotchas.md` (last line).
 - Done (part 4, DEVLOG "Step 10, part 4"): **owner answers 2026-10-23: GitHub Pages of `Stealthx3/argosy-desktop`, GPG key yes, app id kept.** Signing key `5CC88C563BCBCD4F71D096277DDEE596AEB5F186` in its own keyring `~/.local/share/argosy-desktop-signing/gnupg` (only copy: owner to back it up). Repo live at `https://stealthx3.github.io/argosy-desktop/repo/`; install: `flatpak install --user --from https://stealthx3.github.io/argosy-desktop/io.github.stealthx3.ArgosyDesktop.flatpakref`. `push-pages.sh` force-pushes a single-commit `gh-pages` (pushed ahead of `main` by necessity). Proven in a fresh `FLATPAK_USER_DIR`: gpg-verify on, Home opened (`build/desktop-check/p3s10-pages/`). Republish recipe in `docs/desktop/gotchas.md` (last line).
 - **Next action (step 11, once the owner answers which machines/VMs):** on a clean Fedora and a SteamOS install: install the alpha from the Pages `.flatpakref`, check emulator detection, launch a game, exit and return, save sync to RomM (live proof), plus the step 8/9 "verify in step 11" items. Then the phase close (handoff close, README rebuild, push `main`, `phase-gate`).
-- **Owner questions still open:** step 11 machines; step 6 standalone save proof; step 7 rows 18–30.
+- **Owner questions still open:** step 11 machine details (own Fedora + SteamOS machines, answered; hosts/access pending); step 6 standalone save proof; step 7 rows 18–30.
 
 ## Step 9 closed: what carries
 
@@ -73,7 +73,7 @@ Emulator registry, host launch, save paths, Apps tab, Quick Settings; Flatpak fr
 
 ## Owner checkpoints already known (ask when reached, one question each)
 
-- Step 10: answered (see Step 10). Step 11: which Fedora/SteamOS machines or VMs (asked 2026-10-23).
+- Step 10: answered (see Step 10). Step 11: owner answered 2026-10-23: the owner's own Fedora and SteamOS machines; details (hosts, access) to come from the owner.
 
 ## Carried forward
 
