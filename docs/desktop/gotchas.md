@@ -51,3 +51,4 @@ Collected from the Phase 1 and 2 handoffs. Read the part that matches the work i
 - Settings walks: `settings-walk.sh`, `deep-settings-walk.sh`. Captured desktop client area is 1910×1050 (compare at 0.97×).
 - The check AVD can be down after a pause: `~/Android/Sdk/emulator/emulator -avd argosy_handheld_check -port 5556 -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect`, wait for `sys.boot_completed`.
 - Desktop state persists in `~/.local/share/argosy-desktop`; runs start at Home. To drive first run again, move that folder aside (never delete it without the owner); the first-run sign-in recipe is in the p4f entry of `DEVLOG.md`.
+- `pad-walk.sh desktop <out>`: `<out>` must be repo-relative. `desktop-drive.sh` prefixes the repo root to it for the key pipe, so an absolute path makes the walk block forever opening a pipe that does not exist.

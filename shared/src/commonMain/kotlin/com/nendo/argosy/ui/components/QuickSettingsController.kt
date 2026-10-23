@@ -66,6 +66,7 @@ private data class DeviceSettings(
 private data class DisplayLevels(
     val volume: Float,
     val brightness: Float,
+    val brightnessAvailable: Boolean,
     val secondaryBrightness: Float?
 )
 
@@ -108,6 +109,7 @@ class QuickSettingsController(
         DisplayLevels(
             volume = QuickSettingsState().systemVolume,
             brightness = DEFAULT_BRIGHTNESS,
+            brightnessAvailable = true,
             secondaryBrightness = null
         )
     )
@@ -148,6 +150,7 @@ class QuickSettingsController(
             deviceSettingsEnabled = deviceSettings.hasWritePermission,
             systemVolume = displayLevels.volume,
             screenBrightness = displayLevels.brightness,
+            screenBrightnessAvailable = displayLevels.brightnessAvailable,
             secondaryBrightness = displayLevels.secondaryBrightness,
             isDualScreenActive = screens.active,
             isRolesSwapped = screens.rolesSwapped,
@@ -202,6 +205,7 @@ class QuickSettingsController(
         return DisplayLevels(
             volume = volumeController.getVolume().primary,
             brightness = brightness.primary ?: fallbackBrightness,
+            brightnessAvailable = brightness.primary != null,
             secondaryBrightness = null
         )
     }

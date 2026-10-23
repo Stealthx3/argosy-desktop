@@ -20,6 +20,7 @@ interface Sdl3Library : Library {
     fun SDL_GetGamepadVendor(gamepad: Pointer): Short
     fun SDL_GetGamepadProduct(gamepad: Pointer): Short
     fun SDL_GetGamepadPlayerIndex(gamepad: Pointer): Int
+    fun SDL_RumbleGamepad(gamepad: Pointer, lowFrequency: Short, highFrequency: Short, durationMs: Int): Byte
     fun SDL_GetGamepadGUIDForID(instanceId: Int): SdlGuid.ByValue
     fun SDL_AttachVirtualJoystick(desc: Pointer): Int
     fun SDL_DetachVirtualJoystick(instanceId: Int): Byte

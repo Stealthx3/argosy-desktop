@@ -95,7 +95,8 @@ class KeyPipe(private val pipe: File, private val gamepads: DesktopGamepadDispat
             System.err.println("key-pipe: SDL gamepad input is not running")
             return null
         }
-        return SdlVirtualPad.attach(VIRTUAL_PAD_NAME).also {
+        val rumbleLog: (Int, Int) -> Unit = { low, high -> System.err.println("key-pipe: pad rumble low=$low high=$high") }
+        return SdlVirtualPad.attach(VIRTUAL_PAD_NAME, rumbleLog).also {
             if (it == null) System.err.println("key-pipe: SDL virtual gamepad could not be attached")
             pad = it
             Thread.sleep(PAD_SETTLE_MS)

@@ -27,7 +27,8 @@ sealed interface SdlPadEvent {
 
 /**
  * Owns SDL's gamepad subsystem on one thread: SDL is initialised, pumped and every gamepad opened
- * and closed there, and [onEvent] is called on that thread for each gamepad event.
+ * and closed there, and [onEvent] is called on that thread for each gamepad event. [rumble] may be
+ * called from any thread.
  */
 class SdlGamepadSource(
     private val sdl: Sdl3Library,
@@ -43,6 +44,9 @@ class SdlGamepadSource(
     var initialized = false
         private set
 
+    @Volatile
+    private var lastActive: Int? = null
+
     fun start() {
         running = true
         Thread(::run, "sdl-gamepad").apply { isDaemon = true }.start()
@@ -52,6 +56,15 @@ class SdlGamepadSource(
 
     fun stop() {
         running = false
+    }
+
+    /**
+     * Rumbles the gamepad that last sent input (or any open one) at [low] and [high] motor
+     * strength, 0 to 65535, for [durationMs]. False when no gamepad is open or it cannot rumble.
+     */
+    fun rumble(low: Int, high: Int, durationMs: Int): Boolean = synchronized(open) {
+        val gamepad = lastActive?.let(open::get) ?: open.values.firstOrNull() ?: return false
+        sdl.SDL_RumbleGamepad(gamepad, low.toShort(), high.toShort(), durationMs) != FALSE
     }
 
     private fun run() {
@@ -66,10 +79,14 @@ class SdlGamepadSource(
         val event = Memory(Sdl3.EVENT_SIZE)
         while (running) {
             if (sdl.SDL_WaitEventTimeout(event, WAIT_MS) == FALSE) continue
-            translate(event)?.let(onEvent)
+            val padEvent = translate(event) ?: continue
+            if (padEvent is SdlPadEvent.Button || padEvent is SdlPadEvent.Axis) lastActive = padEvent.instanceId
+            onEvent(padEvent)
         }
-        open.values.forEach(sdl::SDL_CloseGamepad)
-        open.clear()
+        synchronized(open) {
+            open.values.forEach(sdl::SDL_CloseGamepad)
+            open.clear()
+        }
         sdl.SDL_Quit()
     }
 
@@ -78,7 +95,7 @@ class SdlGamepadSource(
         return when (event.getInt(0)) {
             Sdl3.EVENT_GAMEPAD_ADDED -> opened(which)
             Sdl3.EVENT_GAMEPAD_REMOVED -> {
-                open.remove(which)?.let(sdl::SDL_CloseGamepad) ?: return null
+                synchronized(open) { open.remove(which)?.let(sdl::SDL_CloseGamepad) } ?: return null
                 SdlPadEvent.Removed(which)
             }
             Sdl3.EVENT_GAMEPAD_BUTTON_DOWN, Sdl3.EVENT_GAMEPAD_BUTTON_UP -> SdlPadEvent.Button(
@@ -102,7 +119,7 @@ class SdlGamepadSource(
             Logger.warn(TAG, "SDL_OpenGamepad($instanceId) failed: ${sdl.SDL_GetError()}")
             return null
         }
-        open[instanceId] = gamepad
+        synchronized(open) { open[instanceId] = gamepad }
         val location = sdl.SDL_GetGamepadSerial(gamepad)?.takeIf { it.isNotBlank() }
             ?: sdl.SDL_GetGamepadPath(gamepad).orEmpty()
         return SdlPadEvent.Added(

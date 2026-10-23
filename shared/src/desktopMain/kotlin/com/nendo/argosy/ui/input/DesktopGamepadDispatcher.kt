@@ -31,6 +31,7 @@ class DesktopGamepadDispatcher @Inject constructor(
     private val gamepadInputHandler: GamepadInputHandler,
     private val triggerAxisKeyEmitter: TriggerAxisKeyEmitter,
     private val controllerTracker: ConnectedControllerTracker,
+    private val rumble: GamepadRumble,
 ) {
     private val axisValues = HashMap<Int, HashMap<Int, Float>>()
     private val downTimes = HashMap<Pair<Int, Int>, Long>()
@@ -44,7 +45,10 @@ class DesktopGamepadDispatcher @Inject constructor(
             Logger.warn(TAG, "SDL3 not found; gamepads unavailable")
             return false
         }
-        source = SdlGamepadSource(sdl) { event -> EventQueue.invokeLater { handle(event) } }.also { it.start() }
+        source = SdlGamepadSource(sdl) { event -> EventQueue.invokeLater { handle(event) } }.also {
+            rumble.attach(it)
+            it.start()
+        }
         return true
     }
 

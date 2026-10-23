@@ -65,6 +65,7 @@ data class QuickSettingsState(
     val deviceSettingsEnabled: Boolean = false,
     val systemVolume: Float = 1f,
     val screenBrightness: Float = 0.5f,
+    val screenBrightnessAvailable: Boolean = true,
     val secondaryBrightness: Float? = null,
     val isDualScreenActive: Boolean = false,
     val isRolesSwapped: Boolean = false,
@@ -112,7 +113,8 @@ sealed class QuickSettingsItem(
     data object Theme : QuickSettingsItem("theme", QuickSettingsPage.QUICK, QuickSettingsGroup.DISPLAY)
     data object Accent : QuickSettingsItem("accent", QuickSettingsPage.QUICK, QuickSettingsGroup.DISPLAY)
     data object ScreenBrightness : QuickSettingsItem(
-        "screenBrightness", QuickSettingsPage.QUICK, QuickSettingsGroup.DISPLAY
+        "screenBrightness", QuickSettingsPage.QUICK, QuickSettingsGroup.DISPLAY,
+        visibleWhen = { it.screenBrightnessAvailable }
     )
     data object SecondScreenBrightness : QuickSettingsItem(
         "secondScreenBrightness", QuickSettingsPage.QUICK, QuickSettingsGroup.DISPLAY,

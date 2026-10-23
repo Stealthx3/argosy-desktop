@@ -4,7 +4,7 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 History and reasoning live in `DEVLOG.md`; read only the parts this file points to. Earlier phases:
 `phase-0.md`, `phase-1.md`, `phase-2.md` (closed summaries).
 
-**Updated:** 2026-10-23 (step 7 part 3, step 7 closed). Steps 1–7 done (commits "Phase 3 step 1" … "Phase 3 step 7 (part 3)"; step 6's standalone-emulator proof waits on the owner's answer, below). The Phase 3 step plan (steps 1–11) is in `DEVLOG.md` under "Phase 3 · Linux services and alpha Flatpak" → "Phase 3 step plan". Step 6 history: DEVLOG "Step 6, part 0" … "part 8"; step 7: "Step 7, part 1" … "part 3". Nothing uncommitted. Next action: step 8 (Quick Settings and haptics), see below.
+**Updated:** 2026-10-23 (step 8, step 8 closed). Steps 1–8 done (commits "Phase 3 step 1" … "Phase 3 step 8"; step 6's standalone-emulator proof waits on the owner's answer, below). The Phase 3 step plan (steps 1–11) is in `DEVLOG.md` under "Phase 3 · Linux services and alpha Flatpak" → "Phase 3 step plan". Step 6 history: DEVLOG "Step 6, part 0" … "part 8"; step 7: "Step 7, part 1" … "part 3"; step 8: "Step 8". Nothing uncommitted. Next action: step 9 (first-run and file access), see below.
 
 ## Scope and exit criterion (`PORT_PLAN.md`, Roadmap)
 
@@ -22,11 +22,17 @@ Emulator registry, host launch, save paths, Apps tab, Quick Settings; Flatpak fr
 
 - Step 5: `SaveSyncWorker.doWork` → commonMain `SaveSyncPass` (worker maps outcome to `Result`); `SaveSyncDownloadObserver` → commonMain. Desktop `data/sync/DesktopBackgroundJobs` (started in `Main.kt`): download observer, `SaveSyncPass` every 6 h, `processQueue()` every 15 min, RA patch backfill (desktop `RAPatchBackfillWorker` actual calls it). Each job waits for a RomM connection. Android-only by reason: foreground service/notification trio, `SocialSyncWorker` (social), `AchievementSubmissionWorker` (built-in libretro, Phase 4). Save proof `save-proof/p3s5` identical to baseline. Desktop pass against the connected testbed proven in step 6 part 0 (`build/desktop-check/p3s6-jobs/`: negotiate 200, reconcile, queue drain).
 
-## Step 8 (Quick Settings and haptics): next
+## Step 9 (first-run and file access): next
 
-- Plan text (DEVLOG step plan, 8): brightness and volume through the host (backlight via logind/`brightnessctl`, volume via PipeWire/Pulse), SDL rumble for haptics; performance and fan only where a supported handheld exposes them, otherwise a capability flag that names why. Check: R3 panel changes host brightness and volume.
-- **First actions:** (1) read the desktop stubs `hardware/BrightnessController.desktop.kt`, `hardware/VolumeController.desktop.kt`, `ui/input/HapticFeedbackManager.desktop.kt`, `util/SystemSettings.desktop.kt` (all under `shared/src/desktopMain/kotlin/com/nendo/argosy/`) and the Android actuals they mirror; find the Quick Settings panel's view model and which controllers it reads. (2) Pick host commands (`wpctl`/`pactl` for volume, logind `SetBrightness` via `busctl`/`brightnessctl` for backlight; through `HostShell` so they work sandboxed) and note which this host has. (3) Open the R3 panel on Android (`pad-walk.sh android`) and desktop to compare before coding.
-- Changing host volume/brightness during a walk affects the owner's desktop: restore the original values at the end of every walk.
+- Plan text (DEVLOG step plan, 9): emulator folder-access step (with consent, `flatpak override --user --filesystem=~/Games/Argosy <id>` on the host), XDG user dirs (`~/.config/user-dirs.dirs`), the FileChooser portal for `OpenDocument`. Check: the wizard on a fresh data dir.
+- **First actions:** (1) find the first-run wizard's steps in commonMain (grep `FirstRun`/`Quickstart`/`Onboarding` under `ui/screens`) and the desktop actuals they reach (storage permission, folder pickers); list which are Android-only. (2) Read the desktop `OpenDocument` stub and the XDG Music/Download carry-forward below. (3) ROMs move from `~/.local/share/argosy-desktop/external/downloads` to `~/Games/Argosy` here: plan the move for existing rows (recovery before rejection) before coding.
+- **Fresh data dir without touching the owner's:** never delete or move `~/.local/share/argosy-desktop`. Run the wizard against a separate dir (check `DesktopDirectories` for an override such as `XDG_DATA_HOME`; add one if missing) and remove only that temporary dir afterwards.
+
+## Step 8 closed: what carries
+
+- Desktop volume (`wpctl` > `pactl`, 20 steps), backlight (`/sys/class/backlight` + logind `SetBrightness`), SDL rumble haptics (`GamepadRumble`, `SdlGamepadSource.rumble`). Brightness row hidden without a backlight (`screenBrightnessAvailable`). Performance/fan already device-gated (Phase 4: Deck/Legion TDP and fan).
+- **Verify in step 11:** a live logind brightness write on a machine with a backlight (SteamOS Deck or a Fedora laptop); rumble on a physical pad.
+- Walk recipe: R3 opens Quick Settings; Volume is DOWN×2; RIGHT/LEFT = one 5 % step. Always read `wpctl get-volume @DEFAULT_AUDIO_SINK@` before and restore it after (owner's desktop). `pad-walk.sh` out dir must be repo-relative (an absolute one hangs the walk).
 
 ## Step 7 closed: what carries
 
