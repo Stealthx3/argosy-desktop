@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# usage: pad-walk.sh android|desktop <outdir> shot:<name>|wait:<s>|TYPE:<text>|A|B|X|Y|START|SELECT|R3|UP|DOWN|LEFT|RIGHT|ENTER[*n]...
+# usage: pad-walk.sh android|desktop|flatpak <outdir> shot:<name>|wait:<s>|TYPE:<text>|A|B|X|Y|START|SELECT|R3|UP|DOWN|LEFT|RIGHT|ENTER[*n]...
 set -u
 mode=$1; out=$2; shift 2
 steps=("$@")
@@ -29,5 +29,6 @@ else
       START) d+=("PAD:START$r");; SELECT) d+=("PAD:BACK$r");; R3) d+=("PAD:RIGHT_STICK$r");; UP) d+=("PAD:DPAD_UP$r");; DOWN) d+=("PAD:DPAD_DOWN$r");;
       LEFT) d+=("PAD:DPAD_LEFT$r");; RIGHT) d+=("PAD:DPAD_RIGHT$r");; *) d+=("$s");; esac
   done
+  [ "$mode" = flatpak ] && export DRIVE_TARGET=flatpak
   scripts/desktop/check/desktop-drive.sh "$out" 40 "${d[@]}"
 fi

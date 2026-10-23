@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# usage: desktop-drive.sh <out-dir> <settle-s> <step>... [-- WxH]; step = shot:<name> | wait:<s> | <AWT VK name>[*n] | PAD:<SDL button>[*n] | PAD:<axis>=<value> | TYPE:<text> | TYPEFILE:<path> (types the file's first line, not echoed) | RUN:<command> (host command, run to completion)
+# usage: [DRIVE_TARGET=flatpak] desktop-drive.sh <out-dir> <settle-s> <step>... [-- WxH]; step = shot:<name> | wait:<s> | <AWT VK name>[*n] | PAD:<SDL button>[*n] | PAD:<axis>=<value> | TYPE:<text> | TYPEFILE:<path> (types the file's first line, not echoed) | RUN:<command> (host command, run to completion)
 set -u
 outdir=$1
 settle=$2
@@ -19,9 +19,18 @@ export JAVA_HOME=${JAVA_HOME:-$HOME/.jdks/jdk-21.0.12.1+1}
 export JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS:-} -Dskiko.vsync.enabled=false"
 mkdir -p build/desktop-logs "$outdir"
 log="build/desktop-logs/$(date +%Y%m%d-%H%M%S)-desktop-run.log"
-fifo="$outdir/key-pipe"
-rm -f "$fifo"; mkfifo "$fifo"
-./gradlew --console=plain :desktopApp:run --args="--windowed --size=$size --key-pipe=$root/$fifo" > "$log" 2>&1 &
+app_id=io.github.stealthx3.ArgosyDesktop
+if [ "${DRIVE_TARGET:-}" = flatpak ]; then
+  # The installed Flatpak sees only its own ~/.var/app tree, so the pipe lives there.
+  fifo="$HOME/.var/app/$app_id/cache/key-pipe"
+  mkdir -p "$(dirname "$fifo")"
+  rm -f "$fifo"; mkfifo "$fifo"
+  flatpak run --env=JAVA_TOOL_OPTIONS=-Dskiko.vsync.enabled=false "$app_id" --windowed --size="$size" --key-pipe="$fifo" > "$log" 2>&1 &
+else
+  fifo="$root/$outdir/key-pipe"
+  rm -f "$fifo"; mkfifo "$fifo"
+  ./gradlew --console=plain :desktopApp:run --args="--windowed --size=$size --key-pipe=$fifo" > "$log" 2>&1 &
+fi
 gradle=$!
 win=""
 for _ in $(seq 1 240); do
@@ -33,6 +42,7 @@ done
 if [ -z "$win" ]; then
   echo "no Argosy window appeared; log $log"
   kill $gradle 2>/dev/null
+  [ "${DRIVE_TARGET:-}" = flatpak ] && flatpak kill "$app_id" 2>/dev/null
   exit 1
 fi
 exec 3>"$fifo"
@@ -50,7 +60,7 @@ for step in "${steps[@]}"; do
 done
 exec 3>&-
 rm -f "$fifo"
-pkill -f "com.nendo.argosy.desktop.MainKt" 2>/dev/null
+if [ "${DRIVE_TARGET:-}" = flatpak ]; then flatpak kill "$app_id" 2>/dev/null; else pkill -f "com.nendo.argosy.desktop.MainKt" 2>/dev/null; fi
 wait $gradle 2>/dev/null
 echo "log $log"
 grep -E "Exception|Error|FATAL|at com\.nendo" "$log" | head -40
