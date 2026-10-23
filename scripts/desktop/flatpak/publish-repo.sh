@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # usage: scripts/desktop/flatpak/publish-repo.sh <repo-url> [gpg-key-id]  (unsigned without a key)
+# GNUPGHOME selects the keyring (the alpha key lives in ~/.local/share/argosy-desktop-signing/gnupg)
 set -euo pipefail
 url=${1:?usage: publish-repo.sh <repo-url> [gpg-key-id]}
 key=${2:-}
@@ -14,6 +15,7 @@ sign=()
 gpg_line=""
 if [ -n "$key" ]; then
   sign=(--gpg-sign="$key")
+  [ -n "${GNUPGHOME:-}" ] && sign+=(--gpg-homedir="$GNUPGHOME")
   flatpak build-sign "${sign[@]}" "$repo" "$app_id" master
   gpg_line="GPGKey=$(gpg --export "$key" | base64 -w0)"
 fi
