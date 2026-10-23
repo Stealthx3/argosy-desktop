@@ -782,7 +782,7 @@ internal fun formatStoragePath(rawPath: String): String {
     val primaryRoot = com.nendo.argosy.data.storage.StoragePathUtils.primaryExternalRoot
     return when {
         rawPath.startsWith(primaryRoot) ->
-            rawPath.replaceFirst(primaryRoot, "Internal")
+            rawPath.replaceFirst(primaryRoot, com.nendo.argosy.platform.PlatformEnvironment.PRIMARY_STORAGE_LABEL)
         rawPath.startsWith("/storage/") -> {
             val parts = rawPath.removePrefix("/storage/").split("/", limit = 2)
             if (parts.size == 2) {

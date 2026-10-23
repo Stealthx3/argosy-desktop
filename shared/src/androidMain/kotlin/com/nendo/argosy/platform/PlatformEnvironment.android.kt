@@ -6,6 +6,7 @@ import java.io.File
 actual object PlatformEnvironment {
     actual val MEDIA_MOUNTED: String get() = Environment.MEDIA_MOUNTED
     actual val DIRECTORY_DOWNLOADS: String get() = Environment.DIRECTORY_DOWNLOADS
+    actual val PRIMARY_STORAGE_LABEL: String = "Internal"
 
     actual fun getExternalStorageDirectory(): File =
         Environment.getExternalStorageDirectory() ?: File(PRIMARY_USER_ROOT)
