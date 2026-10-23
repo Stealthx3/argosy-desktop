@@ -131,6 +131,9 @@ Android → Flatpak permission mapping:
 | Display over other apps | none (no overlay concept) | not shown |
 | Live wallpaper | none | not shown |
 | (no Android row) | `--device=all` (gamepads), `--share=network`, `--socket=pulseaudio`, `--device=dri`, `--socket=wayland`/`x11` | Controllers, network, audio, GPU, display: shown for completeness |
+| (no Android row) | Steam client access for native Steam Input (`--filesystem=~/.steam:ro` and the Steam data folder, `--device=shm`), only if the native revisit runs it in the sandbox | "Steam Input (native)": shown only once that revisit lands, and only while Steam Input is available |
+
+The screen lists every permission the manifest requires (from `/.flatpak-info`, so user overrides and revocations show), each with its Flatpak name, its state and what Argosy uses it for, plus the optional grants Argosy can request (emulator save folders, Steam client access).
 
 ### New desktop features
 
@@ -138,8 +141,30 @@ Android → Flatpak permission mapping:
 | --- | --- |
 | Window | System title bar (decorated window) in windowed mode. First launch opens windowed and in the dark theme; later launches restore the user's choice |
 | Start in full screen | New Interface setting, off by default; consumed by `desktopApp` `Main.kt` at window creation. `--windowed`/`--fullscreen` on the command line override it; F11 toggles at runtime. Under gamescope (SteamOS/Bazzite Game Mode) the window is always full screen |
-| Steam Input | Navigation → Controller → "Steam Input" option. Default approach: use the virtual gamepad Steam Input creates (SDL3 reports it as Steam's virtual controller) and ignore the raw device behind it so input is not doubled, with Steam's layout and glyphs. Native `ISteamInput` (Steamworks SDK) only if the licence question is settled (see Open decisions) |
+| Controller input mode | Navigation → Controller → "Input mode": **Auto**, **Steam Input**, **SDL3** (owner decision 2026-10-23; Phase 4 builds it on SDL3 only). **SDL3** reads pads directly through SDL3, including the Steam Deck's and Steam Controller's own controls (back buttons, gyro, trackpads) via SDL's HIDAPI drivers; always offered. **Steam Input** is listed only while it is available, i.e. a Steam Input virtual gamepad is connected (Argosy started from Steam with Steam Input on); it reads that virtual pad through SDL3 with the user's Steam layout applied and ignores the raw device behind it so input is not doubled. **Auto** (default) picks Steam Input when available, else SDL3. Input goes through one controller-source interface so the native layer below can be added later without touching the SDL3 path. Native `ISteamInput` is a planned later revisit (next table) |
 | Button mapping | Navigation → "Button mapping" sub-section: one row per navigation action (Confirm, Back, Context, Secondary, Menu, Select, L1/R1, L2/R2, L3/R3, D-pad directions), each remappable to any button of the active controller, stored per controller (SDL GUID), with "Reset to default". The existing Swap A/B, X/Y and Start/Select toggles become presets over the same mapping. Keyboard bindings get the same list |
+
+### Native Steam Input: planned revisit (after 1.0)
+
+Not part of Phase 4. Adds Steam's glyphs, action sets and Steam's controller configuration screen on top of the Steam Input mode; SDL3 keeps doing the input.
+
+| Piece | Plan |
+| --- | --- |
+| Loading | Load-at-runtime workaround: Argosy never bundles `libsteam_api.so`; when Steam launched Argosy under its app ID (`SteamAppId` set) and the library is present on the system, Argosy loads it at runtime and maps each pad with SDL3's `SDL_GetGamepadSteamHandle`. Any failure (no library, `SteamAPI_Init` false) leaves input on SDL3 without a message |
+| Where it runs | Decided by a spike: in the sandbox (needs the permissions below), or a small helper started on the host with `flatpak-spawn --host` that talks to Argosy over a socket (needs no new permission; the separate-process shape RetroArch's Steam build uses for Steamworks) |
+| Permissions it may need | Read access to the Steam client (`--filesystem=~/.steam:ro`, `~/.local/share/Steam:ro`, or `~/.var/app/com.valvesoftware.Steam/.local/share/Steam:ro` for Flatpak Steam) and host shared memory (`--device=shm`, to be verified against `--device=all`). These are added to the manifest only if the in-sandbox route wins |
+| Licence | Runtime loading of a library the user already has, never distributed with Argosy; the owner accepts the GPL-3.0 question (2026-10-23) |
+
+**Resolving blocker 1, the Steam app ID** (`SteamAPI_Init` only succeeds for an app Steam launched under a registered app ID; a non-Steam shortcut has none). Steps, owner-driven where marked:
+
+1. **Upstream and naming (owner):** agree a Steam listing with rommapp, since it presents their product; settle the Steam name and icon (the plan's existing "Name and app ID" decision).
+2. **Valve rules check:** confirm an emulator frontend that ships no games and no BIOS fits Steam's content rules (precedents: RetroArch), and word the store page as a launcher for the user's own RomM library.
+3. **Steamworks account (owner):** join the Steamworks partner programme (identity, tax and bank details are entered by the owner only) and pay the Steam Direct fee ($100 per app).
+4. **Create the app:** receive the app ID; set type, Linux as the platform, and launch options.
+5. **Steam build:** package a Linux build for the Steam Linux Runtime (the Flatpak cannot be uploaded as is); upload with SteamPipe to a private branch.
+6. **Steam Input defaults:** publish an official controller configuration for the app so Steam Input has sane defaults for Argosy's actions.
+7. **Native layer:** implement the loading above; test on Steam Deck/SteamOS and Bazzite Game Mode with the private branch (the app ID is now real); confirm the Flatpak build also initialises when launched by Steam with `SteamAppId` set for an owner of the app, or document that native Steam Input is a Steam-build feature.
+8. **Store review and release (owner):** store page, Valve's build and store review, then release; the Flatpak and Flathub builds keep working without Steam.
 
 ### Handheld and TV layout options (to choose from)
 
@@ -258,7 +283,7 @@ Six phases over about 32 weeks; restructure first, then get every screen on the 
 | 1 · Kotlin Multiplatform restructure | 3–8 | Shared modules, DI, Room and DataStore KMP, shared resources; Android app unchanged for users | — |
 | 2 · Desktop UI | 9–13 | Every screen runs on the desktop; SDL3 gamepad input; identical focus feel | — |
 | 3 · Linux services and alpha Flatpak | 14–19 | Emulator registry, host launch, save paths, Apps tab, Quick Settings; Flatpak from your own repo | Alpha: sync, download, play, save sync |
-| 4 · Linux adaptation | 20–28 | libmpv video wallpaper; Desktop removals (Steam Jellyfin Social Android Settings); Linux emulator suggestions and managed installers; Host GPU screen; Flatpak permissions screen; Window title bar and full-screen setting; Steam Input controller option; Navigation button mapping; Handheld and TV layout | — |
+| 4 · Linux adaptation | 20–28 | libmpv video wallpaper; Desktop removals (Steam Jellyfin Social Android Settings); Linux emulator suggestions and managed installers; Host GPU screen; Flatpak permissions screen; Window title bar and full-screen setting; Controller input mode (Auto Steam Input SDL3); Navigation button mapping; Handheld and TV layout | — |
 | 5 · Beta and Flathub | 29–32 | Side-by-side checks against Android; GNOME, KDE and SteamOS testing; Flathub submission | 1.0 live on Flathub |
 
 Exit criteria per phase:
@@ -282,7 +307,7 @@ The two risks that decide the project are upstream drift and the sandbox; both a
 | Android-only calls scattered through screens (Context, toasts, R.*) | UI phase slips | Phase 0 counted them (see survey); compatibility shims in `desktopMain` for the common ones |
 | Focus feel differs on desktop | App feels different on a gamepad | Side-by-side video tests of every screen against an Android handheld before alpha |
 | Gamepad edge cases (hotplug, Steam Input remapping, handheld built-in pads) | Wrong buttons or none | SDL3 controller database; test on Steam Deck, an Xbox pad and a DualSense |
-| Steam Input through the Steamworks SDK | `libsteam_api` is proprietary: GPL-3.0 and Flathub conflict; only works when Steam launches Argosy | Default to Steam's virtual gamepad through SDL3; native `ISteamInput` only after the licence decision |
+| Native Steam Input through the Steamworks SDK | `libsteam_api` is proprietary; `SteamAPI_Init` needs a Steam app ID; in the sandbox it may need Steam client and shared-memory access | Phase 4 ships SDL3 input only; the native layer is a later revisit: never bundled, loaded at runtime if present (owner accepted the GPL-3.0 question), app ID through the Steam listing steps |
 | Desktop-only gates drift from upstream | A removed feature reappears after an upstream re-apply | Gates live in desktop source sets and a desktop capability; the re-apply check lists new Steam/Jellyfin/Social entry points |
 | Java toolkit on XWayland (fractional scaling, frame pacing) | Blurry or stuttery UI on Wayland desktops | Test GNOME and KDE at 125% and 150%; move to JetBrains Runtime's native Wayland toolkit if needed |
 | `--device=all` flagged potentially unsafe | Lower trust on the store page | Move to `--device=input` once Flatpak 1.16+ is universal |
@@ -296,7 +321,7 @@ Four decisions shape everything after Phase 0; settle them in the first two week
 - **Name and app ID.** "Argosy Desktop" with upstream's blessing, under rommapp or your own GitHub account.
 - **Java runtime.** Stock OpenJDK on XWayland for 1.0, or JetBrains Runtime with native Wayland from the start.
 - **Built-in emulation timing.** Decided 2026-10-23: not in this version; external emulators only.
-- **Steam Input approach** (open): Steam's virtual gamepad through SDL3 (recommended), or native `ISteamInput` via the Steamworks SDK (licence and Flathub implications).
+- **Steam Input approach.** Decided 2026-10-23: Phase 4 builds input mode Auto / Steam Input / SDL3 on SDL3 (Steam Input listed only when available). Native `ISteamInput` is a planned revisit after 1.0 with the load-at-runtime workaround, gated on a Steam app ID (steps under "Native Steam Input: planned revisit").
 - **Handheld/TV options** (open): which of the ten options under Desktop divergences go into Phase 4.
 - **Managed installer seeds** (open): which AppImage emulators to seed (candidates: Cemu, RPCS3, PCSX2, Azahar and other emulators that publish AppImages on GitHub).
 
