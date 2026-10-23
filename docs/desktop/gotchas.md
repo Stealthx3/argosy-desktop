@@ -47,6 +47,7 @@ Collected from the Phase 1 and 2 handoffs. Read the part that matches the work i
 
 - `scripts/desktop/check/pad-walk.sh android|desktop <dir> <step>...` (steps: `shot:`, `wait:`, `TYPE:`, A B X Y START SELECT UP DOWN LEFT RIGHT ENTER[*n]). Start desktop walks with `wait:5` (the first key can be lost). Buttons: X = context (Library filter, Home Details), Y = Favorite, SELECT = quick menu. Detail's menu does not wrap; row counts differ per game.
 - Drawer from Home (START, then DOWN×n): Check-In 1, Collections 2, Downloads 4, Library Sync 5, Save Sync 6, Apps 7, Settings 8. About = Settings DOWN×20; Changelog = RIGHT, A from Check for Updates.
+- Detail → Options (DOWN×4, A) → Manage Cached Saves (A) opens Save Management. **Y there is Delete** (opens "Delete save slot"; B cancels). Never send A after Y in a walk.
 - Settings walks: `settings-walk.sh`, `deep-settings-walk.sh`. Captured desktop client area is 1910×1050 (compare at 0.97×).
 - The check AVD can be down after a pause: `~/Android/Sdk/emulator/emulator -avd argosy_handheld_check -port 5556 -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect`, wait for `sys.boot_completed`.
 - Desktop state persists in `~/.local/share/argosy-desktop`; runs start at Home. To drive first run again, move that folder aside (never delete it without the owner); the first-run sign-in recipe is in the p4f entry of `DEVLOG.md`.
