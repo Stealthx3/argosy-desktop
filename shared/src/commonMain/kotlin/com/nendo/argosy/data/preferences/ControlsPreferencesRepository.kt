@@ -39,6 +39,7 @@ data class ControlsPreferences(
     val menuWrapMode: MenuWrapMode = MenuWrapMode.HARD_STOP,
     val selectSwapMode: SelectSwapMode = SelectSwapMode.HOLD,
     val controllerInputMode: ControllerInputMode = ControllerInputMode.AUTO,
+    val navigationButtonMaps: NavigationButtonMaps = NavigationButtonMaps(),
     val openNavigationKey: Int = DEFAULT_OPEN_NAVIGATION_KEY,
     val openQuickPanelKey: Int = DEFAULT_OPEN_QUICK_PANEL_KEY,
     val navRingRoutes: List<String>? = null,
@@ -80,6 +81,7 @@ class ControlsPreferencesRepository @Inject constructor(
         val MENU_WRAP_MODE = stringPreferencesKey("menu_wrap_mode")
         val SELECT_SWAP_MODE = stringPreferencesKey("select_swap_mode")
         val CONTROLLER_INPUT_MODE = stringPreferencesKey("controller_input_mode")
+        val NAVIGATION_BUTTON_MAPS = stringPreferencesKey("navigation_button_maps")
         val OPEN_NAVIGATION_KEY = intPreferencesKey("open_navigation_key")
         val OPEN_QUICK_PANEL_KEY = intPreferencesKey("open_quick_panel_key")
         val NAV_RING_ROUTES = stringPreferencesKey("nav_ring_routes")
@@ -109,6 +111,7 @@ class ControlsPreferencesRepository @Inject constructor(
             menuWrapMode = MenuWrapMode.fromString(prefs[Keys.MENU_WRAP_MODE]),
             selectSwapMode = SelectSwapMode.fromString(prefs[Keys.SELECT_SWAP_MODE]),
             controllerInputMode = ControllerInputMode.fromString(prefs[Keys.CONTROLLER_INPUT_MODE]),
+            navigationButtonMaps = NavigationButtonMaps.decode(prefs[Keys.NAVIGATION_BUTTON_MAPS]),
             openNavigationKey = prefs[Keys.OPEN_NAVIGATION_KEY]
                 ?: ControlsPreferences.DEFAULT_OPEN_NAVIGATION_KEY,
             openQuickPanelKey = prefs[Keys.OPEN_QUICK_PANEL_KEY]
@@ -257,6 +260,13 @@ class ControlsPreferencesRepository @Inject constructor(
 
     suspend fun setControllerInputMode(mode: ControllerInputMode) {
         dataStore.edit { it[Keys.CONTROLLER_INPUT_MODE] = mode.name }
+    }
+
+    suspend fun setNavigationButtonMaps(maps: NavigationButtonMaps) {
+        dataStore.edit { prefs ->
+            val encoded = maps.encode()
+            if (encoded.isEmpty()) prefs.remove(Keys.NAVIGATION_BUTTON_MAPS) else prefs[Keys.NAVIGATION_BUTTON_MAPS] = encoded
+        }
     }
 
     suspend fun setSelectSwapMode(mode: SelectSwapMode) {

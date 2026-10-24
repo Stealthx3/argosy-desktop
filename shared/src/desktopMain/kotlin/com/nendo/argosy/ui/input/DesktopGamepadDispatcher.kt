@@ -46,9 +46,11 @@ class DesktopGamepadDispatcher @Inject constructor(
     private val controllerTracker: ConnectedControllerTracker,
     private val rumble: GamepadRumble,
     private val controlsPreferences: ControlsPreferencesRepository,
+    private val remapper: NavigationButtonRemapper,
 ) {
     private val axisValues = HashMap<Int, HashMap<Int, Float>>()
-    private val downTimes = HashMap<Pair<Int, Int>, Long>()
+    private val pressed = HashMap<Pair<Int, Int>, PressedKey>()
+    private val controllerKeys = HashMap<Int, String>()
     private var repeating: RepeatingKey? = null
     private val connectedIds = LinkedHashSet<Int>()
     private val scope = SafeCoroutineScope(Dispatchers.Default, TAG)
@@ -113,6 +115,7 @@ class DesktopGamepadDispatcher @Inject constructor(
                 "type=${event.gamepadType} steamVirtual=${event.steamVirtual} mode=${source?.mode} id=$deviceId",
         )
         connectedIds += deviceId
+        controllerKeys[deviceId] = NavigationButtonRemapper.controllerKey(event.descriptor)
         PlatformInputDevices.connected(
             PlatformInputDevice(
                 deviceId = deviceId,
@@ -131,31 +134,42 @@ class DesktopGamepadDispatcher @Inject constructor(
         connectedIds -= deviceId
         if (repeating?.deviceId == deviceId) stopRepeat()
         axisValues.remove(deviceId)
-        downTimes.keys.removeAll { it.first == deviceId }
+        pressed.keys.removeAll { it.first == deviceId }
+        controllerKeys.remove(deviceId)
         triggerAxisKeyEmitter.forget(deviceId)
         PlatformInputDevices.disconnected(deviceId)
         controllerTracker.refresh()
     }
 
     private fun button(deviceId: Int, event: SdlPadEvent.Button) {
-        val keyCode = SdlGamepadMapping.keyCode(event.button) ?: return
-        val source = if (SdlGamepadMapping.isDpad(event.button)) SOURCE_GAMEPAD or SOURCE_DPAD else SOURCE_GAMEPAD
+        val physical = SdlGamepadMapping.keyCode(event.button) ?: return
+        val controller = controllerKeys[deviceId].orEmpty()
         val now = System.currentTimeMillis()
-        val key = deviceId to keyCode
+        val key = deviceId to physical
         if (event.down) {
-            downTimes[key] = now
+            if (remapper.interceptDown(controller, physical)) return
+            val keyCode = remapper.translate(controller, physical)
+            val source = sourceFor(keyCode)
+            pressed[key] = PressedKey(now, keyCode)
             stopRepeat()
             val down = PlatformKeyEvent(deviceId, source, now, keyCode, AndroidKeyCodes.ACTION_DOWN, 0, now)
             keyDispatcher.deliver(down)
             startRepeat(RepeatingKey(deviceId, source, keyCode, now))
         } else {
-            val downTime = downTimes.remove(key) ?: now
+            if (remapper.interceptUp(controller, physical)) return
+            val press = pressed.remove(key)
+            val keyCode = press?.keyCode ?: remapper.translate(controller, physical)
             if (repeating?.let { it.deviceId == deviceId && it.keyCode == keyCode } == true) stopRepeat()
             keyDispatcher.deliver(
-                PlatformKeyEvent(deviceId, source, now, keyCode, AndroidKeyCodes.ACTION_UP, 0, downTime),
+                PlatformKeyEvent(
+                    deviceId, sourceFor(keyCode), now, keyCode, AndroidKeyCodes.ACTION_UP, 0, press?.downTime ?: now,
+                ),
             )
         }
     }
+
+    private fun sourceFor(keyCode: Int): Int =
+        if (keyCode in DPAD_KEYCODES) SOURCE_GAMEPAD or SOURCE_DPAD else SOURCE_GAMEPAD
 
     private fun axis(deviceId: Int, event: SdlPadEvent.Axis) {
         val axis = SdlGamepadMapping.axis(event.axis) ?: return
@@ -199,6 +213,8 @@ class DesktopGamepadDispatcher @Inject constructor(
         repeating = null
     }
 
+    private class PressedKey(val downTime: Long, val keyCode: Int)
+
     private class RepeatingKey(val deviceId: Int, val source: Int, val keyCode: Int, val downTime: Long) {
         var repeatCount = 0
         var timer: Timer? = null
@@ -209,5 +225,11 @@ class DesktopGamepadDispatcher @Inject constructor(
         const val REPEAT_TIMEOUT_MS = 400
         const val REPEAT_INTERVAL_MS = 50
         const val STOP_TIMEOUT_MS = 2_000L
+        val DPAD_KEYCODES = setOf(
+            AndroidKeyCodes.KEYCODE_DPAD_UP,
+            AndroidKeyCodes.KEYCODE_DPAD_DOWN,
+            AndroidKeyCodes.KEYCODE_DPAD_LEFT,
+            AndroidKeyCodes.KEYCODE_DPAD_RIGHT,
+        )
     }
 }

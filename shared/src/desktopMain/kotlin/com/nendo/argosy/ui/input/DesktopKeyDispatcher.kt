@@ -5,6 +5,7 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
 import com.nendo.argosy.core.input.AndroidKeyCodes
+import com.nendo.argosy.data.preferences.NavigationButtonMaps
 import com.nendo.argosy.platform.PlatformKeyEvent
 import com.nendo.argosy.platform.SOURCE_KEYBOARD
 import com.nendo.argosy.platform.action
@@ -28,29 +29,38 @@ import androidx.compose.ui.input.key.KeyEvent as ComposeKeyEvent
 class DesktopKeyDispatcher @Inject constructor(
     private val gamepadInputHandler: GamepadInputHandler,
     private val ambientAudioManager: AmbientAudioManager,
+    private val remapper: NavigationButtonRemapper,
 ) {
     private val held = mutableMapOf<Int, HeldKey>()
     private val passedToTextField = mutableSetOf<Key>()
 
     fun dispatch(event: ComposeKeyEvent): Boolean {
         if (passesToTextField(event)) return false
-        val keyCode = KEYBOARD_KEYCODES[event.key] ?: return false
+        val physical = KEYBOARD_KEYCODES[event.key] ?: return false
         val action = when (event.type) {
             KeyEventType.KeyDown -> AndroidKeyCodes.ACTION_DOWN
             KeyEventType.KeyUp -> AndroidKeyCodes.ACTION_UP
             else -> return false
         }
         val now = System.currentTimeMillis()
+        val keyCode: Int
         val repeatCount: Int
         val downTime: Long
         if (action == AndroidKeyCodes.ACTION_DOWN) {
-            val previous = held[keyCode]
-            val current = previous?.let { it.copy(repeatCount = it.repeatCount + 1) } ?: HeldKey(now, 0)
-            held[keyCode] = current
+            val previous = held[physical]
+            if (previous == null && remapper.interceptDown(NavigationButtonMaps.KEYBOARD, physical)) return true
+            if (previous == null && remapper.isSwallowed(NavigationButtonMaps.KEYBOARD, physical)) return true
+            val current = previous?.let { it.copy(repeatCount = it.repeatCount + 1) }
+                ?: HeldKey(now, 0, remapper.translate(NavigationButtonMaps.KEYBOARD, physical))
+            held[physical] = current
+            keyCode = current.keyCode
             repeatCount = current.repeatCount
             downTime = current.downTime
         } else {
-            downTime = held.remove(keyCode)?.downTime ?: now
+            if (remapper.interceptUp(NavigationButtonMaps.KEYBOARD, physical)) return true
+            val released = held.remove(physical)
+            keyCode = released?.keyCode ?: remapper.translate(NavigationButtonMaps.KEYBOARD, physical)
+            downTime = released?.downTime ?: now
             repeatCount = 0
         }
         val platformEvent = PlatformKeyEvent(
@@ -93,7 +103,7 @@ class DesktopKeyDispatcher @Inject constructor(
         else -> false
     }
 
-    private data class HeldKey(val downTime: Long, val repeatCount: Int)
+    private data class HeldKey(val downTime: Long, val repeatCount: Int, val keyCode: Int)
 
     private companion object {
         const val KEYBOARD_DEVICE_ID = 1
