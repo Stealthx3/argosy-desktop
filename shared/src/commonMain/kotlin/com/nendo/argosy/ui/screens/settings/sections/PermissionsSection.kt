@@ -102,7 +102,8 @@ internal fun PermissionsItem.confirm(viewModel: SettingsViewModel) {
         PermissionsItem.ScreenCapture -> viewModel.requestScreenCapturePermission()
         PermissionsItem.DisplayOverlay -> viewModel.openDisplayOverlaySettings()
         PermissionsItem.LiveWallpaper -> viewModel.openLiveWallpaperPicker()
-        PermissionsItem.InfoText, PermissionsItem.StatusFooter, is PermissionsItem.Sandbox -> Unit
+        is PermissionsItem.Sandbox -> viewModel.requestSandboxGrant(permission)
+        PermissionsItem.InfoText, PermissionsItem.StatusFooter -> Unit
     }
 }
 
@@ -147,6 +148,8 @@ fun PermissionsSection(uiState: SettingsUiState, viewModel: SettingsViewModel) {
                     text = stringResource(
                         when {
                             !permissions.sandboxSupported -> R.string.settings_permissions_intro
+                            permissions.sandboxGrantFailed -> R.string.settings_permissions_sandbox_grant_failed
+                            permissions.sandboxRestartNeeded -> R.string.settings_permissions_sandbox_restart
                             permissions.sandbox.sandboxed -> R.string.settings_permissions_sandbox_intro
                             else -> R.string.settings_permissions_sandbox_unsandboxed
                         }

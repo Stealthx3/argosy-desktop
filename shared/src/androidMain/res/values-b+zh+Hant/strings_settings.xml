@@ -612,6 +612,11 @@
     <string name="settings_permissions_sandbox_gpu_description">用你的 GPU 繪製介面。</string>
     <string name="settings_permissions_sandbox_display_title">顯示</string>
     <string name="settings_permissions_sandbox_display_description">在你的桌面工作階段中開啟視窗。</string>
+    <string name="settings_permissions_sandbox_grant_title">允許「%1$s」？</string>
+    <string name="settings_permissions_sandbox_grant_message">Argosy 將在你的電腦上執行：\n%1$s\n變更將在下次啟動 Argosy 時生效。</string>
+    <string name="settings_permissions_sandbox_grant_confirm">允許</string>
+    <string name="settings_permissions_sandbox_restart">已授予權限。重新啟動 Argosy 後生效。</string>
+    <string name="settings_permissions_sandbox_grant_failed">無法授予權限。請在終端機中執行該列顯示的指令。</string>
     <string name="settings_permissions_intro">Argosy需要特定權限才能提供完整功能，點選各項權限即可授予存取權。</string>
     <string name="settings_permissions_storage_title">儲存空間存取權</string>
     <string name="settings_permissions_storage_description">下載遊戲、同步存檔，以及存取裝置上的ROM檔案都需要此權限。</string>

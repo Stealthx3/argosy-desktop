@@ -1,5 +1,7 @@
 package com.nendo.argosy.ui.screens.settings
 
+import com.nendo.argosy.ui.common.titleRes
+import com.nendo.argosy.ui.common.FlatpakOverrideCommand
 import com.nendo.argosy.platform.PlatformContext as Context
 import com.nendo.argosy.platform.startActivity
 import com.nendo.argosy.platform.getApplicationInfo
@@ -1224,6 +1226,20 @@ fun SettingsScreen(
         onConfirm = { viewModel.confirmDeleteCore() },
         onDismiss = { viewModel.cancelDeleteCore() }
     )
+
+    uiState.permissions.sandboxGrant?.let { permission ->
+        ArgosyConfirmModal(
+            title = stringResource(R.string.settings_permissions_sandbox_grant_title, stringResource(permission.titleRes)),
+            message = stringResource(
+                R.string.settings_permissions_sandbox_grant_message,
+                FlatpakOverrideCommand.of(uiState.permissions.sandbox.missingFlags[permission].orEmpty())
+            ),
+            confirmLabel = stringResource(R.string.settings_permissions_sandbox_grant_confirm),
+            onConfirm = { viewModel.confirmSandboxGrant() },
+            onDismiss = { viewModel.cancelSandboxGrant() },
+            focusedIndex = uiState.permissions.sandboxGrantButtonIndex
+        )
+    }
 
     ArgosyConfirmModal(
         visible = uiState.syncSettings.showForceSyncConfirm,

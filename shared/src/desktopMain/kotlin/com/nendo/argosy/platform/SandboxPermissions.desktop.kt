@@ -22,6 +22,13 @@ actual class SandboxPermissions @Inject constructor() {
         }
     }
 
+    actual suspend fun grant(permission: SandboxPermission, flags: List<String>): Boolean = withContext(Dispatchers.IO) {
+        HostShell.run(SandboxPermission.overrideArgs(flags))
+        val hostView = HostShell.run(listOf("flatpak", "info", "--show-permissions", SandboxPermission.APP_ID))
+            ?: return@withContext false
+        FlatpakInfo.report(hostView, System.getProperty("user.home")).granted[permission] == true
+    }
+
     private companion object {
         const val FLATPAK_INFO = "/.flatpak-info"
     }

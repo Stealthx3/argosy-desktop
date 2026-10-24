@@ -641,6 +641,11 @@
     <string name="settings_permissions_sandbox_gpu_description">用你的 GPU 绘制界面。</string>
     <string name="settings_permissions_sandbox_display_title">显示</string>
     <string name="settings_permissions_sandbox_display_description">在你的桌面会话中打开窗口。</string>
+    <string name="settings_permissions_sandbox_grant_title">允许“%1$s”？</string>
+    <string name="settings_permissions_sandbox_grant_message">Argosy 将在你的电脑上运行：\n%1$s\n更改将在下次启动 Argosy 时生效。</string>
+    <string name="settings_permissions_sandbox_grant_confirm">允许</string>
+    <string name="settings_permissions_sandbox_restart">已授予权限。重新启动 Argosy 后生效。</string>
+    <string name="settings_permissions_sandbox_grant_failed">无法授予权限。请在终端中运行该行显示的命令。</string>
     <string name="settings_permissions_intro">Argosy需要一些权限才能提供完整功能。点按每项权限即可授予访问权限。</string>
     <string name="settings_permissions_storage_title">存储访问权限</string>
     <string name="settings_permissions_storage_description">下载游戏、同步存档文件以及访问设备上的ROM文件都需要此权限。</string>

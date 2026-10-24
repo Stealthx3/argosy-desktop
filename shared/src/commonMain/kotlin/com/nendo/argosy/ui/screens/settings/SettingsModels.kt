@@ -1629,8 +1629,15 @@ data class PermissionsState(
     val hasLiveWallpaper: Boolean = false,
     val isLiveWallpaperRelevant: Boolean = false,
     val sandboxSupported: Boolean = false,
-    val sandbox: com.nendo.argosy.data.model.SandboxPermissionReport = com.nendo.argosy.data.model.SandboxPermissionReport()
+    val sandbox: com.nendo.argosy.data.model.SandboxPermissionReport = com.nendo.argosy.data.model.SandboxPermissionReport(),
+    val sandboxGrant: com.nendo.argosy.data.model.SandboxPermission? = null,
+    val sandboxGrantButtonIndex: Int = 1,
+    val sandboxRestartNeeded: Boolean = false,
+    val sandboxGrantFailed: Boolean = false
 ) {
+    val canGrantSandbox: Boolean
+        get() = sandbox.sandboxed && sandbox.granted[com.nendo.argosy.data.model.SandboxPermission.HOST_ACCESS] == true
+
     private val relevantGrants: List<Boolean>
         get() = if (sandboxSupported) sandbox.granted.values.toList() else listOfNotNull(
             hasStorageAccess,

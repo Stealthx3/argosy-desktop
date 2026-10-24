@@ -1649,6 +1649,11 @@ class SettingsViewModel @Inject constructor(
 
     fun requestScreenCapturePermission() = routeRequestScreenCapturePermission(this)
     fun refreshPermissions() = permissionsDelegate.refreshPermissions()
+    fun requestSandboxGrant(permission: com.nendo.argosy.data.model.SandboxPermission) =
+        permissionsDelegate.requestSandboxGrant(permission)
+    fun moveSandboxGrantFocus(delta: Int) = permissionsDelegate.moveSandboxGrantFocus(delta)
+    fun cancelSandboxGrant() = permissionsDelegate.cancelSandboxGrant()
+    fun confirmSandboxGrant() = permissionsDelegate.confirmSandboxGrant()
 
     fun showSyncFiltersModal() = routeShowSyncFiltersModal(this)
     fun dismissSyncFiltersModal() = routeDismissSyncFiltersModal(this)

@@ -76,4 +76,14 @@ class FlatpakInfoTest {
             .filterNot { it.startsWith("~/Games/Argosy") }
         assertEquals(manifest, FlatpakInfo.EMULATOR_FOLDERS)
     }
+
+    @Test
+    fun theHostViewOfAGrantedOverrideReadsAsGranted() {
+        val hostView = info("~/Games/Argosy:create;", bus = "org.freedesktop.Flatpak=talk")
+        assertTrue(FlatpakInfo.report(hostView, home).granted.getValue(SandboxPermission.HOST_ACCESS))
+        assertEquals(
+            listOf("flatpak", "override", "--user", "--device=all", SandboxPermission.APP_ID),
+            SandboxPermission.overrideArgs(listOf("--device=all"))
+        )
+    }
 }

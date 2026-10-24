@@ -37,6 +37,7 @@ internal class ModalInputRouter(private val viewModel: SettingsViewModel) {
         interceptPlatformFiltersModal(state, method)?.let { return it }
         interceptSyncFiltersModal(state, method)?.let { return it }
         interceptForceSyncConfirm(state, method)?.let { return it }
+        interceptSandboxGrant(state, method)?.let { return it }
         interceptAddressVerifyPrompt(state, method)?.let { return it }
         interceptAddressEditor(state, method)?.let { return it }
         interceptAddressMenu(state, method)?.let { return it }
@@ -376,6 +377,20 @@ internal class ModalInputRouter(private val viewModel: SettingsViewModel) {
                 }
             }
             InputMethod.BACK -> { viewModel.dismissSyncFiltersModal(); InputResult.HANDLED }
+            else -> InputResult.HANDLED
+        }
+    }
+
+    private fun interceptSandboxGrant(state: SettingsUiState, method: InputMethod): InputResult? {
+        if (state.permissions.sandboxGrant == null) return null
+        return when (method) {
+            InputMethod.LEFT -> { viewModel.moveSandboxGrantFocus(-1); InputResult.HANDLED }
+            InputMethod.RIGHT -> { viewModel.moveSandboxGrantFocus(1); InputResult.HANDLED }
+            InputMethod.CONFIRM -> {
+                if (state.permissions.sandboxGrantButtonIndex == 0) viewModel.cancelSandboxGrant() else viewModel.confirmSandboxGrant()
+                InputResult.HANDLED
+            }
+            InputMethod.BACK -> { viewModel.cancelSandboxGrant(); InputResult.HANDLED }
             else -> InputResult.HANDLED
         }
     }

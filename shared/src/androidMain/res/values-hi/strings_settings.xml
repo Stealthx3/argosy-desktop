@@ -655,6 +655,11 @@
     <string name="settings_permissions_sandbox_gpu_description">आपके GPU से इंटरफ़ेस बनाएँ।</string>
     <string name="settings_permissions_sandbox_display_title">डिस्प्ले</string>
     <string name="settings_permissions_sandbox_display_description">आपके डेस्कटॉप सत्र में विंडो खोलें।</string>
+    <string name="settings_permissions_sandbox_grant_title">%1$s की अनुमति दें?</string>
+    <string name="settings_permissions_sandbox_grant_message">Argosy आपके कंप्यूटर पर यह चलाएगा:\n%1$s\nबदलाव अगली बार Argosy शुरू करने पर लागू होगा।</string>
+    <string name="settings_permissions_sandbox_grant_confirm">अनुमति दें</string>
+    <string name="settings_permissions_sandbox_restart">अनुमति दी गई। इसका उपयोग करने के लिए Argosy फिर से शुरू करें।</string>
+    <string name="settings_permissions_sandbox_grant_failed">अनुमति नहीं दी जा सकी। पंक्ति में दिखाया गया कमांड टर्मिनल में चलाएँ।</string>
     <string name="settings_permissions_intro">पूरी कार्यक्षमता के लिए Argosy को कुछ अनुमतियाँ चाहिए। एक्सेस देने के लिए हर अनुमति पर टैप करें।</string>
     <string name="settings_permissions_storage_title">स्टोरेज एक्सेस</string>
     <string name="settings_permissions_storage_description">गेम डाउनलोड करने, सेव फ़ाइलें सिंक करने और डिवाइस पर ROM फ़ाइलों तक पहुँचने के लिए आवश्यक।</string>

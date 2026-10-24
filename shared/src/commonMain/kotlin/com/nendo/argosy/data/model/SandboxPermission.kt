@@ -18,6 +18,8 @@ enum class SandboxPermission(val flag: String, val isPortal: Boolean = false) {
 
     companion object {
         const val APP_ID = "io.github.stealthx3.ArgosyDesktop"
+
+        fun overrideArgs(flags: List<String>): List<String> = listOf("flatpak", "override", "--user") + flags + APP_ID
     }
 }
 

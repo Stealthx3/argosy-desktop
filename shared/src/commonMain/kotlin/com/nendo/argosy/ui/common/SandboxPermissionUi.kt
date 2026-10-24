@@ -58,6 +58,5 @@ val SandboxPermission.icon: ImageVector
     }
 
 object FlatpakOverrideCommand {
-    fun of(flags: List<String>): String =
-        (listOf("flatpak", "override", "--user") + flags + SandboxPermission.APP_ID).joinToString(" ")
+    fun of(flags: List<String>): String = SandboxPermission.overrideArgs(flags).joinToString(" ")
 }

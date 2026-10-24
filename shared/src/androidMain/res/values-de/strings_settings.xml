@@ -665,6 +665,11 @@
     <string name="settings_permissions_sandbox_gpu_description">Die Oberfläche mit deiner GPU zeichnen.</string>
     <string name="settings_permissions_sandbox_display_title">Anzeige</string>
     <string name="settings_permissions_sandbox_display_description">Ein Fenster in deiner Desktop-Sitzung öffnen.</string>
+    <string name="settings_permissions_sandbox_grant_title">%1$s erlauben?</string>
+    <string name="settings_permissions_sandbox_grant_message">Argosy führt dies auf deinem Computer aus:\n%1$s\nDie Änderung gilt ab dem nächsten Start von Argosy.</string>
+    <string name="settings_permissions_sandbox_grant_confirm">Erlauben</string>
+    <string name="settings_permissions_sandbox_restart">Berechtigung erteilt. Starte Argosy neu, um sie zu nutzen.</string>
+    <string name="settings_permissions_sandbox_grant_failed">Die Berechtigung konnte nicht erteilt werden. Führe den Befehl in der Zeile in einem Terminal aus.</string>
     <string name="settings_permissions_intro">Argosy benötigt bestimmte Berechtigungen für den vollen Funktionsumfang. Tippen Sie auf eine Berechtigung, um sie zu erteilen.</string>
     <string name="settings_permissions_storage_title">Speicherzugriff</string>
     <string name="settings_permissions_storage_description">Erforderlich zum Herunterladen von Spielen, Synchronisieren von Spielstanddateien und Zugriff auf ROM-Dateien auf Ihrem Gerät.</string>

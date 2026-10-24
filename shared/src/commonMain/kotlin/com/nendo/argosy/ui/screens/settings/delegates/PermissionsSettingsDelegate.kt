@@ -1,5 +1,6 @@
 package com.nendo.argosy.ui.screens.settings.delegates
 
+import com.nendo.argosy.data.model.SandboxPermission
 import kotlinx.coroutines.Dispatchers
 import com.nendo.argosy.util.SafeCoroutineScope
 import com.nendo.argosy.platform.SandboxPermissions
@@ -79,6 +80,35 @@ class PermissionsSettingsDelegate @Inject constructor(
             displayPreferences.preferences.map { it.lockScreenArt }.distinctUntilChanged().collect {
                 lockScreenArt = it
                 refreshPermissions()
+            }
+        }
+    }
+
+    fun requestSandboxGrant(permission: SandboxPermission) {
+        val current = _state.value
+        if (!current.canGrantSandbox || current.sandbox.missingFlags[permission].isNullOrEmpty()) return
+        _state.update { it.copy(sandboxGrant = permission, sandboxGrantButtonIndex = 1, sandboxGrantFailed = false) }
+    }
+
+    fun moveSandboxGrantFocus(delta: Int) {
+        _state.update { it.copy(sandboxGrantButtonIndex = (it.sandboxGrantButtonIndex + delta).coerceIn(0, 1)) }
+    }
+
+    fun cancelSandboxGrant() {
+        _state.update { it.copy(sandboxGrant = null) }
+    }
+
+    fun confirmSandboxGrant() {
+        val permission = _state.value.sandboxGrant ?: return
+        val flags = _state.value.sandbox.missingFlags[permission].orEmpty()
+        _state.update { it.copy(sandboxGrant = null) }
+        sandboxScope.launch {
+            val granted = sandboxPermissions.grant(permission, flags)
+            _state.update {
+                it.copy(
+                    sandboxRestartNeeded = it.sandboxRestartNeeded || granted,
+                    sandboxGrantFailed = !granted
+                )
             }
         }
     }

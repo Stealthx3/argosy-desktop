@@ -2,7 +2,7 @@
 
 Rewritten (not appended) at the end of every work unit, so a fresh session can start from it alone. History and reasoning live in `DEVLOG.md`; read only the parts this file points to. Earlier phases: `phase-0.md` … `phase-3.md` (closed summaries).
 
-**Updated:** 2026-10-24 (step 6 part 1). Steps 1–5 done (step 1's owner hardware check still pending, below); step 6 in progress. The Phase 4 step plan (steps 1–10) is in `DEVLOG.md` under "Phase 4 · Linux adaptation" → "Phase 4 step plan". Nothing uncommitted.
+**Updated:** 2026-10-24 (step 6 closed). Steps 1–6 done (step 1's owner hardware check still pending, below); next is step 7. The Phase 4 step plan (steps 1–10) is in `DEVLOG.md` under "Phase 4 · Linux adaptation" → "Phase 4 step plan". Nothing uncommitted.
 
 ## Scope and exit criterion
 
@@ -32,11 +32,14 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 
 - DEVLOG "Step 5, part 1" and "part 2". TV = option B Couch scale (owner, https://claude.ai/artifact/4DJ1zZT3T26ALojCQkdrdB). Evidence `fresh-p4s5/`, `fresh-p4s5b/`, Android `p4s5-android`, `p4s5b-android`. Not verified: cursor hiding, detection on a real handheld/TV, touch on a handheld (add to the owner test).
 
-## Step 6 (Flatpak permissions screen): part 1 done, next part 2
+## Step 6 (Flatpak permissions screen): closed
 
-- Done (DEVLOG "Step 6, part 1"): `SandboxPermission`, `SandboxPermissions` (desktop reads `/.flatpak-info`), `FlatpakInfo` parser, desktop rows in Settings → Permissions with purpose and the exact override command when missing. Evidence `p4s6/` (dev run, unsandboxed), `p4s6-flatpak/` (installed local alpha, sandboxed), Android `p4s6-android`.
-- **Next action, part 2:** the grant: A on a missing sandbox row opens a confirm modal naming the command; on yes run `flatpak override --user <flags> io.github.stealthx3.ArgosyDesktop` through `HostShell` (works only with host access; without it the modal shows the command to run by hand), then a notice that the change applies after restarting Argosy. Wire `PermissionsItem.Sandbox.confirm`. Test the override path with a fake HostShell runner; on the real alpha, a grant test needs a revoked permission first (`flatpak override --user --nofilesystem=… ` on the owner's machine: ask before touching their overrides, or use a throwaway `FLATPAK_USER_DIR` install).
-- Settings → Permissions route: Settings `START wait:2 DOWN*7 A`, then `DOWN*13 A`. Flatpak walks: `pad-walk.sh flatpak <out>` after `build-alpha.sh` (never `--no-gradle` after code changes: it packages the old distributable).
+- DEVLOG "Step 6, part 1" and "part 2". Not verified: the grant modal and a real grant (needs a revoked permission on the owner's machine; owner-test recipe in the part 2 entry).
+
+## Step 7 (host GPU screen): next action
+
+- Scope (plan step 7, `PORT_PLAN.md` "GPU drivers" row): Settings → GPU Drivers becomes a read-only host GPU page on desktop: GPU name and vendor, kernel driver, Mesa/NVIDIA driver version, VRAM, OpenGL version and renderer, Vulkan API version, device type and key features, displays in use. Sources: `/sys/class/drm` (card, driver via `device/driver` link, vendor/device ids), the app's own GL context, `vulkaninfo --summary` / `glxinfo -B` on the host (`HostShell`) when present.
+- First actions: read the Drivers section/delegate (`SettingsSection.DRIVERS`, `DriversSettingsDelegate`, the main row subtitle "GPU not detected" seen on desktop); gate the Android driver UI off on desktop through a capability like `sandboxSupported`; parse `glxinfo -B` / `vulkaninfo --summary` output with fixture tests; desktop rows as InfoPreference lines.
 
 ## Every step close from now on
 

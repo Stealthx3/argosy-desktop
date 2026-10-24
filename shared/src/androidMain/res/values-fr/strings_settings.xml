@@ -669,6 +669,11 @@
     <string name="settings_permissions_sandbox_gpu_description">Dessiner l\'interface avec ton GPU.</string>
     <string name="settings_permissions_sandbox_display_title">Affichage</string>
     <string name="settings_permissions_sandbox_display_description">Ouvrir une fenêtre dans ta session de bureau.</string>
+    <string name="settings_permissions_sandbox_grant_title">Autoriser %1$s ?</string>
+    <string name="settings_permissions_sandbox_grant_message">Argosy va exécuter ceci sur ton ordinateur :\n%1$s\nLe changement s\'applique au prochain démarrage d\'Argosy.</string>
+    <string name="settings_permissions_sandbox_grant_confirm">Autoriser</string>
+    <string name="settings_permissions_sandbox_restart">Permission accordée. Redémarre Argosy pour l\'utiliser.</string>
+    <string name="settings_permissions_sandbox_grant_failed">La permission n\'a pas pu être accordée. Lance dans un terminal la commande affichée sur la ligne.</string>
     <string name="settings_permissions_intro">Argosy nécessite certaines autorisations pour fonctionner pleinement. Appuyez sur chaque autorisation pour l\'accorder.</string>
     <string name="settings_permissions_storage_title">Accès au stockage</string>
     <string name="settings_permissions_storage_description">Nécessaire pour télécharger les jeux, synchroniser les fichiers de sauvegarde et accéder aux fichiers ROM sur votre appareil.</string>

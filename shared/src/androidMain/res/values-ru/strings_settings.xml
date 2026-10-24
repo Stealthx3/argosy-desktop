@@ -682,6 +682,11 @@
     <string name="settings_permissions_sandbox_gpu_description">Отрисовывать интерфейс на GPU.</string>
     <string name="settings_permissions_sandbox_display_title">Экран</string>
     <string name="settings_permissions_sandbox_display_description">Открывать окно в сеансе рабочего стола.</string>
+    <string name="settings_permissions_sandbox_grant_title">Разрешить «%1$s»?</string>
+    <string name="settings_permissions_sandbox_grant_message">Argosy выполнит на вашем компьютере:\n%1$s\nИзменение вступит в силу при следующем запуске Argosy.</string>
+    <string name="settings_permissions_sandbox_grant_confirm">Разрешить</string>
+    <string name="settings_permissions_sandbox_restart">Разрешение выдано. Перезапустите Argosy, чтобы его использовать.</string>
+    <string name="settings_permissions_sandbox_grant_failed">Не удалось выдать разрешение. Выполните команду из строки в терминале.</string>
     <string name="settings_permissions_intro">Argosy требует определённых разрешений для полноценной работы. Нажмите на каждое разрешение, чтобы предоставить доступ.</string>
     <string name="settings_permissions_storage_title">Доступ к хранилищу</string>
     <string name="settings_permissions_storage_description">Требуется для скачивания игр, синхронизации файлов сохранений и доступа к файлам ROM на устройстве.</string>
