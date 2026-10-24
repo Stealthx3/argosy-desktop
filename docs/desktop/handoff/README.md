@@ -14,7 +14,7 @@ forward, where the details are) and the next phase's file is created from it.
 | 2 · Desktop UI | [phase-2.md](phase-2.md) | Closed 2026-10-22 |
 | 3 · Linux services and alpha Flatpak | [phase-3.md](phase-3.md) | Closed 2026-10-23 |
 | 4 · Linux adaptation | [phase-4.md](phase-4.md) | Closed 2026-10-24 |
-| 5 · Beta and Flathub | [phase-5.md](phase-5.md) | Current (not started; waiting for the owner) |
+| 5 · Beta and Flathub | [phase-5.md](phase-5.md) | Current (started 2026-10-24) |
 
 A new session reads the current phase's file first. Earlier phases' files are short summaries;
 open one only when the current handoff points to something carried forward from it.

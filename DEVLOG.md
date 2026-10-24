@@ -1298,5 +1298,17 @@ Mapped ids: retroarch, dolphin, cemu, azahar, ryujinx (Ryubing), eden, melonds, 
 
 ## Phase 5 · Beta and Flathub
 
-(Not started: waiting for the owner at the phase gate.)
+### 2026-10-24 — Phase 5 started; pre-beta fixes first (owner request)
+
+**Reasoning:** the owner asked for four fixes before the beta work (side-by-side checks, desktop environment testing, Flathub). They become the first four steps.
+
+**Phase 5 plan:**
+
+1. **Wizard emulator step wording.** The desktop first-run step listing emulator Flatpaks is titled and described as "Emulators Argosy should manage" instead of permissions.
+2. **Close Argosy in Quick Settings.** A desktop-only "Close Argosy" entry that asks for confirmation and then shuts the app down gracefully (input, sync and players stopped, window closed).
+3. **Game thumbnails from sync.** Cover art for games on Home and the platform selection screens is fetched and cached during the library sync on desktop (the desktop image cache is a stub today).
+4. **Steam Game Mode compatibility.** Re-assess gamescope sessions: emulator and game launches from Argosy, and a clean exit when closed from the Steam overlay (today it hangs the system and crashes Steam).
+5. **Side-by-side checks against Android.** Testers compare both apps; fix every difference outside the listed desktop divergences.
+6. **GNOME, KDE and SteamOS testing.** Install, wizard, launches and save sync on each.
+7. **Flathub submission.** Lint clean (folder grants, `flatpak-spawn`, screenshots, app id), offline from-source build in CI for x86_64 and aarch64, Flathub PR.
 

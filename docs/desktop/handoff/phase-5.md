@@ -2,7 +2,7 @@
 
 Rewritten (not appended) at the end of every work unit, so a fresh session can start from it alone. History and reasoning live in `DEVLOG.md`. Earlier phases: `phase-0.md` … `phase-4.md` (closed summaries).
 
-**Updated:** 2026-10-24 (phase not started; waiting for the owner at the phase gate). Steps 0 done.
+**Updated:** 2026-10-24 (Phase 5 started by the owner; step plan written, steps 1–4 are the owner's pre-beta fixes). No steps closed yet.
 
 ## Scope and exit criterion
 
@@ -16,7 +16,14 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 - Flathub lint: exceptions or alternatives for emulator folder grants and `flatpak-spawn` access, screenshots, the app id vs repository name; offline from-source build (Gradle dependencies as Flatpak sources).
 - YouTube trailers on desktop (deferred; needs yt-dlp and a JavaScript runtime).
 
-## First actions (once the owner starts the phase)
+## Pre-beta fixes (owner, 2026-10-24): steps 1–4, next action step 1
+
+1. Wizard: the desktop Permissions step (`EmulatorFolderAccessStep` in `FirstRunScreen.kt`, title/intro reuse `firstrun_permissions_*` keys) gets its own title "Emulators Argosy should manage" and a matching intro (new keys, eight locales); Android keeps its Permissions step.
+2. Quick Settings: desktop-only "Close Argosy" item (`QuickSettingsItem`, gate on `PlatformFeatures.desktopWindow`) → confirm modal (`ArgosyConfirmModal` pattern) → graceful exit: a shell hook observed by `Main.kt` that stops the gamepad dispatcher, background jobs and players, then `exitApplication()`.
+3. Thumbnails: check the desktop `ImageCacheManager` actual (stub?) and how Android caches covers during sync; implement the desktop cache so Home and platform selection show covers. Testbed games have no covers (synthetic): check against a game with IGDB art or the owner's library.
+4. Steam Game Mode: no gamescope session here; check whether `gamescope` can run nested for a test; review launch under gamescope (`flatpak-spawn --host` from inside a Steam-launched Flatpak, window focus) and shutdown (SIGTERM handling, non-daemon threads, SDL quit); ask the owner for `~/argosy-run.log` from a Game Mode session.
+
+## First actions
 
 1. Read the owner's Phase 4 test results and fix failures.
 2. Write the Phase 5 step plan in `DEVLOG.md` as a numbered `N. **Title.**` list under `**Phase 5 plan:**` (the progress page reads it).
