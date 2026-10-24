@@ -1,5 +1,6 @@
 package com.nendo.argosy.ui.screens.settings.sections
 
+import com.nendo.argosy.platform.PlatformFeatures
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -187,7 +188,7 @@ internal data class PlatformDetailVisibility(
             showExtension = config.showExtensionSelection,
             showDisplayTarget = config.showDisplayTargetOption,
             showLegacyMode = config.showLegacyModeOption,
-            isBuiltin = config.effectiveEmulatorId == EmulatorRegistry.BUILTIN_ID,
+            isBuiltin = PlatformFeatures.builtInEmulation && config.effectiveEmulatorId == EmulatorRegistry.BUILTIN_ID,
             isRetroArch = config.effectiveEmulatorIsRetroArch,
             showSavePath = config.showSavePath,
             showStatePath = detail.supportsStatePath,

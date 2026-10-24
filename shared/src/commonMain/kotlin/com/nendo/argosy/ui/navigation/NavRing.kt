@@ -1,5 +1,6 @@
 package com.nendo.argosy.ui.navigation
 
+import com.nendo.argosy.platform.PlatformFeatures
 import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.ui.DrawerItem
 
@@ -23,7 +24,7 @@ object NavRing {
         DrawerItem(Screen.SaveSync.route, R.string.ui_drawer_nav_save_sync),
         DrawerItem(Screen.Apps.route, R.string.ui_drawer_nav_apps),
         DrawerItem(Screen.Settings.route, R.string.ui_drawer_nav_settings)
-    )
+    ).filter { isOffered(it.route) }
 
     val DEFAULT_TOKENS: List<String> = listOf(
         Screen.Home.route,
@@ -40,6 +41,12 @@ object NavRing {
     private val knownTokens: Set<String> = PAGES.map { token(it.route) }.toSet()
 
     fun token(route: String): String = route.substringBefore('?')
+
+    private fun isOffered(route: String): Boolean = when (route) {
+        Screen.Social.route -> PlatformFeatures.social
+        Screen.MediaLibrary.route -> PlatformFeatures.jellyfin
+        else -> true
+    }
 
     fun routeMatches(destinationRoute: String, currentRoute: String?): Boolean =
         currentRoute != null && token(destinationRoute) == token(currentRoute)

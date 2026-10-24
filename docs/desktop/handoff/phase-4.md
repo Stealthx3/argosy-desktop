@@ -2,7 +2,7 @@
 
 Rewritten (not appended) at the end of every work unit, so a fresh session can start from it alone. History and reasoning live in `DEVLOG.md`; read only the parts this file points to. Earlier phases: `phase-0.md` … `phase-3.md` (closed summaries).
 
-**Updated:** 2026-10-23 (step 2 closed). Steps 1–2 done (step 1's owner hardware check still pending, below); next is step 3. The Phase 4 step plan (steps 1–10) is in `DEVLOG.md` under "Phase 4 · Linux adaptation" → "Phase 4 step plan". Nothing uncommitted.
+**Updated:** 2026-10-23 (step 3 part 1). Steps 1–2 done (step 1's owner hardware check still pending, below); step 3 in progress. The Phase 4 step plan (steps 1–10) is in `DEVLOG.md` under "Phase 4 · Linux adaptation" → "Phase 4 step plan". Nothing uncommitted.
 
 ## Scope and exit criterion
 
@@ -20,10 +20,11 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 - Not verified: a real controller with a remap, a Nintendo-layout pad with a remap (ask with the step 1 owner check).
 - Walk route to Button Mapping: from Home `START wait:2 DOWN*8 A`, `DOWN*2 A`, `DOWN A`; focus 1–16 actions, 17 reset, 21–36 keyboard, 37 keyboard reset. End walks with the resets.
 
-## Step 3 (desktop removals): next action
+## Step 3 (desktop removals): part 1 done, next part 2
 
-- Scope (plan step 3): Steam, Jellyfin and media, Argosy Social, the "Android Settings" row, built-in emulator settings, core downloads and the first-run cores step. Gate each entry point off on desktop through one desktop capability (follow `ControllerInputSupport` / `NavigationButtonCapture.supported`: an expect/actual flag, never a deletion from shared code); Steam stubs out of `desktopMain`; Android A/B unchanged.
-- First actions: list every entry point per item (Settings main rows, drawer `NavRing.PAGES`, Home rows, first-run steps, game-detail actions, deep links) and record the list in DEVLOG; check `PORT_PLAN.md` parity matrix "Remove" rows so nothing is missed; then gate in small committed parts, each with a desktop walk and `settings-walk.sh android` A/B against `p4s2-android`.
+- Done (DEVLOG "Step 3, part 1", with the entry-point list): `PlatformFeatures` (expect object, desktop all false) gates the Steam, Jellyfin, Social, Android Settings and Built-in Emulator main rows, the Social/Media drawer and ring pages, the Quick Settings Friends page, per-platform built-in rows and the first-run core steps. Evidence `build/desktop-check/p4s3/`, Android `p4s3-android` (identical to `p4s2-android` apart from live data).
+- **Next action, part 2:** (a) Steam stubs out of `desktopMain`: list the commonMain users of `SteamService`, `SteamContentManager`, `SteamPathResolver`, `SteamLaunchers` and decide per type (bind a desktop no-op through DI vs move the caller androidMain-only); keep Android unchanged. (b) Remaining traces: Steam games in library/game detail (only if Steam rows can exist on desktop), Jellyfin trailers or media on Home/game detail. (c) Ask the owner whether QuayPass / Check-In (drawer row, uses SocialRepository) goes with Social. (d) Fix the fresh-data wizard walk (welcome timing, URL field focus) and walk the wizard to confirm Image Cache → All Set.
+- Fresh-data wizard walk gotchas: run `pair-code.py` with `build/desktop-testbed/venv/bin/python` (system python lacks socketio); the dev run may open on Welcome or already on Login; `TYPE:` did not reach the URL field in three tries; add a 600 s `timeout` (one walk hung after its last shot until killed).
 
 ## Carried forward
 

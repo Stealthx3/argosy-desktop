@@ -1,5 +1,6 @@
 package com.nendo.argosy.ui.screens.settings.sections
 
+import com.nendo.argosy.platform.PlatformFeatures
 import com.nendo.argosy.platform.PlatformIntentType as Intent
 import com.nendo.argosy.platform.action
 import com.nendo.argosy.platform.data
@@ -137,7 +138,8 @@ internal sealed class MainSettingsItem(
         "builtin_emulator",
         Icons.Default.Build,
         R.string.settings_main_builtin_emulator_title,
-        "gameplay"
+        "gameplay",
+        { PlatformFeatures.builtInEmulation }
     )
     data object Saves :
         MainSettingsItem("saves", Icons.Default.Save, R.string.settings_main_saves_title, "gameplay")
@@ -177,16 +179,23 @@ internal sealed class MainSettingsItem(
         "steam",
         Icons.Default.CloudQueue,
         R.string.settings_main_steam_title,
-        "connections"
+        "connections",
+        { PlatformFeatures.steam }
     )
     data object Jellyfin : MainSettingsItem(
         "jellyfin",
         Icons.Default.Movie,
         R.string.settings_main_jellyfin_title,
-        "connections"
+        "connections",
+        { PlatformFeatures.jellyfin }
     )
-    data object Social :
-        MainSettingsItem("social", Icons.Default.Group, R.string.settings_main_social_title, "connections")
+    data object Social : MainSettingsItem(
+        "social",
+        Icons.Default.Group,
+        R.string.settings_main_social_title,
+        "connections",
+        { PlatformFeatures.social }
+    )
 
     data object Permissions : MainSettingsItem(
         "permissions",
@@ -198,7 +207,8 @@ internal sealed class MainSettingsItem(
         "device",
         Icons.Default.PhoneAndroid,
         R.string.settings_main_device_title,
-        "system"
+        "system",
+        { PlatformFeatures.deviceSettings }
     )
     data object About :
         MainSettingsItem("about", Icons.Default.Info, R.string.settings_main_about_title, "system")

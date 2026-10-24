@@ -1,5 +1,6 @@
 package com.nendo.argosy.ui.components
 
+import com.nendo.argosy.platform.PlatformFeatures
 import com.nendo.argosy.DualScreenManagerHolder
 import com.nendo.argosy.core.input.SoundType
 import com.nendo.argosy.data.preferences.ControlsPreferences
@@ -155,7 +156,7 @@ class QuickSettingsController(
             isDualScreenActive = screens.active,
             isRolesSwapped = screens.rolesSwapped,
             hudEnabled = hud,
-            isSocialLinked = prefs.isSocialLinked,
+            isSocialLinked = PlatformFeatures.social && prefs.isSocialLinked,
             isSocialConnected = social is SocialConnectionState.Connected,
             quayPassEnabled = prefs.quayPassEnabled
         )

@@ -1,5 +1,6 @@
 package com.nendo.argosy.ui.screens.firstrun
 
+import com.nendo.argosy.platform.PlatformFeatures
 import com.nendo.argosy.platform.PlatformManifest as Manifest
 import com.nendo.argosy.platform.PlatformBuild as Build
 import com.nendo.argosy.platform.PlatformPackageManagerConstants as PackageManager
@@ -80,6 +81,18 @@ data class CoreDownloadState(
     val status: CoreDownloadStatus = CoreDownloadStatus.PENDING,
     val errorMessage: String? = null
 )
+
+internal fun stepAfterPlatformSelect(builtInEmulation: Boolean = PlatformFeatures.builtInEmulation): FirstRunStep =
+    if (builtInEmulation) FirstRunStep.CORE_PROMPT else FirstRunStep.COMPLETE
+
+internal fun stepBeforeComplete(
+    rommPlatformCount: Int,
+    builtInEmulation: Boolean = PlatformFeatures.builtInEmulation
+): FirstRunStep = when {
+    builtInEmulation -> FirstRunStep.CORE_DOWNLOAD
+    rommPlatformCount > 10 -> FirstRunStep.PLATFORM_SELECT
+    else -> FirstRunStep.IMAGE_CACHE
+}
 
 enum class CoreDownloadStatus {
     PENDING, DOWNLOADING, COMPLETE, FAILED
@@ -212,9 +225,9 @@ class FirstRunViewModel @Inject constructor(
                     if (state.hostFolderAccessSupported) FirstRunStep.PERMISSIONS else FirstRunStep.IMAGE_CACHE
                 FirstRunStep.IMAGE_CACHE -> {
                     if (state.rommPlatformCount > 10) FirstRunStep.PLATFORM_SELECT
-                    else FirstRunStep.CORE_PROMPT
+                    else stepAfterPlatformSelect()
                 }
-                FirstRunStep.PLATFORM_SELECT -> FirstRunStep.CORE_PROMPT
+                FirstRunStep.PLATFORM_SELECT -> stepAfterPlatformSelect()
                 FirstRunStep.CORE_PROMPT -> FirstRunStep.CORE_DOWNLOAD
                 FirstRunStep.CORE_DOWNLOAD -> FirstRunStep.COMPLETE
                 FirstRunStep.COMPLETE -> FirstRunStep.COMPLETE
@@ -252,7 +265,7 @@ class FirstRunViewModel @Inject constructor(
                     else FirstRunStep.IMAGE_CACHE
                 }
                 FirstRunStep.CORE_DOWNLOAD -> FirstRunStep.CORE_PROMPT
-                FirstRunStep.COMPLETE -> FirstRunStep.CORE_DOWNLOAD
+                FirstRunStep.COMPLETE -> stepBeforeComplete(state.rommPlatformCount)
             }
             val initialFocus = if (prevStep == FirstRunStep.IMAGE_CACHE) 1 else 0
             state.copy(currentStep = prevStep, focusedIndex = initialFocus, rommUrlCommitted = false)
