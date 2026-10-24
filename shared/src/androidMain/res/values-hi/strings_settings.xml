@@ -107,6 +107,8 @@
     <string name="settings_interface_ui_scale_title">UI स्केल</string>
     <string name="settings_interface_compact_footer_title">कॉम्पैक्ट फ़ुटर</string>
     <string name="settings_interface_compact_footer_subtitle">पतली कंट्रोल गाइड बार का उपयोग करें</string>
+    <string name="settings_interface_start_full_screen_title">फ़ुल स्क्रीन में शुरू करें</string>
+    <string name="settings_interface_start_full_screen_subtitle">Argosy को विंडो के बजाय फ़ुल स्क्रीन में खोलें। F11 से कभी भी बदलें।</string>
     <string name="settings_interface_hide_system_nav_bar_title">सिस्टम नेविगेशन बार छिपाएँ</string>
     <string name="settings_interface_hide_system_nav_bar_subtitle">Android के बैक, होम और हाल के ऐप्स बटन या जेस्चर बार छिपाता है। दिखाने के लिए किनारे से स्वाइप करें</string>
     <string name="settings_interface_hide_system_status_bar_title">सिस्टम स्टेटस बार छिपाएँ</string>

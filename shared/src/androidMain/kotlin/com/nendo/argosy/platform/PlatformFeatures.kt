@@ -6,4 +6,6 @@ actual object PlatformFeatures {
     actual val social: Boolean = true
     actual val deviceSettings: Boolean = true
     actual val builtInEmulation: Boolean = true
+    actual val desktopWindow: Boolean = false
+    actual val darkThemeByDefault: Boolean = false
 }

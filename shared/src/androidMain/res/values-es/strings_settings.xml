@@ -119,6 +119,8 @@
     <string name="settings_interface_ui_scale_title">Escala de la interfaz</string>
     <string name="settings_interface_compact_footer_title">Pie de página compacto</string>
     <string name="settings_interface_compact_footer_subtitle">Usar una barra de controles más fina</string>
+    <string name="settings_interface_start_full_screen_title">Iniciar en pantalla completa</string>
+    <string name="settings_interface_start_full_screen_subtitle">Abrir Argosy a pantalla completa en lugar de en una ventana. F11 cambia en cualquier momento.</string>
     <string name="settings_interface_hide_system_nav_bar_title">Ocultar barra de navegación del sistema</string>
     <string name="settings_interface_hide_system_nav_bar_subtitle">Oculta los botones de atrás, inicio y recientes de Android o la barra de gestos. Desliza desde el borde para mostrarlos</string>
     <string name="settings_interface_hide_system_status_bar_title">Ocultar barra de estado del sistema</string>

@@ -307,6 +307,8 @@
     <string name="settings_interface_compact_footer_subtitle">Use a thinner control guide bar</string>
     <!-- Row title. Verb phrase: take Android's own navigation buttons or gesture bar off the
          screen. Not Argosy's in-app nav bar, which has its own setting. -->
+    <string name="settings_interface_start_full_screen_title">Start in Full Screen</string>
+    <string name="settings_interface_start_full_screen_subtitle">Open Argosy full screen instead of in a window. F11 switches at any time.</string>
     <string name="settings_interface_hide_system_nav_bar_title">Hide System Navigation Bar</string>
     <!-- Second line of that row. Says what is hidden and how to bring it back for a moment. -->
     <string name="settings_interface_hide_system_nav_bar_subtitle">Hide Android\'s back, home and recents buttons or gesture bar. Swipe from the edge to show them</string>

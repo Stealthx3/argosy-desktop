@@ -613,6 +613,8 @@ internal fun routeLoadSettings(vm: SettingsViewModel) {
             compactFooter = prefs.compactFooter,
             hideSystemNavigationBar = prefs.hideSystemNavigationBar,
             hideSystemStatusBar = prefs.hideSystemStatusBar,
+            startFullScreen = prefs.startFullScreen,
+            desktopWindow = com.nendo.argosy.platform.PlatformFeatures.desktopWindow,
             lockScreenArt = prefs.lockScreenArt,
             homeAppAvailable = prefs.homeAppAvailable,
             isDefaultHome = vm.displayDelegate.isDefaultHome(),

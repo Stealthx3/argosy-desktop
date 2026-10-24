@@ -276,6 +276,8 @@ data class DisplayState(
     val compactFooter: Boolean = false,
     val hideSystemNavigationBar: Boolean = true,
     val hideSystemStatusBar: Boolean = true,
+    val startFullScreen: Boolean = false,
+    val desktopWindow: Boolean = false,
     val lockScreenArt: Boolean = true,
     val homeAppAvailable: Boolean = true,
     val isDefaultHome: Boolean = false,

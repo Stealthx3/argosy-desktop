@@ -110,6 +110,8 @@
     <string name="settings_interface_ui_scale_title">Масштаб интерфейса</string>
     <string name="settings_interface_compact_footer_title">Компактная панель</string>
     <string name="settings_interface_compact_footer_subtitle">Использовать более тонкую панель подсказок</string>
+    <string name="settings_interface_start_full_screen_title">Запуск в полноэкранном режиме</string>
+    <string name="settings_interface_start_full_screen_subtitle">Открывать Argosy во весь экран, а не в окне. F11 переключает режим в любой момент.</string>
     <string name="settings_interface_hide_system_nav_bar_title">Скрывать системную панель навигации</string>
     <string name="settings_interface_hide_system_nav_bar_subtitle">Скрывает кнопки Android «Назад», «Домой» и «Недавние» или панель жестов. Проведите от края экрана, чтобы показать их</string>
     <string name="settings_interface_hide_system_status_bar_title">Скрывать системную строку состояния</string>

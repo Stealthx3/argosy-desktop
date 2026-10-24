@@ -5,7 +5,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.unit.Density
@@ -13,17 +18,22 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPlacement
+import androidx.compose.ui.window.WindowPosition
+import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.nendo.argosy.di.DesktopApplication
 import com.nendo.argosy.di.LocalViewModelProviders
 import com.nendo.argosy.di.viewModelFactory
+import com.nendo.argosy.platform.DesktopWindowMode
 import com.nendo.argosy.platform.LocalPlatformContext
 import com.nendo.argosy.platform.image.installDesktopImageLoader
 import com.nendo.argosy.ui.ArgosyApp
 import com.nendo.argosy.ui.theme.ALauncherTheme
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 
 fun main(args: Array<String>) {
     val options = ShellOptions.parse(args)
@@ -37,17 +47,27 @@ fun main(args: Array<String>) {
     app.component.backgroundJobs().start()
     val fontFamilyResolver = robotoFontFamilyResolver()
     val keyPipe = options.keyPipe?.let { KeyPipe(java.io.File(it), gamepadDispatcher) }?.also { it.start() }
+    val gamescope = DesktopWindowMode.isGamescope(System.getenv())
+    val startFullScreen = runBlocking { app.component.displayPreferences().preferences.first().startFullScreen }
+    val fullScreen = DesktopWindowMode.startsFullScreen(startFullScreen, options.fullScreenOverride, gamescope)
     application {
         val state = rememberWindowState(
-            placement = if (options.windowed) WindowPlacement.Floating else WindowPlacement.Fullscreen,
+            placement = if (fullScreen) WindowPlacement.Fullscreen else WindowPlacement.Floating,
+            position = WindowPosition(Alignment.Center),
             size = DpSize(options.width.dp, options.height.dp),
         )
         Window(
             onCloseRequest = ::exitApplication,
             title = "Argosy",
             state = state,
-            undecorated = !options.windowed,
-            onPreviewKeyEvent = keyDispatcher::dispatch,
+            onPreviewKeyEvent = { event ->
+                if (event.key == Key.F11) {
+                    if (event.type == KeyEventType.KeyDown && !gamescope) state.toggleFullScreen()
+                    true
+                } else {
+                    keyDispatcher.dispatch(event)
+                }
+            },
         ) {
             DisposableEffect(window) {
                 keyPipe?.attach(window)
@@ -89,7 +109,11 @@ fun tvDensity(heightPx: Int, fontScale: Float): Density =
 
 private const val TV_HEIGHT_DP = 540f
 
-data class ShellOptions(val windowed: Boolean, val width: Int, val height: Int, val keyPipe: String?) {
+private fun WindowState.toggleFullScreen() {
+    placement = if (placement == WindowPlacement.Fullscreen) WindowPlacement.Floating else WindowPlacement.Fullscreen
+}
+
+data class ShellOptions(val fullScreenOverride: Boolean?, val width: Int, val height: Int, val keyPipe: String?) {
     companion object {
         fun parse(args: Array<String>): ShellOptions {
             val size = args.firstOrNull { it.startsWith("--size=") }
@@ -98,11 +122,14 @@ data class ShellOptions(val windowed: Boolean, val width: Int, val height: Int, 
                 ?.mapNotNull { it.toIntOrNull() }
                 ?.takeIf { it.size == 2 }
             return ShellOptions(
-                windowed = "--windowed" in args,
-                width = size?.get(0) ?: 1920,
-                height = size?.get(1) ?: 1080,
+                fullScreenOverride = DesktopWindowMode.overrideFrom(args),
+                width = size?.get(0) ?: DEFAULT_WIDTH,
+                height = size?.get(1) ?: DEFAULT_HEIGHT,
                 keyPipe = args.firstOrNull { it.startsWith("--key-pipe=") }?.removePrefix("--key-pipe="),
             )
         }
+
+        private const val DEFAULT_WIDTH = 1280
+        private const val DEFAULT_HEIGHT = 720
     }
 }

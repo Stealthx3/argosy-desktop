@@ -81,8 +81,11 @@ internal sealed class InterfaceItem(
     data object Language : InterfaceItem("language", SECTION_GENERAL)
     data object UiScale : InterfaceItem("uiScale", SECTION_GENERAL)
     data object CompactFooter : InterfaceItem("compactFooter", SECTION_GENERAL)
-    data object HideSystemNavigationBar : InterfaceItem("hideSystemNavigationBar", SECTION_GENERAL)
-    data object HideSystemStatusBar : InterfaceItem("hideSystemStatusBar", SECTION_GENERAL)
+    data object StartFullScreen : InterfaceItem("startFullScreen", SECTION_GENERAL, { it.display.desktopWindow })
+    data object HideSystemNavigationBar :
+        InterfaceItem("hideSystemNavigationBar", SECTION_GENERAL, { !it.display.desktopWindow })
+    data object HideSystemStatusBar :
+        InterfaceItem("hideSystemStatusBar", SECTION_GENERAL, { !it.display.desktopWindow })
     data object ControllerGrip : InterfaceItem("controllerGrip", SECTION_GENERAL)
     data object HomeScreen : InterfaceItem("homeScreen", SECTION_SCREENS)
     data object LibraryView : InterfaceItem("libraryView", SECTION_SCREENS)
@@ -122,7 +125,7 @@ internal sealed class InterfaceItem(
         val ALL: List<InterfaceItem>
             get() = listOf(
                 Header("generalHeader", SECTION_GENERAL, R.string.settings_interface_section_general),
-                Language, UiScale, CompactFooter, HideSystemNavigationBar, HideSystemStatusBar,
+                Language, UiScale, CompactFooter, StartFullScreen, HideSystemNavigationBar, HideSystemStatusBar,
                 ControllerGrip,
                 Header("screensHeader", SECTION_SCREENS, R.string.settings_interface_section_screens),
                 HomeScreen, LibraryView, BoxArt, Presentation, LockScreenArt,
@@ -257,6 +260,14 @@ fun InterfaceSection(uiState: SettingsUiState, viewModel: SettingsViewModel) {
                     isEnabled = display.compactFooter,
                     isFocused = isFocused(item),
                     onToggle = { viewModel.setCompactFooter(it) }
+                )
+
+                InterfaceItem.StartFullScreen -> SwitchPreference(
+                    title = stringResource(R.string.settings_interface_start_full_screen_title),
+                    subtitle = stringResource(R.string.settings_interface_start_full_screen_subtitle),
+                    isEnabled = display.startFullScreen,
+                    isFocused = isFocused(item),
+                    onToggle = { viewModel.setStartFullScreen(it) }
                 )
 
                 InterfaceItem.HideSystemNavigationBar -> SwitchPreference(

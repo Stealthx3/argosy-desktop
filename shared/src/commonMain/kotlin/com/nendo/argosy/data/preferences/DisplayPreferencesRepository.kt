@@ -1,5 +1,6 @@
 package com.nendo.argosy.data.preferences
 
+import com.nendo.argosy.platform.PlatformFeatures
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -80,6 +81,7 @@ data class DisplayPreferences(
     val compactFooter: Boolean = false,
     val hideSystemNavigationBar: Boolean = true,
     val hideSystemStatusBar: Boolean = true,
+    val startFullScreen: Boolean = false,
     val lockScreenArt: Boolean = true,
     val homeAppAvailable: Boolean = true,
     val iconPack: String? = null,
@@ -186,6 +188,7 @@ class DisplayPreferencesRepository @Inject constructor(
         val COMPACT_FOOTER = booleanPreferencesKey("compact_footer")
         val HIDE_SYSTEM_NAVIGATION_BAR = booleanPreferencesKey("hide_system_navigation_bar")
         val HIDE_SYSTEM_STATUS_BAR = booleanPreferencesKey("hide_system_status_bar")
+        val START_FULL_SCREEN = booleanPreferencesKey("start_full_screen")
         val LOCK_SCREEN_ART = booleanPreferencesKey("lock_screen_art")
         val LOCK_SCREEN_ART_APPLIED = booleanPreferencesKey("lock_screen_art_applied")
         val LIVE_WALLPAPER_OFFERED = booleanPreferencesKey("live_wallpaper_offered")
@@ -243,7 +246,8 @@ class DisplayPreferencesRepository @Inject constructor(
             showStatusClock = prefs[Keys.SHOW_STATUS_CLOCK] ?: true,
             showStatusBattery = prefs[Keys.SHOW_STATUS_BATTERY] ?: true,
             showStatusNetwork = prefs[Keys.SHOW_STATUS_NETWORK] ?: false,
-            themeMode = ThemeMode.fromString(prefs[Keys.THEME_MODE]),
+            themeMode = prefs[Keys.THEME_MODE]?.let(ThemeMode::fromString)
+                ?: if (PlatformFeatures.darkThemeByDefault) ThemeMode.DARK else ThemeMode.SYSTEM,
             primaryColor = prefs[Keys.PRIMARY_COLOR],
             secondaryColor = prefs[Keys.SECONDARY_COLOR],
             tertiaryColor = prefs[Keys.TERTIARY_COLOR],
@@ -300,6 +304,7 @@ class DisplayPreferencesRepository @Inject constructor(
             compactFooter = prefs[Keys.COMPACT_FOOTER] ?: false,
             hideSystemNavigationBar = prefs[Keys.HIDE_SYSTEM_NAVIGATION_BAR] ?: true,
             hideSystemStatusBar = prefs[Keys.HIDE_SYSTEM_STATUS_BAR] ?: true,
+            startFullScreen = prefs[Keys.START_FULL_SCREEN] ?: false,
             lockScreenArt = prefs[Keys.LOCK_SCREEN_ART] ?: true,
             homeAppAvailable = prefs[Keys.HOME_APP_AVAILABLE] ?: true,
             iconPack = prefs[Keys.ICON_PACK],
@@ -610,6 +615,10 @@ class DisplayPreferencesRepository @Inject constructor(
 
     suspend fun setHideSystemStatusBar(hide: Boolean) {
         dataStore.edit { it[Keys.HIDE_SYSTEM_STATUS_BAR] = hide }
+    }
+
+    suspend fun setStartFullScreen(fullScreen: Boolean) {
+        dataStore.edit { it[Keys.START_FULL_SCREEN] = fullScreen }
     }
 
     suspend fun setLockScreenArt(enabled: Boolean) {

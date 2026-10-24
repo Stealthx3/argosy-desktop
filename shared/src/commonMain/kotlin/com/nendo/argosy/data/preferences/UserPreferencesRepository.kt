@@ -133,6 +133,7 @@ class UserPreferencesRepository @Inject constructor(
             compactFooter = display.compactFooter,
             hideSystemNavigationBar = display.hideSystemNavigationBar,
             hideSystemStatusBar = display.hideSystemStatusBar,
+            startFullScreen = display.startFullScreen,
             lockScreenArt = display.lockScreenArt,
             homeAppAvailable = display.homeAppAvailable,
             iconPack = display.iconPack,
@@ -357,6 +358,7 @@ class UserPreferencesRepository @Inject constructor(
     suspend fun setUseAccentColorFooter(use: Boolean) = displayPrefs.setUseAccentColorFooter(use)
     suspend fun setCompactFooter(enabled: Boolean) = displayPrefs.setCompactFooter(enabled)
     suspend fun setHideSystemNavigationBar(hide: Boolean) = displayPrefs.setHideSystemNavigationBar(hide)
+    suspend fun setStartFullScreen(fullScreen: Boolean) = displayPrefs.setStartFullScreen(fullScreen)
     suspend fun setHideSystemStatusBar(hide: Boolean) = displayPrefs.setHideSystemStatusBar(hide)
     suspend fun setLockScreenArt(enabled: Boolean) = displayPrefs.setLockScreenArt(enabled)
     suspend fun setIconPack(packageName: String?) = displayPrefs.setIconPack(packageName)

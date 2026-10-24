@@ -564,6 +564,13 @@ class DisplaySettingsDelegate @Inject constructor(
         }
     }
 
+    fun setStartFullScreen(scope: CoroutineScope, fullScreen: Boolean) {
+        scope.launch {
+            preferencesRepository.setStartFullScreen(fullScreen)
+            _state.update { it.copy(startFullScreen = fullScreen) }
+        }
+    }
+
     fun setHideSystemNavigationBar(scope: CoroutineScope, hide: Boolean) {
         scope.launch {
             preferencesRepository.setHideSystemNavigationBar(hide)

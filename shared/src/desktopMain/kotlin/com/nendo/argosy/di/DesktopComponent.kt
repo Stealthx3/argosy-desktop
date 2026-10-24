@@ -2,6 +2,7 @@ package com.nendo.argosy.di
 
 import com.nendo.argosy.data.emulator.HostSessionWatcher
 import com.nendo.argosy.data.local.dao.PlatformDao
+import com.nendo.argosy.data.preferences.DisplayPreferencesRepository
 import com.nendo.argosy.data.preferences.SyncPreferencesRepository
 import com.nendo.argosy.data.remote.romm.RomMConnectionManager
 import com.nendo.argosy.data.remote.ssl.UserCertStore
@@ -23,6 +24,8 @@ interface DesktopComponent : LaunchProgressEntryPoint {
     fun platformDao(): PlatformDao
 
     fun syncPreferences(): SyncPreferencesRepository
+
+    fun displayPreferences(): DisplayPreferencesRepository
 
     fun monthlyRecapController(): MonthlyRecapController
 

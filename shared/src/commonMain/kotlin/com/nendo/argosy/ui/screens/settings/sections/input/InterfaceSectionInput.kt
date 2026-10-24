@@ -61,6 +61,9 @@ internal class InterfaceSectionInput(
             InterfaceItem.CompactFooter -> return toggleLeftRight(direction, state.display.compactFooter) {
                 viewModel.setCompactFooter(it)
             }
+            InterfaceItem.StartFullScreen -> return toggleLeftRight(direction, state.display.startFullScreen) {
+                viewModel.setStartFullScreen(it)
+            }
             InterfaceItem.HideSystemNavigationBar ->
                 return toggleLeftRight(direction, state.display.hideSystemNavigationBar) {
                     viewModel.setHideSystemNavigationBar(it)

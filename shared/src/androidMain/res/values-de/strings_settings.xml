@@ -117,6 +117,8 @@
     <string name="settings_interface_ui_scale_title">UI-Skalierung</string>
     <string name="settings_interface_compact_footer_title">Kompakter Footer</string>
     <string name="settings_interface_compact_footer_subtitle">Schmalere Bedienleiste verwenden</string>
+    <string name="settings_interface_start_full_screen_title">Im Vollbild starten</string>
+    <string name="settings_interface_start_full_screen_subtitle">Argosy im Vollbild statt in einem Fenster öffnen. F11 wechselt jederzeit.</string>
     <string name="settings_interface_hide_system_nav_bar_title">System-Navigationsleiste ausblenden</string>
     <string name="settings_interface_hide_system_nav_bar_subtitle">Blendet die Android-Tasten für Zurück, Startbildschirm und Übersicht oder die Gestenleiste aus. Vom Rand wischen, um sie anzuzeigen</string>
     <string name="settings_interface_hide_system_status_bar_title">System-Statusleiste ausblenden</string>

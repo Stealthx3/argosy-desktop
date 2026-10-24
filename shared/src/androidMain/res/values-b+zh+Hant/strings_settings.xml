@@ -96,6 +96,8 @@
     <string name="settings_interface_ui_scale_title">介面縮放</string>
     <string name="settings_interface_compact_footer_title">精簡頁尾</string>
     <string name="settings_interface_compact_footer_subtitle">使用較窄的操作提示列</string>
+    <string name="settings_interface_start_full_screen_title">以全螢幕啟動</string>
+    <string name="settings_interface_start_full_screen_subtitle">以全螢幕而非視窗方式開啟 Argosy。隨時按 F11 切換。</string>
     <string name="settings_interface_hide_system_nav_bar_title">隱藏系統導覽列</string>
     <string name="settings_interface_hide_system_nav_bar_subtitle">隱藏 Android 的返回、主畫面和最近使用按鈕或手勢列。從邊緣滑動即可顯示</string>
     <string name="settings_interface_hide_system_status_bar_title">隱藏系統狀態列</string>

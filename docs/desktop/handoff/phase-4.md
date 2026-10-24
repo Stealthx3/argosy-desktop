@@ -2,7 +2,7 @@
 
 Rewritten (not appended) at the end of every work unit, so a fresh session can start from it alone. History and reasoning live in `DEVLOG.md`; read only the parts this file points to. Earlier phases: `phase-0.md` … `phase-3.md` (closed summaries).
 
-**Updated:** 2026-10-23 (step 3 closed). Steps 1–3 done (step 1's owner hardware check still pending, below); next is step 4. The Phase 4 step plan (steps 1–10) is in `DEVLOG.md` under "Phase 4 · Linux adaptation" → "Phase 4 step plan". Nothing uncommitted.
+**Updated:** 2026-10-23 (step 4 closed). Steps 1–4 done (step 1's owner hardware check still pending, below); next is step 5. The Phase 4 step plan (steps 1–10) is in `DEVLOG.md` under "Phase 4 · Linux adaptation" → "Phase 4 step plan". Nothing uncommitted.
 
 ## Scope and exit criterion
 
@@ -18,16 +18,20 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 
 - Parts 1–3 in DEVLOG ("Step 2, part 1/2/3"). Footer glyphs follow the active controller's remap through `LocalButtonGlyphRemap` (identity on Android); mapping rows use friendly key names. Evidence `build/desktop-check/p4s2/`, `p4s2p3/`, Android `p4s2-android` (identical to `p4s1-android` apart from live data).
 - Not verified: a real controller with a remap, a Nintendo-layout pad with a remap (ask with the step 1 owner check).
-- Walk route to Button Mapping: from Home `START wait:2 DOWN*8 A`, `DOWN*2 A`, `DOWN A`; focus 1–16 actions, 17 reset, 21–36 keyboard, 37 keyboard reset. End walks with the resets.
+- Walk route to Button Mapping: from Home `START wait:2 DOWN*7 A` (Settings; DOWN×8 now opens Accounts), `DOWN*2 A`, `DOWN A`; focus 1–16 actions, 17 reset, 21–36 keyboard, 37 keyboard reset. End walks with the resets.
 
 ## Step 3 (desktop removals): closed
 
 - DEVLOG "Step 3, part 1" (entry-point list, `PlatformFeatures`), "part 2" (QuayPass with Social; JavaSteam inert by owner decision; no remaining traces; wizard verified). Evidence `p4s3/`, `p4s3b/`, `fresh-p4s3w/`, Android `p4s3-android`, `p4s3b-android`.
 
-## Step 4 (window and full screen): next action
+## Step 4 (window and full screen): closed
 
-- Scope (plan step 4): decorated window with the system title bar; first launch windowed and dark; Interface → "Start in full screen" through the full settings chain (DataStore key → prefs repo → UserPreferences → SettingsModels → SettingsInitRouter → delegate/confirm router → section → consumption in `desktopApp` `Main.kt`); F11 toggle; gamescope forces full screen; `--windowed` / `--fullscreen` override the setting.
-- First actions: read `desktopApp/src/.../Main.kt` window creation and its current flags (`--windowed`, `--size` already exist for walks); find how Interface rows are declared (follow `NavigationItem.ButtonMapping`'s desktop-only visibility); detect gamescope (`GAMESCOPE_WAYLAND_DISPLAY` / `XDG_CURRENT_DESKTOP=gamescope`); default theme dark on first launch only (check upstream's theme default before changing anything shared).
+- DEVLOG "Step 4". Decorated 1280×720 window, F11, gamescope forced, `--fullscreen`/`--windowed`, Interface → Start in Full Screen (desktop only; Android's system-bar rows hidden on desktop), dark when no theme is stored. Evidence `p4s4/`, `fresh-p4s4/`, Android `p4s4-android2`. Not verified: launch with the setting on, real gamescope (owner test with the next alpha).
+
+## Step 5 (display profiles and the wizard's Display setup step): next action
+
+- Scope (plan step 5): Handheld / Desktop / TV profiles with auto-detection (DMI product, gamescope, EDID physical size), TV → upstream's TV `AspectRatioClass`, TV safe area (default 3 %, confirm with the owner), touch and cursor rules for handhelds; a first-run step after Welcome with live thumbnail previews (confirm with the owner); the same cards in Interface → Display profile.
+- First actions: read `PORT_PLAN.md` "Display profiles" text (grep "Display profile"); find `AspectRatioClass` and how upstream picks TV vs handheld (`ui/theme` or `util`); see how `tvDensity` in `Main.kt` relates (540 dp rule); list what each profile changes before writing code, and put the two owner questions (safe area default, live thumbnails) in one message at the first natural stop.
 
 ## Carried forward
 

@@ -1205,6 +1205,8 @@ class SettingsViewModel @Inject constructor(
     fun adjustPresentationBackgroundBlur(delta: Int) = routeAdjustPresentationBackgroundBlur(this, delta)
     fun setUseAccentColorFooter(use: Boolean) = displayDelegate.setUseAccentColorFooter(viewModelScope, use)
     fun setCompactFooter(enabled: Boolean) = displayDelegate.setCompactFooter(viewModelScope, enabled)
+    fun setStartFullScreen(fullScreen: Boolean) = displayDelegate.setStartFullScreen(viewModelScope, fullScreen)
+
     fun setHideSystemNavigationBar(hide: Boolean) =
         displayDelegate.setHideSystemNavigationBar(viewModelScope, hide)
     fun setHideSystemStatusBar(hide: Boolean) = displayDelegate.setHideSystemStatusBar(viewModelScope, hide)
