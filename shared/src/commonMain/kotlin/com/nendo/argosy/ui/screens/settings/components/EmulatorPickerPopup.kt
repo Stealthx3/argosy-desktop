@@ -258,6 +258,7 @@ fun EmulatorPickerPopup(
                         is PickerItem.DownloadableItem -> {
                             val isTouchSelected = selectedIndex == item.itemIndex
                             val isPlayStore = item.emulator.downloadUrl?.contains("play.google.com") == true
+                            val isFlathub = item.emulator.downloadUrl?.startsWith(FLATHUB_APPS) == true
                             val isDownloading = info.downloadingEmulatorId == item.emulator.id
                             val downloadState = if (isDownloading) info.downloadState else EmulatorDownloadState.Idle
                             val isDisabled = info.downloadState !is EmulatorDownloadState.Idle && !isDownloading
@@ -273,6 +274,7 @@ fun EmulatorPickerPopup(
                                 downloadState is EmulatorDownloadState.Failed ->
                                     stringResource(R.string.settings_emulator_picker_downloadable_download_error)
                                 isPlayStore -> stringResource(R.string.settings_emulator_picker_source_play_store)
+                                isFlathub -> stringResource(R.string.settings_emulator_picker_source_flathub)
                                 else -> stringResource(R.string.settings_emulator_picker_source_github)
                             }
 
@@ -441,3 +443,5 @@ private fun EmulatorPickerItem(
         }
     }
 }
+
+private const val FLATHUB_APPS = "https://flathub.org/apps/"

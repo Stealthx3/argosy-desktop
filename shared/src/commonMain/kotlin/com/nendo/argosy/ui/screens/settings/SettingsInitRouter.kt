@@ -431,9 +431,13 @@ internal fun routeLoadSettings(vm: SettingsViewModel) {
             val isUserConfigured = defaultConfig != null
 
             val recommended = EmulatorRegistry.getRecommendedEmulators()[canonicalSlug] ?: emptyList()
-            val downloadable = recommended
-                .mapNotNull { EmulatorRegistry.getById(it) }
-                .filter { it.packageName !in installedPackages && it.downloadUrl != null }
+            val downloadable = if (vm.emulatorDelegate.emulatorSuggestions.isSupported) {
+                vm.emulatorDelegate.emulatorSuggestions.forPlatform(canonicalSlug, installedPackages)
+            } else {
+                recommended
+                    .mapNotNull { EmulatorRegistry.getById(it) }
+                    .filter { it.packageName !in installedPackages && it.downloadUrl != null }
+            }
 
             val rawSelectedEmulatorDef = defaultConfig?.packageName?.let { vm.emulatorDetector.getByPackage(it) }
             val selectedEmulatorDef = if (!prefs.builtinLibretroEnabled && rawSelectedEmulatorDef?.id == EmulatorRegistry.BUILTIN_ID) {

@@ -4141,6 +4141,7 @@
     <string name="settings_emulator_picker_source_play_store" translatable="false">Play Store</string>
     <!-- Subtitle naming the download source. Product name, never translated. -->
     <string name="settings_emulator_picker_source_github" translatable="false">GitHub</string>
+    <string name="settings_emulator_picker_source_flathub" translatable="false">Flathub</string>
     <!-- Row name for launching the game with an app the user picks manually. -->
     <string name="settings_emulator_picker_other_app_name">Other app...</string>
     <!-- Row subtitle for the "Other app" row. -->

@@ -4,6 +4,7 @@
     {
       "id": "retroarch",
       "name": "RetroArch",
+      "flathub": "org.libretro.RetroArch",
       "flatpakIds": [
         "org.libretro.RetroArch"
       ],
@@ -17,6 +18,7 @@
     {
       "id": "dolphin",
       "name": "Dolphin",
+      "flathub": "org.DolphinEmu.dolphin-emu",
       "flatpakIds": [
         "org.DolphinEmu.dolphin-emu"
       ],
@@ -37,6 +39,7 @@
     {
       "id": "cemu",
       "name": "Cemu",
+      "flathub": "info.cemu.Cemu",
       "flatpakIds": [
         "info.cemu.Cemu"
       ],
@@ -57,6 +60,7 @@
     {
       "id": "azahar",
       "name": "Azahar",
+      "flathub": "org.azahar_emu.Azahar",
       "flatpakIds": [
         "org.azahar_emu.Azahar"
       ],
@@ -70,6 +74,7 @@
     {
       "id": "ryujinx",
       "name": "Ryujinx",
+      "flathub": "io.github.ryubing.Ryujinx",
       "flatpakIds": [
         "io.github.ryubing.Ryujinx"
       ],
@@ -87,6 +92,7 @@
     {
       "id": "eden",
       "name": "Eden",
+      "flathub": "dev.eden_emu.eden",
       "flatpakIds": [
         "dev.eden_emu.eden"
       ],
@@ -100,6 +106,7 @@
     {
       "id": "melonds",
       "name": "melonDS",
+      "flathub": "net.kuribo64.melonDS",
       "flatpakIds": [
         "net.kuribo64.melonDS"
       ],
@@ -113,6 +120,7 @@
     {
       "id": "duckstation",
       "name": "DuckStation",
+      "flathub": "org.duckstation.DuckStation",
       "flatpakIds": [
         "org.duckstation.DuckStation"
       ],
@@ -126,6 +134,7 @@
     {
       "id": "pcsx2",
       "name": "PCSX2",
+      "flathub": "net.pcsx2.PCSX2",
       "flatpakIds": [
         "net.pcsx2.PCSX2"
       ],
@@ -139,6 +148,7 @@
     {
       "id": "ppsspp",
       "name": "PPSSPP",
+      "flathub": "org.ppsspp.PPSSPP",
       "flatpakIds": [
         "org.ppsspp.PPSSPP"
       ],
@@ -173,6 +183,7 @@
     {
       "id": "flycast",
       "name": "Flycast",
+      "flathub": "org.flycast.Flycast",
       "flatpakIds": [
         "org.flycast.Flycast"
       ],
@@ -186,6 +197,7 @@
     {
       "id": "scummvm",
       "name": "ScummVM",
+      "flathub": "org.scummvm.ScummVM",
       "flatpakIds": [
         "org.scummvm.ScummVM"
       ],
@@ -199,6 +211,7 @@
     {
       "id": "mame4droid",
       "name": "MAME",
+      "flathub": "org.mamedev.MAME",
       "flatpakIds": [
         "org.mamedev.MAME"
       ],
@@ -209,6 +222,7 @@
     {
       "id": "dosbox_turbo",
       "name": "DOSBox",
+      "flathub": "com.dosbox_x.DOSBox-X",
       "flatpakIds": [
         "com.dosbox_x.DOSBox-X",
         "io.github.dosbox-staging"
@@ -228,6 +242,7 @@
     {
       "id": "aps3e",
       "name": "RPCS3",
+      "flathub": "net.rpcs3.RPCS3",
       "flatpakIds": [
         "net.rpcs3.RPCS3"
       ],
@@ -241,6 +256,7 @@
     {
       "id": "mupen64plus_fz",
       "name": "Rosalie's Mupen GUI",
+      "flathub": "com.github.Rosalie241.RMG",
       "flatpakIds": [
         "com.github.Rosalie241.RMG"
       ],
@@ -254,6 +270,7 @@
     {
       "id": "linkboy",
       "name": "mGBA",
+      "flathub": "io.mgba.mGBA",
       "flatpakIds": [
         "io.mgba.mGBA"
       ],
@@ -273,6 +290,7 @@
     {
       "id": "super_zsnes",
       "name": "Snes9x",
+      "flathub": "com.snes9x.Snes9x",
       "flatpakIds": [
         "com.snes9x.Snes9x"
       ],
@@ -292,6 +310,7 @@
     {
       "id": "hakux",
       "name": "xemu",
+      "flathub": "app.xemu.xemu",
       "flatpakIds": [
         "app.xemu.xemu"
       ],

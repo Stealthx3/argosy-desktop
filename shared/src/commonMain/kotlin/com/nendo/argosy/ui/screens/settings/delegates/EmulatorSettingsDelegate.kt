@@ -75,7 +75,8 @@ class EmulatorSettingsDelegate @Inject constructor(
     private val emulatorUpdateRepository: EmulatorUpdateRepository,
     private val saveHandlerRegistry: PlatformSaveHandlerRegistry,
     private val savePathAuthority: com.nendo.argosy.data.emulator.savepath.SavePathAuthority,
-    private val builtinCoreSummaryLoader: BuiltinCoreSummaryLoader
+    private val builtinCoreSummaryLoader: BuiltinCoreSummaryLoader,
+    val emulatorSuggestions: com.nendo.argosy.data.emulator.EmulatorSuggestions
 ) {
     companion object {
         private const val TAG = "EmulatorSettingsDelegate"
@@ -321,7 +322,9 @@ class EmulatorSettingsDelegate @Inject constructor(
                     val downloadIndex = focusIndex - downloadBaseIndex
                     val emulator = info.downloadableEmulators.getOrNull(downloadIndex) ?: return@launch
 
-                    if (emulator.releaseSource != null) {
+                    if (emulatorSuggestions.isSupported) {
+                        installSuggestedEmulator(emulator, onLoadSettings)
+                    } else if (emulator.releaseSource != null) {
                         fetchAndDownloadEmulator(emulator)
                     } else {
                         emulator.downloadUrl?.let { _openUrlEvent.emit(it) }
@@ -1014,6 +1017,26 @@ class EmulatorSettingsDelegate @Inject constructor(
                     downloadingEmulatorId = emulatorId
                 )
             )
+        }
+    }
+
+    private suspend fun installSuggestedEmulator(
+        emulator: com.nendo.argosy.data.emulator.EmulatorDef,
+        onLoadSettings: suspend () -> Unit
+    ) {
+        setPickerDownloadState(EmulatorDownloadState.Downloading(0f), emulator.id)
+        val installed = emulatorSuggestions.install(emulator)
+        setPickerDownloadState(
+            if (installed) EmulatorDownloadState.Installed else EmulatorDownloadState.Failed(emulator.id),
+            emulator.id
+        )
+        if (installed) onLoadSettings()
+    }
+
+    private fun setPickerDownloadState(downloadState: EmulatorDownloadState, emulatorId: String) {
+        _state.update { state ->
+            val info = state.emulatorPickerInfo ?: return@update state
+            state.copy(emulatorPickerInfo = info.copy(downloadState = downloadState, downloadingEmulatorId = emulatorId))
         }
     }
 

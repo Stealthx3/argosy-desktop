@@ -30,7 +30,8 @@ class EmulatorDisplayTargetWriteTest {
         emulatorUpdateRepository = mockk(relaxed = true),
         saveHandlerRegistry = mockk(relaxed = true),
         savePathAuthority = mockk(relaxed = true),
-        builtinCoreSummaryLoader = mockk(relaxed = true)
+        builtinCoreSummaryLoader = mockk(relaxed = true),
+        emulatorSuggestions = com.nendo.argosy.data.emulator.EmulatorSuggestions()
     )
 
     @Test
