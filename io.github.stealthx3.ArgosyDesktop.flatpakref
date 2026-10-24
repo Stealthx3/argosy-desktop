@@ -1,0 +1,11 @@
+[Flatpak Ref]
+Title=Argosy Desktop
+Name=io.github.stealthx3.ArgosyDesktop
+Branch=master
+Url=https://stealthx3.github.io/argosy-desktop/repo/
+SuggestRemoteName=argosy-desktop
+Homepage=https://github.com/Stealthx3/argosy-desktop
+Icon=https://raw.githubusercontent.com/Stealthx3/argosy-desktop/main/argosy_icon.svg
+IsRuntime=false
+RuntimeRepo=https://dl.flathub.org/repo/flathub.flatpakrepo
+GPGKey=mDMEatu0rRYJKwYBBAHaRw8BAQdAcH5J+GkRCbmsIU5ETY7y7ZiJXb7+PByVP5Zepl2lP2O0L0FyZ29zeSBEZXNrdG9wIEZsYXRwYWsgcmVwbyAoYWxwaGEgc2lnbmluZyBrZXkpiJAEExYKADgWIQRcyIxWO8vNT3HQlid93uWWrrXxhgUCatu0rQIbAwULCQgHAgYVCgkICwIEFgIDAQIeAQIXgAAKCRB93uWWrrXxhv6GAQD8hG7wX8VvgcMHnN2hzhmaFhm+EfUXBuuPYVSTBSNN8gEAslNhXMtXJjDisMDUYcs1PTYErHKZJp88cffP++SeDQs=
