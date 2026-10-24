@@ -2,7 +2,7 @@
 
 Rewritten (not appended) at the end of every work unit, so a fresh session can start from it alone. History and reasoning live in `DEVLOG.md`; read only the parts this file points to. Earlier phases: `phase-0.md` … `phase-3.md` (closed summaries).
 
-**Updated:** 2026-10-24 (step 8 closed). Steps 1–8 done (step 1's owner hardware check still pending, below); next is step 9. The Phase 4 step plan (steps 1–10) is in `DEVLOG.md` under "Phase 4 · Linux adaptation" → "Phase 4 step plan". Nothing uncommitted.
+**Updated:** 2026-10-24 (step 9 investigation). Steps 1–8 done (step 1's owner hardware check still pending, below); step 9 in progress. The Phase 4 step plan (steps 1–10) is in `DEVLOG.md` under "Phase 4 · Linux adaptation" → "Phase 4 step plan". Nothing uncommitted.
 
 ## Scope and exit criterion
 
@@ -44,9 +44,11 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 
 - DEVLOG "Step 8 decisions" and parts 1–3. Not verified: a real Flathub install from the picker, an AppImage install or a Flatpak update from Managed Installers (owner tests in the part 2 and part 3 entries), the remote database refresh (repo `main` has no copy until the phase push).
 
-## Step 9 (libmpv video wallpaper): next action
+## Step 9 (libmpv video wallpaper): investigation done, part 1 next
 
-- Scope (plan step 9): libmpv rendered into a Compose surface for video wallpaper (and trailers where upstream shows them). First actions: find upstream's video wallpaper / trailer playback (grep `ExoPlayer`, `VideoWallpaper`, `trailer`) and the desktop stand-in today; check libmpv availability (system `libmpv.so.2`, and in the Flatpak runtime: org.freedesktop.Platform has no mpv; a module in the manifest may be needed); pick the render path (mpv render API to an OpenGL texture vs software frames into a Skia image) with a spike before wiring.
+- Findings and part plan in DEVLOG "Step 9 investigation". Video entry points: `YouTubeVideoPlayer`, `InlineTilePlayer`, `PageThemePlayer` (desktop actuals empty).
+- **Next action, part 1:** add manifest modules to `desktopApp/flatpak/io.github.stealthx3.ArgosyDesktop.yml`: libass (meson/autotools; needs fribidi, harfbuzz, freetype from the SDK), libplacebo (meson, `-Dvulkan` per SDK headers, no demos), mpv (meson `-Dlibmpv=true -Dcplayer=false -Dlua=disabled`), each pinned by tag + sha256; `add-extensions`/`inherit-extensions` for `org.freedesktop.Platform.ffmpeg-full` (version 25.08). Then a JNA probe (`mpv_client_api_version`) run inside the built Flatpak. Builds are long: run `build-alpha.sh` in the background and log to a file.
+- libmpv is not installed on the host; do not install packages on the owner's system without asking. Dev-run playback stays empty until then.
 
 ## Every step close from now on
 
