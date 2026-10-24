@@ -1283,3 +1283,7 @@ Mapped ids: retroarch, dolphin, cemu, azahar, ryujinx (Ryubing), eden, melonds, 
 **Verification:** inside the built Flatpak: a 4 s 640×360 VP9 WebM rendered 119 frames, an H.264 MP4 118 frames (≈30 fps, 4 s), centre pixel `#0707ff` (the test pattern), so H.264 decodes with the 25.08 runtime even without the ffmpeg-full extension. Gate `:shared:desktopTest` (131) + `:app:testDebugUnitTest` (4,426), 0 failures; both apps build; checks clean; desktop-only change (no Android A/B beyond the gate). **Not verified:** a tile or page backdrop video in the running UI (needs a custom-grid tile or backdrop with a local video file set up), seek ticks (`seekTicks` is not mapped yet), audio output through PipeWire in the sandbox (the probe is muted).
 **Next (part 3):** YouTube trailers for the Home video wallpaper.
 
+### 2026-10-24 — Step 9, part 3: blocked on the owner
+
+- yt-dlp 2026.10.21 (`yt-dlp` zipapp, sha256 matches the release's SHA2-256SUMS) was downloaded to the scratchpad for a test inside the Flatpak runtime; running it was denied by the session's permission check (executing code from an external source). Not worked around. Asked the owner: allow running and bundling yt-dlp, or close step 9 with local video only (YouTube trailers stay empty on desktop). Also open: recent yt-dlp expects a JavaScript runtime for YouTube; the Flatpak runtime has none (bundling Deno would add roughly 100 MB).
+
