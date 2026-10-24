@@ -2,7 +2,7 @@
 
 Rewritten (not appended) at the end of every work unit, so a fresh session can start from it alone. History and reasoning live in `DEVLOG.md`; read only the parts this file points to. Earlier phases: `phase-0.md` … `phase-3.md` (closed summaries).
 
-**Updated:** 2026-10-23 (step 3 part 2: QuayPass / Check-In hidden with Social, committed). Steps 1–2 done (step 1's owner hardware check still pending, below); step 3 in progress. The Phase 4 step plan (steps 1–10) is in `DEVLOG.md` under "Phase 4 · Linux adaptation" → "Phase 4 step plan". Nothing uncommitted.
+**Updated:** 2026-10-23 (step 3 closed). Steps 1–3 done (step 1's owner hardware check still pending, below); next is step 4. The Phase 4 step plan (steps 1–10) is in `DEVLOG.md` under "Phase 4 · Linux adaptation" → "Phase 4 step plan". Nothing uncommitted.
 
 ## Scope and exit criterion
 
@@ -20,12 +20,14 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 - Not verified: a real controller with a remap, a Nintendo-layout pad with a remap (ask with the step 1 owner check).
 - Walk route to Button Mapping: from Home `START wait:2 DOWN*8 A`, `DOWN*2 A`, `DOWN A`; focus 1–16 actions, 17 reset, 21–36 keyboard, 37 keyboard reset. End walks with the resets.
 
-## Step 3 (desktop removals): part 1 done, next part 2
+## Step 3 (desktop removals): closed
 
-- Done (DEVLOG "Step 3, part 1", with the entry-point list): `PlatformFeatures` (expect object, desktop all false) gates the Steam, Jellyfin, Social, Android Settings and Built-in Emulator main rows, the Social/Media drawer and ring pages, the Quick Settings Friends page, per-platform built-in rows and the first-run core steps. Evidence `build/desktop-check/p4s3/`, Android `p4s3-android` (identical to `p4s2-android` apart from live data).
-- **Next action, part 2:** (a) Steam stubs out of `desktopMain` — scope found: JavaSteam is a **commonMain** dependency (`shared/build.gradle.kts` commonMain `libs.bundles.steam`) imported by 7 commonMain files, including the `SteamService`/`SteamContentManager` expects (JavaSteam types in their signatures); `SteamContentManager` has 16 commonMain users, `SteamDownloadTypes` 9. Getting JavaSteam out of the desktop graph means moving those files androidMain-only behind a JavaSteam-free commonMain surface; plan it as its own part, list every moved file for the upstream re-apply script. **Asked the owner (2026-10-23)** whether to do this restructure or keep JavaSteam on the desktop classpath, inert (no entry point, never connects) and reword the divergence; until answered, do (b) and (d) first. list the commonMain users of `SteamService`, `SteamContentManager`, `SteamPathResolver`, `SteamLaunchers` and decide per type (bind a desktop no-op through DI vs move the caller androidMain-only); keep Android unchanged. (b) Remaining traces: Steam games in library/game detail (only if Steam rows can exist on desktop), Jellyfin trailers or media on Home/game detail. (c) Done: QuayPass / Check-In hidden with Social (owner decision 2026-10-23); evidence `p4s3b/`, `p4s3b-android`. (d) Fix the fresh-data wizard walk (welcome timing, URL field focus) and walk the wizard to confirm Image Cache → All Set.
-- Flaky test: `DownloadManagerAutoStartTest` ("new download is queued") failed once in a full run, passed rerun alone; rerun before treating a gate failure there as real.
-- Fresh-data wizard walk gotchas: run `pair-code.py` with `build/desktop-testbed/venv/bin/python` (system python lacks socketio); the dev run may open on Welcome or already on Login; `TYPE:` did not reach the URL field in three tries; add a 600 s `timeout` (one walk hung after its last shot until killed).
+- DEVLOG "Step 3, part 1" (entry-point list, `PlatformFeatures`), "part 2" (QuayPass with Social; JavaSteam inert by owner decision; no remaining traces; wizard verified). Evidence `p4s3/`, `p4s3b/`, `fresh-p4s3w/`, Android `p4s3-android`, `p4s3b-android`.
+
+## Step 4 (window and full screen): next action
+
+- Scope (plan step 4): decorated window with the system title bar; first launch windowed and dark; Interface → "Start in full screen" through the full settings chain (DataStore key → prefs repo → UserPreferences → SettingsModels → SettingsInitRouter → delegate/confirm router → section → consumption in `desktopApp` `Main.kt`); F11 toggle; gamescope forces full screen; `--windowed` / `--fullscreen` override the setting.
+- First actions: read `desktopApp/src/.../Main.kt` window creation and its current flags (`--windowed`, `--size` already exist for walks); find how Interface rows are declared (follow `NavigationItem.ButtonMapping`'s desktop-only visibility); detect gamescope (`GAMESCOPE_WAYLAND_DISPLAY` / `XDG_CURRENT_DESKTOP=gamescope`); default theme dark on first launch only (check upstream's theme default before changing anything shared).
 
 ## Carried forward
 

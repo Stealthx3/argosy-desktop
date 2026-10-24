@@ -99,7 +99,7 @@ Where Argosy Desktop deliberately differs from Android. Every item is desktop-on
 
 | Feature | What goes | How |
 | --- | --- | --- |
-| Steam | Settings → Steam (`SteamSection`), the Steam account login, Steam library import and launch, Steam rows in launch targets | Entry points hidden on desktop; JavaSteam/DepotDownloader stay out of the desktop dependency graph; Steam stubs deleted from `desktopMain` |
+| Steam | Settings → Steam (`SteamSection`), the Steam account login, Steam library import and launch, Steam rows in launch targets | Entry points hidden on desktop (`PlatformFeatures.steam`); JavaSteam/DepotDownloader stay on the desktop classpath because shared code depends on them, but nothing on desktop reaches them: the `desktopMain` Steam actuals are inert (never connect, empty launcher lists) (owner decision 2026-10-23) |
 | Jellyfin | Settings → Jellyfin (`JellyfinSection`), Media Library and Media Detail, offline media downloads, Storage → Media | Entry points and the media tab hidden; Jellyfin network client not bound on desktop |
 | Argosy Social | Settings → Social (`SocialSection`), the Social screens, presence and friends, social events from play sessions | Entry points hidden; the social WebSocket never connects on desktop (now-playing to RomM stays) |
 | "Android Settings" | The main Settings row that opens the device's settings (`settings_main_device_title`) | Row hidden on desktop |
