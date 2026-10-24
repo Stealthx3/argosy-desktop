@@ -280,6 +280,7 @@ data class DisplayState(
     val desktopWindow: Boolean = false,
     val displayProfile: com.nendo.argosy.data.preferences.DisplayProfile = com.nendo.argosy.data.preferences.DisplayProfile.DESKTOP,
     val safeAreaPercent: Int = 0,
+    val detectedDisplayProfile: com.nendo.argosy.data.preferences.DisplayProfile? = null,
     val lockScreenArt: Boolean = true,
     val homeAppAvailable: Boolean = true,
     val isDefaultHome: Boolean = false,

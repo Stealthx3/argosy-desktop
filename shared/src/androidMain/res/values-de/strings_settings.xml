@@ -122,6 +122,12 @@
     <string name="settings_interface_display_profile_handheld">Handheld</string>
     <string name="settings_interface_display_profile_desktop">Desktop</string>
     <string name="settings_interface_display_profile_tv">TV</string>
+    <string name="settings_interface_display_profile_handheld_detail">Eingebauter Bildschirm, in der Hand gespielt.</string>
+    <string name="settings_interface_display_profile_desktop_detail">Ein Monitor mit Maus und Tastatur in der Nähe.</string>
+    <string name="settings_interface_display_profile_tv_detail">Größere Schrift und ein Sicherheitsrand, für die Couch.</string>
+    <string name="settings_interface_display_profile_recommended">Empfohlen</string>
+    <string name="firstrun_display_setup_title">Wo spielst du?</string>
+    <string name="firstrun_display_setup_description">Wähle den Bildschirm, auf dem Argosy läuft. Du kannst das später unter Einstellungen, Oberfläche ändern.</string>
     <string name="settings_interface_safe_area_title">Sicherer Bereich</string>
     <string name="settings_interface_start_full_screen_title">Im Vollbild starten</string>
     <string name="settings_interface_start_full_screen_subtitle">Argosy im Vollbild statt in einem Fenster öffnen. F11 wechselt jederzeit.</string>

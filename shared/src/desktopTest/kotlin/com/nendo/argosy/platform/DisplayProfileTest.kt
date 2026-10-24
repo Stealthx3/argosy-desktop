@@ -1,6 +1,7 @@
 package com.nendo.argosy.platform
 
 import com.nendo.argosy.data.preferences.DisplayProfile
+import com.nendo.argosy.ui.screens.firstrun.displaySetupFocus
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -45,5 +46,11 @@ class DisplayProfileTest {
         val edid = ByteArray(128).also { it[21] = 121; it[22] = 68 }
         assertEquals(54.6, DisplayProfileDetection.diagonalInches(edid)!!, 0.1)
         assertNull(DisplayProfileDetection.diagonalInches(ByteArray(128)))
+    }
+
+    @Test
+    fun displaySetupStartsOnTheDetectedProfile() {
+        assertEquals(DisplayProfile.TV.ordinal, displaySetupFocus(DisplayProfile.TV))
+        assertEquals(DisplayProfile.DESKTOP.ordinal, displaySetupFocus(null))
     }
 }

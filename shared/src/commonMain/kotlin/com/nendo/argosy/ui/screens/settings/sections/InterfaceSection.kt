@@ -1,5 +1,8 @@
 package com.nendo.argosy.ui.screens.settings.sections
 
+import androidx.compose.foundation.layout.Column
+import com.nendo.argosy.ui.components.DisplayProfileCards
+import com.nendo.argosy.ui.common.labelRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -153,12 +156,6 @@ private fun interfaceSectionTitleRes(section: String): Int? = when (section) {
     else -> null
 }
 
-internal fun displayProfileLabelRes(profile: com.nendo.argosy.data.preferences.DisplayProfile): Int = when (profile) {
-    com.nendo.argosy.data.preferences.DisplayProfile.HANDHELD -> R.string.settings_interface_display_profile_handheld
-    com.nendo.argosy.data.preferences.DisplayProfile.DESKTOP -> R.string.settings_interface_display_profile_desktop
-    com.nendo.argosy.data.preferences.DisplayProfile.TV -> R.string.settings_interface_display_profile_tv
-}
-
 internal fun languageLabelRes(language: AppLanguage): Int = when (language) {
     AppLanguage.SYSTEM -> R.string.settings_main_language_system_default
     AppLanguage.ENGLISH -> R.string.settings_main_language_name_en
@@ -270,14 +267,22 @@ fun InterfaceSection(uiState: SettingsUiState, viewModel: SettingsViewModel) {
                     onToggle = { viewModel.setCompactFooter(it) }
                 )
 
-                InterfaceItem.DisplayProfile -> CyclePreference(
-                    title = stringResource(R.string.settings_interface_display_profile_title),
-                    value = stringResource(displayProfileLabelRes(display.displayProfile)),
-                    subtitle = stringResource(R.string.settings_interface_display_profile_subtitle),
-                    isFocused = isFocused(item),
-                    onClick = { viewModel.cycleDisplayProfile() },
-                    onPrev = { viewModel.cycleDisplayProfile(-1) }
-                )
+                InterfaceItem.DisplayProfile -> Column(verticalArrangement = Arrangement.spacedBy(Dimens.spacingSm)) {
+                    CyclePreference(
+                        title = stringResource(R.string.settings_interface_display_profile_title),
+                        value = stringResource(display.displayProfile.labelRes),
+                        subtitle = stringResource(R.string.settings_interface_display_profile_subtitle),
+                        isFocused = isFocused(item),
+                        onClick = { viewModel.cycleDisplayProfile() },
+                        onPrev = { viewModel.cycleDisplayProfile(-1) }
+                    )
+                    DisplayProfileCards(
+                        selected = display.displayProfile,
+                        focused = if (isFocused(item)) display.displayProfile else null,
+                        recommended = display.detectedDisplayProfile,
+                        onChoose = { viewModel.setDisplayProfile(it) }
+                    )
+                }
 
                 InterfaceItem.SafeArea -> SliderPreference(
                     title = stringResource(R.string.settings_interface_safe_area_title),

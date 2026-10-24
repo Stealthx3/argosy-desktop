@@ -110,6 +110,12 @@
     <string name="settings_interface_display_profile_handheld">掌机</string>
     <string name="settings_interface_display_profile_desktop">桌面</string>
     <string name="settings_interface_display_profile_tv">电视</string>
+    <string name="settings_interface_display_profile_handheld_detail">内置屏幕，手持游玩。</string>
+    <string name="settings_interface_display_profile_desktop_detail">显示器，旁边有鼠标和键盘。</string>
+    <string name="settings_interface_display_profile_tv_detail">更大的文字和安全边距，适合沙发。</string>
+    <string name="settings_interface_display_profile_recommended">推荐</string>
+    <string name="firstrun_display_setup_title">你会在哪里玩？</string>
+    <string name="firstrun_display_setup_description">选择运行 Argosy 的屏幕。之后可在“设置”的“界面”中更改。</string>
     <string name="settings_interface_safe_area_title">安全区域</string>
     <string name="settings_interface_start_full_screen_title">以全屏启动</string>
     <string name="settings_interface_start_full_screen_subtitle">以全屏而非窗口方式打开 Argosy。随时按 F11 切换。</string>

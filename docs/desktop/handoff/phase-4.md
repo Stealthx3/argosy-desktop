@@ -2,7 +2,7 @@
 
 Rewritten (not appended) at the end of every work unit, so a fresh session can start from it alone. History and reasoning live in `DEVLOG.md`; read only the parts this file points to. Earlier phases: `phase-0.md` … `phase-3.md` (closed summaries).
 
-**Updated:** 2026-10-24 (step 5 part 1). Steps 1–4 done (step 1's owner hardware check still pending, below); step 5 in progress. The Phase 4 step plan (steps 1–10) is in `DEVLOG.md` under "Phase 4 · Linux adaptation" → "Phase 4 step plan". Nothing uncommitted.
+**Updated:** 2026-10-24 (step 5 closed). Steps 1–5 done (step 1's owner hardware check still pending, below); next is step 6. The Phase 4 step plan (steps 1–10) is in `DEVLOG.md` under "Phase 4 · Linux adaptation" → "Phase 4 step plan". Nothing uncommitted.
 
 ## Scope and exit criterion
 
@@ -28,13 +28,19 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 
 - DEVLOG "Step 4". Decorated 1280×720 window, F11, gamescope forced, `--fullscreen`/`--windowed`, Interface → Start in Full Screen (desktop only; Android's system-bar rows hidden on desktop), dark when no theme is stored. Evidence `p4s4/`, `fresh-p4s4/`, Android `p4s4-android2`. Not verified: launch with the setting on, real gamescope (owner test with the next alpha).
 
-## Step 5 (display profiles and the wizard's Display setup step): part 1 done, next part 2
+## Step 5 (display profiles and the wizard's Display setup step): closed
 
-- Owner decisions (2026-10-24): TV = option B "Couch scale" (https://claude.ai/artifact/4DJ1zZT3T26ALojCQkdrdB): starting values UI Scale 125 %, compact footer off, glow High, safe area 3 %; no new Home layout, no text-size setting. Profile cards use a **schematic** preview (drawn Home sketch in theme colours), not live miniatures.
-- Done (DEVLOG "Step 5, part 1"): `DisplayProfile` + `DisplayProfileDetection`, settings chain, Interface rows Display Profile / Safe Area (after Compact Footer: upstream test pins Compact Footer right after UI Scale), safe-area margin and cursor auto-hide in `Main.kt`. Evidence `fresh-p4s5/`, Android `p4s5-android`.
-- **Next action, part 2:** (a) a `DisplayProfileCards` composable (ui/, three cards: schematic Home sketch drawn with Canvas in theme colours showing the profile's margin and scale, name, one line, "Recommended" tag on the detected one; left/right + A, touch via clickableNoFocus, sound feedback, footer hints). (b) Interface: open the cards from the Display Profile row (A) as its own sub-section or modal, following how Button Mapping opened `SettingsSection.BUTTON_MAPPING`. (c) First-run step `DISPLAY_SETUP` right after WELCOME (desktop only via `PlatformFeatures.desktopWindow`; Back returns to Welcome); extend `stepAfterPlatformSelect`-style helpers and the wizard walk recipe (one more A after Get Started).
-- At step 5's close (and every later step close): publish the alpha (`build-alpha.sh` → `publish-repo.sh` → `push-pages.sh --step-close 4.5`), owner rule 2026-10-24; that build also carries steps 2–4.
-- Walks on throwaway data: `fresh-walk.sh` with the recipe in gotchas, but start with `wait:35` (the dark first launch was slower; a short wait sent presses into Add Certificate's file picker). Do not switch profiles on the owner's data: TV rewrites UI scale, footer and glow.
+- DEVLOG "Step 5, part 1" and "part 2". TV = option B Couch scale (owner, https://claude.ai/artifact/4DJ1zZT3T26ALojCQkdrdB). Evidence `fresh-p4s5/`, `fresh-p4s5b/`, Android `p4s5-android`, `p4s5b-android`. Not verified: cursor hiding, detection on a real handheld/TV, touch on a handheld (add to the owner test).
+
+## Step 6 (Flatpak permissions screen): next action
+
+- Scope (plan step 6, `PORT_PLAN.md` "Android → Flatpak permission mapping"): Settings → Permissions on desktop lists Flatpak permissions read live from `/.flatpak-info` (with user overrides): name, granted/missing, purpose in Flatpak terms, and the fix (consented `flatpak override --user`, or the exact command / Flatseal).
+- First actions: read the mapping table in `PORT_PLAN.md` (grep "Android → Flatpak permission mapping"); see what Permissions shows on desktop today (Settings → Permissions, "3/4 granted" in the step 3 walk) and its section/delegate; reuse `FlatpakFilesystems` and `HostFolderAccess` (Phase 3 step 9) for the filesystem rows; the dev run is not sandboxed (no `/.flatpak-info`), so test the parser with fixtures and the screen in the installed alpha.
+
+## Every step close from now on
+
+- After the close commit: `build-alpha.sh` → `GNUPGHOME=~/.local/share/argosy-desktop-signing/gnupg publish-repo.sh https://stealthx3.github.io/argosy-desktop/repo/ 5CC88C563BCBCD4F71D096277DDEE596AEB5F186` → `push-pages.sh --step-close 4.<n>` (owner rule 2026-10-24).
+- Walks on throwaway data: `fresh-walk.sh` with the gotchas recipe (`wait:35`; the wizard now has the Display step: one `PAD:SOUTH` after Get Started chooses the focused card). Do not switch profiles on the owner's data.
 
 ## Carried forward
 

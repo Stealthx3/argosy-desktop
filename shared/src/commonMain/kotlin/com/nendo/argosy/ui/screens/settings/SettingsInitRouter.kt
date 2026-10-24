@@ -619,6 +619,7 @@ internal fun routeLoadSettings(vm: SettingsViewModel) {
                 prefs.displayProfile,
                 com.nendo.argosy.platform.DisplayProfileDetection.detect()
             ),
+            detectedDisplayProfile = com.nendo.argosy.platform.DisplayProfileDetection.detect(),
             safeAreaPercent = com.nendo.argosy.data.preferences.DisplayProfile.effectiveSafeArea(
                 prefs.safeAreaPercent,
                 com.nendo.argosy.data.preferences.DisplayProfile.effective(

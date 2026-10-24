@@ -1,5 +1,7 @@
 package com.nendo.argosy.ui.screens.firstrun
 
+import com.nendo.argosy.platform.DisplayProfileDetection
+import com.nendo.argosy.data.preferences.DisplayProfile
 import com.nendo.argosy.platform.PlatformFeatures
 import com.nendo.argosy.platform.PlatformManifest as Manifest
 import com.nendo.argosy.platform.PlatformBuild as Build
@@ -63,6 +65,7 @@ import javax.inject.Inject
 
 enum class FirstRunStep {
     WELCOME,
+    DISPLAY_SETUP,
     ROMM_LOGIN,
     ROMM_SUCCESS,
     PERMISSIONS,
@@ -81,6 +84,9 @@ data class CoreDownloadState(
     val status: CoreDownloadStatus = CoreDownloadStatus.PENDING,
     val errorMessage: String? = null
 )
+
+internal fun displaySetupFocus(detected: DisplayProfile?): Int =
+    (detected ?: DisplayProfile.DESKTOP).ordinal
 
 internal fun stepAfterPlatformSelect(builtInEmulation: Boolean = PlatformFeatures.builtInEmulation): FirstRunStep =
     if (builtInEmulation) FirstRunStep.CORE_PROMPT else FirstRunStep.COMPLETE
@@ -152,6 +158,8 @@ data class FirstRunUiState(
     val hasOverlayPermission: Boolean = false,
     val hasUsageStatsPermission: Boolean = false,
     val hostFolderAccessSupported: Boolean = false,
+    val displaySetupSupported: Boolean = false,
+    val detectedDisplayProfile: DisplayProfile? = null,
     val gamesFolder: String = "",
     val emulatorFolderAccess: List<EmulatorFolderAccess> = emptyList(),
     val rommFocusField: Int? = null,
@@ -192,12 +200,18 @@ class FirstRunViewModel @Inject constructor(
             FirstRunUiState(
                 rommHasCamera = com.nendo.argosy.ui.components.deviceHasCamera(application),
                 hostFolderAccessSupported = true,
+                displaySetupSupported = PlatformFeatures.desktopWindow,
+                detectedDisplayProfile = DisplayProfileDetection.detect(),
                 gamesFolder = defaultFolder,
                 romStoragePath = defaultFolder,
                 folderSelected = true
             )
         } else {
-            FirstRunUiState(rommHasCamera = com.nendo.argosy.ui.components.deviceHasCamera(application))
+            FirstRunUiState(
+                rommHasCamera = com.nendo.argosy.ui.components.deviceHasCamera(application),
+                displaySetupSupported = PlatformFeatures.desktopWindow,
+                detectedDisplayProfile = DisplayProfileDetection.detect()
+            )
         }
     )
     val uiState: StateFlow<FirstRunUiState> = _uiState.asStateFlow()
@@ -215,7 +229,9 @@ class FirstRunViewModel @Inject constructor(
     fun nextStep() {
         _uiState.update { state ->
             val nextStep = when (state.currentStep) {
-                FirstRunStep.WELCOME -> FirstRunStep.ROMM_LOGIN
+                FirstRunStep.WELCOME ->
+                    if (state.displaySetupSupported) FirstRunStep.DISPLAY_SETUP else FirstRunStep.ROMM_LOGIN
+                FirstRunStep.DISPLAY_SETUP -> FirstRunStep.ROMM_LOGIN
                 FirstRunStep.ROMM_LOGIN -> FirstRunStep.ROMM_SUCCESS
                 FirstRunStep.ROMM_SUCCESS ->
                     if (state.hostFolderAccessSupported) FirstRunStep.ROM_PATH else FirstRunStep.PERMISSIONS
@@ -232,7 +248,11 @@ class FirstRunViewModel @Inject constructor(
                 FirstRunStep.CORE_DOWNLOAD -> FirstRunStep.COMPLETE
                 FirstRunStep.COMPLETE -> FirstRunStep.COMPLETE
             }
-            val initialFocus = if (nextStep == FirstRunStep.IMAGE_CACHE) 1 else 0
+            val initialFocus = when (nextStep) {
+                FirstRunStep.IMAGE_CACHE -> 1
+                FirstRunStep.DISPLAY_SETUP -> displaySetupFocus(state.detectedDisplayProfile)
+                else -> 0
+            }
             state.copy(currentStep = nextStep, focusedIndex = initialFocus)
         }
         when (_uiState.value.currentStep) {
@@ -251,7 +271,9 @@ class FirstRunViewModel @Inject constructor(
         _uiState.update { state ->
             val prevStep = when (state.currentStep) {
                 FirstRunStep.WELCOME -> FirstRunStep.WELCOME
-                FirstRunStep.ROMM_LOGIN -> FirstRunStep.WELCOME
+                FirstRunStep.DISPLAY_SETUP -> FirstRunStep.WELCOME
+                FirstRunStep.ROMM_LOGIN ->
+                    if (state.displaySetupSupported) FirstRunStep.DISPLAY_SETUP else FirstRunStep.WELCOME
                 FirstRunStep.ROMM_SUCCESS -> FirstRunStep.ROMM_LOGIN
                 FirstRunStep.PERMISSIONS ->
                     if (state.hostFolderAccessSupported) FirstRunStep.ROM_PATH else FirstRunStep.ROMM_SUCCESS
@@ -267,7 +289,11 @@ class FirstRunViewModel @Inject constructor(
                 FirstRunStep.CORE_DOWNLOAD -> FirstRunStep.CORE_PROMPT
                 FirstRunStep.COMPLETE -> stepBeforeComplete(state.rommPlatformCount)
             }
-            val initialFocus = if (prevStep == FirstRunStep.IMAGE_CACHE) 1 else 0
+            val initialFocus = when (prevStep) {
+                FirstRunStep.IMAGE_CACHE -> 1
+                FirstRunStep.DISPLAY_SETUP -> displaySetupFocus(state.detectedDisplayProfile)
+                else -> 0
+            }
             state.copy(currentStep = prevStep, focusedIndex = initialFocus, rommUrlCommitted = false)
         }
     }
@@ -290,6 +316,13 @@ class FirstRunViewModel @Inject constructor(
                     _uiState.update { it.copy(platformsAll = platforms, platforms = platforms) }
                 }
             }
+        }
+    }
+
+    fun chooseDisplayProfile(profile: DisplayProfile) {
+        viewModelScope.launch {
+            preferencesRepository.setDisplayProfile(profile)
+            nextStep()
         }
     }
 
@@ -501,6 +534,7 @@ class FirstRunViewModel @Inject constructor(
         val state = _uiState.value
         return when (state.currentStep) {
             FirstRunStep.WELCOME -> 0
+            FirstRunStep.DISPLAY_SETUP -> DisplayProfile.entries.size - 1
             FirstRunStep.ROMM_LOGIN -> when {
                 state.rommDevicePairing -> 2
                 !state.rommUrlCommitted -> 3
@@ -556,6 +590,7 @@ class FirstRunViewModel @Inject constructor(
 
     fun moveButtonFocus(delta: Int): Boolean {
         val state = _uiState.value
+        if (state.currentStep == FirstRunStep.DISPLAY_SETUP) return moveFocus(delta)
         if (state.currentStep != FirstRunStep.PLATFORM_SELECT) return false
         if (state.platformHeaderFocused && !state.platformSortMenuOpen && !state.platformSearchActive) {
             _uiState.update { it.copy(platformHeaderIndex = (it.platformHeaderIndex + delta).mod(PLATFORM_HEADER_COUNT)) }
@@ -1039,6 +1074,7 @@ class FirstRunViewModel @Inject constructor(
         val state = _uiState.value
         when (state.currentStep) {
             FirstRunStep.WELCOME -> nextStep()
+            FirstRunStep.DISPLAY_SETUP -> chooseDisplayProfile(DisplayProfile.entries[state.focusedIndex])
             FirstRunStep.ROMM_LOGIN -> {
                 when {
                     state.rommDevicePairing -> when (state.focusedIndex) {

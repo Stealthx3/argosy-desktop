@@ -1,5 +1,7 @@
 package com.nendo.argosy.ui.screens.firstrun
 
+import com.nendo.argosy.ui.components.DisplayProfileCards
+import com.nendo.argosy.data.preferences.DisplayProfile
 import com.nendo.argosy.platform.PlatformActivityNotFoundException as ActivityNotFoundException
 import com.nendo.argosy.platform.PlatformIntentType as Intent
 import com.nendo.argosy.platform.action
@@ -261,6 +263,11 @@ fun FirstRunScreen(
                     isFocused = true,
                     onGetStarted = { viewModel.nextStep() }
                 )
+                FirstRunStep.DISPLAY_SETUP -> DisplaySetupStep(
+                    focused = DisplayProfile.entries[uiState.focusedIndex.coerceIn(0, DisplayProfile.entries.size - 1)],
+                    recommended = uiState.detectedDisplayProfile,
+                    onChoose = { viewModel.chooseDisplayProfile(it) }
+                )
                 FirstRunStep.ROMM_LOGIN -> if (uiState.rommShowScanner) {
                     Box(modifier = Modifier.fillMaxSize()) {
                         com.nendo.argosy.ui.components.QrScannerWithPermission(
@@ -451,6 +458,35 @@ private fun StepColumn(
             .padding(horizontal = Dimens.spacingXl, vertical = Dimens.spacingMd),
         content = content
     )
+}
+
+@Composable
+private fun DisplaySetupStep(
+    focused: DisplayProfile,
+    recommended: DisplayProfile?,
+    onChoose: (DisplayProfile) -> Unit
+) {
+    StepColumn {
+        Text(
+            text = stringResource(R.string.firstrun_display_setup_title),
+            style = MaterialTheme.typography.headlineSmall
+        )
+        Spacer(modifier = Modifier.height(Dimens.spacingMd))
+        Text(
+            text = stringResource(R.string.firstrun_display_setup_description),
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(modifier = Modifier.height(Dimens.spacingLg))
+        DisplayProfileCards(
+            selected = null,
+            focused = focused,
+            recommended = recommended,
+            onChoose = onChoose,
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
 }
 
 @Composable

@@ -115,6 +115,12 @@
     <string name="settings_interface_display_profile_handheld">Портативное</string>
     <string name="settings_interface_display_profile_desktop">Компьютер</string>
     <string name="settings_interface_display_profile_tv">ТВ</string>
+    <string name="settings_interface_display_profile_handheld_detail">Встроенный экран, игра в руках.</string>
+    <string name="settings_interface_display_profile_desktop_detail">Монитор с мышью и клавиатурой под рукой.</string>
+    <string name="settings_interface_display_profile_tv_detail">Крупнее текст и безопасное поле, для дивана.</string>
+    <string name="settings_interface_display_profile_recommended">Рекомендуется</string>
+    <string name="firstrun_display_setup_title">Где вы будете играть?</string>
+    <string name="firstrun_display_setup_description">Выберите экран, на котором работает Argosy. Это можно изменить позже в Настройках, Интерфейс.</string>
     <string name="settings_interface_safe_area_title">Безопасная зона</string>
     <string name="settings_interface_start_full_screen_title">Запуск в полноэкранном режиме</string>
     <string name="settings_interface_start_full_screen_subtitle">Открывать Argosy во весь экран, а не в окне. F11 переключает режим в любой момент.</string>

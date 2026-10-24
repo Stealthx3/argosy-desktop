@@ -312,6 +312,12 @@
     <string name="settings_interface_display_profile_handheld">Handheld</string>
     <string name="settings_interface_display_profile_desktop">Desktop</string>
     <string name="settings_interface_display_profile_tv">TV</string>
+    <string name="settings_interface_display_profile_handheld_detail">Built-in screen, played in your hands.</string>
+    <string name="settings_interface_display_profile_desktop_detail">A monitor with a mouse and keyboard nearby.</string>
+    <string name="settings_interface_display_profile_tv_detail">Larger text and a safe margin, for the couch.</string>
+    <string name="settings_interface_display_profile_recommended">Recommended</string>
+    <string name="firstrun_display_setup_title">Where will you play?</string>
+    <string name="firstrun_display_setup_description">Choose the screen Argosy runs on. You can change it later in Settings, Interface.</string>
     <string name="settings_interface_safe_area_title">Safe Area</string>
     <string name="settings_interface_start_full_screen_title">Start in Full Screen</string>
     <string name="settings_interface_start_full_screen_subtitle">Open Argosy full screen instead of in a window. F11 switches at any time.</string>
