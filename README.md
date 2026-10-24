@@ -14,6 +14,13 @@ The repository is signed; updates arrive through `flatpak update`. This is an al
 
 ## Status
 
+**Phase 4 (Linux adaptation): complete (2026-10-24).**
+
+- Controllers: input mode Auto / Steam Input / SDL3 and per-controller button mapping with matching footer icons.
+- Desktop removals (Steam, Jellyfin, Social, Android Settings, built-in emulation); window with F11 and a Start in Full Screen setting; display profiles (Handheld / Desktop / TV) with a first-run Display setup step.
+- Linux screens: Flatpak permissions, host GPU, Linux emulator suggestions and managed installers from an emulator compatibility database; libmpv video for local files and theme audio.
+- The alpha Flatpak is republished at every step close. Hardware checks for the owner: [`docs/desktop/owner-test-phase-4.md`](docs/desktop/owner-test-phase-4.md).
+
 **Phase 3 (Linux services and alpha Flatpak): complete (2026-10-23).**
 
 - Emulator detection for Flatpak, AppImage, EmuDeck and PATH installs; RetroArch, Dolphin, PPSSPP, Cemu and DOSBox-X launch on the host, and Argosy returns when they exit.
@@ -27,7 +34,7 @@ The repository is signed; updates arrive through `flatpak update`. This is an al
 
 **Phase 0 (discovery and spikes): complete, gate passed.** See the spikes under [`spikes/`](spikes/).
 
-Next: Phase 4, Linux adaptation (controller input mode with Steam Input, button mapping, desktop removals, window and display profiles, Flatpak permissions and host GPU screens, emulator compatibility database, video wallpaper). The development log is in [`DEVLOG.md`](DEVLOG.md).
+Next: Phase 5, beta and Flathub (side-by-side checks against Android, GNOME/KDE/SteamOS testing, Flathub submission). The development log is in [`DEVLOG.md`](DEVLOG.md).
 
 ![Upstream's Library list rendered by Compose Multiplatform on the desktop](spikes/compose-desktop-library/library.png)
 
@@ -45,6 +52,8 @@ As of 2026-10-16 · Micaiah Fonken · Source of truth: the "Argosy Desktop — L
 
 > **Phase 2 results** (2026-10-22, details in `DEVLOG.md`): upstream's whole UI runs in the desktop window. `commonMain` now holds 1,720 Kotlin files and `androidMain` 243; `app` keeps 30. SDL3 gamepad input and the keyboard drive upstream's own InputDispatcher, so focus and navigation behave as on Android. Every screen reachable with the RomM testbed was walked with the same pad steps on an Android handheld emulator and on the desktop and matches (first run, Home and drawer, Game Detail and its sheets, Library, Collections, Downloads, Library Sync, Save Sync, Check-In, Apps, every Settings page, About, Changelog, file browser). Not yet opened on the desktop: Media Library/Detail (needs a Jellyfin server in the testbed), the Social screens (need an Argosy Social session), Save Timeline and the emulator rows of Per-Game Settings (need Phase 3 emulators); Search and Manage Pins have no entry point in upstream v2.24.0 on either platform. Still to check: a physical pad, Nintendo layouts and stick navigation.
 
+> **Phase 4 results** (2026-10-24, details in `DEVLOG.md`): Linux adaptation complete. Controller input mode (Auto / Steam Input / SDL3) and per-controller button mapping; Steam, Jellyfin, Social (with QuayPass), the Android Settings row and built-in emulation removed on desktop through one capability (JavaSteam kept on the classpath, inert); decorated window with F11, gamescope and a Start in Full Screen setting, dark first launch; display profiles Handheld / Desktop / TV with detection, TV couch scale (125 %, 3 % safe area), cursor auto-hide, profile cards and a first-run Display setup step; Flatpak permissions and host GPU screens; the Linux emulator compatibility database with Flathub suggestions and managed installers (AppImage releases, Flathub updates); libmpv local video and theme audio (YouTube trailers deferred). The alpha was republished at every step close. Hardware checks wait on the owner (`docs/desktop/owner-test-phase-4.md`).
+>
 > **Phase 3 results** (2026-10-23, details in `DEVLOG.md`): closed by owner decision. Desktop detects Linux emulators (Flatpak, AppImage, EmuDeck, PATH), launches RetroArch, Dolphin, PPSSPP, Cemu and DOSBox-X on the host through `flatpak-spawn --host`, supervises the process and returns to Argosy, records play sessions, and syncs RetroArch saves and states with RomM (live proof against the testbed: GET /api/saves, `no_op` twice). Apps tab, Quick Settings (volume, backlight, rumble), the first-run wizard with an emulator folder-access step and the XDG file chooser portal all run on the desktop. The alpha Flatpak is signed and published at `https://stealthx3.github.io/argosy-desktop/` and installs from its `.flatpakref`. Owner test on Bazzite (HTPC on a TV, production RomM): install, wizard, library, downloads, keyboard/mouse and standalone-emulator launches pass; Steam Controller mapping and rumble fail (Phase 4 step 1) and a stall when downloading a ROM already in the folder moves to Phase 5. Not exercised on real machines: save sync, a clean Fedora install; DuckStation, PCSX2, RPCS3, Azahar, Vita3K and ScummVM still return a launch error.
 
 > **Desktop divergences** (owner decision, 2026-10-23, after a first look at the alpha): Argosy Desktop no longer aims to match Android feature for feature. Steam, Jellyfin, Argosy Social and the "Android Settings" row are removed from the desktop app; built-in emulation, netplay and dual-screen are not part of this version; Android-only screens (emulator suggestions, managed installers, GPU drivers, permissions) become Linux screens; the desktop gains a system title bar, windowed dark first launch, a full-screen setting, a controller input mode (Auto / Steam Input / SDL3), per-button navigation mapping, display profiles (Handheld/Desktop/TV) and a Display setup step in the first-run wizard. Details: "Desktop divergences" below; Phase 4 in the Roadmap now carries this work. The Android app is unchanged: every removal is a desktop-only gate, not a deletion from shared code.
@@ -122,7 +131,7 @@ Look-alike is guaranteed by construction: the pixels come from the same composab
 
 **Window.** Undecorated fullscreen by default (the Android app is always fullscreen), with a windowed mode for desktop use. Handheld targets such as Steam Deck Game Mode get the same layout as an Android handheld of that resolution. *Changed 2026-10-23 (Desktop divergences):* first launch is windowed with the system title bar and the dark theme, "Start in full screen" is a setting, and display profiles (Handheld/Desktop/TV) pick the layout.
 
-**Media.** Trailers and video wallpaper use libmpv rendered into a Compose surface, with Argosy's existing player controls on top (Jellyfin playback removed on desktop, 2026-10-23).
+**Media.** Local video (Home tiles, page backdrops) and theme audio use libmpv, software-rendered into a Compose surface, with Argosy's existing player controls on top (Jellyfin playback removed on desktop, 2026-10-23). YouTube trailers (Home's video wallpaper) stay empty on desktop for now (owner decision 2026-10-24): resolving YouTube streams needs yt-dlp and a JavaScript runtime the Flatpak does not have.
 
 **Built-in emulator.** Not in this version (owner decision, 2026-10-23): the earlier plan for a desktop counterpart to `libretrodroid` is dropped, and the desktop launches external emulators only.
 
@@ -134,7 +143,7 @@ Where Argosy Desktop deliberately differs from Android. Every item is desktop-on
 
 | Feature | What goes | How |
 | --- | --- | --- |
-| Steam | Settings → Steam (`SteamSection`), the Steam account login, Steam library import and launch, Steam rows in launch targets | Entry points hidden on desktop; JavaSteam/DepotDownloader stay out of the desktop dependency graph; Steam stubs deleted from `desktopMain` |
+| Steam | Settings → Steam (`SteamSection`), the Steam account login, Steam library import and launch, Steam rows in launch targets | Entry points hidden on desktop (`PlatformFeatures.steam`); JavaSteam/DepotDownloader stay on the desktop classpath because shared code depends on them, but nothing on desktop reaches them: the `desktopMain` Steam actuals are inert (never connect, empty launcher lists) (owner decision 2026-10-23) |
 | Jellyfin | Settings → Jellyfin (`JellyfinSection`), Media Library and Media Detail, offline media downloads, Storage → Media | Entry points and the media tab hidden; Jellyfin network client not bound on desktop |
 | Argosy Social | Settings → Social (`SocialSection`), the Social screens, presence and friends, social events from play sessions | Entry points hidden; the social WebSocket never connects on desktop (now-playing to RomM stays) |
 | "Android Settings" | The main Settings row that opens the device's settings (`settings_main_device_title`) | Row hidden on desktop |
@@ -247,7 +256,7 @@ Port means the shared code runs as is, Adapt means the same screen and behaviour
 | First-run wizard: Display setup step | Linux | 4 | Profile choice with thumbnail previews |
 | Apps tab | Adapt | 3 | Host .desktop apps, launched on the host |
 | Jellyfin media with offline downloads | Remove | 4 | Desktop divergence |
-| Video wallpaper | Adapt | 4 | Same libmpv surface |
+| Video wallpaper | Adapt | 4 | Local video via the libmpv surface; YouTube trailers deferred (owner decision 2026-10-24) |
 | Built-in emulation and netplay | Later | — | Not in this version |
 | Steam integration | Remove | 4 | Desktop divergence |
 | Dual-screen | Later | — | Not in this version |

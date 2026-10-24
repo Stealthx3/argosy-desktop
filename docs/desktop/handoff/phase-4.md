@@ -1,78 +1,26 @@
-# Phase 4 · Linux adaptation — handoff (current phase)
+# Phase 4 · Linux adaptation — closed
 
-Rewritten (not appended) at the end of every work unit, so a fresh session can start from it alone. History and reasoning live in `DEVLOG.md`; read only the parts this file points to. Earlier phases: `phase-0.md` … `phase-3.md` (closed summaries).
+**Closed:** 2026-10-24 (exit verification, step 10). `main` pushed; `gh-pages` carries the signed Flatpak repo (republished at every step close since the owner's 2026-10-24 rule).
 
-**Updated:** 2026-10-24 (step 9 closed). Steps 1–9 done (step 1's owner hardware check still pending, below); next is step 10, the phase's exit verification. The Phase 4 step plan (steps 1–10) is in `DEVLOG.md` under "Phase 4 · Linux adaptation" → "Phase 4 step plan". Nothing uncommitted.
+## Outcome
 
-## Scope and exit criterion
-
-`PORT_PLAN.md` Roadmap (Phase 4) and "Desktop divergences". Exit: every Port, Adapt and Linux row of the parity matrix works on the desktop; every Remove row has no entry point on the desktop and the Android app is unchanged (A/B screenshots and unit tests); display profiles and the wizard's Display setup step work on a handheld, a monitor and a TV-sized screen.
-
-## Step 1 (input mode, Steam Input): code done, owner check pending
-
-- Done (DEVLOG "Step 1, part 1"): `ControllerInputMode` setting (Navigation → Controller → Input Mode, desktop only via `ControllerInputSupport`), SDL hints per mode at OVERRIDE priority, Steam-virtual pads skipped outside Steam Input, pad logging on connect, SDL restart on change. Walk evidence `build/desktop-check/p4s1/`, Android unchanged `p4s1-android`.
-- Owner check (ask once, with the Phase 4 close alpha; the live repo changes only at a phase close): which Steam Controller model; in Desktop Mode with Steam running and Argosy started normally (expect mode SDL3, the controller via SDL's HIDAPI driver, no rumble: SDL has none for it), and Argosy added to Steam and started from it (expect Steam Input, rumble through Steam). The `grep -i "DesktopGamepad" ~/argosy-run.log` lines show what Argosy saw. A new alpha needs `build-alpha.sh` → `publish-repo.sh` → `push-pages.sh --phase-close 4` (recipe in `docs/desktop/gotchas.md`).
-- Inside the Flatpak, `SteamVirtualGamepadInfo` points to a host `/tmp` file the sandbox cannot read, so Steam handles may read 0; detection also uses the 28de:11ff ids. Check in the owner test.
-
-## Step 2 (navigation button mapping): closed
-
-- Parts 1–3 in DEVLOG ("Step 2, part 1/2/3"). Footer glyphs follow the active controller's remap through `LocalButtonGlyphRemap` (identity on Android); mapping rows use friendly key names. Evidence `build/desktop-check/p4s2/`, `p4s2p3/`, Android `p4s2-android` (identical to `p4s1-android` apart from live data).
-- Not verified: a real controller with a remap, a Nintendo-layout pad with a remap (ask with the step 1 owner check).
-- Walk route to Button Mapping: from Home `START wait:2 DOWN*7 A` (Settings; DOWN×8 now opens Accounts), `DOWN*2 A`, `DOWN A`; focus 1–16 actions, 17 reset, 21–36 keyboard, 37 keyboard reset. End walks with the resets.
-
-## Step 3 (desktop removals): closed
-
-- DEVLOG "Step 3, part 1" (entry-point list, `PlatformFeatures`), "part 2" (QuayPass with Social; JavaSteam inert by owner decision; no remaining traces; wizard verified). Evidence `p4s3/`, `p4s3b/`, `fresh-p4s3w/`, Android `p4s3-android`, `p4s3b-android`.
-
-## Step 4 (window and full screen): closed
-
-- DEVLOG "Step 4". Decorated 1280×720 window, F11, gamescope forced, `--fullscreen`/`--windowed`, Interface → Start in Full Screen (desktop only; Android's system-bar rows hidden on desktop), dark when no theme is stored. Evidence `p4s4/`, `fresh-p4s4/`, Android `p4s4-android2`. Not verified: launch with the setting on, real gamescope (owner test with the next alpha).
-
-## Step 5 (display profiles and the wizard's Display setup step): closed
-
-- DEVLOG "Step 5, part 1" and "part 2". TV = option B Couch scale (owner, https://claude.ai/artifact/4DJ1zZT3T26ALojCQkdrdB). Evidence `fresh-p4s5/`, `fresh-p4s5b/`, Android `p4s5-android`, `p4s5b-android`. Not verified: cursor hiding, detection on a real handheld/TV, touch on a handheld (add to the owner test).
-
-## Step 6 (Flatpak permissions screen): closed
-
-- DEVLOG "Step 6, part 1" and "part 2". Not verified: the grant modal and a real grant (needs a revoked permission on the owner's machine; owner-test recipe in the part 2 entry).
-
-## Step 7 (host GPU screen): closed
-
-- DEVLOG "Step 7". Not verified: AMD/Intel/multi-GPU hardware (fixture tests).
-
-## Step 8 (emulator database, suggestions, managed installers): closed
-
-- DEVLOG "Step 8 decisions" and parts 1–3. Not verified: a real Flathub install from the picker, an AppImage install or a Flatpak update from Managed Installers (owner tests in the part 2 and part 3 entries), the remote database refresh (repo `main` has no copy until the phase push).
-
-## Step 9 (libmpv video): closed
-
-- Parts 1–2 (libmpv in the Flatpak, software-rendered local video and theme audio, `--probe-video`). YouTube trailers deferred by the owner (2026-10-24). Not verified: a tile/backdrop video in the running UI, theme audio output, `seekTicks`.
-
-## Step 10 (exit verification): next action
-
-- Exit criterion (`PORT_PLAN.md` Phase 4): every Port/Adapt/Linux row of the parity matrix works on desktop; every Remove row has no entry point; Android unchanged (A/B + unit tests); display profiles and the Display setup step on a handheld, a monitor and a TV.
-- First actions: list the parity matrix rows (`PORT_PLAN.md` "Feature parity matrix") with their status and the evidence folder for each Phase 4 row; run the full gate, a full desktop settings walk (`settings-walk.sh desktop`) and a full Android A/B against the Phase 3 baseline; collect the owner tests gathered through the phase (step 1 Steam Controller, remapped pad, Nintendo layout, cursor hiding, profile detection on a handheld/TV, permission grant, Flathub/AppImage installs, video tile) into one checklist for the owner; then the phase close per CLAUDE.md (handoff summary, `phase-5.md`, README rebuild, push, `phase-gate`, ask the owner).
-
-## Every step close from now on
-
-- After the close commit: `build-alpha.sh` → `GNUPGHOME=~/.local/share/argosy-desktop-signing/gnupg publish-repo.sh https://stealthx3.github.io/argosy-desktop/repo/ 5CC88C563BCBCD4F71D096277DDEE596AEB5F186` → `push-pages.sh --step-close 4.<n>` (owner rule 2026-10-24).
-- Walks on throwaway data: `fresh-walk.sh` with the gotchas recipe (`wait:35`; the wizard now has the Display step: one `PAD:SOUTH` after Get Started chooses the focused card). Do not switch profiles on the owner's data.
+- Controllers: input mode Auto / Steam Input / SDL3 (`ControllerInputSupport`, SDL hints, Steam-virtual pads), per-controller navigation button mapping (`NavigationButtonMaps`, Button Mapping screen, footer glyphs follow the remap).
+- Removals on desktop through `PlatformFeatures`: Steam (JavaSteam kept inert by owner decision), Jellyfin/Media, Social and QuayPass/Check-In, Android Settings row, built-in emulation (rows, core downloads, first-run core steps).
+- Window: decorated, 1280×720 centred, F11, gamescope forces full screen, `--fullscreen`/`--windowed`, Interface → Start in Full Screen, dark when no theme is stored.
+- Display profiles Handheld / Desktop / TV (detection by DMI, EDID size, gamescope; TV = option B "Couch scale": UI Scale 125 %, full footer, strong glow, 3 % safe area; cursor auto-hide), schematic profile cards in Interface and the first-run Display setup step.
+- Linux screens: Flatpak permissions from `/.flatpak-info` with consented grants; read-only host GPU page (`vulkaninfo`, `glxinfo`, sysfs).
+- Emulator compatibility database (`linux-emulators.json`, bundled + cached refresh from the repo): detection and launch arguments, Flathub suggestions in the emulator picker, managed installers (AppImage releases into `~/Applications`, Flathub update rows).
+- Video: libmpv (+ libass, libplacebo, ffmpeg-full extension) in the Flatpak, software-rendered local video and theme audio; YouTube trailers deferred (owner decision).
+- Exit verification: parity matrix rows for Phase 4 all closed; full desktop Settings walk `build/desktop-check/p4x-desktop/` (16 rows render); Android unchanged since step 1 apart from live data (`p4s1-android` vs `p4s8c-android`); gate 131 desktop + 4,426 Android tests.
 
 ## Carried forward
 
-- From Phase 3: see `phase-3.md` "Carried forward" (download stall is Phase 5; open owner questions on standalone save proof and rows 18–30).
-- Phase 4 decisions still open inside steps: emulator database schema/location/update path and initial emulators (step 8); TV safe-area default 3 % and live thumbnails (step 5, confirm with the owner when reached).
-- Rules that still apply: label vs token for every new string; settings chain end to end; desktop-only gates, never deletions from shared code; Android A/B baseline `build/desktop-baseline/app-debug-upstream-v2.24.0.apk`.
+- Owner test list: `docs/desktop/owner-test-phase-4.md` (hardware-only checks gathered through the phase).
+- Upstream entry points still on desktop: Displays → "Enable Dual-screen Mode" (dual-screen is not in this version), About → upstream "Update Available — Download" (in-app updater is a Phase 5 row).
+- Not verified here: real Steam Controller and Nintendo-layout pads, a real handheld/TV, real installs and grants, a video tile in the running UI, theme audio output, `seekTicks`, the remote emulator-database refresh (needs `main` pushed, now done).
+- From Phase 3 (still open): download stall with a ROM already in the folder; standalone-emulator save proof and "Scan for Android games" rows (owner questions).
+- Flathub lint items (Phase 5): emulator folder grants, `flatpak-spawn` access, screenshots, app-id URL.
 
-## Where things are
+## Details
 
-- Desktop graph `shared/src/desktopMain/.../di/`; new commonMain injections need desktop bindings (`scripts/desktop/restructure/di_closure.py`).
-- Desktop data `~/.local/share/argosy-desktop` (never delete without the owner); Flatpak data `~/.var/app/io.github.stealthx3.ArgosyDesktop`.
-- Testbed now has a GameCube platform (`Big Disc Test`, 1.4 GB synthetic); save-proof expectations count only the battery ROMs.
-
-## Commands and tools
-
-- Runs and walks: `scripts/desktop/check/{desktop-shot,desktop-drive,pad-walk}.sh`; Flatpak build/publish: `scripts/desktop/flatpak/`.
-- Verification: `verify.sh`, `ab-check.sh`, `save-proof.sh`; quiet runner `scripts/desktop/quiet.sh`; JDK `JAVA_HOME=~/.jdks/jdk-21.0.12.1+1`.
-- Screenshots: window captures only, never full screen. `pkill -x <name>` inside walks.
-- Gotchas: `docs/desktop/gotchas.md`.
+`DEVLOG.md`, section "Phase 4 · Linux adaptation". Gotchas and walk recipes: `docs/desktop/gotchas.md`.

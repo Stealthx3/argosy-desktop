@@ -1288,3 +1288,15 @@ Mapped ids: retroarch, dolphin, cemu, azahar, ryujinx (Ryubing), eden, melonds, 
 - yt-dlp 2026.10.21 (`yt-dlp` zipapp, sha256 matches the release's SHA2-256SUMS) was downloaded to the scratchpad for a test inside the Flatpak runtime; running it was denied by the session's permission check (executing code from an external source). Not worked around. Asked the owner: allow running and bundling yt-dlp, or close step 9 with local video only (YouTube trailers stay empty on desktop). Also open: recent yt-dlp expects a JavaScript runtime for YouTube; the Flatpak runtime has none (bundling Deno would add roughly 100 MB).- **Owner decision (2026-10-24):** close step 9 with local video only; YouTube trailers stay empty on desktop for now (the existing desktop `YouTubeVideoPlayer` reports an error, so Home falls back to artwork as before). The downloaded yt-dlp file was deleted. `PORT_PLAN.md` (Media, parity row) updated.
 **Step 9 closed.** Next: step 10, exit verification. The alpha is republished for this step close.- **Alpha published for step 4.9:** `build-alpha.sh` (with libass, libplacebo, mpv), `flatpak-shot.sh` Home OK, signed, `push-pages.sh --step-close 4.9` (gh-pages b578f200fcba); the live summary matches the local build.
 
+### 2026-10-24 — Step 10: exit verification; Phase 4 close
+
+- **Parity matrix:** every Phase 4 row is closed (Remove: Social, Android Settings row, Jellyfin, Steam; Linux: suggestions and managed installers, GPU screen, permissions screen, window/full screen/input mode/button mapping/display profiles, Display setup step; Adapt: video wallpaper, local video only by owner decision).
+- **Desktop:** full Settings walk `build/desktop-check/p4x-desktop/` (Settings at `START DOWN*7 A`; 16 main rows open and render, no exception in the run log). Leftovers recorded for Phase 5: Displays → "Enable Dual-screen Mode", About → upstream APK update.
+- **Android unchanged:** `p4s8c-android` (latest) against `p4s1-android` (step 1) differs only in live data (clock, storage figures, Play Time dates, status bar); against `p4l-android` also the testbed changes recorded at step 1. Gate at the last code change: `:shared:desktopTest` 131, `:app:testDebugUnitTest` 4,426, 0 failures.
+- **Owner checks:** `docs/desktop/owner-test-phase-4.md` (15 items gathered through the phase).
+- **Close:** `phase-4.md` rewritten as the closed summary, `phase-5.md` created (carried-forward items, first actions), handoff table updated, `PORT_PLAN.md` gains a Phase 4 results note, `README.md` rebuilt (status + full plan + upstream link), `main` pushed. The alpha published at step 4.9 is this phase's final build (no code change since).
+
+## Phase 5 · Beta and Flathub
+
+(Not started: waiting for the owner at the phase gate.)
+
