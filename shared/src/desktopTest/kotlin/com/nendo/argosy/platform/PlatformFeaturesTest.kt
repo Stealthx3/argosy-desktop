@@ -15,7 +15,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class PlatformFeaturesTest {
-    private val removedTokens = listOf(Screen.Social.route, Screen.MediaLibrary.route).map(NavRing::token)
+    private val removedTokens = listOf(Screen.Social.route, Screen.QuayPass.route, Screen.MediaLibrary.route).map(NavRing::token)
 
     @Test
     fun desktopOffersNoneOfTheRemovedFeatures() {
@@ -39,7 +39,7 @@ class PlatformFeaturesTest {
     }
 
     @Test
-    fun drawerAndRingHaveNoSocialOrMediaPage() {
+    fun drawerAndRingHaveNoSocialCheckInOrMediaPage() {
         assertTrue(NavRing.PAGES.none { NavRing.token(it.route) in removedTokens })
         assertTrue(NavRing.resolve(null).none { it in removedTokens })
         assertTrue(NavRing.resolve(removedTokens).none { it in removedTokens })

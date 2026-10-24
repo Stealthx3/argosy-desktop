@@ -43,7 +43,7 @@ object NavRing {
     fun token(route: String): String = route.substringBefore('?')
 
     private fun isOffered(route: String): Boolean = when (route) {
-        Screen.Social.route -> PlatformFeatures.social
+        Screen.Social.route, Screen.QuayPass.route -> PlatformFeatures.social
         Screen.MediaLibrary.route -> PlatformFeatures.jellyfin
         else -> true
     }
