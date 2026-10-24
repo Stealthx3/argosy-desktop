@@ -201,6 +201,11 @@
     <string name="settings_navigation_haptic_title">Вибрация</string>
     <string name="settings_navigation_vibration_title">Сила вибрации</string>
 
+    <string name="settings_navigation_input_mode_title">Режим ввода</string>
+    <string name="settings_navigation_input_mode_subtitle">Как Argosy считывает контроллеры</string>
+    <string name="settings_navigation_input_mode_auto">Авто</string>
+    <string name="settings_navigation_input_mode_steam_input">Steam Input</string>
+    <string name="settings_navigation_input_mode_sdl3">SDL3</string>
     <string name="settings_navigation_menu_wrap_title">Зацикливание меню</string>
     <string name="settings_navigation_menu_wrap_subtitle">Переход от последнего пункта к первому</string>
     <string name="settings_navigation_menu_wrap_off">Выкл</string>

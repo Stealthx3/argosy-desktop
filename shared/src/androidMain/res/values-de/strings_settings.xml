@@ -208,6 +208,11 @@
     <string name="settings_navigation_haptic_title">Haptisches Feedback</string>
     <string name="settings_navigation_vibration_title">Vibrationsstärke</string>
 
+    <string name="settings_navigation_input_mode_title">Eingabemodus</string>
+    <string name="settings_navigation_input_mode_subtitle">Wie Argosy die Controller liest</string>
+    <string name="settings_navigation_input_mode_auto">Auto</string>
+    <string name="settings_navigation_input_mode_steam_input">Steam Input</string>
+    <string name="settings_navigation_input_mode_sdl3">SDL3</string>
     <string name="settings_navigation_menu_wrap_title">Listenumlauf</string>
     <string name="settings_navigation_menu_wrap_subtitle">Nach dem letzten Eintrag zum ersten springen</string>
     <string name="settings_navigation_menu_wrap_off">Aus</string>

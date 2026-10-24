@@ -24,6 +24,7 @@ class KeyPipe(private val pipe: File, private val gamepads: DesktopGamepadDispat
     private var window: Window? = null
 
     private var pad: SdlVirtualPad? = null
+    private var padGeneration = -1
 
     fun attach(target: Window) {
         window = target
@@ -90,7 +91,7 @@ class KeyPipe(private val pipe: File, private val gamepads: DesktopGamepadDispat
     }
 
     private fun virtualPad(): SdlVirtualPad? {
-        pad?.let { return it }
+        pad?.takeIf { padGeneration == gamepads.sourceGeneration }?.let { return it }
         if (!gamepads.awaitReady(PAD_READY_MS)) {
             System.err.println("key-pipe: SDL gamepad input is not running")
             return null
@@ -99,6 +100,7 @@ class KeyPipe(private val pipe: File, private val gamepads: DesktopGamepadDispat
         return SdlVirtualPad.attach(VIRTUAL_PAD_NAME, rumbleLog).also {
             if (it == null) System.err.println("key-pipe: SDL virtual gamepad could not be attached")
             pad = it
+            padGeneration = gamepads.sourceGeneration
             Thread.sleep(PAD_SETTLE_MS)
         }
     }

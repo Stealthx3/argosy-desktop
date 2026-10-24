@@ -196,6 +196,11 @@
     <string name="settings_navigation_haptic_title">震动反馈</string>
     <string name="settings_navigation_vibration_title">震动强度</string>
 
+    <string name="settings_navigation_input_mode_title">输入模式</string>
+    <string name="settings_navigation_input_mode_subtitle">Argosy 读取手柄的方式</string>
+    <string name="settings_navigation_input_mode_auto">自动</string>
+    <string name="settings_navigation_input_mode_steam_input">Steam Input</string>
+    <string name="settings_navigation_input_mode_sdl3">SDL3</string>
     <string name="settings_navigation_menu_wrap_title">菜单循环</string>
     <string name="settings_navigation_menu_wrap_subtitle">移动到最后一项后回到第一项</string>
     <string name="settings_navigation_menu_wrap_off">关闭</string>

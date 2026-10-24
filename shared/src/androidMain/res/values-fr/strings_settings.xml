@@ -200,6 +200,11 @@
     <string name="settings_navigation_haptic_title">Retour haptique</string>
     <string name="settings_navigation_vibration_title">Intensité de vibration</string>
 
+    <string name="settings_navigation_input_mode_title">Mode de saisie</string>
+    <string name="settings_navigation_input_mode_subtitle">Façon dont Argosy lit les manettes</string>
+    <string name="settings_navigation_input_mode_auto">Auto</string>
+    <string name="settings_navigation_input_mode_steam_input">Steam Input</string>
+    <string name="settings_navigation_input_mode_sdl3">SDL3</string>
     <string name="settings_navigation_menu_wrap_title">Bouclage des menus</string>
     <string name="settings_navigation_menu_wrap_subtitle">Passer de la fin d\'une liste à son début</string>
     <string name="settings_navigation_menu_wrap_off">Désactivé</string>

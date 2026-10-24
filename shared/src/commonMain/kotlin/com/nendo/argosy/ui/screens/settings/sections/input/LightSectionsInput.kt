@@ -53,6 +53,8 @@ import com.nendo.argosy.ui.screens.settings.sections.jellyfinSections
 import com.nendo.argosy.ui.screens.settings.sections.mainSettingsSections
 import com.nendo.argosy.ui.screens.settings.sections.audioSections
 import com.nendo.argosy.ui.screens.settings.sections.navigationItemAtFocusIndex
+import com.nendo.argosy.ui.screens.settings.sections.offeredInputModes
+import com.nendo.argosy.ui.screens.settings.sections.shownInputMode
 import com.nendo.argosy.ui.screens.settings.sections.navigationSections
 import com.nendo.argosy.ui.screens.settings.sections.rommSections
 import com.nendo.argosy.ui.screens.settings.sections.savesItemAtFocusIndex
@@ -316,6 +318,12 @@ internal class LightSectionsInput(
                 controls.selectRCombo,
                 direction,
                 viewModel::setSelectRCombo
+            )
+            NavigationItem.InputMode -> return stepOption(
+                controls.offeredInputModes(),
+                controls.shownInputMode(),
+                direction,
+                viewModel::setControllerInputMode
             )
             NavigationItem.MenuWrap ->
                 return stepOption(MenuWrapMode.entries, controls.menuWrapMode, direction, viewModel::setMenuWrapMode)

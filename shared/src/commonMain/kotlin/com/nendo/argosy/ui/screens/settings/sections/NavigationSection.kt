@@ -38,6 +38,7 @@ import com.nendo.argosy.platform.resources
 import com.nendo.argosy.res.stringResource
 import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.data.preferences.ControlsPreferences
+import com.nendo.argosy.data.preferences.ControllerInputMode
 import com.nendo.argosy.data.preferences.MenuWrapMode
 import com.nendo.argosy.data.preferences.SelectSwapMode
 import com.nendo.argosy.libretro.HotkeyManager
@@ -80,6 +81,11 @@ internal sealed class NavigationItem(
     class SectionSpacer(key: String, section: String, visibleWhen: (ControlsState) -> Boolean = { true })
         : NavigationItem(key, section, visibleWhen)
 
+    data object InputMode : NavigationItem(
+        key = "inputMode",
+        section = "controller",
+        visibleWhen = { it.inputModeConfigurable }
+    )
     data object ControllerLayout : NavigationItem("layout", "controller")
     data object SwapAB : NavigationItem("swapAB", "controller")
     data object SwapXY : NavigationItem("swapXY", "controller")
@@ -139,7 +145,7 @@ internal sealed class NavigationItem(
         val ALL: List<NavigationItem>
             get() = listOf(
                 ControllerHeader,
-                ControllerLayout, SwapAB, SwapXY, SwapStartSelect,
+                InputMode, ControllerLayout, SwapAB, SwapXY, SwapStartSelect,
                 FeedbackSpacer, FeedbackHeader,
                 HapticFeedback, VibrationStrength,
                 MenusSpacer, MenusHeader,
@@ -175,6 +181,18 @@ internal fun navigationItemAtFocusIndex(index: Int, controls: ControlsState): Na
     navigationLayout.itemAtFocusIndex(index, controls)
 
 internal fun navigationSections(controls: ControlsState) = navigationLayout.buildSections(controls)
+
+internal fun ControlsState.offeredInputModes(): List<ControllerInputMode> =
+    ControllerInputMode.offered(steamInputAvailable)
+
+internal fun ControlsState.shownInputMode(): ControllerInputMode =
+    controllerInputMode.takeIf { it in offeredInputModes() } ?: ControllerInputMode.SDL3
+
+private fun inputModeLabelRes(mode: ControllerInputMode): Int = when (mode) {
+    ControllerInputMode.AUTO -> R.string.settings_navigation_input_mode_auto
+    ControllerInputMode.STEAM_INPUT -> R.string.settings_navigation_input_mode_steam_input
+    ControllerInputMode.SDL3 -> R.string.settings_navigation_input_mode_sdl3
+}
 
 private fun menuWrapLabelRes(mode: MenuWrapMode): Int = when (mode) {
     MenuWrapMode.OFF -> R.string.settings_navigation_menu_wrap_off
@@ -293,6 +311,15 @@ fun NavigationSection(uiState: SettingsUiState, viewModel: SettingsViewModel) {
                         if (it < 0) -ControlsPreferences.HAPTIC_STRENGTH_STEP else ControlsPreferences.HAPTIC_STRENGTH_STEP
                     )
                 }
+            )
+
+            NavigationItem.InputMode -> SegmentedPreference(
+                title = stringResource(R.string.settings_navigation_input_mode_title),
+                subtitle = stringResource(R.string.settings_navigation_input_mode_subtitle),
+                options = controls.offeredInputModes().map { stringResource(inputModeLabelRes(it)) },
+                selectedIndex = controls.offeredInputModes().indexOf(controls.shownInputMode()),
+                isFocused = isFocused(item),
+                onSelect = { viewModel.setControllerInputMode(controls.offeredInputModes()[it]) }
             )
 
             NavigationItem.MenuWrap -> SegmentedPreference(

@@ -38,6 +38,7 @@ data class ControlsPreferences(
     val selectRCombo: String = "quick_settings",
     val menuWrapMode: MenuWrapMode = MenuWrapMode.HARD_STOP,
     val selectSwapMode: SelectSwapMode = SelectSwapMode.HOLD,
+    val controllerInputMode: ControllerInputMode = ControllerInputMode.AUTO,
     val openNavigationKey: Int = DEFAULT_OPEN_NAVIGATION_KEY,
     val openQuickPanelKey: Int = DEFAULT_OPEN_QUICK_PANEL_KEY,
     val navRingRoutes: List<String>? = null,
@@ -78,6 +79,7 @@ class ControlsPreferencesRepository @Inject constructor(
         val SELECT_R_COMBO = stringPreferencesKey("select_r_combo")
         val MENU_WRAP_MODE = stringPreferencesKey("menu_wrap_mode")
         val SELECT_SWAP_MODE = stringPreferencesKey("select_swap_mode")
+        val CONTROLLER_INPUT_MODE = stringPreferencesKey("controller_input_mode")
         val OPEN_NAVIGATION_KEY = intPreferencesKey("open_navigation_key")
         val OPEN_QUICK_PANEL_KEY = intPreferencesKey("open_quick_panel_key")
         val NAV_RING_ROUTES = stringPreferencesKey("nav_ring_routes")
@@ -106,6 +108,7 @@ class ControlsPreferencesRepository @Inject constructor(
             selectRCombo = prefs[Keys.SELECT_R_COMBO] ?: "quick_settings",
             menuWrapMode = MenuWrapMode.fromString(prefs[Keys.MENU_WRAP_MODE]),
             selectSwapMode = SelectSwapMode.fromString(prefs[Keys.SELECT_SWAP_MODE]),
+            controllerInputMode = ControllerInputMode.fromString(prefs[Keys.CONTROLLER_INPUT_MODE]),
             openNavigationKey = prefs[Keys.OPEN_NAVIGATION_KEY]
                 ?: ControlsPreferences.DEFAULT_OPEN_NAVIGATION_KEY,
             openQuickPanelKey = prefs[Keys.OPEN_QUICK_PANEL_KEY]
@@ -250,6 +253,10 @@ class ControlsPreferencesRepository @Inject constructor(
 
     suspend fun setMenuWrapMode(mode: MenuWrapMode) {
         dataStore.edit { it[Keys.MENU_WRAP_MODE] = mode.name }
+    }
+
+    suspend fun setControllerInputMode(mode: ControllerInputMode) {
+        dataStore.edit { it[Keys.CONTROLLER_INPUT_MODE] = mode.name }
     }
 
     suspend fun setSelectSwapMode(mode: SelectSwapMode) {

@@ -1,5 +1,6 @@
 package com.nendo.argosy.platform.sdl
 
+import com.nendo.argosy.data.preferences.ControllerInputMode
 import com.nendo.argosy.util.Logger
 import com.sun.jna.Memory
 import com.sun.jna.Pointer
@@ -16,6 +17,8 @@ sealed interface SdlPadEvent {
         val productId: Int,
         val descriptor: String,
         val playerIndex: Int,
+        val gamepadType: Int,
+        val steamVirtual: Boolean,
     ) : SdlPadEvent
 
     data class Removed(override val instanceId: Int) : SdlPadEvent
@@ -28,10 +31,12 @@ sealed interface SdlPadEvent {
 /**
  * Owns SDL's gamepad subsystem on one thread: SDL is initialised, pumped and every gamepad opened
  * and closed there, and [onEvent] is called on that thread for each gamepad event. [rumble] may be
- * called from any thread.
+ * called from any thread. [mode] is STEAM_INPUT (Steam's virtual gamepads, the devices Steam hides
+ * stay hidden) or SDL3 (physical pads only, Valve hardware through SDL's HIDAPI driver).
  */
 class SdlGamepadSource(
     private val sdl: Sdl3Library,
+    val mode: ControllerInputMode,
     private val onEvent: (SdlPadEvent) -> Unit,
 ) {
     private val open = HashMap<Int, Pointer>()
@@ -47,9 +52,16 @@ class SdlGamepadSource(
     @Volatile
     private var lastActive: Int? = null
 
+    private var thread: Thread? = null
+
     fun start() {
         running = true
-        Thread(::run, "sdl-gamepad").apply { isDaemon = true }.start()
+        thread = Thread(::run, "sdl-gamepad").apply { isDaemon = true }.also { it.start() }
+    }
+
+    fun stopAndJoin(timeoutMs: Long) {
+        running = false
+        thread?.join(timeoutMs)
     }
 
     fun awaitReady(timeoutMs: Long): Boolean = ready.await(timeoutMs, TimeUnit.MILLISECONDS) && initialized
@@ -68,7 +80,7 @@ class SdlGamepadSource(
     }
 
     private fun run() {
-        sdl.SDL_SetHint(Sdl3.HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1")
+        configureHints()
         if (sdl.SDL_Init(Sdl3.INIT_GAMEPAD) == FALSE) {
             Logger.warn(TAG, "SDL_Init failed: ${sdl.SDL_GetError()}")
             ready.countDown()
@@ -88,6 +100,20 @@ class SdlGamepadSource(
             open.clear()
         }
         sdl.SDL_Quit()
+    }
+
+    private fun configureHints() {
+        sdl.SDL_SetHint(Sdl3.HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1")
+        val steamInput = mode == ControllerInputMode.STEAM_INPUT
+        override(Sdl3.HINT_ALLOW_STEAM_VIRTUAL_GAMEPAD, if (steamInput) "1" else "0")
+        override(Sdl3.HINT_JOYSTICK_HIDAPI_STEAM, if (steamInput) "0" else "1")
+        if (!steamInput) override(Sdl3.HINT_GAMECONTROLLER_IGNORE_DEVICES, "")
+    }
+
+    private fun override(name: String, value: String) {
+        if (sdl.SDL_SetHintWithPriority(name, value, Sdl3.HINT_PRIORITY_OVERRIDE) == FALSE) {
+            Logger.warn(TAG, "SDL hint $name=$value refused: ${sdl.SDL_GetError()}")
+        }
     }
 
     private fun translate(event: Pointer): SdlPadEvent? {
@@ -119,16 +145,27 @@ class SdlGamepadSource(
             Logger.warn(TAG, "SDL_OpenGamepad($instanceId) failed: ${sdl.SDL_GetError()}")
             return null
         }
+        val vendorId = sdl.SDL_GetGamepadVendor(gamepad).toInt() and 0xffff
+        val productId = sdl.SDL_GetGamepadProduct(gamepad).toInt() and 0xffff
+        val steamVirtual = sdl.SDL_GetGamepadSteamHandle(gamepad) != 0L ||
+            (vendorId == Sdl3.VENDOR_VALVE && productId == Sdl3.PRODUCT_STEAM_VIRTUAL_GAMEPAD)
+        if (steamVirtual && mode != ControllerInputMode.STEAM_INPUT) {
+            Logger.info(TAG, "Steam virtual gamepad ${sdl.SDL_GetGamepadName(gamepad)} ignored in $mode mode")
+            sdl.SDL_CloseGamepad(gamepad)
+            return null
+        }
         synchronized(open) { open[instanceId] = gamepad }
         val location = sdl.SDL_GetGamepadSerial(gamepad)?.takeIf { it.isNotBlank() }
             ?: sdl.SDL_GetGamepadPath(gamepad).orEmpty()
         return SdlPadEvent.Added(
             instanceId = instanceId,
             name = sdl.SDL_GetGamepadName(gamepad) ?: "Gamepad",
-            vendorId = sdl.SDL_GetGamepadVendor(gamepad).toInt() and 0xffff,
-            productId = sdl.SDL_GetGamepadProduct(gamepad).toInt() and 0xffff,
+            vendorId = vendorId,
+            productId = productId,
             descriptor = "${sdl.SDL_GetGamepadGUIDForID(instanceId).hex()}:$location",
             playerIndex = sdl.SDL_GetGamepadPlayerIndex(gamepad),
+            gamepadType = sdl.SDL_GetGamepadType(gamepad),
+            steamVirtual = steamVirtual,
         )
     }
 

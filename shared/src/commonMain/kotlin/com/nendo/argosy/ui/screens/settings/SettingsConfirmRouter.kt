@@ -1027,7 +1027,8 @@ private fun routeNavigationConfirm(vm: SettingsViewModel, state: SettingsUiState
         }
         NavigationItem.VibrationStrength -> vm.cycleVibrationStrength()
         NavigationItem.ControllerLayout, NavigationItem.SelectLCombo, NavigationItem.SelectRCombo,
-        NavigationItem.MenuWrap, NavigationItem.SelectSwap -> return InputResult.handled(SoundType.SILENT)
+        NavigationItem.InputMode, NavigationItem.MenuWrap, NavigationItem.SelectSwap ->
+            return InputResult.handled(SoundType.SILENT)
         NavigationItem.SwapAB -> {
             val swapped = !state.controls.swapAB
             vm.setSwapAB(swapped)

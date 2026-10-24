@@ -168,6 +168,7 @@ object SettingsBackupKeys {
     private val NAVIGATION = listOf(
         SettingsBackupKey("app_language", SettingsBackupType.STRING),
         SettingsBackupKey("menu_wrap_mode", SettingsBackupType.STRING),
+        SettingsBackupKey("controller_input_mode", SettingsBackupType.STRING),
         SettingsBackupKey("controller_layout", SettingsBackupType.STRING),
         SettingsBackupKey("nintendo_button_layout", SettingsBackupType.BOOLEAN),
         SettingsBackupKey("swap_xy", SettingsBackupType.BOOLEAN),

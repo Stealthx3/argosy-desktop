@@ -165,6 +165,7 @@ data class UserPreferences(
     val selectLCombo: String = "quick_menu",
     val selectRCombo: String = "quick_settings",
     val menuWrapMode: MenuWrapMode = MenuWrapMode.HARD_STOP,
+    val controllerInputMode: ControllerInputMode = ControllerInputMode.AUTO,
     val selectSwapMode: SelectSwapMode = SelectSwapMode.HOLD,
     val openNavigationKey: Int = ControlsPreferences.DEFAULT_OPEN_NAVIGATION_KEY,
     val openQuickPanelKey: Int = ControlsPreferences.DEFAULT_OPEN_QUICK_PANEL_KEY,

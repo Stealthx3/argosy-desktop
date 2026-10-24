@@ -104,6 +104,7 @@ class UserPreferencesRepository @Inject constructor(
             selectLCombo = controls.selectLCombo,
             selectRCombo = controls.selectRCombo,
             menuWrapMode = controls.menuWrapMode,
+            controllerInputMode = controls.controllerInputMode,
             selectSwapMode = controls.selectSwapMode,
             openNavigationKey = controls.openNavigationKey,
             openQuickPanelKey = controls.openQuickPanelKey,
@@ -518,6 +519,7 @@ class UserPreferencesRepository @Inject constructor(
     suspend fun setGameDetailThemeEnabled(enabled: Boolean) = controlsPrefs.setGameDetailThemeEnabled(enabled)
     suspend fun setMenuWrapMode(mode: MenuWrapMode) = controlsPrefs.setMenuWrapMode(mode)
     suspend fun setSelectSwapMode(mode: SelectSwapMode) = controlsPrefs.setSelectSwapMode(mode)
+    suspend fun setControllerInputMode(mode: ControllerInputMode) = controlsPrefs.setControllerInputMode(mode)
     suspend fun setOpenNavigationKey(keyCode: Int) = controlsPrefs.setOpenNavigationKey(keyCode)
     suspend fun setOpenQuickPanelKey(keyCode: Int) = controlsPrefs.setOpenQuickPanelKey(keyCode)
     suspend fun setNavRingRoutes(routes: List<String>?) = controlsPrefs.setNavRingRoutes(routes)

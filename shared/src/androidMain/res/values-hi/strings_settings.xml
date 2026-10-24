@@ -198,6 +198,11 @@
     <string name="settings_navigation_haptic_title">हैप्टिक फ़ीडबैक</string>
     <string name="settings_navigation_vibration_title">वाइब्रेशन तीव्रता</string>
 
+    <string name="settings_navigation_input_mode_title">इनपुट मोड</string>
+    <string name="settings_navigation_input_mode_subtitle">Argosy कंट्रोलर को कैसे पढ़ता है</string>
+    <string name="settings_navigation_input_mode_auto">ऑटो</string>
+    <string name="settings_navigation_input_mode_steam_input">Steam Input</string>
+    <string name="settings_navigation_input_mode_sdl3">SDL3</string>
     <string name="settings_navigation_menu_wrap_title">मेनू रैपिंग</string>
     <string name="settings_navigation_menu_wrap_subtitle">सूची के आखिरी आइटम से आगे जाने पर पहले आइटम पर आ जाएँ</string>
     <string name="settings_navigation_menu_wrap_off">बंद</string>

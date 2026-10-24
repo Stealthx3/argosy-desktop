@@ -3,6 +3,9 @@ package com.nendo.argosy.ui.input
 import com.nendo.argosy.core.input.AndroidKeyCodes
 import com.nendo.argosy.core.input.AndroidMotionAxes
 import com.nendo.argosy.core.input.ConnectedControllerTracker
+import com.nendo.argosy.data.preferences.ControllerInputMode
+import com.nendo.argosy.data.preferences.ControlsPreferencesRepository
+import com.nendo.argosy.platform.ControllerInputSupport
 import com.nendo.argosy.platform.PlatformInputDevice
 import com.nendo.argosy.platform.PlatformInputDevices
 import com.nendo.argosy.platform.PlatformKeyEvent
@@ -13,7 +16,16 @@ import com.nendo.argosy.platform.SOURCE_JOYSTICK
 import com.nendo.argosy.platform.sdl.Sdl3
 import com.nendo.argosy.platform.sdl.SdlGamepadSource
 import com.nendo.argosy.platform.sdl.SdlPadEvent
+import com.nendo.argosy.platform.sdl.Sdl3Library
 import com.nendo.argosy.util.Logger
+import com.nendo.argosy.util.SafeCoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.awt.EventQueue
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -24,6 +36,7 @@ import javax.swing.Timer
  * buttons Android key events (with Android's key repeat) through [DesktopKeyDispatcher], and their
  * sticks and triggers motion events through the trigger emitter and the handler's stick processing,
  * as dispatchGenericMotionEvent does. Everything after the SDL thread runs on the AWT event thread.
+ * The SDL source follows the controller input mode setting and is restarted when it changes.
  */
 @Singleton
 class DesktopGamepadDispatcher @Inject constructor(
@@ -32,11 +45,20 @@ class DesktopGamepadDispatcher @Inject constructor(
     private val triggerAxisKeyEmitter: TriggerAxisKeyEmitter,
     private val controllerTracker: ConnectedControllerTracker,
     private val rumble: GamepadRumble,
+    private val controlsPreferences: ControlsPreferencesRepository,
 ) {
     private val axisValues = HashMap<Int, HashMap<Int, Float>>()
     private val downTimes = HashMap<Pair<Int, Int>, Long>()
     private var repeating: RepeatingKey? = null
+    private val connectedIds = LinkedHashSet<Int>()
+    private val scope = SafeCoroutineScope(Dispatchers.Default, TAG)
+
+    @Volatile
     private var source: SdlGamepadSource? = null
+
+    @Volatile
+    var sourceGeneration = 0
+        private set
 
     fun start(): Boolean {
         if (source != null) return true
@@ -45,11 +67,27 @@ class DesktopGamepadDispatcher @Inject constructor(
             Logger.warn(TAG, "SDL3 not found; gamepads unavailable")
             return false
         }
-        source = SdlGamepadSource(sdl) { event -> EventQueue.invokeLater { handle(event) } }.also {
+        val modes = controlsPreferences.preferences.map { it.controllerInputMode }.distinctUntilChanged()
+        launchSource(sdl, runBlocking { modes.first() })
+        scope.launch { modes.drop(1).collect { restart(sdl, it) } }
+        return true
+    }
+
+    private fun launchSource(sdl: Sdl3Library, mode: ControllerInputMode) {
+        val steamInputAvailable = ControllerInputSupport.steamInputAvailable
+        val resolved = mode.resolved(steamInputAvailable)
+        Logger.info(TAG, "input mode: setting=$mode steamInputAvailable=$steamInputAvailable using=$resolved")
+        source = SdlGamepadSource(sdl, resolved) { event -> EventQueue.invokeLater { handle(event) } }.also {
             rumble.attach(it)
             it.start()
         }
-        return true
+        sourceGeneration++
+    }
+
+    private fun restart(sdl: Sdl3Library, mode: ControllerInputMode) {
+        source?.stopAndJoin(STOP_TIMEOUT_MS)
+        EventQueue.invokeAndWait { connectedIds.toList().forEach(::disconnected) }
+        launchSource(sdl, mode)
     }
 
     fun awaitReady(timeoutMs: Long): Boolean = source?.awaitReady(timeoutMs) == true
@@ -69,7 +107,12 @@ class DesktopGamepadDispatcher @Inject constructor(
     }
 
     private fun connected(deviceId: Int, event: SdlPadEvent.Added) {
-        Logger.info(TAG, "gamepad added: ${event.name} (${event.vendorId}:${event.productId}) id=$deviceId")
+        Logger.info(
+            TAG,
+            "gamepad added: ${event.name} (${"%04x".format(event.vendorId)}:${"%04x".format(event.productId)}) " +
+                "type=${event.gamepadType} steamVirtual=${event.steamVirtual} mode=${source?.mode} id=$deviceId",
+        )
+        connectedIds += deviceId
         PlatformInputDevices.connected(
             PlatformInputDevice(
                 deviceId = deviceId,
@@ -85,6 +128,7 @@ class DesktopGamepadDispatcher @Inject constructor(
 
     private fun disconnected(deviceId: Int) {
         Logger.info(TAG, "gamepad removed: id=$deviceId")
+        connectedIds -= deviceId
         if (repeating?.deviceId == deviceId) stopRepeat()
         axisValues.remove(deviceId)
         downTimes.keys.removeAll { it.first == deviceId }
@@ -164,5 +208,6 @@ class DesktopGamepadDispatcher @Inject constructor(
         const val TAG = "DesktopGamepad"
         const val REPEAT_TIMEOUT_MS = 400
         const val REPEAT_INTERVAL_MS = 50
+        const val STOP_TIMEOUT_MS = 2_000L
     }
 }

@@ -8,6 +8,7 @@ import com.sun.jna.Structure
 @Suppress("FunctionName")
 interface Sdl3Library : Library {
     fun SDL_SetHint(name: String, value: String): Byte
+    fun SDL_SetHintWithPriority(name: String, value: String, priority: Int): Byte
     fun SDL_Init(flags: Int): Byte
     fun SDL_Quit()
     fun SDL_GetError(): String?
@@ -20,6 +21,8 @@ interface Sdl3Library : Library {
     fun SDL_GetGamepadVendor(gamepad: Pointer): Short
     fun SDL_GetGamepadProduct(gamepad: Pointer): Short
     fun SDL_GetGamepadPlayerIndex(gamepad: Pointer): Int
+    fun SDL_GetGamepadType(gamepad: Pointer): Int
+    fun SDL_GetGamepadSteamHandle(gamepad: Pointer): Long
     fun SDL_RumbleGamepad(gamepad: Pointer, lowFrequency: Short, highFrequency: Short, durationMs: Int): Byte
     fun SDL_GetGamepadGUIDForID(instanceId: Int): SdlGuid.ByValue
     fun SDL_AttachVirtualJoystick(desc: Pointer): Int
@@ -43,6 +46,13 @@ open class SdlGuid : Structure() {
 object Sdl3 {
     const val INIT_GAMEPAD = 0x00002000
     const val HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS = "SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS"
+    const val HINT_ALLOW_STEAM_VIRTUAL_GAMEPAD = "SDL_GAMECONTROLLER_ALLOW_STEAM_VIRTUAL_GAMEPAD"
+    const val HINT_GAMECONTROLLER_IGNORE_DEVICES = "SDL_GAMECONTROLLER_IGNORE_DEVICES"
+    const val HINT_JOYSTICK_HIDAPI_STEAM = "SDL_JOYSTICK_HIDAPI_STEAM"
+    const val HINT_PRIORITY_OVERRIDE = 2
+
+    const val VENDOR_VALVE = 0x28de
+    const val PRODUCT_STEAM_VIRTUAL_GAMEPAD = 0x11ff
 
     const val EVENT_GAMEPAD_AXIS_MOTION = 0x650
     const val EVENT_GAMEPAD_BUTTON_DOWN = 0x651

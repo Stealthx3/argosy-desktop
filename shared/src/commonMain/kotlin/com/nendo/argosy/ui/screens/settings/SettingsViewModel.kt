@@ -1586,6 +1586,7 @@ class SettingsViewModel @Inject constructor(
     fun setSelectRCombo(value: String) = controlsDelegate.setSelectRCombo(viewModelScope, value)
     fun setMenuWrapMode(mode: com.nendo.argosy.data.preferences.MenuWrapMode) = controlsDelegate.setMenuWrapMode(viewModelScope, mode)
     fun setSelectSwapMode(mode: com.nendo.argosy.data.preferences.SelectSwapMode) = controlsDelegate.setSelectSwapMode(viewModelScope, mode)
+    fun setControllerInputMode(mode: com.nendo.argosy.data.preferences.ControllerInputMode) = controlsDelegate.setControllerInputMode(viewModelScope, mode)
     fun startShortcutCapture(shortcut: com.nendo.argosy.ui.input.UiShortcut) = controlsDelegate.startShortcutCapture(shortcut)
     fun cancelShortcutCapture() = controlsDelegate.cancelShortcutCapture()
     fun showNavRingModal() = controlsDelegate.showNavRingModal()

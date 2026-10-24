@@ -13,6 +13,7 @@ import com.nendo.argosy.platform.resources
 import androidx.annotation.StringRes
 import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.data.preferences.ControlsPreferences
+import com.nendo.argosy.data.preferences.ControllerInputMode
 import com.nendo.argosy.data.preferences.MenuWrapMode
 import com.nendo.argosy.data.preferences.SelectSwapMode
 import com.nendo.argosy.data.preferences.UserPreferencesRepository
@@ -166,6 +167,13 @@ class ControlsSettingsDelegate @Inject constructor(
         scope.launch {
             preferencesRepository.setMenuWrapMode(mode)
             _state.update { it.copy(menuWrapMode = mode) }
+        }
+    }
+
+    fun setControllerInputMode(scope: CoroutineScope, mode: ControllerInputMode) {
+        scope.launch {
+            preferencesRepository.setControllerInputMode(mode)
+            _state.update { it.copy(controllerInputMode = mode) }
         }
     }
 

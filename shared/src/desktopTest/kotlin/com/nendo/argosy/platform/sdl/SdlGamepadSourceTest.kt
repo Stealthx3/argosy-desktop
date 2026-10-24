@@ -1,9 +1,11 @@
 package com.nendo.argosy.platform.sdl
 
+import com.nendo.argosy.data.preferences.ControllerInputMode
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
@@ -17,7 +19,7 @@ class SdlGamepadSourceTest {
         }
         val events = LinkedBlockingQueue<SdlPadEvent>()
         val rumbles = LinkedBlockingQueue<Pair<Int, Int>>()
-        val source = SdlGamepadSource(sdl) { events.put(it) }
+        val source = SdlGamepadSource(sdl, ControllerInputMode.SDL3) { events.put(it) }
         source.start()
         assertTrue(source.awaitReady(5_000), "SDL_Init")
         val pad = assertNotNull(
@@ -29,6 +31,7 @@ class SdlGamepadSourceTest {
             assertEquals(0x045e, added.vendorId)
             assertEquals(0x028e, added.productId)
             assertTrue(added.descriptor.isNotEmpty())
+            assertFalse(added.steamVirtual)
 
             assertTrue(pad.setButton(Sdl3.BUTTON_SOUTH, true))
             assertEquals(SdlPadEvent.Button(pad.instanceId, Sdl3.BUTTON_SOUTH, true), next(events) { it is SdlPadEvent.Button })
@@ -44,7 +47,41 @@ class SdlGamepadSourceTest {
             pad.detach()
         }
         assertEquals(SdlPadEvent.Removed(pad.instanceId), next(events) { it is SdlPadEvent.Removed })
-        source.stop()
+        source.stopAndJoin(5_000)
+    }
+
+    @Test
+    fun steamVirtualGamepadIsReadOnlyInSteamInputMode() {
+        val sdl = Sdl3.load()
+        if (sdl == null) {
+            println("SDL3 not installed; skipped")
+            return
+        }
+        assertFalse(steamPadSeen(sdl, ControllerInputMode.SDL3))
+        assertTrue(steamPadSeen(sdl, ControllerInputMode.STEAM_INPUT))
+    }
+
+    private fun steamPadSeen(sdl: Sdl3Library, mode: ControllerInputMode): Boolean {
+        val events = LinkedBlockingQueue<SdlPadEvent>()
+        val source = SdlGamepadSource(sdl, mode) { events.put(it) }
+        source.start()
+        assertTrue(source.awaitReady(5_000), "SDL_Init")
+        val pad = assertNotNull(
+            SdlVirtualPad.attach(
+                sdl, "Steam Virtual Gamepad",
+                vendorId = Sdl3.VENDOR_VALVE, productId = Sdl3.PRODUCT_STEAM_VIRTUAL_GAMEPAD,
+            )
+        )
+        val added = try {
+            generateSequence { events.poll(2, TimeUnit.SECONDS) }
+                .filterIsInstance<SdlPadEvent.Added>()
+                .firstOrNull { it.instanceId == pad.instanceId }
+        } finally {
+            pad.detach()
+            source.stopAndJoin(5_000)
+        }
+        added?.let { assertTrue(it.steamVirtual) }
+        return added != null
     }
 
     private fun next(events: LinkedBlockingQueue<SdlPadEvent>, match: (SdlPadEvent) -> Boolean): SdlPadEvent {

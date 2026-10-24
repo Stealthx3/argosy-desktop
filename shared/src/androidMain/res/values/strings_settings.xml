@@ -446,6 +446,16 @@
     <!-- Row title. Noun phrase: how hard that buzz is. -->
     <string name="settings_navigation_vibration_title">Vibration Strength</string>
 
+    <!-- Row title, desktop only. Noun phrase: how Argosy reads controllers. -->
+    <string name="settings_navigation_input_mode_title">Input Mode</string>
+    <!-- Second line of that row. -->
+    <string name="settings_navigation_input_mode_subtitle">How Argosy reads your controllers</string>
+    <!-- Value of that row: Steam Input when Steam provides it, SDL3 otherwise. Adjective, short for "automatic". -->
+    <string name="settings_navigation_input_mode_auto">Auto</string>
+    <!-- Value of that row: Valve's Steam Input. Product name, keep untranslated. -->
+    <string name="settings_navigation_input_mode_steam_input">Steam Input</string>
+    <!-- Value of that row: the SDL3 library reads the controllers directly. Library name, keep untranslated. -->
+    <string name="settings_navigation_input_mode_sdl3">SDL3</string>
     <!-- Row title. Noun phrase: whether moving past the end of a list carries on at the top. -->
     <string name="settings_navigation_menu_wrap_title">Menu Wrapping</string>
     <!-- Second line of that row. -->
