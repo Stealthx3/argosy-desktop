@@ -1,5 +1,8 @@
 package com.nendo.argosy.ui.screens.settings.delegates
 
+import kotlinx.coroutines.Dispatchers
+import com.nendo.argosy.util.SafeCoroutineScope
+import com.nendo.argosy.platform.HostGpuReader
 import com.nendo.argosy.platform.PlatformContext as Context
 import com.nendo.argosy.platform.getLaunchIntentForPackage
 import com.nendo.argosy.platform.addFlags
@@ -44,9 +47,11 @@ import javax.inject.Inject
 
 class DriversSettingsDelegate @Inject constructor(
     private val driverFetcher: DriverFetcherRepository,
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    private val hostGpuReader: HostGpuReader
 ) {
-    private val _state = MutableStateFlow(DriversState())
+    private val _state = MutableStateFlow(DriversState(hostGpuSupported = hostGpuReader.isSupported))
+    private val hostScope = SafeCoroutineScope(Dispatchers.IO, "DriversSettingsDelegate")
     val state: StateFlow<DriversState> = _state.asStateFlow()
 
     private var loadJob: Job? = null
@@ -54,13 +59,29 @@ class DriversSettingsDelegate @Inject constructor(
 
     fun loadGpuInfo() {
         if (_state.value.gpuModel != null) return
+        if (hostGpuReader.isSupported) {
+            loadHostGpu()
+            return
+        }
         val gpu = driverFetcher.getGpuInfo()
         _state.update {
             it.copy(gpuModel = gpu.rawModel, recommendedDriver = gpu.recommendedDriver)
         }
     }
 
+    private fun loadHostGpu() {
+        hostScope.launch {
+            _state.update { it.copy(isLoading = true) }
+            val info = hostGpuReader.read()
+            _state.update { it.copy(isLoading = false, hostGpu = info, gpuModel = info.gpus.firstOrNull()?.name) }
+        }
+    }
+
     fun loadDrivers(scope: CoroutineScope, force: Boolean = false) {
+        if (hostGpuReader.isSupported) {
+            loadHostGpu()
+            return
+        }
         if (!force && _state.value.groups.isNotEmpty()) {
             refreshDownloadedFiles()
             return

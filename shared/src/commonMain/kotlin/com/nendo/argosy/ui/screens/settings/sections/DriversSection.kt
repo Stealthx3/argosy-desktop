@@ -40,6 +40,10 @@ import com.nendo.argosy.ui.theme.Dimens
 
 @Composable
 fun DriversSection(uiState: SettingsUiState, viewModel: SettingsViewModel) {
+    if (uiState.drivers.hostGpuSupported) {
+        HostGpuSection(uiState)
+        return
+    }
     val listState = rememberLazyListState()
     val drivers = uiState.drivers
     val pickerIndex = drivers.pickerGroupIndex

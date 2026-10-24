@@ -1456,7 +1456,11 @@ private fun computeMaxFocusIndex(
     SettingsSection.FRAME_PICKER -> com.nendo.argosy.ui.screens.settings.sections.framePickerMaxFocusIndex(vm.getFrameRegistry())
     SettingsSection.BIOS -> biosMaxFocusIndex(state.bios.platformGroups, state.bios.expandedPlatformIndex)
     SettingsSection.PERMISSIONS -> permissionsMaxFocusIndex(state.permissions)
-    SettingsSection.DRIVERS -> (state.drivers.groups.size - 1).coerceAtLeast(0)
+    SettingsSection.DRIVERS -> if (state.drivers.hostGpuSupported) {
+        (com.nendo.argosy.ui.screens.settings.sections.hostGpuRows(state.drivers.hostGpu).count { it.focusable } - 1).coerceAtLeast(0)
+    } else {
+        (state.drivers.groups.size - 1).coerceAtLeast(0)
+    }
     SettingsSection.ABOUT -> aboutMaxFocusIndex(state.fileLoggingPath != null, aboutHasChangelog(state.updateCheck))
     SettingsSection.SOCIAL -> com.nendo.argosy.ui.screens.settings.sections.socialMaxFocusIndex(state.social)
 }

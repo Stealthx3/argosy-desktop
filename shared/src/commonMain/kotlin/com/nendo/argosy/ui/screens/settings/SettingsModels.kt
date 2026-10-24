@@ -1839,11 +1839,14 @@ data class DriversState(
     val activeDownload: DriverDownloadState? = null,
     val downloadedFiles: List<String> = emptyList(),
     val pickerGroupIndex: Int? = null,
-    val pickerReleaseFocusIndex: Int = 0
+    val pickerReleaseFocusIndex: Int = 0,
+    val hostGpuSupported: Boolean = false,
+    val hostGpu: com.nendo.argosy.data.model.HostGpuInfo? = null
 ) {
     val summary: DisplayText get() = when {
         isLoading && groups.isEmpty() -> DisplayText.Res(R.string.settings_drivers_summary_checking)
         gpuModel.isNullOrBlank() -> DisplayText.Res(R.string.settings_drivers_summary_gpu_not_detected)
+        hostGpuSupported -> DisplayText.Raw(gpuModel)
         else -> DisplayText.Res(R.string.settings_drivers_summary_available, listOf(gpuModel.orEmpty()))
     }
 }

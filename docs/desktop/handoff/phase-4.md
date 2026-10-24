@@ -2,7 +2,7 @@
 
 Rewritten (not appended) at the end of every work unit, so a fresh session can start from it alone. History and reasoning live in `DEVLOG.md`; read only the parts this file points to. Earlier phases: `phase-0.md` … `phase-3.md` (closed summaries).
 
-**Updated:** 2026-10-24 (step 6 closed). Steps 1–6 done (step 1's owner hardware check still pending, below); next is step 7. The Phase 4 step plan (steps 1–10) is in `DEVLOG.md` under "Phase 4 · Linux adaptation" → "Phase 4 step plan". Nothing uncommitted.
+**Updated:** 2026-10-24 (step 7 closed). Steps 1–7 done (step 1's owner hardware check still pending, below); next is step 8. The Phase 4 step plan (steps 1–10) is in `DEVLOG.md` under "Phase 4 · Linux adaptation" → "Phase 4 step plan". Nothing uncommitted.
 
 ## Scope and exit criterion
 
@@ -36,10 +36,14 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 
 - DEVLOG "Step 6, part 1" and "part 2". Not verified: the grant modal and a real grant (needs a revoked permission on the owner's machine; owner-test recipe in the part 2 entry).
 
-## Step 7 (host GPU screen): next action
+## Step 7 (host GPU screen): closed
 
-- Scope (plan step 7, `PORT_PLAN.md` "GPU drivers" row): Settings → GPU Drivers becomes a read-only host GPU page on desktop: GPU name and vendor, kernel driver, Mesa/NVIDIA driver version, VRAM, OpenGL version and renderer, Vulkan API version, device type and key features, displays in use. Sources: `/sys/class/drm` (card, driver via `device/driver` link, vendor/device ids), the app's own GL context, `vulkaninfo --summary` / `glxinfo -B` on the host (`HostShell`) when present.
-- First actions: read the Drivers section/delegate (`SettingsSection.DRIVERS`, `DriversSettingsDelegate`, the main row subtitle "GPU not detected" seen on desktop); gate the Android driver UI off on desktop through a capability like `sandboxSupported`; parse `glxinfo -B` / `vulkaninfo --summary` output with fixture tests; desktop rows as InfoPreference lines.
+- DEVLOG "Step 7". Not verified: AMD/Intel/multi-GPU hardware (fixture tests).
+
+## Step 8 (emulator compatibility database, suggestions, managed installers): next action
+
+- Scope (plan step 8; `PORT_PLAN.md` "Linux replacements for Android-only screens": Emulator suggestions, Managed installers): a database per platform of Linux emulators (Flathub app id, AppImage or native package, launch support, save paths), replacing `LinuxEmulators.kt`'s in-code table; suggestions with consented `flatpak install --user flathub <id>` or the project page for AppImages; managed installers for AppImage emulators updated from their releases into `~/Applications`, Flathub ones shown with installed/updatable state. Upstream ids stay exact.
+- **Owner decisions needed first** (open since Phase 3, listed in Carried forward): database schema, where it lives (bundled JSON in the app vs fetched), how it updates, and the initial emulator list. First action: read `LinuxEmulators.kt` (fields, entries) and the Android suggestion/managed-installer screens, then put a short proposal to the owner (schema sketch, bundled-with-optional-update recommendation, initial list = today's table plus AppImage sources) before writing code.
 
 ## Every step close from now on
 

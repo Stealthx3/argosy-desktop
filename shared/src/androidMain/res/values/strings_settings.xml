@@ -1270,6 +1270,23 @@
     <string name="settings_permissions_sandbox_grant_confirm">Allow</string>
     <string name="settings_permissions_sandbox_restart">Permission granted. Restart Argosy to use it.</string>
     <string name="settings_permissions_sandbox_grant_failed">The permission could not be granted. Run the command shown on the row in a terminal.</string>
+    <string name="settings_host_gpu_unknown">Not available</string>
+    <string name="settings_host_gpu_gpu">GPU</string>
+    <string name="settings_host_gpu_vendor">Vendor</string>
+    <string name="settings_host_gpu_type">Type</string>
+    <string name="settings_host_gpu_kernel_driver">Kernel driver</string>
+    <string name="settings_host_gpu_driver">Driver</string>
+    <string name="settings_host_gpu_vram">Video memory</string>
+    <string name="settings_host_gpu_vram_value">%1$d MB</string>
+    <string name="settings_host_gpu_vulkan">Vulkan</string>
+    <string name="settings_host_gpu_opengl">OpenGL</string>
+    <string name="settings_host_gpu_displays">Displays</string>
+    <string name="settings_host_gpu_display">Display</string>
+    <string name="settings_host_gpu_display_value">%1$s, %2$d″</string>
+    <string name="settings_host_gpu_type_discrete">Discrete</string>
+    <string name="settings_host_gpu_type_integrated">Integrated</string>
+    <string name="settings_host_gpu_type_virtual">Virtual</string>
+    <string name="settings_host_gpu_type_other">Other</string>
     <string name="settings_permissions_intro">Argosy requires certain permissions to provide full functionality. Tap each permission to grant access.</string>
     <!-- Card title. Noun phrase naming the permission to read and write files. -->
     <string name="settings_permissions_storage_title">Storage Access</string>
