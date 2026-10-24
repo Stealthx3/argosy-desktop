@@ -44,11 +44,11 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 
 - DEVLOG "Step 8 decisions" and parts 1–3. Not verified: a real Flathub install from the picker, an AppImage install or a Flatpak update from Managed Installers (owner tests in the part 2 and part 3 entries), the remote database refresh (repo `main` has no copy until the phase push).
 
-## Step 9 (libmpv video wallpaper): part 1 done, next part 2
+## Step 9 (libmpv video wallpaper): parts 1–2 done, next part 3
 
-- Done (DEVLOG "Step 9, part 1"): libass, libplacebo, mpv modules + ffmpeg-full extension in the manifest; libmpv loads inside the Flatpak (client API 2.5). ffmpeg-full is not installed here (Flathub runtime extension).
-- **Next action, part 2:** JNA binding (`shared/src/desktopMain/.../platform/mpv/`): `mpv_create`, `mpv_set_option_string` (`vo=libmpv`, `hwdec=no`, `loop-file=inf`, `mute`), `mpv_initialize`, `mpv_command` (`loadfile`), `mpv_render_context_create` with `MPV_RENDER_PARAM_API_TYPE = "sw"`, `mpv_render_context_set_update_callback`, `mpv_render_context_render` with SW size/format(`bgr0`)/stride/pointer params into a direct buffer, copied into a Skia `Bitmap` → `ImageBitmap` drawn by a `Canvas`; frame pacing on a render thread; release on dispose. `InlineTilePlayer` and `PageThemePlayer` desktop actuals use it; missing libmpv (dev run) keeps today's empty behaviour. Test inside the Flatpak (dev run has no libmpv): a local sample video (generate one with the host's `ffmpeg` if present, else a VP9 webm) on a custom-grid tile or page backdrop.
-- Then part 3: YouTube via bundled `yt-dlp` stream URL → `YouTubeVideoPlayer`.
+- Done: libmpv in the Flatpak (part 1); `platform/mpv/` binding, software-rendered `MpvPlayer`, `InlineTilePlayer` and `PageThemePlayer` desktop actuals, `--probe-video=<file>` check (part 2). Probe inside the Flatpak: VP9 and H.264 both ≈30 fps.
+- **Next action, part 3:** YouTube trailers (`YouTubeVideoPlayer` desktop actual, Home's video wallpaper): bundle `yt-dlp` (Python, from its release zipapp or pip module in the manifest, pinned) and resolve `yt-dlp -g -f "best[height<=720][vcodec!=none]"` for the video id on IO, then `MpvPlayer.load(url)`; call `onReady` on the first frame and `onError` when resolution or playback fails; respect `muted`. Probe with `--probe-video=https://…` after resolving in the probe too, or add a `--probe-youtube=<id>` flag.
+- Also: a UI walk with a real local video (custom-grid tile or page backdrop) if a setup path is quick; map `seekTicks` (Android seeks `SEEK_STEP_MS` per tick).
 
 ## Every step close from now on
 

@@ -1,5 +1,6 @@
 package com.nendo.argosy.desktop
 
+import com.nendo.argosy.platform.mpv.MpvProbe
 import kotlinx.coroutines.flow.drop
 import java.awt.image.BufferedImage
 import java.awt.event.MouseMotionAdapter
@@ -51,6 +52,10 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 
 fun main(args: Array<String>) {
+    args.firstOrNull { it.startsWith(PROBE_VIDEO_FLAG) }?.let {
+        println(MpvProbe.run(it.removePrefix(PROBE_VIDEO_FLAG)))
+        return
+    }
     val options = ShellOptions.parse(args)
     val app = DesktopApplication()
     installDesktopImageLoader(app.component.rommConnectionManager(), app.component.userCertStore())
@@ -146,6 +151,8 @@ fun tvDensity(heightPx: Int, fontScale: Float): Density =
     Density(density = (heightPx / TV_HEIGHT_DP).coerceAtLeast(1f), fontScale = fontScale)
 
 private const val TV_HEIGHT_DP = 540f
+
+private const val PROBE_VIDEO_FLAG = "--probe-video="
 
 private fun WindowState.toggleFullScreen() {
     placement = if (placement == WindowPlacement.Fullscreen) WindowPlacement.Floating else WindowPlacement.Fullscreen
