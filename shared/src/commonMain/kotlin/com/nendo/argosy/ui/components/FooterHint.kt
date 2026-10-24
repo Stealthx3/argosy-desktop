@@ -39,6 +39,8 @@ import com.nendo.argosy.ui.icons.InputIcons
 import com.nendo.argosy.ui.input.LocalABIconsSwapped
 import com.nendo.argosy.ui.input.LocalXYIconsSwapped
 import com.nendo.argosy.ui.input.LocalSwapStartSelect
+import com.nendo.argosy.ui.input.LocalButtonGlyphRemap
+import com.nendo.argosy.core.input.AndroidKeyCodes as KeyEvent
 import com.nendo.argosy.platform.LocalPlatformConfiguration as LocalConfiguration
 import com.nendo.argosy.platform.orientation
 import com.nendo.argosy.platform.screenHeightDp
@@ -93,36 +95,62 @@ private fun InputButton.category(): HintCategory = when (this) {
 }
 
 /**
- * The single icon-side resolution of A/B, X/Y and Start/Select swaps. Call this; never copy the
- * mapping and never encode a swap by choosing a different InputButton.
+ * The single icon-side resolution of A/B, X/Y and Start/Select swaps and of the active
+ * controller's navigation remap. Call this; never copy the mapping and never encode a swap by
+ * choosing a different InputButton.
  */
 @Composable
 fun InputButton.toPainter(): Painter? {
-    val abIconsSwapped = LocalABIconsSwapped.current
-    val xyIconsSwapped = LocalXYIconsSwapped.current
+    val remap = LocalButtonGlyphRemap.current
+    val swapAB = LocalABIconsSwapped.current xor remap.nintendo
+    val swapXY = LocalXYIconsSwapped.current xor remap.nintendo
     val swapStartSelect = LocalSwapStartSelect.current
     return when (this) {
-        InputButton.A -> if (abIconsSwapped) InputIcons.FaceRight else InputIcons.FaceBottom
-        InputButton.B -> if (abIconsSwapped) InputIcons.FaceBottom else InputIcons.FaceRight
-        InputButton.X -> if (xyIconsSwapped) InputIcons.FaceTop else InputIcons.FaceLeft
-        InputButton.Y -> if (xyIconsSwapped) InputIcons.FaceLeft else InputIcons.FaceTop
         InputButton.DPAD -> InputIcons.Dpad
-        InputButton.DPAD_UP -> InputIcons.DpadUp
-        InputButton.DPAD_DOWN -> InputIcons.DpadDown
-        InputButton.DPAD_LEFT -> InputIcons.DpadLeft
-        InputButton.DPAD_RIGHT -> InputIcons.DpadRight
         InputButton.DPAD_HORIZONTAL -> InputIcons.DpadHorizontal
         InputButton.DPAD_VERTICAL -> InputIcons.DpadVertical
-        InputButton.LB -> InputIcons.BumperLeft
-        InputButton.RB -> InputIcons.BumperRight
-        InputButton.LB_RB -> null
-        InputButton.LT -> InputIcons.TriggerLeft
-        InputButton.RT -> InputIcons.TriggerRight
-        InputButton.LT_RT -> null
+        InputButton.LB_RB, InputButton.LT_RT -> null
         InputButton.RIGHT_STICK_VERTICAL -> InputIcons.RightStickVertical
-        InputButton.START -> if (swapStartSelect) InputIcons.Options else InputIcons.Menu
-        InputButton.SELECT -> if (swapStartSelect) InputIcons.Menu else InputIcons.Options
+        else -> standardKeyCode(swapAB, swapXY, swapStartSelect)
+            ?.let { glyphForKeyCode(remap.physicalFor(it), remap.nintendo) }
     }
+}
+
+private fun InputButton.standardKeyCode(swapAB: Boolean, swapXY: Boolean, swapStartSelect: Boolean): Int? = when (this) {
+    InputButton.A -> if (swapAB) KeyEvent.KEYCODE_BUTTON_B else KeyEvent.KEYCODE_BUTTON_A
+    InputButton.B -> if (swapAB) KeyEvent.KEYCODE_BUTTON_A else KeyEvent.KEYCODE_BUTTON_B
+    InputButton.X -> if (swapXY) KeyEvent.KEYCODE_BUTTON_Y else KeyEvent.KEYCODE_BUTTON_X
+    InputButton.Y -> if (swapXY) KeyEvent.KEYCODE_BUTTON_X else KeyEvent.KEYCODE_BUTTON_Y
+    InputButton.DPAD_UP -> KeyEvent.KEYCODE_DPAD_UP
+    InputButton.DPAD_DOWN -> KeyEvent.KEYCODE_DPAD_DOWN
+    InputButton.DPAD_LEFT -> KeyEvent.KEYCODE_DPAD_LEFT
+    InputButton.DPAD_RIGHT -> KeyEvent.KEYCODE_DPAD_RIGHT
+    InputButton.LB -> KeyEvent.KEYCODE_BUTTON_L1
+    InputButton.RB -> KeyEvent.KEYCODE_BUTTON_R1
+    InputButton.LT -> KeyEvent.KEYCODE_BUTTON_L2
+    InputButton.RT -> KeyEvent.KEYCODE_BUTTON_R2
+    InputButton.START -> if (swapStartSelect) KeyEvent.KEYCODE_BUTTON_SELECT else KeyEvent.KEYCODE_BUTTON_START
+    InputButton.SELECT -> if (swapStartSelect) KeyEvent.KEYCODE_BUTTON_START else KeyEvent.KEYCODE_BUTTON_SELECT
+    else -> null
+}
+
+@Composable
+private fun glyphForKeyCode(keyCode: Int, nintendo: Boolean): Painter? = when (keyCode) {
+    KeyEvent.KEYCODE_BUTTON_A -> if (nintendo) InputIcons.FaceRight else InputIcons.FaceBottom
+    KeyEvent.KEYCODE_BUTTON_B -> if (nintendo) InputIcons.FaceBottom else InputIcons.FaceRight
+    KeyEvent.KEYCODE_BUTTON_X -> if (nintendo) InputIcons.FaceTop else InputIcons.FaceLeft
+    KeyEvent.KEYCODE_BUTTON_Y -> if (nintendo) InputIcons.FaceLeft else InputIcons.FaceTop
+    KeyEvent.KEYCODE_DPAD_UP -> InputIcons.DpadUp
+    KeyEvent.KEYCODE_DPAD_DOWN -> InputIcons.DpadDown
+    KeyEvent.KEYCODE_DPAD_LEFT -> InputIcons.DpadLeft
+    KeyEvent.KEYCODE_DPAD_RIGHT -> InputIcons.DpadRight
+    KeyEvent.KEYCODE_BUTTON_L1 -> InputIcons.BumperLeft
+    KeyEvent.KEYCODE_BUTTON_R1 -> InputIcons.BumperRight
+    KeyEvent.KEYCODE_BUTTON_L2 -> InputIcons.TriggerLeft
+    KeyEvent.KEYCODE_BUTTON_R2 -> InputIcons.TriggerRight
+    KeyEvent.KEYCODE_BUTTON_START -> InputIcons.Menu
+    KeyEvent.KEYCODE_BUTTON_SELECT -> InputIcons.Options
+    else -> null
 }
 
 private fun InputButton.isComposite(): Boolean = this == InputButton.LB_RB || this == InputButton.LT_RT

@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextAlign
 import com.nendo.argosy.data.preferences.NavigationButtonMaps
+import com.nendo.argosy.core.input.AndroidKeyCodes as KeyEvent
 import com.nendo.argosy.libretro.HotkeyManager
 import com.nendo.argosy.platform.LocalPlatformContext as LocalContext
 import com.nendo.argosy.res.ArgosyR as R
@@ -138,6 +139,37 @@ private fun ControlsState.defaultKey(target: ButtonMappingTarget, action: Naviga
     standardCode(target, action)
         .takeUnless { target == ButtonMappingTarget.KEYBOARD && it in NavigationAction.GAMEPAD_BUTTON_CODES }
 
+@Composable
+private fun buttonMappingKeyName(keyCode: Int, target: ButtonMappingTarget): String =
+    buttonMappingKeyLabelRes(keyCode, target == ButtonMappingTarget.KEYBOARD)?.let { stringResource(it) }
+        ?: HotkeyManager.getKeyName(keyCode)
+
+internal fun buttonMappingKeyLabelRes(keyCode: Int, keyboard: Boolean): Int? = when (keyCode) {
+    KeyEvent.KEYCODE_DPAD_UP -> if (keyboard) R.string.settings_button_mapping_key_arrow_up else R.string.settings_button_mapping_key_dpad_up
+    KeyEvent.KEYCODE_DPAD_DOWN -> if (keyboard) R.string.settings_button_mapping_key_arrow_down else R.string.settings_button_mapping_key_dpad_down
+    KeyEvent.KEYCODE_DPAD_LEFT -> if (keyboard) R.string.settings_button_mapping_key_arrow_left else R.string.settings_button_mapping_key_dpad_left
+    KeyEvent.KEYCODE_DPAD_RIGHT -> if (keyboard) R.string.settings_button_mapping_key_arrow_right else R.string.settings_button_mapping_key_dpad_right
+    KeyEvent.KEYCODE_DPAD_CENTER -> R.string.settings_button_mapping_key_dpad_center
+    KeyEvent.KEYCODE_ENTER -> R.string.settings_button_mapping_key_enter
+    KeyEvent.KEYCODE_ESCAPE -> R.string.settings_button_mapping_key_escape
+    KeyEvent.KEYCODE_SPACE -> R.string.settings_button_mapping_key_space
+    KeyEvent.KEYCODE_TAB -> R.string.settings_button_mapping_key_tab
+    KeyEvent.KEYCODE_DEL -> R.string.settings_button_mapping_key_backspace
+    KeyEvent.KEYCODE_FORWARD_DEL -> R.string.settings_button_mapping_key_delete
+    KeyEvent.KEYCODE_INSERT -> R.string.settings_button_mapping_key_insert
+    KeyEvent.KEYCODE_MOVE_HOME -> R.string.settings_button_mapping_key_home
+    KeyEvent.KEYCODE_MOVE_END -> R.string.settings_button_mapping_key_end
+    KeyEvent.KEYCODE_PAGE_UP -> R.string.settings_button_mapping_key_page_up
+    KeyEvent.KEYCODE_PAGE_DOWN -> R.string.settings_button_mapping_key_page_down
+    KeyEvent.KEYCODE_SHIFT_LEFT -> R.string.settings_button_mapping_key_shift_left
+    KeyEvent.KEYCODE_SHIFT_RIGHT -> R.string.settings_button_mapping_key_shift_right
+    KeyEvent.KEYCODE_CTRL_LEFT -> R.string.settings_button_mapping_key_ctrl_left
+    KeyEvent.KEYCODE_CTRL_RIGHT -> R.string.settings_button_mapping_key_ctrl_right
+    KeyEvent.KEYCODE_ALT_LEFT -> R.string.settings_button_mapping_key_alt_left
+    KeyEvent.KEYCODE_ALT_RIGHT -> R.string.settings_button_mapping_key_alt_right
+    else -> null
+}
+
 internal fun navigationActionLabelRes(action: NavigationAction): Int = when (action) {
     NavigationAction.CONFIRM -> R.string.settings_button_mapping_action_confirm
     NavigationAction.BACK -> R.string.settings_button_mapping_action_back
@@ -201,12 +233,12 @@ fun ButtonMappingSection(uiState: SettingsUiState, viewModel: SettingsViewModel)
                 ActionPreference(
                     title = stringResource(navigationActionLabelRes(item.action)),
                     subtitle = if (default != null) {
-                        stringResource(R.string.settings_button_mapping_default, HotkeyManager.getKeyName(default))
+                        stringResource(R.string.settings_button_mapping_default, buttonMappingKeyName(default, item.target))
                     } else {
                         stringResource(R.string.settings_button_mapping_default_none)
                     },
                     isFocused = isFocused(item),
-                    trailingText = mapped?.let { HotkeyManager.getKeyName(it) }
+                    trailingText = mapped?.let { buttonMappingKeyName(it, item.target) }
                         ?: stringResource(R.string.settings_button_mapping_unassigned),
                     onClick = { viewModel.startButtonCapture(item.target, item.action) }
                 )

@@ -5228,6 +5228,32 @@
     <string name="settings_button_mapping_action_right">Right</string>
     <!-- Second line of an action row. %1$s is a button name such as A or L1. -->
     <string name="settings_button_mapping_default">Default: %1$s</string>
+    <string name="settings_button_mapping_key_dpad_up">D-pad Up</string>
+    <string name="settings_button_mapping_key_dpad_down">D-pad Down</string>
+    <string name="settings_button_mapping_key_dpad_left">D-pad Left</string>
+    <string name="settings_button_mapping_key_dpad_right">D-pad Right</string>
+    <string name="settings_button_mapping_key_dpad_center">D-pad Center</string>
+    <string name="settings_button_mapping_key_arrow_up">Up Arrow</string>
+    <string name="settings_button_mapping_key_arrow_down">Down Arrow</string>
+    <string name="settings_button_mapping_key_arrow_left">Left Arrow</string>
+    <string name="settings_button_mapping_key_arrow_right">Right Arrow</string>
+    <string name="settings_button_mapping_key_enter">Enter</string>
+    <string name="settings_button_mapping_key_escape">Esc</string>
+    <string name="settings_button_mapping_key_space">Space</string>
+    <string name="settings_button_mapping_key_tab">Tab</string>
+    <string name="settings_button_mapping_key_backspace">Backspace</string>
+    <string name="settings_button_mapping_key_delete">Delete</string>
+    <string name="settings_button_mapping_key_insert">Insert</string>
+    <string name="settings_button_mapping_key_home">Home</string>
+    <string name="settings_button_mapping_key_end">End</string>
+    <string name="settings_button_mapping_key_page_up">Page Up</string>
+    <string name="settings_button_mapping_key_page_down">Page Down</string>
+    <string name="settings_button_mapping_key_shift_left">Left Shift</string>
+    <string name="settings_button_mapping_key_shift_right">Right Shift</string>
+    <string name="settings_button_mapping_key_ctrl_left">Left Ctrl</string>
+    <string name="settings_button_mapping_key_ctrl_right">Right Ctrl</string>
+    <string name="settings_button_mapping_key_alt_left">Left Alt</string>
+    <string name="settings_button_mapping_key_alt_right">Right Alt</string>
     <!-- Second line of a keyboard action row that has no key unless one is mapped. -->
     <string name="settings_button_mapping_default_none">No key by default</string>
     <!-- Value of an action row with no key. -->

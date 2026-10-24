@@ -1114,6 +1114,7 @@ fun ArgosyApp(
         LocalABIconsSwapped provides uiState.abIconsSwapped,
         LocalXYIconsSwapped provides uiState.xyIconsSwapped,
         LocalSwapStartSelect provides uiState.swapStartSelect,
+        com.nendo.argosy.ui.input.LocalButtonGlyphRemap provides uiState.buttonGlyphRemap,
         LocalFooterHost provides footerHostController,
         LocalFooterHostVisible provides (!presentationShowsHints && !navRingState.footerYieldsToBar),
         LocalFrostedBackdrop provides frostedBackdrop,

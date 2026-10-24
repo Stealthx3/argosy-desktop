@@ -58,6 +58,7 @@ import com.nendo.argosy.ui.input.GamepadInputHandler
 import com.nendo.argosy.ui.input.HapticFeedbackManager
 import com.nendo.argosy.ui.input.InputHandler
 import com.nendo.argosy.ui.input.InputResult
+import com.nendo.argosy.ui.input.buttonGlyphRemap
 import com.nendo.argosy.ui.input.buttonGlyphSwaps
 import com.nendo.argosy.ui.input.SoundFeedbackManager
 import com.nendo.argosy.core.input.SoundType
@@ -104,6 +105,7 @@ data class ArgosyUiState(
     val abIconsSwapped: Boolean = false,
     val xyIconsSwapped: Boolean = false,
     val swapStartSelect: Boolean = false,
+    val buttonGlyphRemap: com.nendo.argosy.ui.input.ButtonGlyphRemap = com.nendo.argosy.ui.input.ButtonGlyphRemap(),
     val menuWrapMode: MenuWrapMode = MenuWrapMode.HARD_STOP
 )
 
@@ -204,7 +206,8 @@ class ArgosyViewModel @Inject constructor(
     val saveConflicts: com.nendo.argosy.ui.conflict.SaveConflictPrompts,
     private val deepLinkLaunchCoordinator: com.nendo.argosy.ui.deeplink.DeepLinkLaunchCoordinator,
     private val gameStartRouter: com.nendo.argosy.ui.screens.common.GameStartRouter,
-    private val connectedControllerTracker: com.nendo.argosy.core.input.ConnectedControllerTracker
+    private val connectedControllerTracker: com.nendo.argosy.core.input.ConnectedControllerTracker,
+    private val navigationButtonCapture: com.nendo.argosy.ui.input.NavigationButtonCapture
 ) : ViewModel() {
 
     suspend fun resolveDeepLinkLaunch(
@@ -321,8 +324,9 @@ class ArgosyViewModel @Inject constructor(
         preferencesRepository.userPreferences,
         connectedControllerTracker.activeLayout,
         launcherStartup.complete,
-        launcherStartup.status
-    ) { prefs, detectedLayout, startupDone, status ->
+        launcherStartup.status,
+        connectedControllerTracker.activeController
+    ) { prefs, detectedLayout, startupDone, status, _ ->
         val glyphSwaps = prefs.buttonGlyphSwaps(detectedLayout)
         val hasExistingConfig = prefs.rommBaseUrl != null || prefs.romStoragePath != null
         ArgosyUiState(
@@ -335,6 +339,7 @@ class ArgosyViewModel @Inject constructor(
             abIconsSwapped = glyphSwaps.ab,
             xyIconsSwapped = glyphSwaps.xy,
             swapStartSelect = glyphSwaps.startSelect,
+            buttonGlyphRemap = prefs.buttonGlyphRemap(detectedLayout, navigationButtonCapture.activeController()?.key),
             menuWrapMode = prefs.menuWrapMode
         )
     }.stateIn(
