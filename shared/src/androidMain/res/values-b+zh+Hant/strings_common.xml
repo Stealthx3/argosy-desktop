@@ -547,6 +547,10 @@
     <string name="ui_quick_settings_hud">效能資訊疊加層</string>
     <string name="ui_quick_settings_hud_description">於內建模擬器遊戲中</string>
     <string name="ui_quick_settings_device_access_notice">Argosy 需要權限才能變更這些設定。</string>
+    <string name="ui_quick_settings_close_app_label">關閉 Argosy</string>
+    <string name="ui_quick_settings_close_app_action">關閉</string>
+    <string name="ui_quick_settings_close_app_confirm_title">關閉 Argosy？</string>
+    <string name="ui_quick_settings_close_app_confirm_message">Argosy 將停止並關閉視窗。進行中的同步會在下次開啟時完成。</string>
     <string name="ui_quick_settings_device_access_allow">允許</string>
     <string name="ui_quick_settings_theme">主題</string>
     <string name="ui_quick_settings_accent">強調色</string>

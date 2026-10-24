@@ -560,6 +560,10 @@
     <string name="ui_quick_settings_hud">स्टैट्स ओवरले</string>
     <string name="ui_quick_settings_hud_description">बिल्ट-इन गेम में</string>
     <string name="ui_quick_settings_device_access_notice">इन्हें बदलने के लिए Argosy को अनुमति चाहिए।</string>
+    <string name="ui_quick_settings_close_app_label">Argosy बंद करें</string>
+    <string name="ui_quick_settings_close_app_action">बंद करें</string>
+    <string name="ui_quick_settings_close_app_confirm_title">Argosy बंद करें?</string>
+    <string name="ui_quick_settings_close_app_confirm_message">Argosy रुक जाएगा और उसकी विंडो बंद हो जाएगी। चल रहा सिंक अगली बार खोलने पर पूरा होगा।</string>
     <string name="ui_quick_settings_device_access_allow">अनुमति दें</string>
     <string name="ui_quick_settings_theme">थीम</string>
     <string name="ui_quick_settings_accent">एक्सेंट रंग</string>

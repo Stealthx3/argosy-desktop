@@ -131,6 +131,10 @@ sealed class QuickSettingsItem(
     data object SwapXY : QuickSettingsItem("swapXY", QuickSettingsPage.QUICK, QuickSettingsGroup.CONTROLS)
     data object SwapStartSelect : QuickSettingsItem("swapStartSelect", QuickSettingsPage.QUICK, QuickSettingsGroup.CONTROLS)
 
+    data object CloseApp : QuickSettingsItem(
+        "closeApp", QuickSettingsPage.QUICK,
+        visibleWhen = { com.nendo.argosy.platform.PlatformFeatures.desktopWindow }
+    )
     data object DeviceAccess : QuickSettingsItem(
         "deviceAccess", QuickSettingsPage.PERFORMANCE,
         visibleWhen = { it.deviceControlsLocked }
@@ -181,6 +185,7 @@ sealed class QuickSettingsItem(
                 DisplayHeader, Theme, Accent, ScreenBrightness, SecondScreenBrightness, SwapDisplays,
                 SoundHeader, SystemVolume, UISounds,
                 ControlsHeader, Haptic, SwapAB, SwapXY, SwapStartSelect,
+                CloseApp,
                 DeviceAccess,
                 PerformanceHeader, Performance, Refresh,
                 FanHeader, Fan, FanSpeed,

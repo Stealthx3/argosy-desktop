@@ -2,7 +2,7 @@
 
 Rewritten (not appended) at the end of every work unit, so a fresh session can start from it alone. History and reasoning live in `DEVLOG.md`. Earlier phases: `phase-0.md` … `phase-4.md` (closed summaries).
 
-**Updated:** 2026-10-24 (step 2 in progress, code uncommitted). Steps 1–1 done; step 2 code written and the gate passes (131 + 4,426), walk not yet confirming the row.
+**Updated:** 2026-10-24 (step 2 closed). Steps 1–2 done; next is step 3 (game thumbnails from sync).
 
 ## Scope and exit criterion
 
@@ -16,14 +16,12 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 - Flathub lint: exceptions or alternatives for emulator folder grants and `flatpak-spawn` access, screenshots, the app id vs repository name; offline from-source build (Gradle dependencies as Flatpak sources).
 - YouTube trailers on desktop (deferred; needs yt-dlp and a JavaScript runtime).
 
-## Step 2 state (uncommitted)
+## Known issue (for step 4)
 
-- Written: `platform/AppShutdown.kt` (shared request flag), `QuickSettingsItem.CloseApp` (QUICK page, after Swap Start/Select, `visibleWhen` desktopWindow), controller `closeConfirm` flow + `requestClose/cancelClose/confirmClose` and modal-aware input handler, `QuickNoticeRow` + `ArgosyConfirmModal` in `QuickSettingsPanel`, 4 strings × 8 locales (`ui_quick_settings_close_app_*` in strings_common.xml), `Main.kt` observes `AppShutdown.requested` → `exitApplication()`, then after `application {}` releases input and `exitProcess(0)`. Gate green.
-- Walk `build/desktop-check/p5s2/`: Quick Settings (R3) opens; after `DOWN*11` focus sat on Haptics and A opened nothing: check how focus moves on the QUICK page (sliders may take Down? hidden rows?), confirm the Close Argosy row is reachable (scroll), then A → modal, B cancels, A,A exits (window gone, process ended).
-- **Found:** an uncaught `UnsatisfiedLinkError: no sigil-jni` on the AWT thread from `TitleIdDownloadObserver` → `TitleIdExtractor` → `Sigil.<clinit>` (desktop has no libsigil-jni); track as a bug (catch/disable title-id extraction on desktop or ship the native lib) — may matter for Game Mode stability (step 4).
-- Walk gotcha: `desktop-drive.sh` ends with `pkill -f com.nendo.argosy.desktop.MainKt`; never put that string in the same Bash command line.
+- Desktop throws an uncaught `UnsatisfiedLinkError: no sigil-jni` from `TitleIdDownloadObserver` → `TitleIdExtractor` → `Sigil.<clinit>` (no libsigil-jni on desktop): catch it or skip title-id extraction on desktop, or ship the native library.
+- Walk gotchas: Quick Settings menus wrap (Close Argosy is `R3 DOWN*8`); `desktop-drive.sh` ends with `pkill -f` on the main class name, so never put that name in the same Bash command.
 
-## Pre-beta fixes (owner, 2026-10-24): step 1 done, step 2 in progress
+## Pre-beta fixes (owner, 2026-10-24): steps 1–2 done, next action step 3
 
 1. Wizard: the desktop Permissions step (`EmulatorFolderAccessStep` in `FirstRunScreen.kt`, title/intro reuse `firstrun_permissions_*` keys) gets its own title "Emulators Argosy should manage" and a matching intro (new keys, eight locales); Android keeps its Permissions step.
 2. Quick Settings: desktop-only "Close Argosy" item (`QuickSettingsItem`, gate on `PlatformFeatures.desktopWindow`) → confirm modal (`ArgosyConfirmModal` pattern) → graceful exit: a shell hook observed by `Main.kt` that stops the gamepad dispatcher, background jobs and players, then `exitApplication()`.

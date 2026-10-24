@@ -1318,3 +1318,10 @@ Mapped ids: retroarch, dolphin, cemu, azahar, ryujinx (Ryubing), eden, melonds, 
 **Verification:** gate `:shared:desktopTest` 131 + `:app:testDebugUnitTest` 4,426, 0 failures; translation check clean; fresh-data wizard walk `build/desktop-check/fresh-p5s1/emulators.png` shows the new title and intro above the emulator cards. Android untouched (desktop-only composable).
 **Step 1 closed.** Alpha republished (`--step-close 5.1`).
 
+### 2026-10-24 — Step 2: Close Argosy in Quick Settings; step closed
+
+**Action:** `QuickSettingsItem.CloseApp` (Quick page, after the controls, desktop only through `PlatformFeatures.desktopWindow`) renders a "Close Argosy" row with a Close button; A or a click opens an `ArgosyConfirmModal` ("Close Argosy?", Cancel / Close, Close focused) drawn on top of the panel; while it is open the Quick Settings input handler only moves between the two buttons, A chooses, B cancels. Confirm sets the shared `AppShutdown` request; `Main.kt` observes it and calls `exitApplication()`; after the application loop returns, the shell releases key and pad state and ends the process with `exitProcess(0)`, so no leftover thread can keep it alive (relevant to the Game Mode hang in step 4). 4 labels in all eight locales.
+**Verification:** gate 131 + 4,426, 0 failures; translation check clean. Desktop walk `build/desktop-check/p5s2/`: R3 opens Quick Settings, the row is the ninth focusable item (menus wrap: `DOWN*8`), A shows the dialog above the panel, B cancels, A then A closes Argosy and the run exits on its own (Gradle `run` succeeds instead of being killed). A first walk showed the dialog behind the panel; it is now emitted after the panel content. Android: the row is hidden (`desktopWindow` false), `AppShutdown` is never requested.
+**Found along the way:** desktop throws an uncaught `UnsatisfiedLinkError: no sigil-jni` from `TitleIdDownloadObserver` → `TitleIdExtractor` → `Sigil` (no libsigil-jni on the desktop); recorded in the handoff for step 4.
+**Step 2 closed.** Alpha republished (`--step-close 5.2`).
+

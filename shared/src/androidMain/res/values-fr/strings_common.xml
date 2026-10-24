@@ -584,6 +584,10 @@
     <string name="ui_quick_settings_hud">Infos en surimpression</string>
     <string name="ui_quick_settings_hud_description">Dans les jeux intégrés</string>
     <string name="ui_quick_settings_device_access_notice">Argosy a besoin d\'une autorisation pour modifier ces réglages.</string>
+    <string name="ui_quick_settings_close_app_label">Fermer Argosy</string>
+    <string name="ui_quick_settings_close_app_action">Fermer</string>
+    <string name="ui_quick_settings_close_app_confirm_title">Fermer Argosy ?</string>
+    <string name="ui_quick_settings_close_app_confirm_message">Argosy s\'arrête et sa fenêtre se ferme. Les synchronisations en cours reprendront à la prochaine ouverture.</string>
     <string name="ui_quick_settings_device_access_allow">Autoriser</string>
     <string name="ui_quick_settings_theme">Thème</string>
     <string name="ui_quick_settings_accent">Couleur d\'accent</string>

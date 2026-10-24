@@ -1,5 +1,7 @@
 package com.nendo.argosy.desktop
 
+import kotlin.system.exitProcess
+import com.nendo.argosy.platform.AppShutdown
 import com.nendo.argosy.platform.mpv.MpvProbe
 import kotlinx.coroutines.flow.drop
 import java.awt.image.BufferedImage
@@ -74,6 +76,8 @@ fun main(args: Array<String>) {
     val blankCursor = Toolkit.getDefaultToolkit()
         .createCustomCursor(BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB), Point(0, 0), "blank")
     application {
+        val shutdownRequested by AppShutdown.requested.collectAsState()
+        LaunchedEffect(shutdownRequested) { if (shutdownRequested) exitApplication() }
         val state = rememberWindowState(
             placement = if (fullScreen) WindowPlacement.Fullscreen else WindowPlacement.Floating,
             position = WindowPosition(Alignment.Center),
@@ -141,6 +145,9 @@ fun main(args: Array<String>) {
             }
         }
     }
+    gamepadDispatcher.releaseAll()
+    keyDispatcher.releaseAll()
+    exitProcess(0)
 }
 
 /**
