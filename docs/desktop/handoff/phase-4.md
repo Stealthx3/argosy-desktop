@@ -2,7 +2,7 @@
 
 Rewritten (not appended) at the end of every work unit, so a fresh session can start from it alone. History and reasoning live in `DEVLOG.md`; read only the parts this file points to. Earlier phases: `phase-0.md` … `phase-3.md` (closed summaries).
 
-**Updated:** 2026-10-24 (step 9 investigation). Steps 1–8 done (step 1's owner hardware check still pending, below); step 9 in progress. The Phase 4 step plan (steps 1–10) is in `DEVLOG.md` under "Phase 4 · Linux adaptation" → "Phase 4 step plan". Nothing uncommitted.
+**Updated:** 2026-10-24 (step 9 closed). Steps 1–9 done (step 1's owner hardware check still pending, below); next is step 10, the phase's exit verification. The Phase 4 step plan (steps 1–10) is in `DEVLOG.md` under "Phase 4 · Linux adaptation" → "Phase 4 step plan". Nothing uncommitted.
 
 ## Scope and exit criterion
 
@@ -44,12 +44,14 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 
 - DEVLOG "Step 8 decisions" and parts 1–3. Not verified: a real Flathub install from the picker, an AppImage install or a Flatpak update from Managed Installers (owner tests in the part 2 and part 3 entries), the remote database refresh (repo `main` has no copy until the phase push).
 
-## Step 9 (libmpv video wallpaper): parts 1–2 done, next part 3
+## Step 9 (libmpv video): closed
 
-- Done: libmpv in the Flatpak (part 1); `platform/mpv/` binding, software-rendered `MpvPlayer`, `InlineTilePlayer` and `PageThemePlayer` desktop actuals, `--probe-video=<file>` check (part 2). Probe inside the Flatpak: VP9 and H.264 both ≈30 fps.
-- **Blocked on the owner (2026-10-24):** running the downloaded `yt-dlp` release (2026.10.21, sha256 b7af77f6…bf14, matches the release's SHA2-256SUMS) was denied by the session's permission check (code from an external source). Asked the owner whether to allow running/bundling yt-dlp, or to close step 9 with local video only and leave YouTube trailers empty on the desktop. Open question either way: yt-dlp now wants a JavaScript runtime (Deno/Node) for YouTube, which the Flatpak runtime lacks.
-- **Next action, part 3 (if allowed):** YouTube trailers (`YouTubeVideoPlayer` desktop actual, Home's video wallpaper): bundle `yt-dlp` (Python, from its release zipapp or pip module in the manifest, pinned) and resolve `yt-dlp -g -f "best[height<=720][vcodec!=none]"` for the video id on IO, then `MpvPlayer.load(url)`; call `onReady` on the first frame and `onError` when resolution or playback fails; respect `muted`. Probe with `--probe-video=https://…` after resolving in the probe too, or add a `--probe-youtube=<id>` flag.
-- Also: a UI walk with a real local video (custom-grid tile or page backdrop) if a setup path is quick; map `seekTicks` (Android seeks `SEEK_STEP_MS` per tick).
+- Parts 1–2 (libmpv in the Flatpak, software-rendered local video and theme audio, `--probe-video`). YouTube trailers deferred by the owner (2026-10-24). Not verified: a tile/backdrop video in the running UI, theme audio output, `seekTicks`.
+
+## Step 10 (exit verification): next action
+
+- Exit criterion (`PORT_PLAN.md` Phase 4): every Port/Adapt/Linux row of the parity matrix works on desktop; every Remove row has no entry point; Android unchanged (A/B + unit tests); display profiles and the Display setup step on a handheld, a monitor and a TV.
+- First actions: list the parity matrix rows (`PORT_PLAN.md` "Feature parity matrix") with their status and the evidence folder for each Phase 4 row; run the full gate, a full desktop settings walk (`settings-walk.sh desktop`) and a full Android A/B against the Phase 3 baseline; collect the owner tests gathered through the phase (step 1 Steam Controller, remapped pad, Nintendo layout, cursor hiding, profile detection on a handheld/TV, permission grant, Flathub/AppImage installs, video tile) into one checklist for the owner; then the phase close per CLAUDE.md (handoff summary, `phase-5.md`, README rebuild, push, `phase-gate`, ask the owner).
 
 ## Every step close from now on
 

@@ -87,7 +87,7 @@ Look-alike is guaranteed by construction: the pixels come from the same composab
 
 **Window.** Undecorated fullscreen by default (the Android app is always fullscreen), with a windowed mode for desktop use. Handheld targets such as Steam Deck Game Mode get the same layout as an Android handheld of that resolution. *Changed 2026-10-23 (Desktop divergences):* first launch is windowed with the system title bar and the dark theme, "Start in full screen" is a setting, and display profiles (Handheld/Desktop/TV) pick the layout.
 
-**Media.** Trailers and video wallpaper use libmpv rendered into a Compose surface, with Argosy's existing player controls on top (Jellyfin playback removed on desktop, 2026-10-23).
+**Media.** Local video (Home tiles, page backdrops) and theme audio use libmpv, software-rendered into a Compose surface, with Argosy's existing player controls on top (Jellyfin playback removed on desktop, 2026-10-23). YouTube trailers (Home's video wallpaper) stay empty on desktop for now (owner decision 2026-10-24): resolving YouTube streams needs yt-dlp and a JavaScript runtime the Flatpak does not have.
 
 **Built-in emulator.** Not in this version (owner decision, 2026-10-23): the earlier plan for a desktop counterpart to `libretrodroid` is dropped, and the desktop launches external emulators only.
 
@@ -212,7 +212,7 @@ Port means the shared code runs as is, Adapt means the same screen and behaviour
 | First-run wizard: Display setup step | Linux | 4 | Profile choice with thumbnail previews |
 | Apps tab | Adapt | 3 | Host .desktop apps, launched on the host |
 | Jellyfin media with offline downloads | Remove | 4 | Desktop divergence |
-| Video wallpaper | Adapt | 4 | Same libmpv surface |
+| Video wallpaper | Adapt | 4 | Local video via the libmpv surface; YouTube trailers deferred (owner decision 2026-10-24) |
 | Built-in emulation and netplay | Later | — | Not in this version |
 | Steam integration | Remove | 4 | Desktop divergence |
 | Dual-screen | Later | — | Not in this version |
