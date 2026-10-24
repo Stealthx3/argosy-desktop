@@ -21,6 +21,7 @@ internal class ModalInputRouter(private val viewModel: SettingsViewModel) {
             state.controls.shortcutCaptureTarget != null
         ) return null
 
+        interceptButtonCapture(state, method)?.let { return it }
         interceptNavRingModal(state, method)?.let { return it }
         interceptGpuDriverPrompt(state, method)?.let { return it }
         interceptDriverPicker(state, method)?.let { return it }
@@ -54,6 +55,12 @@ internal class ModalInputRouter(private val viewModel: SettingsViewModel) {
         interceptInstallerAddModal(state, method)?.let { return it }
 
         return null
+    }
+
+    private fun interceptButtonCapture(state: SettingsUiState, method: InputMethod): InputResult? {
+        if (state.controls.buttonMappingCapture == null) return null
+        if (method == InputMethod.BACK) viewModel.cancelButtonCapture()
+        return InputResult.HANDLED
     }
 
     private fun interceptNavRingModal(state: SettingsUiState, method: InputMethod): InputResult? {

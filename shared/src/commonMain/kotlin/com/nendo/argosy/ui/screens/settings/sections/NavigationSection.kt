@@ -86,6 +86,11 @@ internal sealed class NavigationItem(
         section = "controller",
         visibleWhen = { it.inputModeConfigurable }
     )
+    data object ButtonMapping : NavigationItem(
+        key = "buttonMapping",
+        section = "controller",
+        visibleWhen = { it.buttonMappingSupported }
+    )
     data object ControllerLayout : NavigationItem("layout", "controller")
     data object SwapAB : NavigationItem("swapAB", "controller")
     data object SwapXY : NavigationItem("swapXY", "controller")
@@ -145,7 +150,7 @@ internal sealed class NavigationItem(
         val ALL: List<NavigationItem>
             get() = listOf(
                 ControllerHeader,
-                InputMode, ControllerLayout, SwapAB, SwapXY, SwapStartSelect,
+                InputMode, ButtonMapping, ControllerLayout, SwapAB, SwapXY, SwapStartSelect,
                 FeedbackSpacer, FeedbackHeader,
                 HapticFeedback, VibrationStrength,
                 MenusSpacer, MenusHeader,
@@ -320,6 +325,13 @@ fun NavigationSection(uiState: SettingsUiState, viewModel: SettingsViewModel) {
                 selectedIndex = controls.offeredInputModes().indexOf(controls.shownInputMode()),
                 isFocused = isFocused(item),
                 onSelect = { viewModel.setControllerInputMode(controls.offeredInputModes()[it]) }
+            )
+
+            NavigationItem.ButtonMapping -> ActionPreference(
+                title = stringResource(R.string.settings_navigation_button_mapping_title),
+                subtitle = stringResource(R.string.settings_navigation_button_mapping_subtitle),
+                isFocused = isFocused(item),
+                onClick = { viewModel.navigateToButtonMapping() }
             )
 
             NavigationItem.MenuWrap -> SegmentedPreference(

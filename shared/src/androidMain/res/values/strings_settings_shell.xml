@@ -173,6 +173,8 @@
     <!-- "LED" is the RGB light strip on some handhelds; commonly left untranslated. -->
     <string name="settings_shell_header_ambient_led">LED CONTROL</string>
     <string name="settings_shell_header_navigation">NAVIGATION</string>
+    <!-- Screen header, capitals. -->
+    <string name="settings_shell_header_button_mapping">BUTTON MAPPING</string>
     <string name="settings_shell_header_platforms">PLATFORMS</string>
     <string name="settings_shell_header_builtin_emulator">BUILT-IN EMULATOR</string>
     <!-- Fallback heading for a platform detail screen when the platform's own name is unknown. -->

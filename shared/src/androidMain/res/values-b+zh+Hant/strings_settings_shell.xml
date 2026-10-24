@@ -121,6 +121,7 @@
     <string name="settings_shell_header_screens">螢幕配置</string>
     <string name="settings_shell_header_ambient_led">LED控制</string>
     <string name="settings_shell_header_navigation">導覽</string>
+    <string name="settings_shell_header_button_mapping">按鍵對應</string>
     <string name="settings_shell_header_platforms">平台</string>
     <string name="settings_shell_header_builtin_emulator">內建模擬器</string>
     <string name="settings_shell_header_platform_detail_fallback">平台</string>

@@ -67,6 +67,9 @@ import com.nendo.argosy.ui.screens.settings.sections.boxArtItemAtFocusIndex
 import com.nendo.argosy.ui.screens.settings.sections.audioItemAtFocusIndex
 import com.nendo.argosy.ui.screens.settings.sections.audioMaxFocusIndex
 import com.nendo.argosy.ui.screens.settings.sections.navigationItemAtFocusIndex
+import com.nendo.argosy.ui.screens.settings.sections.ButtonMappingItem
+import com.nendo.argosy.ui.screens.settings.sections.buttonMappingItemAtFocusIndex
+import com.nendo.argosy.ui.screens.settings.sections.buttonMappingMaxFocusIndex
 import com.nendo.argosy.ui.screens.settings.sections.displaysItemAtFocusIndex
 import com.nendo.argosy.ui.screens.settings.sections.createStorageLayoutInfo
 import com.nendo.argosy.ui.screens.settings.sections.controllerGripItemAtFocusIndex
@@ -298,6 +301,7 @@ internal fun routeConfirm(vm: SettingsViewModel): InputResult {
             InputResult.handled(SoundType.SILENT)
         }
         SettingsSection.NAVIGATION -> routeNavigationConfirm(vm, state)
+        SettingsSection.BUTTON_MAPPING -> routeButtonMappingConfirm(vm, state)
         SettingsSection.PLATFORMS -> routeEmulatorsConfirm(vm, state)
         SettingsSection.BUILTIN_EMULATOR -> routeBuiltinEmulatorConfirm(vm, state)
         SettingsSection.PLATFORM_DETAIL -> routePlatformDetailConfirm(vm, state)
@@ -1054,6 +1058,7 @@ private fun routeNavigationConfirm(vm: SettingsViewModel, state: SettingsUiState
             vm.setNavBarAutoHide(autoHide)
             return InputResult.toggled(autoHide)
         }
+        NavigationItem.ButtonMapping -> vm.navigateToButtonMapping()
         NavigationItem.NavBarPages -> {
             vm.showNavRingModal()
             return InputResult.handled(SoundType.OPEN_MODAL)
@@ -1066,6 +1071,34 @@ private fun routeNavigationConfirm(vm: SettingsViewModel, state: SettingsUiState
             vm.startShortcutCapture(UiShortcut.OPEN_QUICK_PANEL)
             return InputResult.handled(SoundType.OPEN_MODAL)
         }
+        else -> {}
+    }
+    return InputResult.HANDLED
+}
+
+private fun routeButtonMappingConfirm(vm: SettingsViewModel, state: SettingsUiState): InputResult {
+    when (val item = buttonMappingItemAtFocusIndex(state.focusedIndex, state.controls)) {
+        is ButtonMappingItem.ActionRow -> {
+            vm.startButtonCapture(item.target, item.action)
+            return InputResult.handled(SoundType.OPEN_MODAL)
+        }
+        is ButtonMappingItem.Reset -> vm.resetButtonMapping(item.target)
+        ButtonMappingItem.SwapAB -> {
+            val swapped = !state.controls.swapAB
+            vm.setSwapAB(swapped)
+            return InputResult.toggled(swapped)
+        }
+        ButtonMappingItem.SwapXY -> {
+            val swapped = !state.controls.swapXY
+            vm.setSwapXY(swapped)
+            return InputResult.toggled(swapped)
+        }
+        ButtonMappingItem.SwapStartSelect -> {
+            val swapped = !state.controls.swapStartSelect
+            vm.setSwapStartSelect(swapped)
+            return InputResult.toggled(swapped)
+        }
+        ButtonMappingItem.ControllerInfo -> return InputResult.handled(SoundType.SILENT)
         else -> {}
     }
     return InputResult.HANDLED
@@ -1253,6 +1286,7 @@ private fun routeDismissTopOverlay(vm: SettingsViewModel): Boolean {
         state.builtinControls.showInputMappingModal -> { vm.hideInputMappingModal(); true }
         state.builtinControls.showHotkeysModal -> { vm.hideHotkeysModal(); true }
         state.controls.shortcutCaptureTarget != null -> { vm.cancelShortcutCapture(); true }
+        state.controls.buttonMappingCapture != null -> { vm.cancelButtonCapture(); true }
         state.controls.showNavRingModal -> { vm.backNavRing(); true }
         vm.shaderChainManager.shaderStack.isReordering -> { vm.cancelShaderLift(); true }
         state.accounts.pairing.active -> { vm.cancelAddAccount(); true }
@@ -1401,6 +1435,7 @@ private fun computeMaxFocusIndex(
     SettingsSection.SCREENS -> screensMaxFocusIndex(state.display.screens)
     SettingsSection.LAUNCH_TARGETS -> launchTargetsLayout(state.launchTargets).maxFocusIndex
     SettingsSection.NAVIGATION -> navigationMaxFocusIndex(state.controls)
+    SettingsSection.BUTTON_MAPPING -> buttonMappingMaxFocusIndex(state.controls)
     SettingsSection.MANAGED_INSTALLERS -> installersMaxFocusIndex(state.managedInstallers)
     SettingsSection.PLATFORMS -> emulatorsMaxFocusIndex(state.emulators.platforms)
     SettingsSection.BUILTIN_EMULATOR -> when {

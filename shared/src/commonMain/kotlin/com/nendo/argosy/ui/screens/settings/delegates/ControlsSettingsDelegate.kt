@@ -24,9 +24,15 @@ import com.nendo.argosy.ui.components.ListReorder
 import com.nendo.argosy.ui.components.ReorderStep
 import com.nendo.argosy.ui.input.HapticFeedbackManager
 import com.nendo.argosy.ui.input.HapticPattern
+import com.nendo.argosy.ui.input.MappedController
+import com.nendo.argosy.ui.input.NavigationAction
+import com.nendo.argosy.ui.input.NavigationButtonCapture
 import com.nendo.argosy.ui.input.UiShortcut
 import com.nendo.argosy.ui.input.UiShortcutKeys
 import com.nendo.argosy.ui.navigation.NavRing
+import com.nendo.argosy.data.preferences.NavigationButtonMaps
+import com.nendo.argosy.ui.screens.settings.ButtonMappingCapture
+import com.nendo.argosy.ui.screens.settings.ButtonMappingTarget
 import com.nendo.argosy.ui.screens.settings.ControlsState
 import com.nendo.argosy.ui.screens.settings.shortcutKey
 import com.nendo.argosy.util.PermissionHelper
@@ -43,7 +49,8 @@ class ControlsSettingsDelegate @Inject constructor(
     private val preferencesRepository: UserPreferencesRepository,
     private val hapticManager: HapticFeedbackManager,
     private val permissionHelper: PermissionHelper,
-    private val controllerTracker: ConnectedControllerTracker
+    private val controllerTracker: ConnectedControllerTracker,
+    private val buttonCapture: NavigationButtonCapture
 ) {
     private val _state = MutableStateFlow(ControlsState())
     val state: StateFlow<ControlsState> = _state.asStateFlow()
@@ -315,6 +322,61 @@ class ControlsSettingsDelegate @Inject constructor(
             navRingReorder = step.reorder,
             navRingFocusIndex = step.reorder.heldIndex
         )
+
+    val buttonMappingSupported: Boolean get() = buttonCapture.supported
+
+    fun activeMappedController(): MappedController? = buttonCapture.activeController()
+
+    fun refreshButtonMappingController() {
+        _state.update { it.copy(buttonMappingController = buttonCapture.activeController()) }
+    }
+
+    fun startButtonCapture(scope: CoroutineScope, target: ButtonMappingTarget, action: NavigationAction) {
+        refreshButtonMappingController()
+        val controllerKey = when (target) {
+            ButtonMappingTarget.CONTROLLER -> _state.value.buttonMappingController?.key ?: return
+            ButtonMappingTarget.KEYBOARD -> NavigationButtonMaps.KEYBOARD
+        }
+        val capture = ButtonMappingCapture(target, controllerKey, action)
+        _state.update { it.copy(buttonMappingCapture = capture) }
+        buttonCapture.captureNext { controller, keyCode ->
+            scope.launch { completeButtonCapture(capture, controller, keyCode) }
+        }
+    }
+
+    fun cancelButtonCapture() {
+        buttonCapture.cancel()
+        _state.update { it.copy(buttonMappingCapture = null) }
+    }
+
+    private suspend fun completeButtonCapture(capture: ButtonMappingCapture, controller: String, keyCode: Int) {
+        val current = _state.value
+        if (current.buttonMappingCapture != capture) return
+        if (controller != capture.controllerKey) {
+            _state.update { it.copy(buttonMappingCapture = null) }
+            return
+        }
+        val standard = capture.action.standardCode(
+            keyboard = capture.target == ButtonMappingTarget.KEYBOARD,
+            swapAB = current.swapAB,
+            swapXY = current.swapXY,
+            swapStartSelect = current.swapStartSelect
+        )
+        writeButtonMaps(current.navigationButtonMaps.assign(capture.controllerKey, keyCode, standard))
+    }
+
+    fun resetButtonMapping(scope: CoroutineScope, target: ButtonMappingTarget) {
+        val controllerKey = when (target) {
+            ButtonMappingTarget.CONTROLLER -> _state.value.buttonMappingController?.key ?: return
+            ButtonMappingTarget.KEYBOARD -> NavigationButtonMaps.KEYBOARD
+        }
+        scope.launch { writeButtonMaps(_state.value.navigationButtonMaps.reset(controllerKey)) }
+    }
+
+    private suspend fun writeButtonMaps(maps: NavigationButtonMaps) {
+        _state.update { it.copy(navigationButtonMaps = maps, buttonMappingCapture = null) }
+        preferencesRepository.setNavigationButtonMaps(maps)
+    }
 
     fun startShortcutCapture(shortcut: UiShortcut) {
         _state.update { it.copy(shortcutCaptureTarget = shortcut) }

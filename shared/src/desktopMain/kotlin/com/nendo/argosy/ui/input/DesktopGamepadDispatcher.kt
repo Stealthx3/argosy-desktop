@@ -13,6 +13,8 @@ import com.nendo.argosy.platform.PlatformMotionEvent
 import com.nendo.argosy.platform.SOURCE_DPAD
 import com.nendo.argosy.platform.SOURCE_GAMEPAD
 import com.nendo.argosy.platform.SOURCE_JOYSTICK
+import com.nendo.argosy.platform.action
+import com.nendo.argosy.platform.keyCode
 import com.nendo.argosy.platform.sdl.Sdl3
 import com.nendo.argosy.platform.sdl.SdlGamepadSource
 import com.nendo.argosy.platform.sdl.SdlPadEvent
@@ -143,10 +145,14 @@ class DesktopGamepadDispatcher @Inject constructor(
 
     private fun button(deviceId: Int, event: SdlPadEvent.Button) {
         val physical = SdlGamepadMapping.keyCode(event.button) ?: return
+        press(deviceId, physical, event.down)
+    }
+
+    private fun press(deviceId: Int, physical: Int, down: Boolean) {
         val controller = controllerKeys[deviceId].orEmpty()
         val now = System.currentTimeMillis()
         val key = deviceId to physical
-        if (event.down) {
+        if (down) {
             if (remapper.interceptDown(controller, physical)) return
             val keyCode = remapper.translate(controller, physical)
             val source = sourceFor(keyCode)
@@ -182,7 +188,9 @@ class DesktopGamepadDispatcher @Inject constructor(
             AndroidMotionAxes.ACTION_MOVE,
             HashMap(values),
         )
-        triggerAxisKeyEmitter.emit(motion).forEach { keyDispatcher.deliver(it) }
+        triggerAxisKeyEmitter.emit(motion).forEach {
+            press(deviceId, it.keyCode, it.action == AndroidKeyCodes.ACTION_DOWN)
+        }
         if (gamepadInputHandler.processStickMotion(motion, true, gamepadInputHandler::injectEvent)) return
         gamepadInputHandler.handleMotionEvent(motion)
     }

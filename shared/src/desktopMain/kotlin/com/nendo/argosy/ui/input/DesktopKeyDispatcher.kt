@@ -51,7 +51,7 @@ class DesktopKeyDispatcher @Inject constructor(
             if (previous == null && remapper.interceptDown(NavigationButtonMaps.KEYBOARD, physical)) return true
             if (previous == null && remapper.isSwallowed(NavigationButtonMaps.KEYBOARD, physical)) return true
             val current = previous?.let { it.copy(repeatCount = it.repeatCount + 1) }
-                ?: HeldKey(now, 0, remapper.translate(NavigationButtonMaps.KEYBOARD, physical))
+                ?: HeldKey(now, 0, translate(physical))
             held[physical] = current
             keyCode = current.keyCode
             repeatCount = current.repeatCount
@@ -59,7 +59,7 @@ class DesktopKeyDispatcher @Inject constructor(
         } else {
             if (remapper.interceptUp(NavigationButtonMaps.KEYBOARD, physical)) return true
             val released = held.remove(physical)
-            keyCode = released?.keyCode ?: remapper.translate(NavigationButtonMaps.KEYBOARD, physical)
+            keyCode = released?.keyCode ?: translate(physical)
             downTime = released?.downTime ?: now
             repeatCount = 0
         }
@@ -74,6 +74,9 @@ class DesktopKeyDispatcher @Inject constructor(
         )
         return deliver(platformEvent)
     }
+
+    private fun translate(physical: Int): Int =
+        if (isDesktopTextInputActive()) physical else remapper.translate(NavigationButtonMaps.KEYBOARD, physical)
 
     fun deliver(event: PlatformKeyEvent): Boolean {
         val keyCode = event.keyCode

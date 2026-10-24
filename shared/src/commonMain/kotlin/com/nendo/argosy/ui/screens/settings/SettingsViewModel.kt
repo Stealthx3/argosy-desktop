@@ -1588,6 +1588,11 @@ class SettingsViewModel @Inject constructor(
     fun setSelectSwapMode(mode: com.nendo.argosy.data.preferences.SelectSwapMode) = controlsDelegate.setSelectSwapMode(viewModelScope, mode)
     fun setControllerInputMode(mode: com.nendo.argosy.data.preferences.ControllerInputMode) = controlsDelegate.setControllerInputMode(viewModelScope, mode)
     fun startShortcutCapture(shortcut: com.nendo.argosy.ui.input.UiShortcut) = controlsDelegate.startShortcutCapture(shortcut)
+    fun navigateToButtonMapping() = routeNavigateToSection(this, SettingsSection.BUTTON_MAPPING)
+    fun startButtonCapture(target: ButtonMappingTarget, action: com.nendo.argosy.ui.input.NavigationAction) =
+        controlsDelegate.startButtonCapture(viewModelScope, target, action)
+    fun cancelButtonCapture() = controlsDelegate.cancelButtonCapture()
+    fun resetButtonMapping(target: ButtonMappingTarget) = controlsDelegate.resetButtonMapping(viewModelScope, target)
     fun cancelShortcutCapture() = controlsDelegate.cancelShortcutCapture()
     fun showNavRingModal() = controlsDelegate.showNavRingModal()
     fun backNavRing() = controlsDelegate.backNavRing()

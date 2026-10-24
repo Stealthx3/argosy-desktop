@@ -150,6 +150,7 @@ import com.nendo.argosy.ui.screens.settings.sections.ScreensSection
 import com.nendo.argosy.ui.screens.settings.sections.LaunchTargetsSection
 import com.nendo.argosy.ui.screens.settings.sections.ManagedInstallersSection
 import com.nendo.argosy.ui.screens.settings.sections.NavigationSection
+import com.nendo.argosy.ui.screens.settings.sections.ButtonMappingSection
 import com.nendo.argosy.ui.screens.settings.sections.navigationItemAtFocusIndex
 import com.nendo.argosy.ui.input.UiShortcutKeys
 import com.nendo.argosy.ui.screens.settings.sections.BuiltinEmulatorSection
@@ -748,6 +749,7 @@ fun SettingsScreen(
                         SettingsSection.LAUNCH_TARGETS -> LaunchTargetsSection(uiState, viewModel)
                         SettingsSection.AMBIENT_LED -> AmbientLedSection(uiState, viewModel)
                         SettingsSection.NAVIGATION -> NavigationSection(uiState, viewModel)
+                        SettingsSection.BUTTON_MAPPING -> ButtonMappingSection(uiState, viewModel)
                         SettingsSection.MANAGED_INSTALLERS -> ManagedInstallersSection(uiState, viewModel)
                         SettingsSection.BUILTIN_EMULATOR -> BuiltinEmulatorSection(uiState, viewModel)
                         SettingsSection.PLATFORMS -> EmulatorsSection(
@@ -1558,6 +1560,7 @@ private fun settingsSectionTitle(uiState: SettingsUiState): String = when (uiSta
     SettingsSection.LAUNCH_TARGETS -> stringResource(R.string.settings_launch_targets_title)
     SettingsSection.AMBIENT_LED -> stringResource(R.string.settings_shell_header_ambient_led)
     SettingsSection.NAVIGATION -> stringResource(R.string.settings_shell_header_navigation)
+    SettingsSection.BUTTON_MAPPING -> stringResource(R.string.settings_shell_header_button_mapping)
     SettingsSection.MANAGED_INSTALLERS -> stringResource(R.string.settings_shell_header_installers)
     SettingsSection.PLATFORMS -> stringResource(R.string.settings_shell_header_platforms)
     SettingsSection.BUILTIN_EMULATOR -> stringResource(R.string.settings_shell_header_builtin_emulator)
@@ -1832,7 +1835,7 @@ private fun SettingsFooter(
     if (uiState.currentSection == SettingsSection.ACCOUNTS && uiState.accounts.switchInProgress) {
         return
     }
-    if (uiState.controls.shortcutCaptureTarget != null) {
+    if (uiState.controls.shortcutCaptureTarget != null || uiState.controls.buttonMappingCapture != null) {
         return
     }
     if (uiState.currentSection == SettingsSection.PLATFORMS && uiState.emulators.isReorderingPlatforms) {

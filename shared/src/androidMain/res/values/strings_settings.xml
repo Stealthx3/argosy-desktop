@@ -5179,4 +5179,83 @@
     <string name="settings_builtin_gpu_driver_reason_backend">Applies when Backend is Vulkan</string>
     <!-- Second line of a read-only GPU Driver row on a device that cannot load custom drivers. -->
     <string name="settings_builtin_gpu_driver_reason_device">Custom drivers need an Adreno GPU</string>
+
+    <!-- Row title, desktop only. Noun phrase: the screen where each navigation action gets its button. -->
+    <string name="settings_navigation_button_mapping_title">Button Mapping</string>
+    <!-- Second line of that row. -->
+    <string name="settings_navigation_button_mapping_subtitle">Choose the button for each action</string>
+    <!-- Group heading on the Button Mapping screen: rows for the controller in use. -->
+    <string name="settings_button_mapping_section_controller">Controller</string>
+    <!-- Group heading: the A/B, X/Y and Start/Select swaps. -->
+    <string name="settings_button_mapping_section_presets">Presets</string>
+    <!-- Group heading: rows for the keyboard. -->
+    <string name="settings_button_mapping_section_keyboard">Keyboard</string>
+    <!-- Row title: the controller whose buttons the rows below change. -->
+    <string name="settings_button_mapping_controller_title">Controller</string>
+    <!-- Value of that row when no controller is connected. -->
+    <string name="settings_button_mapping_controller_none">No controller connected</string>
+    <!-- Action row title. -->
+    <string name="settings_button_mapping_action_confirm">Confirm</string>
+    <!-- Action row title. -->
+    <string name="settings_button_mapping_action_back">Back</string>
+    <!-- Action row title. -->
+    <string name="settings_button_mapping_action_context">Context Menu</string>
+    <!-- Action row title. -->
+    <string name="settings_button_mapping_action_secondary">Secondary Action</string>
+    <!-- Action row title: what Start does by default. -->
+    <string name="settings_button_mapping_action_menu">Menu</string>
+    <!-- Action row title: what Select does by default. -->
+    <string name="settings_button_mapping_action_select">Select</string>
+    <!-- Action row title: what L1 does by default. -->
+    <string name="settings_button_mapping_action_prev_section">Previous Section</string>
+    <!-- Action row title: what R1 does by default. -->
+    <string name="settings_button_mapping_action_next_section">Next Section</string>
+    <!-- Action row title: what L2 does by default. -->
+    <string name="settings_button_mapping_action_prev_trigger">Previous Group</string>
+    <!-- Action row title: what R2 does by default. -->
+    <string name="settings_button_mapping_action_next_trigger">Next Group</string>
+    <!-- Action row title: pressing the left stick in. -->
+    <string name="settings_button_mapping_action_left_stick">Left Stick Press</string>
+    <!-- Action row title: pressing the right stick in. -->
+    <string name="settings_button_mapping_action_right_stick">Right Stick Press</string>
+    <!-- Action row title: move up. -->
+    <string name="settings_button_mapping_action_up">Up</string>
+    <!-- Action row title: move down. -->
+    <string name="settings_button_mapping_action_down">Down</string>
+    <!-- Action row title: move left. -->
+    <string name="settings_button_mapping_action_left">Left</string>
+    <!-- Action row title: move right. -->
+    <string name="settings_button_mapping_action_right">Right</string>
+    <!-- Second line of an action row. %1$s is a button name such as A or L1. -->
+    <string name="settings_button_mapping_default">Default: %1$s</string>
+    <!-- Second line of a keyboard action row that has no key unless one is mapped. -->
+    <string name="settings_button_mapping_default_none">No key by default</string>
+    <!-- Value of an action row with no key. -->
+    <string name="settings_button_mapping_unassigned">Not set</string>
+    <!-- Row title: put every button back to its default. -->
+    <string name="settings_button_mapping_reset_title">Reset to Default</string>
+    <!-- Second line of the reset row in the controller group. -->
+    <string name="settings_button_mapping_reset_controller_subtitle">Restore this controller\'s buttons</string>
+    <!-- Second line of the reset row in the keyboard group. -->
+    <string name="settings_button_mapping_reset_keyboard_subtitle">Restore the keyboard keys</string>
+    <!-- Title of the dialog that waits for a press. Imperative. -->
+    <string name="settings_button_mapping_capture_title">Map Button</string>
+    <!-- Dialog prompt. %1$s is the controller's name. -->
+    <string name="settings_button_mapping_capture_prompt_controller">Press a button on %1$s</string>
+    <!-- Dialog prompt for a keyboard row. -->
+    <string name="settings_button_mapping_capture_prompt_keyboard">Press a key on the keyboard</string>
+    <!-- Dialog detail line: how to leave without mapping. -->
+    <string name="settings_button_mapping_capture_cancel">Press on another device, tap outside or wait to cancel</string>
+    <!-- Preset row title on the Button Mapping screen. -->
+    <string name="settings_button_mapping_preset_swap_ab_title">Swap A/B</string>
+    <!-- Second line of that row. -->
+    <string name="settings_button_mapping_preset_swap_ab_subtitle">Swap confirm and back buttons</string>
+    <!-- Preset row title on the Button Mapping screen. -->
+    <string name="settings_button_mapping_preset_swap_xy_title">Swap X/Y</string>
+    <!-- Second line of that row. -->
+    <string name="settings_button_mapping_preset_swap_xy_subtitle">Swap context menu and secondary action</string>
+    <!-- Preset row title on the Button Mapping screen. -->
+    <string name="settings_button_mapping_preset_swap_start_select_title">Swap Start/Select</string>
+    <!-- Second line of that row. -->
+    <string name="settings_button_mapping_preset_swap_start_select_subtitle">Flip the Start and Select button functions</string>
 </resources>

@@ -125,6 +125,7 @@
     <string name="settings_shell_header_screens">DISPOSITION DES ÉCRANS</string>
     <string name="settings_shell_header_ambient_led">CONTRÔLE LED</string>
     <string name="settings_shell_header_navigation">NAVIGATION</string>
+    <string name="settings_shell_header_button_mapping">ATTRIBUTION DES BOUTONS</string>
     <string name="settings_shell_header_platforms">PLATEFORMES</string>
     <string name="settings_shell_header_builtin_emulator">ÉMULATEUR INTÉGRÉ</string>
     <string name="settings_shell_header_platform_detail_fallback">PLATEFORME</string>

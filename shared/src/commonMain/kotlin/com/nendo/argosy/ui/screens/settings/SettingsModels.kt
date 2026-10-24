@@ -119,6 +119,7 @@ enum class SettingsSection {
     LAUNCH_TARGETS,
     AMBIENT_LED,
     NAVIGATION,
+    BUTTON_MAPPING,
     PLATFORMS,
     BUILTIN_EMULATOR,
     BUILTIN_VIDEO,
@@ -417,6 +418,10 @@ data class ControlsState(
     val controllerInputMode: com.nendo.argosy.data.preferences.ControllerInputMode = com.nendo.argosy.data.preferences.ControllerInputMode.AUTO,
     val inputModeConfigurable: Boolean = false,
     val steamInputAvailable: Boolean = false,
+    val navigationButtonMaps: com.nendo.argosy.data.preferences.NavigationButtonMaps = com.nendo.argosy.data.preferences.NavigationButtonMaps(),
+    val buttonMappingSupported: Boolean = false,
+    val buttonMappingController: com.nendo.argosy.ui.input.MappedController? = null,
+    val buttonMappingCapture: ButtonMappingCapture? = null,
     val openNavigationKey: Int = com.nendo.argosy.data.preferences.ControlsPreferences.DEFAULT_OPEN_NAVIGATION_KEY,
     val openQuickPanelKey: Int = com.nendo.argosy.data.preferences.ControlsPreferences.DEFAULT_OPEN_QUICK_PANEL_KEY,
     val shortcutCaptureTarget: com.nendo.argosy.ui.input.UiShortcut? = null,
@@ -430,6 +435,14 @@ data class ControlsState(
     val navRingHeld: String?
         get() = navRingReorder?.let { navRingRoutes.getOrNull(it.heldIndex) }
 }
+
+enum class ButtonMappingTarget { CONTROLLER, KEYBOARD }
+
+data class ButtonMappingCapture(
+    val target: ButtonMappingTarget,
+    val controllerKey: String,
+    val action: com.nendo.argosy.ui.input.NavigationAction
+)
 
 fun ControlsState.shortcutKey(shortcut: com.nendo.argosy.ui.input.UiShortcut): Int = when (shortcut) {
     com.nendo.argosy.ui.input.UiShortcut.OPEN_NAVIGATION -> openNavigationKey

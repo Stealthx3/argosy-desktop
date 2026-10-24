@@ -116,6 +116,7 @@
     <string name="settings_shell_header_screens">स्क्रीन व्यवस्था</string>
     <string name="settings_shell_header_ambient_led">LED नियंत्रण</string>
     <string name="settings_shell_header_navigation">नेविगेशन</string>
+    <string name="settings_shell_header_button_mapping">बटन मैपिंग</string>
     <string name="settings_shell_header_platforms">प्लेटफ़ॉर्म</string>
     <string name="settings_shell_header_builtin_emulator">बिल्ट-इन एमुलेटर</string>
     <string name="settings_shell_header_platform_detail_fallback">प्लेटफ़ॉर्म</string>

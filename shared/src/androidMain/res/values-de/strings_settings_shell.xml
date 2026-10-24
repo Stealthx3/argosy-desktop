@@ -123,6 +123,7 @@
     <string name="settings_shell_header_screens">BILDSCHIRMANORDNUNG</string>
     <string name="settings_shell_header_ambient_led">LED-STEUERUNG</string>
     <string name="settings_shell_header_navigation">NAVIGATION</string>
+    <string name="settings_shell_header_button_mapping">TASTENBELEGUNG</string>
     <string name="settings_shell_header_platforms">PLATTFORMEN</string>
     <string name="settings_shell_header_builtin_emulator">INTEGRIERTER EMULATOR</string>
     <string name="settings_shell_header_platform_detail_fallback">PLATTFORM</string>

@@ -56,6 +56,9 @@ import com.nendo.argosy.ui.screens.settings.sections.navigationItemAtFocusIndex
 import com.nendo.argosy.ui.screens.settings.sections.offeredInputModes
 import com.nendo.argosy.ui.screens.settings.sections.shownInputMode
 import com.nendo.argosy.ui.screens.settings.sections.navigationSections
+import com.nendo.argosy.ui.screens.settings.sections.buttonMappingSections
+import com.nendo.argosy.ui.screens.settings.sections.ButtonMappingItem
+import com.nendo.argosy.ui.screens.settings.sections.buttonMappingItemAtFocusIndex
 import com.nendo.argosy.ui.screens.settings.sections.rommSections
 import com.nendo.argosy.ui.screens.settings.sections.savesItemAtFocusIndex
 import com.nendo.argosy.ui.screens.settings.sections.savesSections
@@ -136,6 +139,7 @@ internal class LightSectionsInput(
             SettingsSection.PRESENTATION -> handlePresentationLeftRight(direction)
             SettingsSection.LIBRARY_VIEW -> handleLibraryViewLeftRight(direction)
             SettingsSection.NAVIGATION -> handleNavigationLeftRight(direction)
+            SettingsSection.BUTTON_MAPPING -> handleButtonMappingLeftRight(direction)
             SettingsSection.SYNC_SETTINGS -> handleSyncSettingsLeftRight(direction)
             SettingsSection.STEAM_SETTINGS -> handleSteamLeftRight(direction)
             SettingsSection.JELLYFIN -> handleJellyfinLeftRight(direction)
@@ -279,6 +283,17 @@ internal class LightSectionsInput(
             else -> {}
         }
         return InputResult.UNHANDLED
+    }
+
+    private fun handleButtonMappingLeftRight(direction: Int): InputResult {
+        val controls = viewModel.uiState.value.controls
+        return when (buttonMappingItemAtFocusIndex(viewModel.uiState.value.focusedIndex, controls)) {
+            ButtonMappingItem.SwapAB -> toggleLeftRight(direction, controls.swapAB) { viewModel.setSwapAB(it) }
+            ButtonMappingItem.SwapXY -> toggleLeftRight(direction, controls.swapXY) { viewModel.setSwapXY(it) }
+            ButtonMappingItem.SwapStartSelect ->
+                toggleLeftRight(direction, controls.swapStartSelect) { viewModel.setSwapStartSelect(it) }
+            else -> InputResult.UNHANDLED
+        }
     }
 
     private fun handleNavigationLeftRight(direction: Int): InputResult {
@@ -489,6 +504,7 @@ internal class LightSectionsInput(
             }
             SettingsSection.SOCIAL -> socialSections(hasAvatarDoodle = state.social.avatarDoodle != null)
             SettingsSection.NAVIGATION -> navigationSections(state.controls)
+            SettingsSection.BUTTON_MAPPING -> buttonMappingSections(state.controls)
             SettingsSection.AUDIO -> audioSections()
             SettingsSection.ABOUT -> aboutSections(state.fileLoggingPath != null, aboutHasChangelog(state.updateCheck))
             else -> return InputResult.HANDLED
