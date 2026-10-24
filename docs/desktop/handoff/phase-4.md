@@ -28,10 +28,10 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 
 - DEVLOG "Step 4". Decorated 1280×720 window, F11, gamescope forced, `--fullscreen`/`--windowed`, Interface → Start in Full Screen (desktop only; Android's system-bar rows hidden on desktop), dark when no theme is stored. Evidence `p4s4/`, `fresh-p4s4/`, Android `p4s4-android2`. Not verified: launch with the setting on, real gamescope (owner test with the next alpha).
 
-## Step 5 (display profiles and the wizard's Display setup step): next action
+## Step 5 (display profiles and the wizard's Display setup step): waiting on the owner
 
-- Scope (plan step 5): Handheld / Desktop / TV profiles with auto-detection (DMI product, gamescope, EDID physical size), TV → upstream's TV `AspectRatioClass`, TV safe area (default 3 %, confirm with the owner), touch and cursor rules for handhelds; a first-run step after Welcome with live thumbnail previews (confirm with the owner); the same cards in Interface → Display profile.
-- First actions: read `PORT_PLAN.md` "Display profiles" text (grep "Display profile"); find `AspectRatioClass` and how upstream picks TV vs handheld (`ui/theme` or `util`); see how `tvDensity` in `Main.kt` relates (540 dp rule); list what each profile changes before writing code, and put the two owner questions (safe area default, live thumbnails) in one message at the first natural stop.
+- Investigation done (DEVLOG 2026-10-24 "Step 5 investigation"): upstream has **no TV layout class**; `AspectRatioClass` is ratio-only and the desktop already uses the 540 dp TV density. Three questions asked of the owner (2026-10-24): what the TV profile changes (proposed: safe-area margin + hidden cursor, no new layout), the TV safe-area default (proposed 3 %), and live Home miniatures vs a simpler preview for the profile cards. Resume from the answers: write the step 5 parts (profile setting through the full chain + detection; safe area; cursor rules; wizard step; Interface cards).
+- Detection inputs to use: `/sys/class/dmi/id/product_name` (Steam Deck "Jupiter"/"Galileo", ROG Ally "RC71L"/"RC72L", Legion Go "83E1"), gamescope (`DesktopWindowMode.isGamescope`), EDID physical size from `/sys/class/drm/*/edid` (bytes 21–22, cm).
 
 ## Carried forward
 

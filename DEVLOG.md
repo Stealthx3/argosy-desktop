@@ -1198,3 +1198,8 @@ Mapped ids: retroarch, dolphin, cemu, azahar, ryujinx (Ryubing), eden, melonds, 
 **Walk route change:** with Check-In hidden the drawer is one row shorter: Settings is `START wait:2 DOWN*7 A` (DOWN×8 now lands on the account row and opens Accounts).
 **Step 4 closed.** Next: step 5, display profiles and the wizard's Display setup step.
 
+### 2026-10-24 — Step 5 investigation: no TV layout upstream
+
+- **Finding:** the plan's "TV profile maps the window to upstream's existing TV `AspectRatioClass`" rests on a wrong premise. `AspectRatioClass` (`ui/theme/UiScale.kt`) is ULTRA_WIDE / WIDE / STANDARD / TALL / ULTRA_TALL from the window's width-to-height ratio only, and nothing in shared or Android code detects a TV (no `UI_MODE_TYPE_TELEVISION`, leanback or TV flag). Android TV runs the same layout as any 16:9 device; "TV behaviour" in AGENTS.md means every action has a controller path, which already holds everywhere. The desktop already lays out at Android TV's 540 dp rule (`tvDensity` in `Main.kt`).
+- **Consequence:** what the TV profile changes needs the owner: asked together with the two open step 5 questions (TV safe-area default, live vs simpler thumbnails). Pacer state `waiting-owner` until answered.
+
