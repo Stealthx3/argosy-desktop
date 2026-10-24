@@ -1210,3 +1210,8 @@ Mapped ids: retroarch, dolphin, cemu, azahar, ryujinx (Ryubing), eden, melonds, 
 **Verification:** `DisplayProfileTest` (5: effective profile, safe area by profile and clamp, TV starting values and cursor rule, classification of handheld / TV by size / gamescope / desktop, EDID diagonal). Gate `:shared:desktopTest` (109) + `:app:testDebugUnitTest` (4,426), 0 failures; both apps build; smell, comment, stability and translation checks clean. Fresh-data walk `build/desktop-check/fresh-p4s5/` (this machine detected as Desktop: 34" ultrawide): Interface shows Display Profile Desktop, UI Scale 100 %, Safe Area 0 %; A → TV sets 125 % and 3 %, the margin appears, Home comes back larger with the strong glow. Android `p4s5-android`: identical to `p4s4-android2` apart from the clock and the date rollover in Play Time. **Not verified:** cursor hiding (screenshots do not capture the cursor), detection on a real handheld or TV, the margin at a real TV.
 **Next (part 2):** the schematic profile cards in Interface → Display profile and the first-run Display setup step.
 
+### 2026-10-24 — Rule change: alpha Flatpak at every closed step (owner decision)
+
+- **Action:** `CLAUDE.md` rule, `push-pages.sh` (new `--step-close <phase>.<step>`; `--phase-close` kept; still refuses without a flag), gotchas and the memory note updated: the live Pages repo is republished after each step closes, never mid-step. Git pushes stay phase-close only.
+- **Reasoning:** the owner wants testers to follow progress step by step. Step 5 was half done when the rule arrived, so the first per-step publish is at step 5's close and carries steps 2–4 as well.
+
