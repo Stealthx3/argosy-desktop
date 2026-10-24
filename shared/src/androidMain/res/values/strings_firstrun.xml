@@ -145,6 +145,8 @@
     <!-- ===== Step 4: Android permissions ===== -->
 
     <!-- Heading of the step listing the Android permissions the app asks for. Noun, plural. -->
+    <string name="firstrun_emulators_title">Emulators Argosy should manage</string>
+    <string name="firstrun_emulators_intro">Choose each emulator Argosy should set up. It will be able to open the games in your Argosy folder.</string>
     <string name="firstrun_permissions_title">Permissions</string>
     <!-- Line under that heading explaining why the permissions are needed. "Argosy" is this
          app's name and is not translated. "emulators" are the programs that run console games. -->

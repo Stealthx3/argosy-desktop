@@ -1037,10 +1037,10 @@ private fun EmulatorFolderAccessStep(
     onContinue: () -> Unit
 ) {
     StepColumn {
-        StepHeader(title = stringResource(R.string.firstrun_permissions_title))
+        StepHeader(title = stringResource(R.string.firstrun_emulators_title))
         Spacer(modifier = Modifier.height(Dimens.spacingSm))
         Text(
-            text = stringResource(R.string.firstrun_permissions_intro),
+            text = stringResource(R.string.firstrun_emulators_intro),
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant,

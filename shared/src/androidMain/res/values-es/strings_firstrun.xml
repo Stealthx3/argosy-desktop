@@ -51,6 +51,8 @@
     <string name="firstrun_romm_success_button_continue">Continuar</string>
     <string name="firstrun_romm_success_error_library_fetch">Error al obtener la biblioteca: %1$s</string>
 
+    <string name="firstrun_emulators_title">Emuladores que Argosy debe gestionar</string>
+    <string name="firstrun_emulators_intro">Elige cada emulador que Argosy debe configurar. Podrá abrir los juegos de tu carpeta de Argosy.</string>
     <string name="firstrun_permissions_title">Permisos</string>
     <string name="firstrun_permissions_intro">Argosy los necesita para administrar tu biblioteca y tus emuladores.</string>
     <string name="firstrun_permissions_storage_title">Administrar almacenamiento (obligatorio)</string>

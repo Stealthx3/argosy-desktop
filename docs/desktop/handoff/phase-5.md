@@ -2,7 +2,7 @@
 
 Rewritten (not appended) at the end of every work unit, so a fresh session can start from it alone. History and reasoning live in `DEVLOG.md`. Earlier phases: `phase-0.md` … `phase-4.md` (closed summaries).
 
-**Updated:** 2026-10-24 (Phase 5 started by the owner; step plan written, steps 1–4 are the owner's pre-beta fixes). No steps closed yet.
+**Updated:** 2026-10-24 (step 1 closed). Steps 1–1 done; next is step 2 (Close Argosy in Quick Settings).
 
 ## Scope and exit criterion
 
@@ -16,7 +16,7 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 - Flathub lint: exceptions or alternatives for emulator folder grants and `flatpak-spawn` access, screenshots, the app id vs repository name; offline from-source build (Gradle dependencies as Flatpak sources).
 - YouTube trailers on desktop (deferred; needs yt-dlp and a JavaScript runtime).
 
-## Pre-beta fixes (owner, 2026-10-24): steps 1–4, next action step 1
+## Pre-beta fixes (owner, 2026-10-24): step 1 done, next action step 2
 
 1. Wizard: the desktop Permissions step (`EmulatorFolderAccessStep` in `FirstRunScreen.kt`, title/intro reuse `firstrun_permissions_*` keys) gets its own title "Emulators Argosy should manage" and a matching intro (new keys, eight locales); Android keeps its Permissions step.
 2. Quick Settings: desktop-only "Close Argosy" item (`QuickSettingsItem`, gate on `PlatformFeatures.desktopWindow`) → confirm modal (`ArgosyConfirmModal` pattern) → graceful exit: a shell hook observed by `Main.kt` that stops the gamepad dispatcher, background jobs and players, then `exitApplication()`.

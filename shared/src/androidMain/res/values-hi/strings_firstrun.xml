@@ -61,6 +61,8 @@
 
     <!-- ===== Step 4: Android permissions ===== -->
 
+    <string name="firstrun_emulators_title">एमुलेटर जिन्हें Argosy संभाले</string>
+    <string name="firstrun_emulators_intro">हर वह एमुलेटर चुनें जिसे Argosy सेट करे। वह आपके Argosy फ़ोल्डर के गेम खोल सकेगा।</string>
     <string name="firstrun_permissions_title">अनुमतियां</string>
     <string name="firstrun_permissions_intro">आपकी लाइब्रेरी और एमुलेटर प्रबंधित करने के लिए Argosy को इनकी जरूरत है।</string>
     <string name="firstrun_permissions_storage_title">स्टोरेज प्रबंधित करें (आवश्यक)</string>

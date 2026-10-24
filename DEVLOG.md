@@ -1312,3 +1312,9 @@ Mapped ids: retroarch, dolphin, cemu, azahar, ryujinx (Ryubing), eden, melonds, 
 6. **GNOME, KDE and SteamOS testing.** Install, wizard, launches and save sync on each.
 7. **Flathub submission.** Lint clean (folder grants, `flatpak-spawn`, screenshots, app id), offline from-source build in CI for x86_64 and aarch64, Flathub PR.
 
+### 2026-10-24 — Step 1: wizard emulator step wording; step closed
+
+**Action:** the desktop first-run emulator step (`EmulatorFolderAccessStep`) uses new labels `firstrun_emulators_title` ("Emulators Argosy should manage") and `firstrun_emulators_intro` in all eight locales; Android's Permissions step keeps its strings.
+**Verification:** gate `:shared:desktopTest` 131 + `:app:testDebugUnitTest` 4,426, 0 failures; translation check clean; fresh-data wizard walk `build/desktop-check/fresh-p5s1/emulators.png` shows the new title and intro above the emulator cards. Android untouched (desktop-only composable).
+**Step 1 closed.** Alpha republished (`--step-close 5.1`).
+

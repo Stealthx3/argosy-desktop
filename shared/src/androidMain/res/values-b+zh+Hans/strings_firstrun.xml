@@ -47,6 +47,8 @@
     <string name="firstrun_romm_success_button_continue">继续</string>
     <string name="firstrun_romm_success_error_library_fetch">获取游戏库失败：%1$s</string>
 
+    <string name="firstrun_emulators_title">由 Argosy 管理的模拟器</string>
+    <string name="firstrun_emulators_intro">选择 Argosy 要设置的每个模拟器。它将可以打开 Argosy 文件夹中的游戏。</string>
     <string name="firstrun_permissions_title">权限</string>
     <string name="firstrun_permissions_intro">Argosy需要这些权限来管理你的游戏库和模拟器。</string>
     <string name="firstrun_permissions_storage_title">管理存储（必需）</string>
