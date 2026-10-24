@@ -646,6 +646,29 @@
 
     <!-- ===== Section Autorisations ===== -->
 
+    <string name="settings_permissions_sandbox_intro">Argosy tourne dans un bac à sable Flatpak. Voici ses permissions sur cet ordinateur, lues en direct (tes overrides inclus).</string>
+    <string name="settings_permissions_sandbox_unsandboxed">Argosy tourne hors du bac à sable Flatpak, rien n\'est restreint.</string>
+    <string name="settings_permissions_sandbox_fix">Pour l\'accorder, lance : %1$s</string>
+    <string name="settings_permissions_sandbox_games_folder_title">Dossier des jeux</string>
+    <string name="settings_permissions_sandbox_games_folder_description">Lire et écrire ta ludothèque dans ~/Games/Argosy.</string>
+    <string name="settings_permissions_sandbox_emulator_folders_title">Dossiers de sauvegarde des émulateurs</string>
+    <string name="settings_permissions_sandbox_emulator_folders_description">Synchroniser les sauvegardes dans les dossiers de tes émulateurs.</string>
+    <string name="settings_permissions_sandbox_host_title">Lancer les émulateurs</string>
+    <string name="settings_permissions_sandbox_host_description">Lancer les émulateurs sur cet ordinateur et suivre la session de jeu.</string>
+    <string name="settings_permissions_sandbox_notifications_title">Notifications</string>
+    <string name="settings_permissions_sandbox_notifications_description">Afficher les avis de téléchargement et de synchro (portail de notifications).</string>
+    <string name="settings_permissions_sandbox_screenshots_title">Captures d\'écran</string>
+    <string name="settings_permissions_sandbox_screenshots_description">Prendre des captures (portail de captures).</string>
+    <string name="settings_permissions_sandbox_controllers_title">Manettes</string>
+    <string name="settings_permissions_sandbox_controllers_description">Lire les manettes directement, vibrations comprises.</string>
+    <string name="settings_permissions_sandbox_network_title">Réseau</string>
+    <string name="settings_permissions_sandbox_network_description">Joindre ton serveur RomM et télécharger des jeux.</string>
+    <string name="settings_permissions_sandbox_audio_title">Audio</string>
+    <string name="settings_permissions_sandbox_audio_description">Jouer les sons et la musique.</string>
+    <string name="settings_permissions_sandbox_gpu_title">Graphismes</string>
+    <string name="settings_permissions_sandbox_gpu_description">Dessiner l\'interface avec ton GPU.</string>
+    <string name="settings_permissions_sandbox_display_title">Affichage</string>
+    <string name="settings_permissions_sandbox_display_description">Ouvrir une fenêtre dans ta session de bureau.</string>
     <string name="settings_permissions_intro">Argosy nécessite certaines autorisations pour fonctionner pleinement. Appuyez sur chaque autorisation pour l\'accorder.</string>
     <string name="settings_permissions_storage_title">Accès au stockage</string>
     <string name="settings_permissions_storage_description">Nécessaire pour télécharger les jeux, synchroniser les fichiers de sauvegarde et accéder aux fichiers ROM sur votre appareil.</string>

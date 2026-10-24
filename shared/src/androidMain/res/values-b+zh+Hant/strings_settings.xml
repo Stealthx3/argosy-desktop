@@ -589,6 +589,29 @@
         <item quantity="other">%1$d個版本，最新為%2$s</item>
     </plurals>
 
+    <string name="settings_permissions_sandbox_intro">Argosy 執行在 Flatpak 沙盒中。以下是它在這台電腦上的權限，直接從沙盒讀取（包括你的覆寫設定）。</string>
+    <string name="settings_permissions_sandbox_unsandboxed">Argosy 在 Flatpak 沙盒之外執行，沒有任何限制。</string>
+    <string name="settings_permissions_sandbox_fix">如需授予，請執行：%1$s</string>
+    <string name="settings_permissions_sandbox_games_folder_title">遊戲資料夾</string>
+    <string name="settings_permissions_sandbox_games_folder_description">讀寫 ~/Games/Argosy 中的遊戲庫。</string>
+    <string name="settings_permissions_sandbox_emulator_folders_title">模擬器存檔資料夾</string>
+    <string name="settings_permissions_sandbox_emulator_folders_description">在模擬器保存存檔的資料夾中同步存檔。</string>
+    <string name="settings_permissions_sandbox_host_title">啟動模擬器</string>
+    <string name="settings_permissions_sandbox_host_description">在這台電腦上啟動模擬器並追蹤遊戲工作階段。</string>
+    <string name="settings_permissions_sandbox_notifications_title">通知</string>
+    <string name="settings_permissions_sandbox_notifications_description">顯示下載與同步通知（透過通知入口）。</string>
+    <string name="settings_permissions_sandbox_screenshots_title">截圖</string>
+    <string name="settings_permissions_sandbox_screenshots_description">擷取螢幕（透過截圖入口）。</string>
+    <string name="settings_permissions_sandbox_controllers_title">控制器</string>
+    <string name="settings_permissions_sandbox_controllers_description">直接讀取手把，包括震動。</string>
+    <string name="settings_permissions_sandbox_network_title">網路</string>
+    <string name="settings_permissions_sandbox_network_description">連線到你的 RomM 伺服器並下載遊戲。</string>
+    <string name="settings_permissions_sandbox_audio_title">音訊</string>
+    <string name="settings_permissions_sandbox_audio_description">播放聲音與音樂。</string>
+    <string name="settings_permissions_sandbox_gpu_title">圖形</string>
+    <string name="settings_permissions_sandbox_gpu_description">用你的 GPU 繪製介面。</string>
+    <string name="settings_permissions_sandbox_display_title">顯示</string>
+    <string name="settings_permissions_sandbox_display_description">在你的桌面工作階段中開啟視窗。</string>
     <string name="settings_permissions_intro">Argosy需要特定權限才能提供完整功能，點選各項權限即可授予存取權。</string>
     <string name="settings_permissions_storage_title">儲存空間存取權</string>
     <string name="settings_permissions_storage_description">下載遊戲、同步存檔，以及存取裝置上的ROM檔案都需要此權限。</string>

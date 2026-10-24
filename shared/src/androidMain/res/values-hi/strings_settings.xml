@@ -632,6 +632,29 @@
 
     <!-- ===== Permissions section ===== -->
 
+    <string name="settings_permissions_sandbox_intro">Argosy एक Flatpak सैंडबॉक्स में चलता है। इस कंप्यूटर पर इसकी अनुमतियाँ ये हैं, सैंडबॉक्स से सीधे पढ़ी गईं (आपके ओवरराइड सहित)।</string>
+    <string name="settings_permissions_sandbox_unsandboxed">Argosy Flatpak सैंडबॉक्स के बाहर चल रहा है, कोई पाबंदी नहीं है।</string>
+    <string name="settings_permissions_sandbox_fix">देने के लिए चलाएँ: %1$s</string>
+    <string name="settings_permissions_sandbox_games_folder_title">गेम्स फ़ोल्डर</string>
+    <string name="settings_permissions_sandbox_games_folder_description">~/Games/Argosy में आपकी गेम लाइब्रेरी पढ़ें और लिखें।</string>
+    <string name="settings_permissions_sandbox_emulator_folders_title">एमुलेटर सेव फ़ोल्डर</string>
+    <string name="settings_permissions_sandbox_emulator_folders_description">आपके एमुलेटर जिन फ़ोल्डरों में सेव रखते हैं, वहाँ सेव सिंक करें।</string>
+    <string name="settings_permissions_sandbox_host_title">एमुलेटर चलाएँ</string>
+    <string name="settings_permissions_sandbox_host_description">इस कंप्यूटर पर एमुलेटर शुरू करें और खेल सत्र देखें।</string>
+    <string name="settings_permissions_sandbox_notifications_title">सूचनाएँ</string>
+    <string name="settings_permissions_sandbox_notifications_description">डाउनलोड और सिंक सूचनाएँ दिखाएँ (नोटिफ़िकेशन पोर्टल से)।</string>
+    <string name="settings_permissions_sandbox_screenshots_title">स्क्रीनशॉट</string>
+    <string name="settings_permissions_sandbox_screenshots_description">स्क्रीनशॉट लें (स्क्रीनशॉट पोर्टल से)।</string>
+    <string name="settings_permissions_sandbox_controllers_title">कंट्रोलर</string>
+    <string name="settings_permissions_sandbox_controllers_description">गेमपैड सीधे पढ़ें, वाइब्रेशन सहित।</string>
+    <string name="settings_permissions_sandbox_network_title">नेटवर्क</string>
+    <string name="settings_permissions_sandbox_network_description">आपके RomM सर्वर तक पहुँचें और गेम डाउनलोड करें।</string>
+    <string name="settings_permissions_sandbox_audio_title">ऑडियो</string>
+    <string name="settings_permissions_sandbox_audio_description">आवाज़ें और संगीत चलाएँ।</string>
+    <string name="settings_permissions_sandbox_gpu_title">ग्राफ़िक्स</string>
+    <string name="settings_permissions_sandbox_gpu_description">आपके GPU से इंटरफ़ेस बनाएँ।</string>
+    <string name="settings_permissions_sandbox_display_title">डिस्प्ले</string>
+    <string name="settings_permissions_sandbox_display_description">आपके डेस्कटॉप सत्र में विंडो खोलें।</string>
     <string name="settings_permissions_intro">पूरी कार्यक्षमता के लिए Argosy को कुछ अनुमतियाँ चाहिए। एक्सेस देने के लिए हर अनुमति पर टैप करें।</string>
     <string name="settings_permissions_storage_title">स्टोरेज एक्सेस</string>
     <string name="settings_permissions_storage_description">गेम डाउनलोड करने, सेव फ़ाइलें सिंक करने और डिवाइस पर ROM फ़ाइलों तक पहुँचने के लिए आवश्यक।</string>

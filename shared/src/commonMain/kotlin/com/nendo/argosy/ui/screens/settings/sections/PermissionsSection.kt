@@ -1,5 +1,10 @@
 package com.nendo.argosy.ui.screens.settings.sections
 
+import com.nendo.argosy.ui.common.FlatpakOverrideCommand
+import com.nendo.argosy.ui.common.titleRes
+import com.nendo.argosy.ui.common.icon
+import com.nendo.argosy.ui.common.descriptionRes
+import com.nendo.argosy.data.model.SandboxPermission
 import androidx.compose.foundation.background
 import com.nendo.argosy.ui.util.clickableNoFocus
 import androidx.compose.foundation.layout.Arrangement
@@ -54,30 +59,34 @@ internal sealed class PermissionsItem(
     val isFocusable: Boolean get() = this !is InfoText && this !is StatusFooter
 
     data object InfoText : PermissionsItem("infoText")
-    data object StorageAccess : PermissionsItem("storage")
-    data object UsageStats : PermissionsItem("usageStats")
-    data object Notifications : PermissionsItem("notifications")
+    data object StorageAccess : PermissionsItem("storage", visibleWhen = { !it.sandboxSupported })
+    data object UsageStats : PermissionsItem("usageStats", visibleWhen = { !it.sandboxSupported })
+    data object Notifications : PermissionsItem("notifications", visibleWhen = { !it.sandboxSupported })
     data object WriteSettings : PermissionsItem(
         key = "writeSettings",
-        visibleWhen = { it.isWriteSettingsRelevant }
+        visibleWhen = { it.isWriteSettingsRelevant && !it.sandboxSupported }
     )
     data object ScreenCapture : PermissionsItem(
         key = "screenCapture",
-        visibleWhen = { it.isScreenCaptureRelevant }
+        visibleWhen = { it.isScreenCaptureRelevant && !it.sandboxSupported }
     )
-    data object DisplayOverlay : PermissionsItem("displayOverlay")
+    data object DisplayOverlay : PermissionsItem("displayOverlay", visibleWhen = { !it.sandboxSupported })
     data object LiveWallpaper : PermissionsItem(
         key = "liveWallpaper",
-        visibleWhen = { it.isLiveWallpaperRelevant }
+        visibleWhen = { it.isLiveWallpaperRelevant && !it.sandboxSupported }
     )
+    class Sandbox(val permission: SandboxPermission) :
+        PermissionsItem("sandbox_${permission.name}", visibleWhen = { it.sandboxSupported })
     data object StatusFooter : PermissionsItem("statusFooter")
 
     companion object {
         val ALL: List<PermissionsItem>
             get() = listOf(
                 InfoText, StorageAccess, UsageStats, Notifications, WriteSettings, ScreenCapture, DisplayOverlay,
-                LiveWallpaper, StatusFooter
-            )
+                LiveWallpaper
+            ) + SANDBOX_ITEMS + StatusFooter
+
+        private val SANDBOX_ITEMS = SandboxPermission.entries.map(::Sandbox)
     }
 }
 
@@ -93,7 +102,7 @@ internal fun PermissionsItem.confirm(viewModel: SettingsViewModel) {
         PermissionsItem.ScreenCapture -> viewModel.requestScreenCapturePermission()
         PermissionsItem.DisplayOverlay -> viewModel.openDisplayOverlaySettings()
         PermissionsItem.LiveWallpaper -> viewModel.openLiveWallpaperPicker()
-        PermissionsItem.InfoText, PermissionsItem.StatusFooter -> Unit
+        PermissionsItem.InfoText, PermissionsItem.StatusFooter, is PermissionsItem.Sandbox -> Unit
     }
 }
 
@@ -135,7 +144,13 @@ fun PermissionsSection(uiState: SettingsUiState, viewModel: SettingsViewModel) {
         ) { item ->
             when (item) {
                 PermissionsItem.InfoText -> Text(
-                    text = stringResource(R.string.settings_permissions_intro),
+                    text = stringResource(
+                        when {
+                            !permissions.sandboxSupported -> R.string.settings_permissions_intro
+                            permissions.sandbox.sandboxed -> R.string.settings_permissions_sandbox_intro
+                            else -> R.string.settings_permissions_sandbox_unsandboxed
+                        }
+                    ),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(bottom = Dimens.spacingMd)
@@ -203,6 +218,27 @@ fun PermissionsSection(uiState: SettingsUiState, viewModel: SettingsViewModel) {
                     isFocused = isFocused(item),
                     onClick = { item.confirm(viewModel) }
                 )
+
+                is PermissionsItem.Sandbox -> {
+                    val permission = item.permission
+                    val missing = permissions.sandbox.missingFlags[permission]
+                    val purpose = stringResource(permission.descriptionRes)
+                    PermissionCard(
+                        icon = permission.icon,
+                        title = stringResource(permission.titleRes),
+                        description = if (missing.isNullOrEmpty()) {
+                            purpose
+                        } else {
+                            purpose + "\n" + stringResource(
+                                R.string.settings_permissions_sandbox_fix,
+                                FlatpakOverrideCommand.of(missing)
+                            )
+                        },
+                        isGranted = permissions.sandbox.granted[permission] ?: true,
+                        isFocused = isFocused(item),
+                        onClick = { item.confirm(viewModel) }
+                    )
+                }
 
                 PermissionsItem.StatusFooter -> Column {
                     Spacer(modifier = Modifier.height(Dimens.spacingMd))

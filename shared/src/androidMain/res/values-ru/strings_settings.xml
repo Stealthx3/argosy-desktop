@@ -659,6 +659,29 @@
 
     <!-- ===== Permissions section ===== -->
 
+    <string name="settings_permissions_sandbox_intro">Argosy работает в песочнице Flatpak. Ниже — его разрешения на этом компьютере, прочитанные из песочницы (с вашими переопределениями).</string>
+    <string name="settings_permissions_sandbox_unsandboxed">Argosy работает вне песочницы Flatpak, ограничений нет.</string>
+    <string name="settings_permissions_sandbox_fix">Чтобы выдать, выполните: %1$s</string>
+    <string name="settings_permissions_sandbox_games_folder_title">Папка игр</string>
+    <string name="settings_permissions_sandbox_games_folder_description">Читать и записывать библиотеку в ~/Games/Argosy.</string>
+    <string name="settings_permissions_sandbox_emulator_folders_title">Папки сохранений эмуляторов</string>
+    <string name="settings_permissions_sandbox_emulator_folders_description">Синхронизировать сохранения в папках эмуляторов.</string>
+    <string name="settings_permissions_sandbox_host_title">Запуск эмуляторов</string>
+    <string name="settings_permissions_sandbox_host_description">Запускать эмуляторы на этом компьютере и отслеживать сеанс игры.</string>
+    <string name="settings_permissions_sandbox_notifications_title">Уведомления</string>
+    <string name="settings_permissions_sandbox_notifications_description">Показывать уведомления о загрузках и синхронизации (портал уведомлений).</string>
+    <string name="settings_permissions_sandbox_screenshots_title">Снимки экрана</string>
+    <string name="settings_permissions_sandbox_screenshots_description">Делать снимки экрана (портал снимков).</string>
+    <string name="settings_permissions_sandbox_controllers_title">Контроллеры</string>
+    <string name="settings_permissions_sandbox_controllers_description">Читать геймпады напрямую, с вибрацией.</string>
+    <string name="settings_permissions_sandbox_network_title">Сеть</string>
+    <string name="settings_permissions_sandbox_network_description">Подключаться к серверу RomM и скачивать игры.</string>
+    <string name="settings_permissions_sandbox_audio_title">Звук</string>
+    <string name="settings_permissions_sandbox_audio_description">Воспроизводить звуки и музыку.</string>
+    <string name="settings_permissions_sandbox_gpu_title">Графика</string>
+    <string name="settings_permissions_sandbox_gpu_description">Отрисовывать интерфейс на GPU.</string>
+    <string name="settings_permissions_sandbox_display_title">Экран</string>
+    <string name="settings_permissions_sandbox_display_description">Открывать окно в сеансе рабочего стола.</string>
     <string name="settings_permissions_intro">Argosy требует определённых разрешений для полноценной работы. Нажмите на каждое разрешение, чтобы предоставить доступ.</string>
     <string name="settings_permissions_storage_title">Доступ к хранилищу</string>
     <string name="settings_permissions_storage_description">Требуется для скачивания игр, синхронизации файлов сохранений и доступа к файлам ROM на устройстве.</string>

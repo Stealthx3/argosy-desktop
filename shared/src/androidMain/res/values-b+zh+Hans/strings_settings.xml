@@ -618,6 +618,29 @@
 
     <!-- ===== Permissions section ===== -->
 
+    <string name="settings_permissions_sandbox_intro">Argosy 运行在 Flatpak 沙盒中。以下是它在这台电脑上的权限，直接从沙盒读取（包括你的覆盖设置）。</string>
+    <string name="settings_permissions_sandbox_unsandboxed">Argosy 在 Flatpak 沙盒之外运行，没有任何限制。</string>
+    <string name="settings_permissions_sandbox_fix">如需授予，请运行：%1$s</string>
+    <string name="settings_permissions_sandbox_games_folder_title">游戏文件夹</string>
+    <string name="settings_permissions_sandbox_games_folder_description">读写 ~/Games/Argosy 中的游戏库。</string>
+    <string name="settings_permissions_sandbox_emulator_folders_title">模拟器存档文件夹</string>
+    <string name="settings_permissions_sandbox_emulator_folders_description">在模拟器保存存档的文件夹中同步存档。</string>
+    <string name="settings_permissions_sandbox_host_title">启动模拟器</string>
+    <string name="settings_permissions_sandbox_host_description">在这台电脑上启动模拟器并跟踪游戏会话。</string>
+    <string name="settings_permissions_sandbox_notifications_title">通知</string>
+    <string name="settings_permissions_sandbox_notifications_description">显示下载和同步通知（通过通知门户）。</string>
+    <string name="settings_permissions_sandbox_screenshots_title">截图</string>
+    <string name="settings_permissions_sandbox_screenshots_description">截取屏幕（通过截图门户）。</string>
+    <string name="settings_permissions_sandbox_controllers_title">控制器</string>
+    <string name="settings_permissions_sandbox_controllers_description">直接读取手柄，包括震动。</string>
+    <string name="settings_permissions_sandbox_network_title">网络</string>
+    <string name="settings_permissions_sandbox_network_description">连接你的 RomM 服务器并下载游戏。</string>
+    <string name="settings_permissions_sandbox_audio_title">音频</string>
+    <string name="settings_permissions_sandbox_audio_description">播放声音和音乐。</string>
+    <string name="settings_permissions_sandbox_gpu_title">图形</string>
+    <string name="settings_permissions_sandbox_gpu_description">用你的 GPU 绘制界面。</string>
+    <string name="settings_permissions_sandbox_display_title">显示</string>
+    <string name="settings_permissions_sandbox_display_description">在你的桌面会话中打开窗口。</string>
     <string name="settings_permissions_intro">Argosy需要一些权限才能提供完整功能。点按每项权限即可授予访问权限。</string>
     <string name="settings_permissions_storage_title">存储访问权限</string>
     <string name="settings_permissions_storage_description">下载游戏、同步存档文件以及访问设备上的ROM文件都需要此权限。</string>

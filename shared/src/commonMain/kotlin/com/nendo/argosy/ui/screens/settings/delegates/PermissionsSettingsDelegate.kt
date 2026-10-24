@@ -1,5 +1,8 @@
 package com.nendo.argosy.ui.screens.settings.delegates
 
+import kotlinx.coroutines.Dispatchers
+import com.nendo.argosy.util.SafeCoroutineScope
+import com.nendo.argosy.platform.SandboxPermissions
 import com.nendo.argosy.platform.PlatformManifest as Manifest
 import com.nendo.argosy.platform.PlatformApplication as Application
 import com.nendo.argosy.platform.applicationContext
@@ -62,9 +65,11 @@ class PermissionsSettingsDelegate @Inject constructor(
     private val screenCaptureManager: ScreenCaptureManager,
     private val ledController: LEDController,
     private val fanController: FanController,
-    private val displayPreferences: DisplayPreferencesRepository
+    private val displayPreferences: DisplayPreferencesRepository,
+    private val sandboxPermissions: SandboxPermissions
 ) {
-    private val _state = MutableStateFlow(PermissionsState())
+    private val _state = MutableStateFlow(PermissionsState(sandboxSupported = sandboxPermissions.isSupported))
+    private val sandboxScope = SafeCoroutineScope(Dispatchers.IO, "PermissionsSettingsDelegate")
     val state: StateFlow<PermissionsState> = _state.asStateFlow()
 
     @Volatile private var lockScreenArt = true
@@ -79,6 +84,12 @@ class PermissionsSettingsDelegate @Inject constructor(
     }
 
     fun refreshPermissions() {
+        if (sandboxPermissions.isSupported) {
+            sandboxScope.launch {
+                val report = sandboxPermissions.read()
+                _state.update { it.copy(sandbox = report) }
+            }
+        }
         val hasStorage = StorageAccess.isGranted(application)
         val hasUsageStats = permissionHelper.hasUsageStatsPermission(application)
         val hasNotification = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

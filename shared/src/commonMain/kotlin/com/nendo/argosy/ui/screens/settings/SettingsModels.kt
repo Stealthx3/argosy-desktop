@@ -1627,10 +1627,12 @@ data class PermissionsState(
     val isScreenCaptureRelevant: Boolean = false,
     val hasDisplayOverlay: Boolean = false,
     val hasLiveWallpaper: Boolean = false,
-    val isLiveWallpaperRelevant: Boolean = false
+    val isLiveWallpaperRelevant: Boolean = false,
+    val sandboxSupported: Boolean = false,
+    val sandbox: com.nendo.argosy.data.model.SandboxPermissionReport = com.nendo.argosy.data.model.SandboxPermissionReport()
 ) {
     private val relevantGrants: List<Boolean>
-        get() = listOfNotNull(
+        get() = if (sandboxSupported) sandbox.granted.values.toList() else listOfNotNull(
             hasStorageAccess,
             hasUsageStats,
             hasNotificationPermission,

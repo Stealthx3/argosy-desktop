@@ -1242,6 +1242,29 @@
     <!-- ===== Permissions section ===== -->
 
     <!-- Paragraph at the top of the permissions list. "Argosy" is this app's name. -->
+    <string name="settings_permissions_sandbox_intro">Argosy runs in a Flatpak sandbox. These are the permissions it has on this computer, read live from the sandbox (your overrides included).</string>
+    <string name="settings_permissions_sandbox_unsandboxed">Argosy is running outside the Flatpak sandbox, so nothing is restricted.</string>
+    <string name="settings_permissions_sandbox_fix">To grant it, run: %1$s</string>
+    <string name="settings_permissions_sandbox_games_folder_title">Games folder</string>
+    <string name="settings_permissions_sandbox_games_folder_description">Read and write your game library in ~/Games/Argosy.</string>
+    <string name="settings_permissions_sandbox_emulator_folders_title">Emulator save folders</string>
+    <string name="settings_permissions_sandbox_emulator_folders_description">Sync saves in the folders where your emulators keep them.</string>
+    <string name="settings_permissions_sandbox_host_title">Launch emulators</string>
+    <string name="settings_permissions_sandbox_host_description">Start emulators on this computer and follow the play session.</string>
+    <string name="settings_permissions_sandbox_notifications_title">Notifications</string>
+    <string name="settings_permissions_sandbox_notifications_description">Show download and sync notices (through the notification portal).</string>
+    <string name="settings_permissions_sandbox_screenshots_title">Screenshots</string>
+    <string name="settings_permissions_sandbox_screenshots_description">Capture screenshots (through the screenshot portal).</string>
+    <string name="settings_permissions_sandbox_controllers_title">Controllers</string>
+    <string name="settings_permissions_sandbox_controllers_description">Read gamepads directly, including rumble.</string>
+    <string name="settings_permissions_sandbox_network_title">Network</string>
+    <string name="settings_permissions_sandbox_network_description">Reach your RomM server and download games.</string>
+    <string name="settings_permissions_sandbox_audio_title">Audio</string>
+    <string name="settings_permissions_sandbox_audio_description">Play sounds and music.</string>
+    <string name="settings_permissions_sandbox_gpu_title">Graphics</string>
+    <string name="settings_permissions_sandbox_gpu_description">Draw the interface with your GPU.</string>
+    <string name="settings_permissions_sandbox_display_title">Display</string>
+    <string name="settings_permissions_sandbox_display_description">Open a window on your desktop session.</string>
     <string name="settings_permissions_intro">Argosy requires certain permissions to provide full functionality. Tap each permission to grant access.</string>
     <!-- Card title. Noun phrase naming the permission to read and write files. -->
     <string name="settings_permissions_storage_title">Storage Access</string>
