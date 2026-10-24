@@ -1,5 +1,17 @@
 package com.nendo.argosy.data.cache
 
+import com.nendo.argosy.data.local.dao.resolved
+import kotlinx.coroutines.flow.transform
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.delay
+import com.nendo.argosy.data.local.entity.toResolvedArtByGame
+import coil3.request.ImageRequest
+import coil3.SingletonImageLoader
+import coil3.PlatformContext
 import com.nendo.argosy.data.apps.HostApplications
 import com.nendo.argosy.data.apps.HostIcons
 import com.nendo.argosy.data.local.dao.GameArtDao
@@ -25,13 +37,19 @@ actual class ImageCacheManager @Inject constructor(
 ) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    actual val gameArt: StateFlow<Map<Long, ResolvedGameArt>> = kotlinx.coroutines.flow.MutableStateFlow(emptyMap())
+    actual val gameArt: StateFlow<Map<Long, ResolvedGameArt>> = gameArtDao.observeRowCount()
+        .conflate()
+        .transform {
+            emit(gameArtDao.getAll().toResolvedArtByGame())
+            delay(ART_MODEL_RELOAD_INTERVAL_MS)
+        }
+        .stateIn(scope, SharingStarted.Lazily, emptyMap())
 
-    actual fun artFor(gameId: Long): ResolvedGameArt? = null
+    actual fun artFor(gameId: Long): ResolvedGameArt? = gameArt.value[gameId]
 
-    actual suspend fun loadArt(gameId: Long): ResolvedGameArt = ResolvedGameArt()
+    actual suspend fun loadArt(gameId: Long): ResolvedGameArt = gameArtDao.resolved(gameId)
 
-    actual fun observeArt(gameId: Long): Flow<ResolvedGameArt?> = kotlinx.coroutines.flow.flowOf(null)
+    actual fun observeArt(gameId: Long): Flow<ResolvedGameArt?> = gameArt.map { it[gameId] }.distinctUntilChanged()
 
     actual fun setCustomCachePath(path: String?) {
     }
@@ -52,17 +70,21 @@ actual class ImageCacheManager @Inject constructor(
     actual fun resumeBackgroundCaching() {
     }
 
-    actual fun queueBackgroundCache(url: String, rommId: Long, gameTitle: String) {
-    }
+    actual fun queueBackgroundCache(url: String, rommId: Long, gameTitle: String) = prefetch(listOf(url))
 
-    actual fun queueBackgroundCache(urls: List<String>, rommId: Long, gameTitle: String) {
+    actual fun queueBackgroundCache(urls: List<String>, rommId: Long, gameTitle: String) = prefetch(urls)
+
+    private fun prefetch(urls: List<String>) {
+        val loader = SingletonImageLoader.get(PlatformContext.INSTANCE)
+        urls.filter { it.startsWith("http") }.forEach { url ->
+            loader.enqueue(ImageRequest.Builder(PlatformContext.INSTANCE).data(url).build())
+        }
     }
 
     actual fun queueSteamBackgroundCache(url: String, steamAppId: Long, gameTitle: String) {
     }
 
-    actual fun queueBackgroundCacheByGameId(url: String, gameId: Long, gameTitle: String) {
-    }
+    actual fun queueBackgroundCacheByGameId(url: String, gameId: Long, gameTitle: String) = prefetch(listOf(url))
 
     actual fun isLikelyAppIcon(file: File): Boolean = false
 
@@ -103,8 +125,7 @@ actual class ImageCacheManager @Inject constructor(
     actual fun resumePendingArt(includeBoxFaces: Boolean) {
     }
 
-    actual suspend fun queueArtIfStale(gameId: Long, slot: ArtSlot, urls: List<String>, rommId: Long?, steamAppId: Long?, title: String) {
-    }
+    actual suspend fun queueArtIfStale(gameId: Long, slot: ArtSlot, urls: List<String>, rommId: Long?, steamAppId: Long?, title: String) = prefetch(urls)
 
     actual fun repairMissingArt(gameId: Long, slot: ArtSlot) {
     }
@@ -136,11 +157,9 @@ actual class ImageCacheManager @Inject constructor(
 
     actual enum class BoxFace { BACK, SPINE, LOGO, BOX_3D }
 
-    actual fun queueCoverCache(url: String, rommId: Long, gameTitle: String) {
-    }
+    actual fun queueCoverCache(url: String, rommId: Long, gameTitle: String) = prefetch(listOf(url))
 
-    actual fun queueCoverCache(urls: List<String>, rommId: Long, gameTitle: String) {
-    }
+    actual fun queueCoverCache(urls: List<String>, rommId: Long, gameTitle: String) = prefetch(urls)
 
     actual fun queueCoverRevalidation(cachedPath: String, urls: List<String>, rommId: Long, gameTitle: String) {
     }
@@ -207,3 +226,5 @@ actual class ImageCacheManager @Inject constructor(
         private const val TAG = "ImageCacheManager"
     }
 }
+
+private const val ART_MODEL_RELOAD_INTERVAL_MS = 1_000L

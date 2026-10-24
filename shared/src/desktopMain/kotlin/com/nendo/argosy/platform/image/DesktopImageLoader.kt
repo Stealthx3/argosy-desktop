@@ -1,5 +1,8 @@
 package com.nendo.argosy.platform.image
 
+import okio.Path.Companion.toOkioPath
+import com.nendo.argosy.platform.DesktopDirectories
+import coil3.disk.DiskCache
 import coil3.ImageLoader
 import coil3.SingletonImageLoader
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
@@ -24,7 +27,16 @@ fun installDesktopImageLoader(rommConnectionManager: RomMConnectionManager, user
                 add(HostAppIconFetcher.Factory())
                 add(OkHttpNetworkFetcherFactory(callFactory = { okHttpClient }))
             }
+            .diskCache {
+                DiskCache.Builder()
+                    .directory(DesktopDirectories.cache.resolve(IMAGE_CACHE_DIR).toOkioPath())
+                    .maxSizeBytes(IMAGE_CACHE_BYTES)
+                    .build()
+            }
             .crossfade(true)
             .build()
     }
 }
+
+private const val IMAGE_CACHE_DIR = "image_cache"
+private const val IMAGE_CACHE_BYTES = 512L * 1024 * 1024

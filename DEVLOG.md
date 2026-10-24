@@ -1325,3 +1325,9 @@ Mapped ids: retroarch, dolphin, cemu, azahar, ryujinx (Ryubing), eden, melonds, 
 **Found along the way:** desktop throws an uncaught `UnsatisfiedLinkError: no sigil-jni` from `TitleIdDownloadObserver` → `TitleIdExtractor` → `Sigil` (no libsigil-jni on the desktop); recorded in the handoff for step 4.
 **Step 2 closed.** Alpha republished (`--step-close 5.2`).
 
+
+### 2026-10-24 — Step 3: game thumbnails on desktop; step closed
+
+**Action:** the desktop `ImageCacheManager` was a full stub (empty art model, no caching), so Home and the Library showed placeholder tiles even though sync already records each game's art URLs in `game_art` (shared `ArtSourceRecorder`). The desktop actual now builds the same art model as Android (`gameArt` from `gameArtDao.observeRowCount()` → `getAll().toResolvedArtByGame()`, `artFor`, `loadArt`, `observeArt`), and its background-cache calls (`queueBackgroundCache*`, `queueCoverCache`, `queueArtIfStale`) prefetch the HTTP URLs through Coil's singleton loader. `installDesktopImageLoader` gains a 512 MB Coil disk cache under `DesktopDirectories.cache/image_cache`, so covers fetched during sync stay on disk and later screens load them offline. Divergence from Android: Android writes covers to its own files and stores `cachedPath`; desktop leaves `cachedPath` empty and relies on Coil's disk cache keyed by URL (same display, no extra file bookkeeping).
+**Verification:** gate `:shared:desktopTest` 131 + `:app:testDebugUnitTest` 4,426, 0 failures; smell check clean. Testbed games have no covers, so the walk `build/desktop-check/fresh-p5s3/` inserted COVER rows pointing at a local PNG server: `home-before` shows text tiles, `home-after` shows the covers on the Home rows, `library-all` shows them in the Library grid. Not checked against real RomM/IGDB covers (the owner's library has them; for the owner to check on the alpha).
+**Step 3 closed.** Alpha republished (`--step-close 5.3`).
