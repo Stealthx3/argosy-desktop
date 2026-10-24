@@ -615,6 +615,17 @@ internal fun routeLoadSettings(vm: SettingsViewModel) {
             hideSystemStatusBar = prefs.hideSystemStatusBar,
             startFullScreen = prefs.startFullScreen,
             desktopWindow = com.nendo.argosy.platform.PlatformFeatures.desktopWindow,
+            displayProfile = com.nendo.argosy.data.preferences.DisplayProfile.effective(
+                prefs.displayProfile,
+                com.nendo.argosy.platform.DisplayProfileDetection.detect()
+            ),
+            safeAreaPercent = com.nendo.argosy.data.preferences.DisplayProfile.effectiveSafeArea(
+                prefs.safeAreaPercent,
+                com.nendo.argosy.data.preferences.DisplayProfile.effective(
+                    prefs.displayProfile,
+                    com.nendo.argosy.platform.DisplayProfileDetection.detect()
+                )
+            ),
             lockScreenArt = prefs.lockScreenArt,
             homeAppAvailable = prefs.homeAppAvailable,
             isDefaultHome = vm.displayDelegate.isDefaultHome(),

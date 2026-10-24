@@ -82,6 +82,8 @@ data class DisplayPreferences(
     val hideSystemNavigationBar: Boolean = true,
     val hideSystemStatusBar: Boolean = true,
     val startFullScreen: Boolean = false,
+    val displayProfile: DisplayProfile? = null,
+    val safeAreaPercent: Int? = null,
     val lockScreenArt: Boolean = true,
     val homeAppAvailable: Boolean = true,
     val iconPack: String? = null,
@@ -189,6 +191,8 @@ class DisplayPreferencesRepository @Inject constructor(
         val HIDE_SYSTEM_NAVIGATION_BAR = booleanPreferencesKey("hide_system_navigation_bar")
         val HIDE_SYSTEM_STATUS_BAR = booleanPreferencesKey("hide_system_status_bar")
         val START_FULL_SCREEN = booleanPreferencesKey("start_full_screen")
+        val DISPLAY_PROFILE = stringPreferencesKey("display_profile")
+        val SAFE_AREA_PERCENT = intPreferencesKey("safe_area_percent")
         val LOCK_SCREEN_ART = booleanPreferencesKey("lock_screen_art")
         val LOCK_SCREEN_ART_APPLIED = booleanPreferencesKey("lock_screen_art_applied")
         val LIVE_WALLPAPER_OFFERED = booleanPreferencesKey("live_wallpaper_offered")
@@ -305,6 +309,8 @@ class DisplayPreferencesRepository @Inject constructor(
             hideSystemNavigationBar = prefs[Keys.HIDE_SYSTEM_NAVIGATION_BAR] ?: true,
             hideSystemStatusBar = prefs[Keys.HIDE_SYSTEM_STATUS_BAR] ?: true,
             startFullScreen = prefs[Keys.START_FULL_SCREEN] ?: false,
+            displayProfile = DisplayProfile.fromString(prefs[Keys.DISPLAY_PROFILE]),
+            safeAreaPercent = prefs[Keys.SAFE_AREA_PERCENT],
             lockScreenArt = prefs[Keys.LOCK_SCREEN_ART] ?: true,
             homeAppAvailable = prefs[Keys.HOME_APP_AVAILABLE] ?: true,
             iconPack = prefs[Keys.ICON_PACK],
@@ -619,6 +625,22 @@ class DisplayPreferencesRepository @Inject constructor(
 
     suspend fun setStartFullScreen(fullScreen: Boolean) {
         dataStore.edit { it[Keys.START_FULL_SCREEN] = fullScreen }
+    }
+
+    suspend fun setDisplayProfile(profile: DisplayProfile) {
+        dataStore.edit {
+            it[Keys.DISPLAY_PROFILE] = profile.name
+            it[Keys.SAFE_AREA_PERCENT] = profile.defaultSafeAreaPercent
+            it[Keys.UI_SCALE] = profile.defaultUiScale
+            if (profile == DisplayProfile.TV) {
+                it[Keys.COMPACT_FOOTER] = false
+                it[Keys.BOX_ART_GLOW_STRENGTH] = BoxArtGlowStrength.HIGH.name
+            }
+        }
+    }
+
+    suspend fun setSafeAreaPercent(percent: Int) {
+        dataStore.edit { it[Keys.SAFE_AREA_PERCENT] = percent.coerceIn(0, DisplayProfile.MAX_SAFE_AREA_PERCENT) }
     }
 
     suspend fun setLockScreenArt(enabled: Boolean) {

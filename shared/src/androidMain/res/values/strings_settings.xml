@@ -307,6 +307,12 @@
     <string name="settings_interface_compact_footer_subtitle">Use a thinner control guide bar</string>
     <!-- Row title. Verb phrase: take Android's own navigation buttons or gesture bar off the
          screen. Not Argosy's in-app nav bar, which has its own setting. -->
+    <string name="settings_interface_display_profile_title">Display Profile</string>
+    <string name="settings_interface_display_profile_subtitle">Sets the layout for the screen you play on: a handheld, a desktop monitor or a TV.</string>
+    <string name="settings_interface_display_profile_handheld">Handheld</string>
+    <string name="settings_interface_display_profile_desktop">Desktop</string>
+    <string name="settings_interface_display_profile_tv">TV</string>
+    <string name="settings_interface_safe_area_title">Safe Area</string>
     <string name="settings_interface_start_full_screen_title">Start in Full Screen</string>
     <string name="settings_interface_start_full_screen_subtitle">Open Argosy full screen instead of in a window. F11 switches at any time.</string>
     <string name="settings_interface_hide_system_nav_bar_title">Hide System Navigation Bar</string>

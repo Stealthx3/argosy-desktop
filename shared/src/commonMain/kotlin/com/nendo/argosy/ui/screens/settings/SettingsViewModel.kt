@@ -1207,6 +1207,13 @@ class SettingsViewModel @Inject constructor(
     fun setCompactFooter(enabled: Boolean) = displayDelegate.setCompactFooter(viewModelScope, enabled)
     fun setStartFullScreen(fullScreen: Boolean) = displayDelegate.setStartFullScreen(viewModelScope, fullScreen)
 
+    fun setDisplayProfile(profile: com.nendo.argosy.data.preferences.DisplayProfile) =
+        displayDelegate.setDisplayProfile(viewModelScope, profile)
+
+    fun cycleDisplayProfile(direction: Int = 1) = displayDelegate.cycleDisplayProfile(viewModelScope, direction)
+
+    fun adjustSafeArea(delta: Int) = displayDelegate.adjustSafeArea(viewModelScope, delta)
+
     fun setHideSystemNavigationBar(hide: Boolean) =
         displayDelegate.setHideSystemNavigationBar(viewModelScope, hide)
     fun setHideSystemStatusBar(hide: Boolean) = displayDelegate.setHideSystemStatusBar(viewModelScope, hide)

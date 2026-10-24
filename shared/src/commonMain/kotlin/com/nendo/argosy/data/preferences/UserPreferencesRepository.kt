@@ -134,6 +134,8 @@ class UserPreferencesRepository @Inject constructor(
             hideSystemNavigationBar = display.hideSystemNavigationBar,
             hideSystemStatusBar = display.hideSystemStatusBar,
             startFullScreen = display.startFullScreen,
+            displayProfile = display.displayProfile,
+            safeAreaPercent = display.safeAreaPercent,
             lockScreenArt = display.lockScreenArt,
             homeAppAvailable = display.homeAppAvailable,
             iconPack = display.iconPack,
@@ -359,6 +361,8 @@ class UserPreferencesRepository @Inject constructor(
     suspend fun setCompactFooter(enabled: Boolean) = displayPrefs.setCompactFooter(enabled)
     suspend fun setHideSystemNavigationBar(hide: Boolean) = displayPrefs.setHideSystemNavigationBar(hide)
     suspend fun setStartFullScreen(fullScreen: Boolean) = displayPrefs.setStartFullScreen(fullScreen)
+    suspend fun setDisplayProfile(profile: DisplayProfile) = displayPrefs.setDisplayProfile(profile)
+    suspend fun setSafeAreaPercent(percent: Int) = displayPrefs.setSafeAreaPercent(percent)
     suspend fun setHideSystemStatusBar(hide: Boolean) = displayPrefs.setHideSystemStatusBar(hide)
     suspend fun setLockScreenArt(enabled: Boolean) = displayPrefs.setLockScreenArt(enabled)
     suspend fun setIconPack(packageName: String?) = displayPrefs.setIconPack(packageName)

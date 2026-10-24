@@ -81,6 +81,8 @@ internal sealed class InterfaceItem(
     data object Language : InterfaceItem("language", SECTION_GENERAL)
     data object UiScale : InterfaceItem("uiScale", SECTION_GENERAL)
     data object CompactFooter : InterfaceItem("compactFooter", SECTION_GENERAL)
+    data object DisplayProfile : InterfaceItem("displayProfile", SECTION_GENERAL, { it.display.desktopWindow })
+    data object SafeArea : InterfaceItem("safeArea", SECTION_GENERAL, { it.display.desktopWindow })
     data object StartFullScreen : InterfaceItem("startFullScreen", SECTION_GENERAL, { it.display.desktopWindow })
     data object HideSystemNavigationBar :
         InterfaceItem("hideSystemNavigationBar", SECTION_GENERAL, { !it.display.desktopWindow })
@@ -125,7 +127,7 @@ internal sealed class InterfaceItem(
         val ALL: List<InterfaceItem>
             get() = listOf(
                 Header("generalHeader", SECTION_GENERAL, R.string.settings_interface_section_general),
-                Language, UiScale, CompactFooter, StartFullScreen, HideSystemNavigationBar, HideSystemStatusBar,
+                Language, DisplayProfile, UiScale, CompactFooter, SafeArea, StartFullScreen, HideSystemNavigationBar, HideSystemStatusBar,
                 ControllerGrip,
                 Header("screensHeader", SECTION_SCREENS, R.string.settings_interface_section_screens),
                 HomeScreen, LibraryView, BoxArt, Presentation, LockScreenArt,
@@ -149,6 +151,12 @@ private fun interfaceSectionTitleRes(section: String): Int? = when (section) {
     SECTION_STATUS_BAR -> R.string.settings_interface_section_status_bar
     SECTION_RECAPS -> R.string.settings_interface_section_recaps
     else -> null
+}
+
+internal fun displayProfileLabelRes(profile: com.nendo.argosy.data.preferences.DisplayProfile): Int = when (profile) {
+    com.nendo.argosy.data.preferences.DisplayProfile.HANDHELD -> R.string.settings_interface_display_profile_handheld
+    com.nendo.argosy.data.preferences.DisplayProfile.DESKTOP -> R.string.settings_interface_display_profile_desktop
+    com.nendo.argosy.data.preferences.DisplayProfile.TV -> R.string.settings_interface_display_profile_tv
 }
 
 internal fun languageLabelRes(language: AppLanguage): Int = when (language) {
@@ -260,6 +268,26 @@ fun InterfaceSection(uiState: SettingsUiState, viewModel: SettingsViewModel) {
                     isEnabled = display.compactFooter,
                     isFocused = isFocused(item),
                     onToggle = { viewModel.setCompactFooter(it) }
+                )
+
+                InterfaceItem.DisplayProfile -> CyclePreference(
+                    title = stringResource(R.string.settings_interface_display_profile_title),
+                    value = stringResource(displayProfileLabelRes(display.displayProfile)),
+                    subtitle = stringResource(R.string.settings_interface_display_profile_subtitle),
+                    isFocused = isFocused(item),
+                    onClick = { viewModel.cycleDisplayProfile() },
+                    onPrev = { viewModel.cycleDisplayProfile(-1) }
+                )
+
+                InterfaceItem.SafeArea -> SliderPreference(
+                    title = stringResource(R.string.settings_interface_safe_area_title),
+                    value = display.safeAreaPercent,
+                    minValue = 0,
+                    maxValue = com.nendo.argosy.data.preferences.DisplayProfile.MAX_SAFE_AREA_PERCENT,
+                    isFocused = isFocused(item),
+                    step = 1,
+                    suffix = "%",
+                    onAdjust = { viewModel.adjustSafeArea(it) }
                 )
 
                 InterfaceItem.StartFullScreen -> SwitchPreference(

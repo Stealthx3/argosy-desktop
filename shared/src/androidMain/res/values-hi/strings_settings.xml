@@ -107,6 +107,12 @@
     <string name="settings_interface_ui_scale_title">UI स्केल</string>
     <string name="settings_interface_compact_footer_title">कॉम्पैक्ट फ़ुटर</string>
     <string name="settings_interface_compact_footer_subtitle">पतली कंट्रोल गाइड बार का उपयोग करें</string>
+    <string name="settings_interface_display_profile_title">डिस्प्ले प्रोफ़ाइल</string>
+    <string name="settings_interface_display_profile_subtitle">आपकी स्क्रीन के लिए लेआउट चुनता है: हैंडहेल्ड, डेस्कटॉप मॉनिटर या टीवी।</string>
+    <string name="settings_interface_display_profile_handheld">हैंडहेल्ड</string>
+    <string name="settings_interface_display_profile_desktop">डेस्कटॉप</string>
+    <string name="settings_interface_display_profile_tv">टीवी</string>
+    <string name="settings_interface_safe_area_title">सेफ़ एरिया</string>
     <string name="settings_interface_start_full_screen_title">फ़ुल स्क्रीन में शुरू करें</string>
     <string name="settings_interface_start_full_screen_subtitle">Argosy को विंडो के बजाय फ़ुल स्क्रीन में खोलें। F11 से कभी भी बदलें।</string>
     <string name="settings_interface_hide_system_nav_bar_title">सिस्टम नेविगेशन बार छिपाएँ</string>

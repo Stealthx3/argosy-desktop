@@ -1,5 +1,6 @@
 package com.nendo.argosy.ui.screens.settings.delegates
 
+import com.nendo.argosy.data.preferences.DisplayProfile
 import com.nendo.argosy.platform.PlatformColorUtils as ColorUtils
 import com.nendo.argosy.data.cache.GradientPreset
 import com.nendo.argosy.data.preferences.GripReserveMode
@@ -561,6 +562,37 @@ class DisplaySettingsDelegate @Inject constructor(
         scope.launch {
             preferencesRepository.setCompactFooter(enabled)
             _state.update { it.copy(compactFooter = enabled) }
+        }
+    }
+
+    fun setDisplayProfile(scope: CoroutineScope, profile: DisplayProfile) {
+        scope.launch {
+            preferencesRepository.setDisplayProfile(profile)
+            _state.update {
+                it.copy(
+                    displayProfile = profile,
+                    safeAreaPercent = profile.defaultSafeAreaPercent,
+                    uiScale = profile.defaultUiScale,
+                    compactFooter = if (profile == DisplayProfile.TV) false else it.compactFooter,
+                    boxArtGlowStrength = if (profile == DisplayProfile.TV) BoxArtGlowStrength.HIGH else it.boxArtGlowStrength
+                )
+            }
+        }
+    }
+
+    fun cycleDisplayProfile(scope: CoroutineScope, direction: Int) {
+        val entries = DisplayProfile.entries
+        val next = entries[(_state.value.displayProfile.ordinal + direction).mod(entries.size)]
+        setDisplayProfile(scope, next)
+    }
+
+    fun adjustSafeArea(scope: CoroutineScope, delta: Int) {
+        val current = _state.value.safeAreaPercent
+        val newValue = (current + delta).coerceIn(0, DisplayProfile.MAX_SAFE_AREA_PERCENT)
+        if (newValue == current) return
+        scope.launch {
+            preferencesRepository.setSafeAreaPercent(newValue)
+            _state.update { it.copy(safeAreaPercent = newValue) }
         }
     }
 

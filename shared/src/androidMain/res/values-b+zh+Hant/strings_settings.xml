@@ -96,6 +96,12 @@
     <string name="settings_interface_ui_scale_title">介面縮放</string>
     <string name="settings_interface_compact_footer_title">精簡頁尾</string>
     <string name="settings_interface_compact_footer_subtitle">使用較窄的操作提示列</string>
+    <string name="settings_interface_display_profile_title">顯示設定檔</string>
+    <string name="settings_interface_display_profile_subtitle">依你使用的螢幕設定版面：掌機、桌面顯示器或電視。</string>
+    <string name="settings_interface_display_profile_handheld">掌機</string>
+    <string name="settings_interface_display_profile_desktop">桌面</string>
+    <string name="settings_interface_display_profile_tv">電視</string>
+    <string name="settings_interface_safe_area_title">安全區域</string>
     <string name="settings_interface_start_full_screen_title">以全螢幕啟動</string>
     <string name="settings_interface_start_full_screen_subtitle">以全螢幕而非視窗方式開啟 Argosy。隨時按 F11 切換。</string>
     <string name="settings_interface_hide_system_nav_bar_title">隱藏系統導覽列</string>

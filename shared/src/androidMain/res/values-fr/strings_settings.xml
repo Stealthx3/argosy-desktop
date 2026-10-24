@@ -109,6 +109,12 @@
     <string name="settings_interface_ui_scale_title">Échelle de l\'interface</string>
     <string name="settings_interface_compact_footer_title">Pied de page compact</string>
     <string name="settings_interface_compact_footer_subtitle">Utiliser une barre de contrôle plus fine</string>
+    <string name="settings_interface_display_profile_title">Profil d\'affichage</string>
+    <string name="settings_interface_display_profile_subtitle">Adapte la disposition à ton écran : console portable, moniteur ou téléviseur.</string>
+    <string name="settings_interface_display_profile_handheld">Portable</string>
+    <string name="settings_interface_display_profile_desktop">Bureau</string>
+    <string name="settings_interface_display_profile_tv">TV</string>
+    <string name="settings_interface_safe_area_title">Zone de sécurité</string>
     <string name="settings_interface_start_full_screen_title">Démarrer en plein écran</string>
     <string name="settings_interface_start_full_screen_subtitle">Ouvrir Argosy en plein écran plutôt que dans une fenêtre. F11 bascule à tout moment.</string>
     <string name="settings_interface_hide_system_nav_bar_title">Masquer la barre de navigation système</string>

@@ -2,7 +2,7 @@
 
 Rewritten (not appended) at the end of every work unit, so a fresh session can start from it alone. History and reasoning live in `DEVLOG.md`; read only the parts this file points to. Earlier phases: `phase-0.md` … `phase-3.md` (closed summaries).
 
-**Updated:** 2026-10-23 (step 4 closed). Steps 1–4 done (step 1's owner hardware check still pending, below); next is step 5. The Phase 4 step plan (steps 1–10) is in `DEVLOG.md` under "Phase 4 · Linux adaptation" → "Phase 4 step plan". Nothing uncommitted.
+**Updated:** 2026-10-24 (step 5 part 1). Steps 1–4 done (step 1's owner hardware check still pending, below); step 5 in progress. The Phase 4 step plan (steps 1–10) is in `DEVLOG.md` under "Phase 4 · Linux adaptation" → "Phase 4 step plan". Nothing uncommitted.
 
 ## Scope and exit criterion
 
@@ -28,10 +28,12 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 
 - DEVLOG "Step 4". Decorated 1280×720 window, F11, gamescope forced, `--fullscreen`/`--windowed`, Interface → Start in Full Screen (desktop only; Android's system-bar rows hidden on desktop), dark when no theme is stored. Evidence `p4s4/`, `fresh-p4s4/`, Android `p4s4-android2`. Not verified: launch with the setting on, real gamescope (owner test with the next alpha).
 
-## Step 5 (display profiles and the wizard's Display setup step): waiting on the owner
+## Step 5 (display profiles and the wizard's Display setup step): part 1 done, next part 2
 
-- Investigation done (DEVLOG 2026-10-24 "Step 5 investigation"): upstream has **no TV layout class**; `AspectRatioClass` is ratio-only and the desktop already uses the 540 dp TV density. Three questions asked of the owner (2026-10-24): what the TV profile changes (proposed: safe-area margin + hidden cursor, no new layout), the TV safe-area default (proposed 3 %), and live Home miniatures vs a simpler preview for the profile cards. **Answers (2026-10-24):** TV safe-area default 3 %; profile cards use a schematic preview (drawn Home sketch in theme colours, per-profile margin and density), not live miniatures; TV profile: the owner asked for alternative TV layouts and scaling settings with illustrated mockups to choose from (proposal page https://claude.ai/artifact/4DJ1zZT3T26ALojCQkdrdB : A as-is, B Couch scale (recommended: TV-profile defaults for existing UI Scale 125 %, full footer, strong glow + safe area), C Cinematic, D Ten-foot rail). Resume from the owner's choice: write the step 5 parts (profile setting through the full chain + detection; safe area; cursor rules; wizard step; Interface cards).
-- Detection inputs to use: `/sys/class/dmi/id/product_name` (Steam Deck "Jupiter"/"Galileo", ROG Ally "RC71L"/"RC72L", Legion Go "83E1"), gamescope (`DesktopWindowMode.isGamescope`), EDID physical size from `/sys/class/drm/*/edid` (bytes 21–22, cm).
+- Owner decisions (2026-10-24): TV = option B "Couch scale" (https://claude.ai/artifact/4DJ1zZT3T26ALojCQkdrdB): starting values UI Scale 125 %, compact footer off, glow High, safe area 3 %; no new Home layout, no text-size setting. Profile cards use a **schematic** preview (drawn Home sketch in theme colours), not live miniatures.
+- Done (DEVLOG "Step 5, part 1"): `DisplayProfile` + `DisplayProfileDetection`, settings chain, Interface rows Display Profile / Safe Area (after Compact Footer: upstream test pins Compact Footer right after UI Scale), safe-area margin and cursor auto-hide in `Main.kt`. Evidence `fresh-p4s5/`, Android `p4s5-android`.
+- **Next action, part 2:** (a) a `DisplayProfileCards` composable (ui/, three cards: schematic Home sketch drawn with Canvas in theme colours showing the profile's margin and scale, name, one line, "Recommended" tag on the detected one; left/right + A, touch via clickableNoFocus, sound feedback, footer hints). (b) Interface: open the cards from the Display Profile row (A) as its own sub-section or modal, following how Button Mapping opened `SettingsSection.BUTTON_MAPPING`. (c) First-run step `DISPLAY_SETUP` right after WELCOME (desktop only via `PlatformFeatures.desktopWindow`; Back returns to Welcome); extend `stepAfterPlatformSelect`-style helpers and the wizard walk recipe (one more A after Get Started).
+- Walks on throwaway data: `fresh-walk.sh` with the recipe in gotchas, but start with `wait:35` (the dark first launch was slower; a short wait sent presses into Add Certificate's file picker). Do not switch profiles on the owner's data: TV rewrites UI scale, footer and glow.
 
 ## Carried forward
 

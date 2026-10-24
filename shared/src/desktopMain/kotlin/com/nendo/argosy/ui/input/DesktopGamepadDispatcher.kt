@@ -1,5 +1,8 @@
 package com.nendo.argosy.ui.input
 
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import com.nendo.argosy.core.input.AndroidKeyCodes
 import com.nendo.argosy.core.input.AndroidMotionAxes
 import com.nendo.argosy.core.input.ConnectedControllerTracker
@@ -64,6 +67,9 @@ class DesktopGamepadDispatcher @Inject constructor(
     var sourceGeneration = 0
         private set
 
+    private val _padActivity = MutableStateFlow(0L)
+    val padActivity: StateFlow<Long> = _padActivity.asStateFlow()
+
     fun start(): Boolean {
         if (source != null) return true
         val sdl = Sdl3.load()
@@ -102,6 +108,7 @@ class DesktopGamepadDispatcher @Inject constructor(
 
     internal fun handle(event: SdlPadEvent) {
         val deviceId = SdlGamepadMapping.deviceId(event.instanceId)
+        if (event is SdlPadEvent.Button || event is SdlPadEvent.Axis) _padActivity.value = System.currentTimeMillis()
         when (event) {
             is SdlPadEvent.Added -> connected(deviceId, event)
             is SdlPadEvent.Removed -> disconnected(deviceId)

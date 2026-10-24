@@ -61,6 +61,8 @@ internal class InterfaceSectionInput(
             InterfaceItem.CompactFooter -> return toggleLeftRight(direction, state.display.compactFooter) {
                 viewModel.setCompactFooter(it)
             }
+            InterfaceItem.DisplayProfile -> { viewModel.cycleDisplayProfile(direction); return InputResult.HANDLED }
+            InterfaceItem.SafeArea -> { viewModel.adjustSafeArea(direction); return InputResult.HANDLED }
             InterfaceItem.StartFullScreen -> return toggleLeftRight(direction, state.display.startFullScreen) {
                 viewModel.setStartFullScreen(it)
             }

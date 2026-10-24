@@ -170,6 +170,8 @@ object SettingsBackupKeys {
         SettingsBackupKey("menu_wrap_mode", SettingsBackupType.STRING),
         SettingsBackupKey("controller_input_mode", SettingsBackupType.STRING),
         SettingsBackupKey("start_full_screen", SettingsBackupType.BOOLEAN),
+        SettingsBackupKey("display_profile", SettingsBackupType.STRING),
+        SettingsBackupKey("safe_area_percent", SettingsBackupType.INT),
         SettingsBackupKey("navigation_button_maps", SettingsBackupType.STRING),
         SettingsBackupKey("controller_layout", SettingsBackupType.STRING),
         SettingsBackupKey("nintendo_button_layout", SettingsBackupType.BOOLEAN),

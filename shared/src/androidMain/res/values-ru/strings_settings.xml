@@ -110,6 +110,12 @@
     <string name="settings_interface_ui_scale_title">Масштаб интерфейса</string>
     <string name="settings_interface_compact_footer_title">Компактная панель</string>
     <string name="settings_interface_compact_footer_subtitle">Использовать более тонкую панель подсказок</string>
+    <string name="settings_interface_display_profile_title">Профиль экрана</string>
+    <string name="settings_interface_display_profile_subtitle">Настраивает интерфейс под ваш экран: портативное устройство, монитор или телевизор.</string>
+    <string name="settings_interface_display_profile_handheld">Портативное</string>
+    <string name="settings_interface_display_profile_desktop">Компьютер</string>
+    <string name="settings_interface_display_profile_tv">ТВ</string>
+    <string name="settings_interface_safe_area_title">Безопасная зона</string>
     <string name="settings_interface_start_full_screen_title">Запуск в полноэкранном режиме</string>
     <string name="settings_interface_start_full_screen_subtitle">Открывать Argosy во весь экран, а не в окне. F11 переключает режим в любой момент.</string>
     <string name="settings_interface_hide_system_nav_bar_title">Скрывать системную панель навигации</string>

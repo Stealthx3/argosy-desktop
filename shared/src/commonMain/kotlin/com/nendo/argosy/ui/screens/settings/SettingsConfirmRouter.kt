@@ -735,6 +735,7 @@ private fun routeInterfaceConfirm(vm: SettingsViewModel, state: SettingsUiState)
             return InputResult.handled(SoundType.OPEN_MODAL)
         }
         InterfaceItem.CompactFooter -> vm.setCompactFooter(!state.display.compactFooter)
+        InterfaceItem.DisplayProfile -> vm.cycleDisplayProfile()
         InterfaceItem.StartFullScreen -> vm.setStartFullScreen(!state.display.startFullScreen)
         InterfaceItem.HideSystemNavigationBar ->
             vm.setHideSystemNavigationBar(!state.display.hideSystemNavigationBar)

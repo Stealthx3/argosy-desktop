@@ -117,6 +117,12 @@
     <string name="settings_interface_ui_scale_title">UI-Skalierung</string>
     <string name="settings_interface_compact_footer_title">Kompakter Footer</string>
     <string name="settings_interface_compact_footer_subtitle">Schmalere Bedienleiste verwenden</string>
+    <string name="settings_interface_display_profile_title">Anzeigeprofil</string>
+    <string name="settings_interface_display_profile_subtitle">Legt das Layout für deinen Bildschirm fest: Handheld, Monitor oder Fernseher.</string>
+    <string name="settings_interface_display_profile_handheld">Handheld</string>
+    <string name="settings_interface_display_profile_desktop">Desktop</string>
+    <string name="settings_interface_display_profile_tv">TV</string>
+    <string name="settings_interface_safe_area_title">Sicherer Bereich</string>
     <string name="settings_interface_start_full_screen_title">Im Vollbild starten</string>
     <string name="settings_interface_start_full_screen_subtitle">Argosy im Vollbild statt in einem Fenster öffnen. F11 wechselt jederzeit.</string>
     <string name="settings_interface_hide_system_nav_bar_title">System-Navigationsleiste ausblenden</string>

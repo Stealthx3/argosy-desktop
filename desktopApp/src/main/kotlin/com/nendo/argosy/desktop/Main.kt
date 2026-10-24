@@ -1,5 +1,20 @@
 package com.nendo.argosy.desktop
 
+import kotlinx.coroutines.flow.drop
+import java.awt.image.BufferedImage
+import java.awt.event.MouseMotionAdapter
+import java.awt.event.MouseEvent
+import java.awt.Toolkit
+import java.awt.Point
+import java.awt.Cursor
+import com.nendo.argosy.platform.DisplayProfileDetection
+import com.nendo.argosy.data.preferences.DisplayProfile
+import androidx.compose.ui.graphics.Color
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
@@ -50,6 +65,9 @@ fun main(args: Array<String>) {
     val gamescope = DesktopWindowMode.isGamescope(System.getenv())
     val startFullScreen = runBlocking { app.component.displayPreferences().preferences.first().startFullScreen }
     val fullScreen = DesktopWindowMode.startsFullScreen(startFullScreen, options.fullScreenOverride, gamescope)
+    val detectedProfile = DisplayProfileDetection.detect()
+    val blankCursor = Toolkit.getDefaultToolkit()
+        .createCustomCursor(BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB), Point(0, 0), "blank")
     application {
         val state = rememberWindowState(
             placement = if (fullScreen) WindowPlacement.Fullscreen else WindowPlacement.Floating,
@@ -69,6 +87,22 @@ fun main(args: Array<String>) {
                 }
             },
         ) {
+            val display by app.component.displayPreferences().preferences.collectAsState(initial = null)
+            val profile = DisplayProfile.effective(display?.displayProfile, detectedProfile)
+            val safeArea = DisplayProfile.effectiveSafeArea(display?.safeAreaPercent, profile)
+            LaunchedEffect(window, profile) {
+                window.cursor = Cursor.getDefaultCursor()
+                if (profile.hidesIdleCursor) gamepadDispatcher.padActivity.drop(1).collect { window.cursor = blankCursor }
+            }
+            DisposableEffect(window) {
+                val mouseListener = object : MouseMotionAdapter() {
+                    override fun mouseMoved(e: MouseEvent) {
+                        if (window.cursor == blankCursor) window.cursor = Cursor.getDefaultCursor()
+                    }
+                }
+                window.contentPane.addMouseMotionListener(mouseListener)
+                onDispose { window.contentPane.removeMouseMotionListener(mouseListener) }
+            }
             DisposableEffect(window) {
                 keyPipe?.attach(window)
                 val focusListener = object : WindowAdapter() {
@@ -80,17 +114,21 @@ fun main(args: Array<String>) {
                 window.addWindowFocusListener(focusListener)
                 onDispose { window.removeWindowFocusListener(focusListener) }
             }
-            BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-                CompositionLocalProvider(
-                    LocalDensity provides tvDensity(constraints.maxHeight, LocalDensity.current.fontScale),
-                    LocalFontFamilyResolver provides fontFamilyResolver,
-                    LocalPlatformContext provides app,
-                    LocalViewModelProviders provides viewModels,
-                ) {
-                    MultiResumeLifecycle {
-                        ALauncherTheme {
-                            Surface(modifier = Modifier.fillMaxSize()) {
-                                ArgosyApp()
+            BoxWithConstraints(modifier = Modifier.fillMaxSize().background(Color.Black)) {
+                val marginX = maxWidth * (safeArea / 100f)
+                val marginY = maxHeight * (safeArea / 100f)
+                BoxWithConstraints(modifier = Modifier.fillMaxSize().padding(horizontal = marginX, vertical = marginY)) {
+                    CompositionLocalProvider(
+                        LocalDensity provides tvDensity(constraints.maxHeight, LocalDensity.current.fontScale),
+                        LocalFontFamilyResolver provides fontFamilyResolver,
+                        LocalPlatformContext provides app,
+                        LocalViewModelProviders provides viewModels,
+                    ) {
+                        MultiResumeLifecycle {
+                            ALauncherTheme {
+                                Surface(modifier = Modifier.fillMaxSize()) {
+                                    ArgosyApp()
+                                }
                             }
                         }
                     }

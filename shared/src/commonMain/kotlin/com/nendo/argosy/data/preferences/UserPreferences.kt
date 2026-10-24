@@ -230,6 +230,8 @@ data class UserPreferences(
     val hideSystemNavigationBar: Boolean = true,
     val hideSystemStatusBar: Boolean = true,
     val startFullScreen: Boolean = false,
+    val displayProfile: DisplayProfile? = null,
+    val safeAreaPercent: Int? = null,
     val lockScreenArt: Boolean = true,
     val homeAppAvailable: Boolean = true,
     val iconPack: String? = null,
