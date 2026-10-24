@@ -44,11 +44,11 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 
 - DEVLOG "Step 8 decisions" and parts 1–3. Not verified: a real Flathub install from the picker, an AppImage install or a Flatpak update from Managed Installers (owner tests in the part 2 and part 3 entries), the remote database refresh (repo `main` has no copy until the phase push).
 
-## Step 9 (libmpv video wallpaper): investigation done, part 1 next
+## Step 9 (libmpv video wallpaper): part 1 done, next part 2
 
-- Findings and part plan in DEVLOG "Step 9 investigation". Video entry points: `YouTubeVideoPlayer`, `InlineTilePlayer`, `PageThemePlayer` (desktop actuals empty).
-- **Next action, part 1:** add manifest modules to `desktopApp/flatpak/io.github.stealthx3.ArgosyDesktop.yml`: libass (meson/autotools; needs fribidi, harfbuzz, freetype from the SDK), libplacebo (meson, `-Dvulkan` per SDK headers, no demos), mpv (meson `-Dlibmpv=true -Dcplayer=false -Dlua=disabled`), each pinned by tag + sha256; `add-extensions`/`inherit-extensions` for `org.freedesktop.Platform.ffmpeg-full` (version 25.08). Then a JNA probe (`mpv_client_api_version`) run inside the built Flatpak. Builds are long: run `build-alpha.sh` in the background and log to a file.
-- libmpv is not installed on the host; do not install packages on the owner's system without asking. Dev-run playback stays empty until then.
+- Done (DEVLOG "Step 9, part 1"): libass, libplacebo, mpv modules + ffmpeg-full extension in the manifest; libmpv loads inside the Flatpak (client API 2.5). ffmpeg-full is not installed here (Flathub runtime extension).
+- **Next action, part 2:** JNA binding (`shared/src/desktopMain/.../platform/mpv/`): `mpv_create`, `mpv_set_option_string` (`vo=libmpv`, `hwdec=no`, `loop-file=inf`, `mute`), `mpv_initialize`, `mpv_command` (`loadfile`), `mpv_render_context_create` with `MPV_RENDER_PARAM_API_TYPE = "sw"`, `mpv_render_context_set_update_callback`, `mpv_render_context_render` with SW size/format(`bgr0`)/stride/pointer params into a direct buffer, copied into a Skia `Bitmap` → `ImageBitmap` drawn by a `Canvas`; frame pacing on a render thread; release on dispose. `InlineTilePlayer` and `PageThemePlayer` desktop actuals use it; missing libmpv (dev run) keeps today's empty behaviour. Test inside the Flatpak (dev run has no libmpv): a local sample video (generate one with the host's `ffmpeg` if present, else a VP9 webm) on a custom-grid tile or page backdrop.
+- Then part 3: YouTube via bundled `yt-dlp` stream URL → `YouTubeVideoPlayer`.
 
 ## Every step close from now on
 
