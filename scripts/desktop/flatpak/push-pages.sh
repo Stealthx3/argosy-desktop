@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
-# usage: scripts/desktop/flatpak/push-pages.sh  (after publish-repo.sh <pages-url>/repo/ <key>; single-commit gh-pages)
+# usage: scripts/desktop/flatpak/push-pages.sh --phase-close <n>  (phase close only; after publish-repo.sh <pages-url>/repo/ <key>; single-commit gh-pages)
 set -euo pipefail
+[ "${1:-}" = "--phase-close" ] && [[ "${2:-}" =~ ^[0-9]+$ ]] \
+  || { echo "refused: the Pages Flatpak repo is updated only at a phase close: push-pages.sh --phase-close <n>" >&2; exit 2; }
+phase=$2
 root="$(cd "$(dirname "$0")/../../.." && pwd)"
 cd "$root"
 app_id=io.github.stealthx3.ArgosyDesktop
@@ -27,6 +30,6 @@ cd "$site"
 git init -q -b gh-pages
 git add -A
 git -c user.name="$(git -C "$root" config user.name)" -c user.email="$(git -C "$root" config user.email)" \
-  commit -q -m "Argosy Desktop Flatpak repo ($(date -u +%Y-%m-%dT%H:%MZ))"
+  commit -q -m "Argosy Desktop Flatpak repo, phase $phase close ($(date -u +%Y-%m-%dT%H:%MZ))"
 GIT_SSH_COMMAND="${ssh_cmd:-ssh}" git push -q --force "$remote" gh-pages
 echo "pushed gh-pages: $(git rev-parse --short HEAD), $(du -sh . | cut -f1)"
