@@ -2,7 +2,7 @@
 
 Rewritten (not appended) at the end of every work unit, so a fresh session can start from it alone. History and reasoning live in `DEVLOG.md`; read only the parts this file points to. Earlier phases: `phase-0.md` … `phase-3.md` (closed summaries).
 
-**Updated:** 2026-10-24 (step 7 closed). Steps 1–7 done (step 1's owner hardware check still pending, below); next is step 8. The Phase 4 step plan (steps 1–10) is in `DEVLOG.md` under "Phase 4 · Linux adaptation" → "Phase 4 step plan". Nothing uncommitted.
+**Updated:** 2026-10-24 (step 8 part 1). Steps 1–7 done (step 1's owner hardware check still pending, below); step 8 in progress. The Phase 4 step plan (steps 1–10) is in `DEVLOG.md` under "Phase 4 · Linux adaptation" → "Phase 4 step plan". Nothing uncommitted.
 
 ## Scope and exit criterion
 
@@ -44,7 +44,9 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 
 - Scope (plan step 8; `PORT_PLAN.md` "Linux replacements for Android-only screens": Emulator suggestions, Managed installers): a database per platform of Linux emulators (Flathub app id, AppImage or native package, launch support, save paths), replacing `LinuxEmulators.kt`'s in-code table; suggestions with consented `flatpak install --user flathub <id>` or the project page for AppImages; managed installers for AppImage emulators updated from their releases into `~/Applications`, Flathub ones shown with installed/updatable state. Upstream ids stay exact.
 - **Owner decisions (2026-10-24, DEVLOG "Step 8 decisions"):** bundled JSON + fetched update from this repo; today's 17 + mGBA, Snes9x, xemu (mapped onto upstream ids: `linkboy`, `super_zsnes`, the Xbox id), Mesen only if it maps cleanly; Flathub install/update + AppImage download/update into `~/Applications`.
-- **Next action, part 1:** schema (id = upstream id, displayName, platforms subset, flatpakIds, binaries, appImagePrefixes, installPaths, flathub id, AppImage source = GitHub owner/repo + asset pattern, project page) as `emulators-linux.json` in desktop resources; `LinuxEmulatorDatabase` loader (bundled, then a cached newer copy by `version`); `LinuxEmulators.all` reads it; parity test: every field of today's 17 entries survives the move.
+- Done (DEVLOG "Step 8, part 1"): `linux-emulators.json` + `LinuxEmulatorDatabase` (bundled floor, cached newer copy, startup refresh from the repo's main), table and launch arguments read from it.
+- **Next action, part 2:** suggestions: find the Android emulator suggestion UI (Play Store / APK suggestions per platform; grep `PlayStoreAccess`, `suggest`), gate it on desktop and show Linux suggestions from the database: database entries whose upstream id supports the platform and that are not installed; add `flathub` / `homepage` / `appImage` (GitHub repo + asset pattern) fields to the JSON first (verify each source; never guess a URL); A on a Flathub suggestion asks consent and runs `flatpak install --user -y flathub <id>` through `HostShell`, then re-detects; AppImage/other open the project page.
+- Walk care: in Settings → Platforms the first row is the "Close Emulator When Returning to Argosy" switch; never press A there on the owner's data.
 
 ## Every step close from now on
 

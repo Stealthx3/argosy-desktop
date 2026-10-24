@@ -1,5 +1,6 @@
 package com.nendo.argosy.data.sync
 
+import com.nendo.argosy.data.emulator.LinuxEmulatorDatabase
 import com.nendo.argosy.data.remote.romm.ConnectionState
 import com.nendo.argosy.data.remote.romm.RomMRepository
 import com.nendo.argosy.data.repository.RetroAchievementsRepository
@@ -40,6 +41,7 @@ class DesktopBackgroundJobs @Inject constructor(
         scope.launch {
             if (raRepository.get().isLoggedIn()) scheduleRAPatchBackfill()
         }
+        scope.launch { LinuxEmulatorDatabase.refresh() }
     }
 
     @Synchronized

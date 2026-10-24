@@ -10,8 +10,11 @@ data class LinuxEmulator(
     val flatpakIds: List<String> = emptyList(),
     val binaries: List<String> = emptyList(),
     val appImagePrefixes: List<String> = emptyList(),
-    val installPaths: List<String> = emptyList()
+    val installPaths: List<String> = emptyList(),
+    val launch: LinuxLaunchArgs? = null
 )
+
+data class LinuxLaunchArgs(val args: List<String>, val onlyTargetsContaining: String? = null)
 
 enum class LinuxInstallKind { FLATPAK, APPIMAGE, NATIVE }
 
@@ -28,126 +31,9 @@ data class HostInventory(
 )
 
 object LinuxEmulators {
-    val all: List<LinuxEmulator> = listOf(
-        LinuxEmulator(
-            id = "retroarch",
-            displayName = "RetroArch",
-            flatpakIds = listOf("org.libretro.RetroArch"),
-            binaries = listOf("retroarch"),
-            appImagePrefixes = listOf("RetroArch")
-        ),
-        LinuxEmulator(
-            id = "dolphin",
-            displayName = "Dolphin",
-            flatpakIds = listOf("org.DolphinEmu.dolphin-emu"),
-            binaries = listOf("dolphin-emu"),
-            appImagePrefixes = listOf("Dolphin")
-        ),
-        LinuxEmulator(
-            id = "cemu",
-            displayName = "Cemu",
-            flatpakIds = listOf("info.cemu.Cemu"),
-            binaries = listOf("cemu", "Cemu"),
-            appImagePrefixes = listOf("Cemu")
-        ),
-        LinuxEmulator(
-            id = "azahar",
-            displayName = "Azahar",
-            flatpakIds = listOf("org.azahar_emu.Azahar"),
-            binaries = listOf("azahar"),
-            appImagePrefixes = listOf("azahar")
-        ),
-        LinuxEmulator(
-            id = "ryujinx",
-            displayName = "Ryujinx",
-            flatpakIds = listOf("io.github.ryubing.Ryujinx"),
-            binaries = listOf("ryujinx", "Ryujinx"),
-            appImagePrefixes = listOf("Ryujinx"),
-            installPaths = listOf("publish/Ryujinx")
-        ),
-        LinuxEmulator(
-            id = "eden",
-            displayName = "Eden",
-            flatpakIds = listOf("dev.eden_emu.eden"),
-            binaries = listOf("eden"),
-            appImagePrefixes = listOf("Eden")
-        ),
-        LinuxEmulator(
-            id = "melonds",
-            displayName = "melonDS",
-            flatpakIds = listOf("net.kuribo64.melonDS"),
-            binaries = listOf("melonDS"),
-            appImagePrefixes = listOf("melonDS")
-        ),
-        LinuxEmulator(
-            id = "duckstation",
-            displayName = "DuckStation",
-            flatpakIds = listOf("org.duckstation.DuckStation"),
-            binaries = listOf("duckstation-qt"),
-            appImagePrefixes = listOf("DuckStation")
-        ),
-        LinuxEmulator(
-            id = "pcsx2",
-            displayName = "PCSX2",
-            flatpakIds = listOf("net.pcsx2.PCSX2"),
-            binaries = listOf("pcsx2-qt"),
-            appImagePrefixes = listOf("pcsx2")
-        ),
-        LinuxEmulator(
-            id = "ppsspp",
-            displayName = "PPSSPP",
-            flatpakIds = listOf("org.ppsspp.PPSSPP"),
-            binaries = listOf("PPSSPPSDL", "PPSSPPQt", "ppsspp"),
-            appImagePrefixes = listOf("PPSSPP")
-        ),
-        LinuxEmulator(
-            id = "vita3k",
-            displayName = "Vita3K",
-            binaries = listOf("Vita3K"),
-            appImagePrefixes = listOf("Vita3K"),
-            installPaths = listOf("Vita3K/Vita3K")
-        ),
-        LinuxEmulator(
-            id = "flycast",
-            displayName = "Flycast",
-            flatpakIds = listOf("org.flycast.Flycast"),
-            binaries = listOf("flycast"),
-            appImagePrefixes = listOf("flycast")
-        ),
-        LinuxEmulator(
-            id = "scummvm",
-            displayName = "ScummVM",
-            flatpakIds = listOf("org.scummvm.ScummVM"),
-            binaries = listOf("scummvm"),
-            appImagePrefixes = listOf("ScummVM")
-        ),
-        LinuxEmulator(
-            id = "mame4droid",
-            displayName = "MAME",
-            flatpakIds = listOf("org.mamedev.MAME"),
-            binaries = listOf("mame")
-        ),
-        LinuxEmulator(
-            id = "dosbox_turbo",
-            displayName = "DOSBox",
-            flatpakIds = listOf("com.dosbox_x.DOSBox-X", "io.github.dosbox-staging"),
-            binaries = listOf("dosbox-x", "dosbox-staging", "dosbox")
-        ),
-        LinuxEmulator(
-            id = "aps3e",
-            displayName = "RPCS3",
-            flatpakIds = listOf("net.rpcs3.RPCS3"),
-            binaries = listOf("rpcs3"),
-            appImagePrefixes = listOf("rpcs3")
-        ),
-        LinuxEmulator(
-            id = "mupen64plus_fz",
-            displayName = "Rosalie's Mupen GUI",
-            flatpakIds = listOf("com.github.Rosalie241.RMG"),
-            binaries = listOf("RMG"),
-            appImagePrefixes = listOf("RMG")
-        )
-    )
+    val all: List<LinuxEmulator> get() = LinuxEmulatorDatabase.current.emulators
+
+    fun byId(id: String): LinuxEmulator? = all.firstOrNull { it.id == id }
 
     val allBinaries: List<String> get() = all.flatMap { it.binaries }.distinct()
 

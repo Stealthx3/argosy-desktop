@@ -22,15 +22,13 @@ object LinuxLaunch {
         prefix(install) + listOf("-L", corePath, rom)
 
     fun standalone(emulatorId: String, install: LinuxInstall, rom: String): List<String>? {
-        val args = when (emulatorId) {
-            "dolphin" -> listOf("-b", "-e", rom)
-            "ppsspp" -> listOf(rom)
-            "cemu" -> listOf("-g", rom)
-            "dosbox_turbo" -> listOf(rom).takeIf { install.target.contains("dosbox-x", ignoreCase = true) }
-            else -> null
-        } ?: return null
-        return prefix(install) + args
+        val launch = LinuxEmulators.byId(emulatorId)?.launch ?: return null
+        val only = launch.onlyTargetsContaining
+        if (only != null && !install.target.contains(only, ignoreCase = true)) return null
+        return prefix(install) + launch.args.map { it.replace(ROM_PLACEHOLDER, rom) }
     }
+
+    private const val ROM_PLACEHOLDER = "{rom}"
 
     fun retroArchConfigPath(install: LinuxInstall, home: String): String =
         if (install.kind == LinuxInstallKind.FLATPAK && install.target == RETROARCH_FLATPAK) {

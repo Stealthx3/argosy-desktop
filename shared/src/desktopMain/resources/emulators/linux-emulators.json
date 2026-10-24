@@ -1,0 +1,312 @@
+{
+  "version": 1,
+  "emulators": [
+    {
+      "id": "retroarch",
+      "name": "RetroArch",
+      "flatpakIds": [
+        "org.libretro.RetroArch"
+      ],
+      "binaries": [
+        "retroarch"
+      ],
+      "appImagePrefixes": [
+        "RetroArch"
+      ]
+    },
+    {
+      "id": "dolphin",
+      "name": "Dolphin",
+      "flatpakIds": [
+        "org.DolphinEmu.dolphin-emu"
+      ],
+      "binaries": [
+        "dolphin-emu"
+      ],
+      "appImagePrefixes": [
+        "Dolphin"
+      ],
+      "launch": {
+        "args": [
+          "-b",
+          "-e",
+          "{rom}"
+        ]
+      }
+    },
+    {
+      "id": "cemu",
+      "name": "Cemu",
+      "flatpakIds": [
+        "info.cemu.Cemu"
+      ],
+      "binaries": [
+        "cemu",
+        "Cemu"
+      ],
+      "appImagePrefixes": [
+        "Cemu"
+      ],
+      "launch": {
+        "args": [
+          "-g",
+          "{rom}"
+        ]
+      }
+    },
+    {
+      "id": "azahar",
+      "name": "Azahar",
+      "flatpakIds": [
+        "org.azahar_emu.Azahar"
+      ],
+      "binaries": [
+        "azahar"
+      ],
+      "appImagePrefixes": [
+        "azahar"
+      ]
+    },
+    {
+      "id": "ryujinx",
+      "name": "Ryujinx",
+      "flatpakIds": [
+        "io.github.ryubing.Ryujinx"
+      ],
+      "binaries": [
+        "ryujinx",
+        "Ryujinx"
+      ],
+      "appImagePrefixes": [
+        "Ryujinx"
+      ],
+      "installPaths": [
+        "publish/Ryujinx"
+      ]
+    },
+    {
+      "id": "eden",
+      "name": "Eden",
+      "flatpakIds": [
+        "dev.eden_emu.eden"
+      ],
+      "binaries": [
+        "eden"
+      ],
+      "appImagePrefixes": [
+        "Eden"
+      ]
+    },
+    {
+      "id": "melonds",
+      "name": "melonDS",
+      "flatpakIds": [
+        "net.kuribo64.melonDS"
+      ],
+      "binaries": [
+        "melonDS"
+      ],
+      "appImagePrefixes": [
+        "melonDS"
+      ]
+    },
+    {
+      "id": "duckstation",
+      "name": "DuckStation",
+      "flatpakIds": [
+        "org.duckstation.DuckStation"
+      ],
+      "binaries": [
+        "duckstation-qt"
+      ],
+      "appImagePrefixes": [
+        "DuckStation"
+      ]
+    },
+    {
+      "id": "pcsx2",
+      "name": "PCSX2",
+      "flatpakIds": [
+        "net.pcsx2.PCSX2"
+      ],
+      "binaries": [
+        "pcsx2-qt"
+      ],
+      "appImagePrefixes": [
+        "pcsx2"
+      ]
+    },
+    {
+      "id": "ppsspp",
+      "name": "PPSSPP",
+      "flatpakIds": [
+        "org.ppsspp.PPSSPP"
+      ],
+      "binaries": [
+        "PPSSPPSDL",
+        "PPSSPPQt",
+        "ppsspp"
+      ],
+      "appImagePrefixes": [
+        "PPSSPP"
+      ],
+      "launch": {
+        "args": [
+          "{rom}"
+        ]
+      }
+    },
+    {
+      "id": "vita3k",
+      "name": "Vita3K",
+      "flatpakIds": [],
+      "binaries": [
+        "Vita3K"
+      ],
+      "appImagePrefixes": [
+        "Vita3K"
+      ],
+      "installPaths": [
+        "Vita3K/Vita3K"
+      ]
+    },
+    {
+      "id": "flycast",
+      "name": "Flycast",
+      "flatpakIds": [
+        "org.flycast.Flycast"
+      ],
+      "binaries": [
+        "flycast"
+      ],
+      "appImagePrefixes": [
+        "flycast"
+      ]
+    },
+    {
+      "id": "scummvm",
+      "name": "ScummVM",
+      "flatpakIds": [
+        "org.scummvm.ScummVM"
+      ],
+      "binaries": [
+        "scummvm"
+      ],
+      "appImagePrefixes": [
+        "ScummVM"
+      ]
+    },
+    {
+      "id": "mame4droid",
+      "name": "MAME",
+      "flatpakIds": [
+        "org.mamedev.MAME"
+      ],
+      "binaries": [
+        "mame"
+      ]
+    },
+    {
+      "id": "dosbox_turbo",
+      "name": "DOSBox",
+      "flatpakIds": [
+        "com.dosbox_x.DOSBox-X",
+        "io.github.dosbox-staging"
+      ],
+      "binaries": [
+        "dosbox-x",
+        "dosbox-staging",
+        "dosbox"
+      ],
+      "launch": {
+        "args": [
+          "{rom}"
+        ],
+        "onlyTargetsContaining": "dosbox-x"
+      }
+    },
+    {
+      "id": "aps3e",
+      "name": "RPCS3",
+      "flatpakIds": [
+        "net.rpcs3.RPCS3"
+      ],
+      "binaries": [
+        "rpcs3"
+      ],
+      "appImagePrefixes": [
+        "rpcs3"
+      ]
+    },
+    {
+      "id": "mupen64plus_fz",
+      "name": "Rosalie's Mupen GUI",
+      "flatpakIds": [
+        "com.github.Rosalie241.RMG"
+      ],
+      "binaries": [
+        "RMG"
+      ],
+      "appImagePrefixes": [
+        "RMG"
+      ]
+    },
+    {
+      "id": "linkboy",
+      "name": "mGBA",
+      "flatpakIds": [
+        "io.mgba.mGBA"
+      ],
+      "binaries": [
+        "mgba-qt",
+        "mgba"
+      ],
+      "appImagePrefixes": [
+        "mGBA"
+      ],
+      "launch": {
+        "args": [
+          "{rom}"
+        ]
+      }
+    },
+    {
+      "id": "super_zsnes",
+      "name": "Snes9x",
+      "flatpakIds": [
+        "com.snes9x.Snes9x"
+      ],
+      "binaries": [
+        "snes9x-gtk",
+        "snes9x"
+      ],
+      "appImagePrefixes": [
+        "Snes9x"
+      ],
+      "launch": {
+        "args": [
+          "{rom}"
+        ]
+      }
+    },
+    {
+      "id": "hakux",
+      "name": "xemu",
+      "flatpakIds": [
+        "app.xemu.xemu"
+      ],
+      "binaries": [
+        "xemu"
+      ],
+      "appImagePrefixes": [
+        "xemu"
+      ],
+      "launch": {
+        "args": [
+          "-dvd_path",
+          "{rom}"
+        ]
+      }
+    }
+  ]
+}
