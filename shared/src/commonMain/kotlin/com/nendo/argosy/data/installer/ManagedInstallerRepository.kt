@@ -20,7 +20,20 @@ class ManagedInstallerRepository @Inject constructor(
     suspend fun getById(id: Long): ManagedInstallerEntity? = dao.getById(id)
 
     suspend fun ensureSeeded() {
-        SeededInstallers.ALL.forEach { seed ->
+        val seeds = InstallerSeeds.all
+        if (InstallerSeeds.replacesUpstreamSeeds) {
+            val wanted = seeds.map { it.repoOwner to it.repoName }.toSet()
+            dao.getAll()
+                .filter { it.locked && it.repoOwner != FLATHUB_OWNER && (it.repoOwner to it.repoName) !in wanted }
+                .forEach { dao.delete(it.id) }
+            seeds.forEach { seed ->
+                val existing = dao.getByRepo(seed.repoOwner, seed.repoName)
+                if (existing != null && existing.tagAtInstall == null && existing.packageName != seed.packageName) {
+                    dao.upsert(existing.copy(packageName = seed.packageName))
+                }
+            }
+        }
+        seeds.forEach { seed ->
             val existing = dao.getByRepo(seed.repoOwner, seed.repoName)
             if (existing == null) {
                 dao.upsert(seed)
@@ -49,6 +62,18 @@ class ManagedInstallerRepository @Inject constructor(
         )
 
     suspend fun remove(id: Long): Boolean = dao.deleteUnlocked(id) > 0
+
+    suspend fun syncPlatformRows(owner: String, rows: List<ManagedInstallerEntity>) {
+        val wanted = rows.map { it.repoName }.toSet()
+        dao.getAll().filter { it.repoOwner == owner && it.repoName !in wanted }.forEach { dao.delete(it.id) }
+        rows.forEach { row ->
+            val existing = dao.getByRepo(owner, row.repoName)
+            when {
+                existing == null -> dao.upsert(row)
+                existing.packageName != row.packageName -> dao.upsert(existing.copy(packageName = row.packageName))
+            }
+        }
+    }
 
     suspend fun recordCheck(id: Long, latestSeenTag: String?) {
         val row = dao.getById(id) ?: return

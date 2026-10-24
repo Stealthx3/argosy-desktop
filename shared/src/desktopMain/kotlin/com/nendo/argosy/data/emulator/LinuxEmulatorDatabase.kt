@@ -44,6 +44,7 @@ object LinuxEmulatorDatabase {
                 appImagePrefixes = entry.strings("appImagePrefixes"),
                 installPaths = entry.strings("installPaths"),
                 flathubId = entry.optString("flathub").takeIf { it.isNotEmpty() },
+                appImageRepo = entry.optString("appImageRepo").takeIf { it.contains('/') },
                 launch = entry.optJSONObject("launch")?.let { launch ->
                     LinuxLaunchArgs(
                         args = launch.strings("args"),

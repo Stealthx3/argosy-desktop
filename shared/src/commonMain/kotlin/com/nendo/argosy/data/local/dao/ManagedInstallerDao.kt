@@ -28,6 +28,9 @@ interface ManagedInstallerDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsert(entity: ManagedInstallerEntity): Long
 
+    @Query("DELETE FROM managed_installers WHERE id = :id")
+    suspend fun delete(id: Long): Int
+
     @Query("DELETE FROM managed_installers WHERE id = :id AND locked = 0")
     suspend fun deleteUnlocked(id: Long): Int
 }

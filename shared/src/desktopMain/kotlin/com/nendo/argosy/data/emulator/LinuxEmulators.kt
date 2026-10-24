@@ -12,7 +12,8 @@ data class LinuxEmulator(
     val appImagePrefixes: List<String> = emptyList(),
     val installPaths: List<String> = emptyList(),
     val launch: LinuxLaunchArgs? = null,
-    val flathubId: String? = null
+    val flathubId: String? = null,
+    val appImageRepo: String? = null
 )
 
 data class LinuxLaunchArgs(val args: List<String>, val onlyTargetsContaining: String? = null)

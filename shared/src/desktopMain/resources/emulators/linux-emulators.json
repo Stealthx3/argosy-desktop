@@ -55,7 +55,8 @@
           "-g",
           "{rom}"
         ]
-      }
+      },
+      "appImageRepo": "cemu-project/Cemu"
     },
     {
       "id": "azahar",
@@ -69,7 +70,8 @@
       ],
       "appImagePrefixes": [
         "azahar"
-      ]
+      ],
+      "appImageRepo": "azahar-emu/azahar"
     },
     {
       "id": "ryujinx",
@@ -129,7 +131,8 @@
       ],
       "appImagePrefixes": [
         "DuckStation"
-      ]
+      ],
+      "appImageRepo": "stenzek/duckstation"
     },
     {
       "id": "pcsx2",
@@ -143,7 +146,8 @@
       ],
       "appImagePrefixes": [
         "pcsx2"
-      ]
+      ],
+      "appImageRepo": "PCSX2/pcsx2"
     },
     {
       "id": "ppsspp",
@@ -164,7 +168,8 @@
         "args": [
           "{rom}"
         ]
-      }
+      },
+      "appImageRepo": "hrydgard/ppsspp"
     },
     {
       "id": "vita3k",
@@ -178,7 +183,8 @@
       ],
       "installPaths": [
         "Vita3K/Vita3K"
-      ]
+      ],
+      "appImageRepo": "Vita3K/Vita3K"
     },
     {
       "id": "flycast",
@@ -192,7 +198,8 @@
       ],
       "appImagePrefixes": [
         "flycast"
-      ]
+      ],
+      "appImageRepo": "flyinghead/flycast"
     },
     {
       "id": "scummvm",
@@ -251,7 +258,8 @@
       ],
       "appImagePrefixes": [
         "rpcs3"
-      ]
+      ],
+      "appImageRepo": "RPCS3/rpcs3-binaries-linux"
     },
     {
       "id": "mupen64plus_fz",
@@ -285,7 +293,8 @@
         "args": [
           "{rom}"
         ]
-      }
+      },
+      "appImageRepo": "mgba-emu/mgba"
     },
     {
       "id": "super_zsnes",
@@ -325,7 +334,8 @@
           "-dvd_path",
           "{rom}"
         ]
-      }
+      },
+      "appImageRepo": "xemu-project/xemu"
     }
   ]
 }

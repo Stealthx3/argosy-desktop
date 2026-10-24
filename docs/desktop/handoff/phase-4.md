@@ -2,7 +2,7 @@
 
 Rewritten (not appended) at the end of every work unit, so a fresh session can start from it alone. History and reasoning live in `DEVLOG.md`; read only the parts this file points to. Earlier phases: `phase-0.md` … `phase-3.md` (closed summaries).
 
-**Updated:** 2026-10-24 (step 8 part 2). Steps 1–7 done (step 1's owner hardware check still pending, below); step 8 in progress. The Phase 4 step plan (steps 1–10) is in `DEVLOG.md` under "Phase 4 · Linux adaptation" → "Phase 4 step plan". Nothing uncommitted.
+**Updated:** 2026-10-24 (step 8 closed). Steps 1–8 done (step 1's owner hardware check still pending, below); next is step 9. The Phase 4 step plan (steps 1–10) is in `DEVLOG.md` under "Phase 4 · Linux adaptation" → "Phase 4 step plan". Nothing uncommitted.
 
 ## Scope and exit criterion
 
@@ -40,14 +40,13 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 
 - DEVLOG "Step 7". Not verified: AMD/Intel/multi-GPU hardware (fixture tests).
 
-## Step 8 (emulator compatibility database, suggestions, managed installers): next action
+## Step 8 (emulator database, suggestions, managed installers): closed
 
-- Scope (plan step 8; `PORT_PLAN.md` "Linux replacements for Android-only screens": Emulator suggestions, Managed installers): a database per platform of Linux emulators (Flathub app id, AppImage or native package, launch support, save paths), replacing `LinuxEmulators.kt`'s in-code table; suggestions with consented `flatpak install --user flathub <id>` or the project page for AppImages; managed installers for AppImage emulators updated from their releases into `~/Applications`, Flathub ones shown with installed/updatable state. Upstream ids stay exact.
-- **Owner decisions (2026-10-24, DEVLOG "Step 8 decisions"):** bundled JSON + fetched update from this repo; today's 17 + mGBA, Snes9x, xemu (mapped onto upstream ids: `linkboy`, `super_zsnes`, the Xbox id), Mesen only if it maps cleanly; Flathub install/update + AppImage download/update into `~/Applications`.
-- Done (DEVLOG "Step 8, part 1"): `linux-emulators.json` + `LinuxEmulatorDatabase` (bundled floor, cached newer copy, startup refresh from the repo's main), table and launch arguments read from it.
-- Done (DEVLOG "Step 8, part 2"): `flathub` ids in the database; desktop `EmulatorSuggestions` fill the emulator picker's download list; choosing one installs it from Flathub (consented by the press) and re-detects. Not verified: a real install (owner test).
-- **Next action, part 3:** managed installers (Settings → Managed Installers on desktop): read the Android section/delegate (`MainSettingsItem.ManagedInstallers`, `openManagedInstallers`, `ManagedInstallerManager`), gate the Android seeds off on desktop; list database emulators that are installed as Flatpaks with their update state (`flatpak remote-ls --user --updates`), A updates one (`flatpak update --user -y <id>`); AppImage emulators: add a verified GitHub release source (owner/repo + asset regex) to the database only where the project publishes Linux AppImages, download into `~/Applications`, mark executable, re-detect, and update in place when a newer tag exists. Verify each release source from the project's GitHub releases before adding it.
-- Walk care: in Settings → Platforms the first row is the "Close Emulator When Returning to Argosy" switch; never press A there on the owner's data.
+- DEVLOG "Step 8 decisions" and parts 1–3. Not verified: a real Flathub install from the picker, an AppImage install or a Flatpak update from Managed Installers (owner tests in the part 2 and part 3 entries), the remote database refresh (repo `main` has no copy until the phase push).
+
+## Step 9 (libmpv video wallpaper): next action
+
+- Scope (plan step 9): libmpv rendered into a Compose surface for video wallpaper (and trailers where upstream shows them). First actions: find upstream's video wallpaper / trailer playback (grep `ExoPlayer`, `VideoWallpaper`, `trailer`) and the desktop stand-in today; check libmpv availability (system `libmpv.so.2`, and in the Flatpak runtime: org.freedesktop.Platform has no mpv; a module in the manifest may be needed); pick the render path (mpv render API to an OpenGL texture vs software frames into a Skia image) with a spike before wiring.
 
 ## Every step close from now on
 
