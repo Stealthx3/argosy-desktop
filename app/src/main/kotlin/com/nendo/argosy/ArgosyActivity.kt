@@ -3,6 +3,7 @@ package com.nendo.argosy
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.res.Configuration
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.KeyEvent
@@ -28,6 +29,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.nendo.argosy.core.input.ControllerPointerGuard
 import com.nendo.argosy.data.cache.ImageCacheManager
 import com.nendo.argosy.data.local.dao.DownloadQueueDao
 import com.nendo.argosy.data.local.dao.GameDao
@@ -223,6 +225,12 @@ class ArgosyActivity : ComponentActivity() {
 
     private var hasResumedBefore = false
     private var yieldedFocusToGame = false
+    private val pointerGuard = ControllerPointerGuard(
+        windowName = "launcher",
+        scope = lifecycleScope,
+        sessionLive = { playSessionTracker.activeSession.value != null },
+        setWindowTouchable = ::setWindowTouchable
+    )
 
     @SuppressLint("NewApi")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -365,6 +373,7 @@ class ArgosyActivity : ComponentActivity() {
         )
         preferencesObserver.collectIn(activityScope)
         revealCallerWhenExternalSessionCloses()
+        releasePointerGuardWhenSessionEnds()
 
         setContent {
             ALauncherTheme {
@@ -435,6 +444,7 @@ class ArgosyActivity : ComponentActivity() {
     @SuppressLint("NewApi")
     override fun onResume() {
         super.onResume()
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) pointerGuard.onInFrontChanged(true)
         systemBars.apply()
         if (::dualScreenManager.isInitialized) {
             dualScreenManager.notifyUserActivity("mainResume")
@@ -466,6 +476,7 @@ class ArgosyActivity : ComponentActivity() {
 
     override fun onPause() {
         super.onPause()
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) pointerGuard.onInFrontChanged(false)
         if (!ambientAudioManager.keepsPlayingAsleep()) ambientAudioManager.suspend()
         if (!dualScreenManager.isCompanionActive.value) {
             dualScreenManager.broadcastForegroundState(false)
@@ -562,6 +573,7 @@ class ArgosyActivity : ComponentActivity() {
     private var mediaDimSwallowsTouch = false
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
+        if (pointerGuard.consumes(event)) return true
         if (event.actionMasked == MotionEvent.ACTION_DOWN) {
             val dimmed = isMediaDimmed()
             ambientAudioManager.resumeFromSuspend()
@@ -592,6 +604,7 @@ class ArgosyActivity : ComponentActivity() {
             android.view.WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
 
     override fun dispatchGenericMotionEvent(event: MotionEvent): Boolean {
+        if (pointerGuard.consumes(event)) return true
         triggerAxisKeyEmitter.emit(event).forEach { dispatchKeyEvent(it) }
 
         if (!dualScreenManager.claimInput(event)) return true
@@ -608,6 +621,24 @@ class ArgosyActivity : ComponentActivity() {
         if (gamepadInputHandler.processStickMotion(event, steerRightStick, ::deliverStickEvent)) return true
         if (gamepadInputHandler.handleMotionEvent(event)) return true
         return super.dispatchGenericMotionEvent(event)
+    }
+
+    private fun setWindowTouchable(touchable: Boolean) {
+        val flag = android.view.WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+        if (touchable) window.clearFlags(flag) else window.addFlags(flag)
+    }
+
+    private fun releasePointerGuardWhenSessionEnds() {
+        lifecycleScope.launch {
+            playSessionTracker.activeSession.collect { session ->
+                if (session == null) pointerGuard.release()
+            }
+        }
+    }
+
+    override fun onTopResumedActivityChanged(isTopResumedActivity: Boolean) {
+        super.onTopResumedActivityChanged(isTopResumedActivity)
+        pointerGuard.onInFrontChanged(isTopResumedActivity)
     }
 
     private fun deliverStickEvent(stickEvent: GamepadEvent, isRepeat: Boolean) {
