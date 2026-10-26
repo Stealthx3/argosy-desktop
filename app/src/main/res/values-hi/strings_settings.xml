@@ -194,6 +194,8 @@
     <string name="settings_navigation_swap_xy_subtitle">कॉन्टेक्स्ट मेनू और सेकेंडरी एक्शन बदलें</string>
     <string name="settings_navigation_swap_start_select_title">Start/Select बदलें</string>
     <string name="settings_navigation_swap_start_select_subtitle">Start और Select बटन के काम आपस में बदलें</string>
+    <string name="settings_navigation_ignore_controller_touchpad_title">गेम में टचपैड अनदेखा करें</string>
+    <string name="settings_navigation_ignore_controller_touchpad_subtitle">गेम चलते समय कंट्रोलर का टचपैड लॉन्चर पर क्लिक नहीं कर सकता</string>
 
     <string name="settings_navigation_haptic_title">हैप्टिक फ़ीडबैक</string>
     <string name="settings_navigation_vibration_title">वाइब्रेशन तीव्रता</string>

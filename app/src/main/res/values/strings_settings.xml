@@ -440,6 +440,11 @@
     <string name="settings_navigation_swap_start_select_title">Swap Start/Select</string>
     <!-- Second line of that row. -->
     <string name="settings_navigation_swap_start_select_subtitle">Flip the Start and Select button functions</string>
+    <!-- Row title. Switch: while a game runs, the touchpad on a PlayStation-style controller does
+         not act as a mouse on the launcher. -->
+    <string name="settings_navigation_ignore_controller_touchpad_title">Ignore Touchpad In Games</string>
+    <!-- Second line of that row. -->
+    <string name="settings_navigation_ignore_controller_touchpad_subtitle">A controller touchpad can\'t click the launcher while a game is running</string>
 
     <!-- Row title. Noun phrase: the short buzz the device gives when something is pressed. -->
     <string name="settings_navigation_haptic_title">Haptic Feedback</string>

@@ -181,6 +181,8 @@
     <string name="settings_navigation_swap_xy_subtitle">交換選單鍵與次要動作鍵</string>
     <string name="settings_navigation_swap_start_select_title">交換Start／Select鍵</string>
     <string name="settings_navigation_swap_start_select_subtitle">交換Start鍵與Select鍵的功能</string>
+    <string name="settings_navigation_ignore_controller_touchpad_title">遊戲中忽略觸控板</string>
+    <string name="settings_navigation_ignore_controller_touchpad_subtitle">遊戲執行時，控制器觸控板無法點擊啟動器</string>
 
     <string name="settings_navigation_haptic_title">震動回饋</string>
     <string name="settings_navigation_vibration_title">震動強度</string>

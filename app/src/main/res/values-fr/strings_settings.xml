@@ -196,6 +196,8 @@
     <string name="settings_navigation_swap_xy_subtitle">Inverser le menu contextuel et l\'action secondaire</string>
     <string name="settings_navigation_swap_start_select_title">Inverser Start/Select</string>
     <string name="settings_navigation_swap_start_select_subtitle">Inverser les fonctions des boutons Start et Select</string>
+    <string name="settings_navigation_ignore_controller_touchpad_title">Ignorer le pavé tactile en jeu</string>
+    <string name="settings_navigation_ignore_controller_touchpad_subtitle">Le pavé tactile d\'une manette ne peut pas cliquer sur le launcher pendant une partie</string>
 
     <string name="settings_navigation_haptic_title">Retour haptique</string>
     <string name="settings_navigation_vibration_title">Intensité de vibration</string>

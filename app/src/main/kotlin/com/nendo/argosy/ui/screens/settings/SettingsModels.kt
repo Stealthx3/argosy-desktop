@@ -422,6 +422,7 @@ data class ControlsState(
     val navRingRoutes: List<String> = com.nendo.argosy.ui.navigation.NavRing.DEFAULT_TOKENS,
     val quickNavigation: Boolean = true,
     val navBarAutoHide: Boolean = true,
+    val ignoreControllerTouchpad: Boolean = true,
     val showNavRingModal: Boolean = false,
     val navRingFocusIndex: Int = 0,
     val navRingReorder: com.nendo.argosy.ui.components.ListReorder<String>? = null

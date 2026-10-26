@@ -355,7 +355,6 @@ class SecondaryHomeActivity :
     private val pointerGuard = com.nendo.argosy.core.input.ControllerPointerGuard(
         windowName = "companion",
         scope = lifecycleScope,
-        sessionLive = { ::dsm.isInitialized && dsm.hasLiveSession() },
         setWindowTouchable = ::setWindowTouchable
     )
 
@@ -790,11 +789,9 @@ class SecondaryHomeActivity :
         dsm.registerCompanionHost(hostDisplayId(), this)
         systemBars.follow(lifecycleScope, dsm.preferencesRepository.userPreferences)
         lifecycleScope.launch { dsm.companionAchievements.collect { companionAchievements = it } }
-        lifecycleScope.launch {
-            dsm.playSessionTracker.activeSession.collect { session ->
-                if (session == null) pointerGuard.release()
-            }
-        }
+        pointerGuard.follow(
+            com.nendo.argosy.core.input.controllerTouchpadGuarding(dsm.playSessionTracker, dsm.preferencesRepository)
+        )
         lifecycleScope.launch {
             dsm.companionMediaVisible.collect { visible -> isMediaPanelVisible = visible }
         }

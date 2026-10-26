@@ -192,6 +192,8 @@
     <string name="settings_navigation_swap_xy_subtitle">交换上下文菜单与次要操作</string>
     <string name="settings_navigation_swap_start_select_title">交换Start/Select</string>
     <string name="settings_navigation_swap_start_select_subtitle">互换Start与Select按钮的功能</string>
+    <string name="settings_navigation_ignore_controller_touchpad_title">游戏中忽略触摸板</string>
+    <string name="settings_navigation_ignore_controller_touchpad_subtitle">游戏运行时，手柄触摸板无法点击启动器</string>
 
     <string name="settings_navigation_haptic_title">震动反馈</string>
     <string name="settings_navigation_vibration_title">震动强度</string>

@@ -206,6 +206,8 @@
     <string name="settings_navigation_swap_xy_subtitle">Intercambiar el menú contextual y la acción secundaria</string>
     <string name="settings_navigation_swap_start_select_title">Intercambiar Start/Select</string>
     <string name="settings_navigation_swap_start_select_subtitle">Intercambiar las funciones de los botones Start y Select</string>
+    <string name="settings_navigation_ignore_controller_touchpad_title">Ignorar el panel táctil en juego</string>
+    <string name="settings_navigation_ignore_controller_touchpad_subtitle">El panel táctil de un mando no puede hacer clic en el launcher mientras se juega</string>
 
     <string name="settings_navigation_haptic_title">Respuesta háptica</string>
     <string name="settings_navigation_vibration_title">Intensidad de vibración</string>

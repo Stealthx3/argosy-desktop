@@ -30,6 +30,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.nendo.argosy.core.input.ControllerPointerGuard
+import com.nendo.argosy.core.input.controllerTouchpadGuarding
 import com.nendo.argosy.data.cache.ImageCacheManager
 import com.nendo.argosy.data.local.dao.DownloadQueueDao
 import com.nendo.argosy.data.local.dao.GameDao
@@ -229,7 +230,6 @@ class ArgosyActivity : ComponentActivity() {
     private val pointerGuard = ControllerPointerGuard(
         windowName = "launcher",
         scope = lifecycleScope,
-        sessionLive = { playSessionTracker.activeSession.value != null },
         setWindowTouchable = ::setWindowTouchable
     )
 
@@ -375,7 +375,7 @@ class ArgosyActivity : ComponentActivity() {
         )
         preferencesObserver.collectIn(activityScope)
         revealCallerWhenExternalSessionCloses()
-        releasePointerGuardWhenSessionEnds()
+        pointerGuard.follow(controllerTouchpadGuarding(playSessionTracker, preferencesRepository))
 
         setContent {
             ALauncherTheme {
@@ -631,14 +631,6 @@ class ArgosyActivity : ComponentActivity() {
     private fun setWindowTouchable(touchable: Boolean) {
         val flag = android.view.WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
         if (touchable) window.clearFlags(flag) else window.addFlags(flag)
-    }
-
-    private fun releasePointerGuardWhenSessionEnds() {
-        lifecycleScope.launch {
-            playSessionTracker.activeSession.collect { session ->
-                if (session == null) pointerGuard.release()
-            }
-        }
     }
 
     override fun onTopResumedActivityChanged(isTopResumedActivity: Boolean) {

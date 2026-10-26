@@ -197,6 +197,8 @@
     <string name="settings_navigation_swap_xy_subtitle">Поменять местами контекстное меню и второе действие</string>
     <string name="settings_navigation_swap_start_select_title">Поменять местами Start/Select</string>
     <string name="settings_navigation_swap_start_select_subtitle">Поменять местами функции кнопок Start и Select</string>
+    <string name="settings_navigation_ignore_controller_touchpad_title">Игнорировать тачпад в игре</string>
+    <string name="settings_navigation_ignore_controller_touchpad_subtitle">Тачпад контроллера не нажимает на лаунчер, пока идёт игра</string>
 
     <string name="settings_navigation_haptic_title">Вибрация</string>
     <string name="settings_navigation_vibration_title">Сила вибрации</string>

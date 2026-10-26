@@ -111,6 +111,7 @@ class UserPreferencesRepository @Inject constructor(
             navRingRoutes = controls.navRingRoutes,
             quickNavigation = controls.quickNavigation,
             navBarAutoHide = controls.navBarAutoHide,
+            ignoreControllerTouchpad = controls.ignoreControllerTouchpad,
             lastRommSync = sync.lastRommSync,
             rommChangesWatermark = sync.rommChangesWatermark,
             lastFavoritesSync = sync.lastFavoritesSync,
@@ -527,6 +528,7 @@ class UserPreferencesRepository @Inject constructor(
     suspend fun setNavRingRoutes(routes: List<String>?) = controlsPrefs.setNavRingRoutes(routes)
     suspend fun setQuickNavigation(enabled: Boolean) = controlsPrefs.setQuickNavigation(enabled)
     suspend fun setNavBarAutoHide(enabled: Boolean) = controlsPrefs.setNavBarAutoHide(enabled)
+    suspend fun setIgnoreControllerTouchpad(enabled: Boolean) = controlsPrefs.setIgnoreControllerTouchpad(enabled)
 
 
     // --- Storage delegates ---
@@ -864,6 +866,7 @@ data class UserPreferences(
     val navRingRoutes: List<String>? = null,
     val quickNavigation: Boolean = true,
     val navBarAutoHide: Boolean = true,
+    val ignoreControllerTouchpad: Boolean = true,
     val lastRommSync: Instant? = null,
     val rommChangesWatermark: Instant? = null,
     val lastFavoritesSync: Instant? = null,

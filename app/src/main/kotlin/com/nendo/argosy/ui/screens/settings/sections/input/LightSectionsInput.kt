@@ -301,6 +301,10 @@ internal class LightSectionsInput(
                 return toggleLeftRight(direction, controls.swapXY) { viewModel.setSwapXY(it) }
             NavigationItem.SwapStartSelect ->
                 return toggleLeftRight(direction, controls.swapStartSelect) { viewModel.setSwapStartSelect(it) }
+            NavigationItem.IgnoreControllerTouchpad ->
+                return toggleLeftRight(direction, controls.ignoreControllerTouchpad) {
+                    viewModel.setIgnoreControllerTouchpad(it)
+                }
             NavigationItem.QuickNavigation ->
                 return toggleLeftRight(direction, controls.quickNavigation) { viewModel.setQuickNavigation(it) }
             NavigationItem.NavBarAutoHide ->

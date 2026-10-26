@@ -1,8 +1,15 @@
 package com.nendo.argosy.core.input
 
 import android.view.MotionEvent
+import com.nendo.argosy.data.emulator.ActiveSession
+import com.nendo.argosy.data.emulator.PlaySessionTracker
+import com.nendo.argosy.data.preferences.UserPreferences
+import com.nendo.argosy.data.preferences.UserPreferencesRepository
+import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
@@ -15,7 +22,7 @@ import org.junit.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class ControllerPointerGuardTest {
 
-    private var live = true
+    private val live = MutableStateFlow(true)
     private val touchableCalls = mutableListOf<Boolean>()
     private val controllerPointer = mockk<MotionEvent>()
     private val otherEvent = mockk<MotionEvent>()
@@ -23,10 +30,17 @@ class ControllerPointerGuardTest {
     private fun TestScope.guard() = ControllerPointerGuard(
         windowName = "launcher",
         scope = backgroundScope,
-        sessionLive = { live },
         setWindowTouchable = { touchableCalls += it },
         isControllerPointer = { it === controllerPointer }
-    )
+    ).also {
+        it.follow(live)
+        runCurrent()
+    }
+
+    private fun TestScope.setLive(value: Boolean) {
+        live.value = value
+        runCurrent()
+    }
 
     @Test
     fun `a controller pointer during a live session over a window not in front lets pointers pass through`() = runTest {
@@ -78,7 +92,7 @@ class ControllerPointerGuardTest {
         val guard = guard()
 
         assertFalse(guard.consumes(otherEvent))
-        live = false
+        setLive(false)
         assertFalse(guard.consumes(controllerPointer))
 
         assertTrue(touchableCalls.isEmpty())
@@ -109,15 +123,30 @@ class ControllerPointerGuardTest {
     }
 
     @Test
-    fun `after the session ends a controller pointer cannot start a pass-through`() = runTest {
+    fun `turning guarding off ends a pass-through and stops starting new ones`() = runTest {
         val guard = guard()
         guard.consumes(controllerPointer)
-        live = false
-        guard.release()
 
-        assertFalse(guard.consumes(controllerPointer))
+        setLive(false)
 
         assertEquals(listOf(false, true), touchableCalls)
+        assertFalse(guard.consumes(controllerPointer))
+        assertEquals(listOf(false, true), touchableCalls)
+    }
+
+    @Test
+    fun `guarding follows the session and the touchpad setting together`() = runTest {
+        val session = MutableStateFlow<ActiveSession?>(null)
+        val prefs = MutableStateFlow(UserPreferences(ignoreControllerTouchpad = true))
+        val tracker = mockk<PlaySessionTracker> { every { activeSession } returns session }
+        val repository = mockk<UserPreferencesRepository> { every { userPreferences } returns prefs }
+        val guarding = controllerTouchpadGuarding(tracker, repository)
+
+        assertFalse(guarding.first())
+        session.value = mockk()
+        assertTrue(guarding.first())
+        prefs.value = UserPreferences(ignoreControllerTouchpad = false)
+        assertFalse(guarding.first())
     }
 
     @Test

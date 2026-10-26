@@ -204,6 +204,8 @@
     <string name="settings_navigation_swap_xy_subtitle">Kontextmenü- und Zweitaktion-Taste tauschen</string>
     <string name="settings_navigation_swap_start_select_title">Start/Select tauschen</string>
     <string name="settings_navigation_swap_start_select_subtitle">Funktionen von Start und Select vertauschen</string>
+    <string name="settings_navigation_ignore_controller_touchpad_title">Touchpad im Spiel ignorieren</string>
+    <string name="settings_navigation_ignore_controller_touchpad_subtitle">Das Touchpad eines Controllers kann den Launcher während eines Spiels nicht anklicken</string>
 
     <string name="settings_navigation_haptic_title">Haptisches Feedback</string>
     <string name="settings_navigation_vibration_title">Vibrationsstärke</string>

@@ -678,7 +678,8 @@ internal fun routeLoadSettings(vm: SettingsViewModel) {
             openQuickPanelKey = prefs.openQuickPanelKey,
             navRingRoutes = com.nendo.argosy.ui.navigation.NavRing.resolve(prefs.navRingRoutes),
             quickNavigation = prefs.quickNavigation,
-            navBarAutoHide = prefs.navBarAutoHide
+            navBarAutoHide = prefs.navBarAutoHide,
+            ignoreControllerTouchpad = prefs.ignoreControllerTouchpad
         ))
         vm.controlsDelegate.refreshUsageStatsPermission()
 

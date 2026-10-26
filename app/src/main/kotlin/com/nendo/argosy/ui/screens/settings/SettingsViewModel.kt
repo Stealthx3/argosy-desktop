@@ -1555,6 +1555,8 @@ class SettingsViewModel @Inject constructor(
     fun setSwapStartSelect(enabled: Boolean) = controlsDelegate.setSwapStartSelect(viewModelScope, enabled)
     fun setQuickNavigation(enabled: Boolean) = controlsDelegate.setQuickNavigation(viewModelScope, enabled)
     fun setNavBarAutoHide(enabled: Boolean) = controlsDelegate.setNavBarAutoHide(viewModelScope, enabled)
+    fun setIgnoreControllerTouchpad(enabled: Boolean) =
+        controlsDelegate.setIgnoreControllerTouchpad(viewModelScope, enabled)
     fun setSelectLCombo(value: String) = controlsDelegate.setSelectLCombo(viewModelScope, value)
     fun setSelectRCombo(value: String) = controlsDelegate.setSelectRCombo(viewModelScope, value)
     fun setMenuWrapMode(mode: com.nendo.argosy.data.preferences.MenuWrapMode) = controlsDelegate.setMenuWrapMode(viewModelScope, mode)

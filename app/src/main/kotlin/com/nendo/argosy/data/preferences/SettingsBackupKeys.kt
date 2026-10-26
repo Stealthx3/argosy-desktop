@@ -180,6 +180,7 @@ object SettingsBackupKeys {
         SettingsBackupKey("nav_ring_routes", SettingsBackupType.STRING),
         SettingsBackupKey("quick_navigation", SettingsBackupType.BOOLEAN),
         SettingsBackupKey("nav_bar_auto_hide", SettingsBackupType.BOOLEAN),
+        SettingsBackupKey("ignore_controller_touchpad", SettingsBackupType.BOOLEAN),
         SettingsBackupKey("grip_reserve_enabled", SettingsBackupType.BOOLEAN),
         SettingsBackupKey("grip_reserve_mode", SettingsBackupType.STRING),
         SettingsBackupKey("grip_reserve_percent", SettingsBackupType.INT)

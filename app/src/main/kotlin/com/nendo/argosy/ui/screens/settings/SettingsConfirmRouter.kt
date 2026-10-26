@@ -1043,6 +1043,11 @@ private fun routeNavigationConfirm(vm: SettingsViewModel, state: SettingsUiState
             vm.setSwapStartSelect(swapped)
             return InputResult.toggled(swapped)
         }
+        NavigationItem.IgnoreControllerTouchpad -> {
+            val enabled = !state.controls.ignoreControllerTouchpad
+            vm.setIgnoreControllerTouchpad(enabled)
+            return InputResult.toggled(enabled)
+        }
         NavigationItem.QuickNavigation -> {
             val enabled = !state.controls.quickNavigation
             vm.setQuickNavigation(enabled)
