@@ -1087,7 +1087,8 @@ private fun routeLibraryViewConfirm(vm: SettingsViewModel, state: SettingsUiStat
             vm.setSortFavoritesFirst(!state.display.sortFavoritesFirst)
             InputResult.handled(SoundType.TOGGLE)
         }
-        LibraryItem.LayoutItem, LibraryItem.GridDensityItem, LibraryItem.BoxArtItem, LibraryItem.DefaultSource ->
+        LibraryItem.LayoutItem, LibraryItem.ListStyleItem, LibraryItem.GridDensityItem,
+        LibraryItem.BoxArtItem, LibraryItem.DefaultSource ->
             InputResult.handled(SoundType.SILENT)
         else -> {
             vm.requestEnumPicker(item.key)
