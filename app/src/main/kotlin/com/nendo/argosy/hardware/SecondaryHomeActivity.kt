@@ -286,6 +286,9 @@ class SecondaryHomeActivity :
 
     override fun onResume() {
         super.onResume()
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.Q) {
+            pointerGuard.onInFrontChanged(true)
+        }
         if (releaseUnsupportedDisplay()) return
         systemBars.apply()
         if (!::dsm.isInitialized) return
@@ -305,6 +308,23 @@ class SecondaryHomeActivity :
         isGameActive = store.hasActiveSession()
         isHardcore = store.isHardcore()
         currentChannelName = store.getChannelName()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.Q) {
+            pointerGuard.onInFrontChanged(false)
+        }
+    }
+
+    override fun onTopResumedActivityChanged(isTopResumedActivity: Boolean) {
+        super.onTopResumedActivityChanged(isTopResumedActivity)
+        pointerGuard.onInFrontChanged(isTopResumedActivity)
+    }
+
+    private fun setWindowTouchable(touchable: Boolean) {
+        val flag = android.view.WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+        if (touchable) window.clearFlags(flag) else window.addFlags(flag)
     }
 
     override fun onStop() {
@@ -332,6 +352,12 @@ class SecondaryHomeActivity :
     }
 
     private var mediaDimSwallowsTouch = false
+    private val pointerGuard = com.nendo.argosy.core.input.ControllerPointerGuard(
+        windowName = "companion",
+        scope = lifecycleScope,
+        sessionLive = { ::dsm.isInitialized && dsm.hasLiveSession() },
+        setWindowTouchable = ::setWindowTouchable
+    )
 
     /**
      * A gesture that begins while the media dim holds this window, at either stage, is a wake and
@@ -340,6 +366,7 @@ class SecondaryHomeActivity :
      * moved window focus here and key focus must land where any other tap would leave it.
      */
     override fun dispatchTouchEvent(event: android.view.MotionEvent): Boolean {
+        if (pointerGuard.consumes(event)) return true
         if (event.actionMasked == android.view.MotionEvent.ACTION_DOWN) {
             val dimmed = isMediaDimmed()
             if (::dsm.isInitialized) {
@@ -435,6 +462,7 @@ class SecondaryHomeActivity :
      * one a directly-delivered motion event gets.
      */
     override fun dispatchGenericMotionEvent(event: android.view.MotionEvent): Boolean {
+        if (pointerGuard.consumes(event)) return true
         val isJoystick = event.isFromSource(android.view.InputDevice.SOURCE_CLASS_JOYSTICK)
         if (isJoystick && ::dsm.isInitialized && !dsm.companionHoldsPrimary.value) {
             gamepadInputHandler.resetStickMotion()
@@ -762,6 +790,11 @@ class SecondaryHomeActivity :
         dsm.registerCompanionHost(hostDisplayId(), this)
         systemBars.follow(lifecycleScope, dsm.preferencesRepository.userPreferences)
         lifecycleScope.launch { dsm.companionAchievements.collect { companionAchievements = it } }
+        lifecycleScope.launch {
+            dsm.playSessionTracker.activeSession.collect { session ->
+                if (session == null) pointerGuard.release()
+            }
+        }
         lifecycleScope.launch {
             dsm.companionMediaVisible.collect { visible -> isMediaPanelVisible = visible }
         }
