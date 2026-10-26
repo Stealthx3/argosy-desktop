@@ -67,6 +67,8 @@ internal class DisplaysSectionInput(
                 return toggleLeftRight(direction, state.display.dualScreenMatchSize) { viewModel.setDualScreenMatchSize(it) }
             DisplaysItem.ScreenDimmer ->
                 return toggleLeftRight(direction, state.storage.screenDimmerEnabled) { viewModel.toggleScreenDimmer() }
+            DisplaysItem.LidSleep ->
+                return toggleLeftRight(direction, state.display.lidSleepEnabled) { viewModel.setLidSleepEnabled(it) }
             else -> {}
         }
         return InputResult.UNHANDLED

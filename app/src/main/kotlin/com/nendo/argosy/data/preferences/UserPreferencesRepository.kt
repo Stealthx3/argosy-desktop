@@ -234,6 +234,7 @@ class UserPreferencesRepository @Inject constructor(
             ambientLedAchievementFlash = display.ambientLedAchievementFlash,
             builtinLibretroEnabled = builtinEnabled,
             appDisplayTargets = app.appDisplayTargets,
+            lidSleepEnabled = display.lidSleepEnabled,
             dualScreenEnabled = display.dualScreenEnabled,
             displayRoleOverride = display.displayRoleOverride,
             gamesDisplayTarget = display.gamesDisplayTarget,
@@ -403,6 +404,7 @@ class UserPreferencesRepository @Inject constructor(
     suspend fun setScreenDimmerEnabled(enabled: Boolean) = displayPrefs.setScreenDimmerEnabled(enabled)
     suspend fun setScreenDimmerTimeoutMinutes(minutes: Int) = displayPrefs.setScreenDimmerTimeoutMinutes(minutes)
     suspend fun setScreenDimmerLevel(level: Int) = displayPrefs.setScreenDimmerLevel(level)
+    suspend fun setLidSleepEnabled(enabled: Boolean) = displayPrefs.setLidSleepEnabled(enabled)
     suspend fun setDualScreenEnabled(enabled: Boolean) = displayPrefs.setDualScreenEnabled(enabled)
     suspend fun setDisplayRoleOverride(override: DisplayRoleOverride) = displayPrefs.setDisplayRoleOverride(override)
     suspend fun setGamesDisplayTarget(target: EmulatorDisplayTarget) = displayPrefs.setGamesDisplayTarget(target)
@@ -992,6 +994,7 @@ data class UserPreferences(
     val ambientLedAchievementFlash: Boolean = true,
     val builtinLibretroEnabled: Boolean = true,
     val appDisplayTargets: Map<String, String> = emptyMap(),
+    val lidSleepEnabled: Boolean = true,
     val dualScreenEnabled: Boolean = false,
     val displayRoleOverride: DisplayRoleOverride = DisplayRoleOverride.AUTO,
     val gamesDisplayTarget: EmulatorDisplayTarget = EmulatorDisplayTarget.PRESENTATION,

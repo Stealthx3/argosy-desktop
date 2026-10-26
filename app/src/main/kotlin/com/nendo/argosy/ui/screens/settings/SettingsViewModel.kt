@@ -154,6 +154,7 @@ class SettingsViewModel @Inject constructor(
     private val connectedControllerTracker: com.nendo.argosy.core.input.ConnectedControllerTracker,
     internal val frameRegistry: com.nendo.argosy.libretro.frame.FrameRegistry,
     internal val displayAffinityHelper: com.nendo.argosy.util.DisplayAffinityHelper,
+    internal val lidSleepGuard: com.nendo.argosy.hardware.LidSleepGuard,
     internal val emulatorLaunchTargetResolver: com.nendo.argosy.ui.screens.common.EmulatorLaunchTargetResolver,
     internal val appsRepository: com.nendo.argosy.data.repository.AppsRepository,
     internal val socialRepository: SocialRepository,
@@ -303,6 +304,7 @@ class SettingsViewModel @Inject constructor(
         raDelegate.initialize(viewModelScope)
         displayDelegate.loadPreviewGame(viewModelScope)
         displayDelegate.observeScreenCapturePermission(viewModelScope)
+        displayDelegate.observeLidSleepService(viewModelScope, lidSleepGuard.serviceReady)
         permissionsDelegate.observeLockScreenArt(viewModelScope)
         routeStartControllerDetectionPolling(this)
         installerDelegate.observeJobs(viewModelScope)
@@ -1486,6 +1488,7 @@ class SettingsViewModel @Inject constructor(
     fun cycleAppLanguage(direction: Int = 1) = routeCycleAppLanguage(this, direction)
 
     fun setDualScreenEnabled(enabled: Boolean) = routeSetDualScreenEnabled(this, enabled)
+    fun setLidSleepEnabled(enabled: Boolean) = displayDelegate.setLidSleepEnabled(viewModelScope, enabled)
 
     fun setDualScreenMatchSize(enabled: Boolean) = displayDelegate.setDualScreenMatchSize(viewModelScope, enabled)
 
@@ -1606,6 +1609,7 @@ class SettingsViewModel @Inject constructor(
     fun showInstallerImePicker() = installerDelegate.showImePicker()
     fun openNotificationSettings() = permissionsDelegate.openNotificationSettings()
     fun openWriteSettings() = permissionsDelegate.openWriteSettings()
+    fun openAccessibilitySettings() = permissionsDelegate.openAccessibilitySettings()
     fun openDisplayOverlaySettings() = permissionsDelegate.openDisplayOverlaySettings()
 
     fun openLiveWallpaperPicker() = permissionsDelegate.openLiveWallpaperPicker()

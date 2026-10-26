@@ -334,6 +334,9 @@ data class DisplayState(
     val hasScreenCapturePermission: Boolean = true,
     val hasSecondaryDisplay: Boolean = false,
     val hasPhysicalSecondaryDisplay: Boolean = false,
+    val hasLidSensor: Boolean = false,
+    val lidSleepEnabled: Boolean = true,
+    val lidSleepServiceReady: Boolean = false,
     val dualScreenEnabled: Boolean = false,
     val dualScreenMatchSize: Boolean = false,
     val dualScreenMatchSizeAvailable: Boolean = false,
@@ -1612,6 +1615,8 @@ data class PermissionsState(
     val isWriteSettingsRelevant: Boolean = false,
     val hasScreenCapture: Boolean = false,
     val isScreenCaptureRelevant: Boolean = false,
+    val hasAccessibilityService: Boolean = false,
+    val isAccessibilityServiceRelevant: Boolean = false,
     val hasDisplayOverlay: Boolean = false,
     val hasLiveWallpaper: Boolean = false,
     val isLiveWallpaperRelevant: Boolean = false
@@ -1623,6 +1628,7 @@ data class PermissionsState(
             hasNotificationPermission,
             hasWriteSettings.takeIf { isWriteSettingsRelevant },
             hasScreenCapture.takeIf { isScreenCaptureRelevant },
+            hasAccessibilityService.takeIf { isAccessibilityServiceRelevant },
             hasDisplayOverlay,
             hasLiveWallpaper.takeIf { isLiveWallpaperRelevant }
         )

@@ -592,6 +592,13 @@ class DisplaySettingsDelegate @Inject constructor(
         }
     }
 
+    fun setLidSleepEnabled(scope: CoroutineScope, enabled: Boolean) {
+        scope.launch {
+            preferencesRepository.setLidSleepEnabled(enabled)
+            _state.update { it.copy(lidSleepEnabled = enabled) }
+        }
+    }
+
     fun setPreLaunchRecaps(scope: CoroutineScope, enabled: Boolean) {
         scope.launch {
             preferencesRepository.setPreLaunchRecapsEnabled(enabled)
@@ -1063,6 +1070,14 @@ class DisplaySettingsDelegate @Inject constructor(
         scope.launch {
             screenCaptureManager.hasPermission.collect { hasPermission ->
                 _state.update { it.copy(hasScreenCapturePermission = hasPermission) }
+            }
+        }
+    }
+
+    fun observeLidSleepService(scope: CoroutineScope, serviceReady: kotlinx.coroutines.flow.Flow<Boolean>) {
+        scope.launch {
+            serviceReady.collect { ready ->
+                _state.update { it.copy(lidSleepServiceReady = ready) }
             }
         }
     }
