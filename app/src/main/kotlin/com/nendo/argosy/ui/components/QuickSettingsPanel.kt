@@ -26,8 +26,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.VolumeOff
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
-import androidx.compose.material.icons.filled.Bluetooth
-import androidx.compose.material.icons.filled.BluetoothDisabled
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Layers
 import androidx.compose.material.icons.filled.LightMode
@@ -38,8 +36,6 @@ import androidx.compose.material.icons.filled.SportsEsports
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.Toys
 import androidx.compose.material.icons.filled.Vibration
-import androidx.compose.material.icons.filled.Wifi
-import androidx.compose.material.icons.filled.WifiOff
 import androidx.compose.material.icons.outlined.Monitor
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -89,6 +85,7 @@ fun QuickSettingsPanel(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
     friendsPage: @Composable () -> Unit = {},
+    connectionsPage: @Composable () -> Unit = {},
     musicPage: @Composable () -> Unit = {},
     footerHints: List<Pair<InputButton, String>> = emptyList(),
     onHintClick: ((InputButton) -> Unit)? = null
@@ -141,6 +138,7 @@ fun QuickSettingsPanel(
                     Box(modifier = Modifier.weight(1f)) {
                         when (activePage) {
                             QuickSettingsPage.FRIENDS -> friendsPage()
+                            QuickSettingsPage.CONNECTIONS -> connectionsPage()
                             QuickSettingsPage.MUSIC -> musicPage()
                             else -> QuickSettingsList(
                                 page = activePage,
@@ -169,8 +167,8 @@ private fun quickPanelWidthFor(page: QuickSettingsPage): Dp {
     val cap = LocalConfiguration.current.screenWidthDp.dp * WIDE_PAGE_MAX_SCREEN_FRACTION
     val width = when (page) {
         QuickSettingsPage.MUSIC -> Dimens.quickPanelWidthMedia
-        QuickSettingsPage.FRIENDS, QuickSettingsPage.QUICK, QuickSettingsPage.PERFORMANCE ->
-            Dimens.quickPanelWidthWide
+        QuickSettingsPage.FRIENDS, QuickSettingsPage.QUICK, QuickSettingsPage.PERFORMANCE,
+        QuickSettingsPage.CONNECTIONS -> Dimens.quickPanelWidthWide
     }
     return min(width, cap)
 }
@@ -445,54 +443,6 @@ private fun QuickSettingsItemRow(
             onToggle = controller::setSwapStartSelect
         )
 
-        QuickSettingsItem.Wifi -> {
-            val icon = if (state.wifiEnabled) Icons.Default.Wifi else Icons.Default.WifiOff
-            val label = stringResource(R.string.ui_quick_settings_wifi)
-            val status = stringResource(
-                when {
-                    !state.wifiEnabled -> R.string.ui_quick_settings_radio_off
-                    state.wifiConnected -> R.string.ui_quick_settings_wifi_connected
-                    else -> R.string.ui_quick_settings_wifi_not_connected
-                }
-            )
-            if (state.radiosSwitchable) {
-                QuickToggleRow(
-                    icon = icon,
-                    label = label,
-                    checked = state.wifiEnabled,
-                    isFocused = isFocused,
-                    onFocus = focus,
-                    onToggle = controller::setWifiEnabled,
-                    description = status.takeIf { state.wifiEnabled }
-                )
-            } else {
-                QuickStatusRow(icon = icon, label = label, valueText = status)
-            }
-        }
-
-        QuickSettingsItem.Bluetooth -> {
-            val icon = if (state.bluetoothEnabled) Icons.Default.Bluetooth else Icons.Default.BluetoothDisabled
-            val label = stringResource(R.string.ui_quick_settings_bluetooth)
-            if (state.radiosSwitchable) {
-                QuickToggleRow(
-                    icon = icon,
-                    label = label,
-                    checked = state.bluetoothEnabled,
-                    isFocused = isFocused,
-                    onFocus = focus,
-                    onToggle = controller::setBluetoothEnabled
-                )
-            } else {
-                QuickStatusRow(
-                    icon = icon,
-                    label = label,
-                    valueText = stringResource(
-                        if (state.bluetoothEnabled) R.string.ui_quick_settings_radio_on else R.string.ui_quick_settings_radio_off
-                    )
-                )
-            }
-        }
-
         QuickSettingsItem.DeviceAccess -> QuickNoticeRow(
             message = stringResource(R.string.ui_quick_settings_device_access_notice),
             actionLabel = stringResource(R.string.ui_quick_settings_device_access_allow),
@@ -569,7 +519,7 @@ private fun QuickSettingsItemRow(
             description = stringResource(R.string.ui_quick_settings_hud_description)
         )
 
-        QuickSettingsItem.FriendsPage, QuickSettingsItem.MusicPlayer -> Unit
+        QuickSettingsItem.FriendsPage, QuickSettingsItem.ConnectionsPage, QuickSettingsItem.MusicPlayer -> Unit
     }
 }
 

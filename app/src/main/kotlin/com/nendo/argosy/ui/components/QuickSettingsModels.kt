@@ -6,6 +6,7 @@ import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.nendo.argosy.R
 import com.nendo.argosy.data.preferences.ControlsPreferences
@@ -71,11 +72,7 @@ data class QuickSettingsState(
     val hudEnabled: Boolean = false,
     val isSocialLinked: Boolean = false,
     val isSocialConnected: Boolean = false,
-    val quayPassEnabled: Boolean = false,
-    val wifiEnabled: Boolean = false,
-    val wifiConnected: Boolean = false,
-    val bluetoothEnabled: Boolean = false,
-    val radiosSwitchable: Boolean = false
+    val quayPassEnabled: Boolean = false
 ) {
     val deviceControlsLocked: Boolean get() = deviceSettingsSupported && !deviceSettingsEnabled
 }
@@ -84,6 +81,7 @@ enum class QuickSettingsPage(val icon: ImageVector, @StringRes val titleRes: Int
     FRIENDS(Icons.Default.Group, R.string.ui_quick_settings_page_friends),
     QUICK(Icons.Default.Tune, R.string.ui_quick_settings_title),
     PERFORMANCE(Icons.Default.Speed, R.string.ui_quick_settings_page_performance),
+    CONNECTIONS(Icons.Default.Wifi, R.string.ui_quick_settings_page_connections),
     MUSIC(Icons.Default.MusicNote, R.string.ui_quick_settings_page_music)
 }
 
@@ -91,7 +89,6 @@ enum class QuickSettingsGroup(val page: QuickSettingsPage, @StringRes val titleR
     DISPLAY(QuickSettingsPage.QUICK, R.string.ui_quick_settings_group_display),
     SOUND(QuickSettingsPage.QUICK, R.string.ui_quick_settings_group_audio),
     CONTROLS(QuickSettingsPage.QUICK, R.string.ui_quick_settings_group_controls),
-    CONNECTIONS(QuickSettingsPage.QUICK, R.string.ui_quick_settings_group_connections),
     PERFORMANCE(QuickSettingsPage.PERFORMANCE, R.string.ui_quick_settings_group_performance),
     FAN(QuickSettingsPage.PERFORMANCE, R.string.ui_quick_settings_group_fan),
     OVERLAY(QuickSettingsPage.PERFORMANCE, R.string.ui_quick_settings_group_overlay)
@@ -134,13 +131,6 @@ sealed class QuickSettingsItem(
     data object SwapXY : QuickSettingsItem("swapXY", QuickSettingsPage.QUICK, QuickSettingsGroup.CONTROLS)
     data object SwapStartSelect : QuickSettingsItem("swapStartSelect", QuickSettingsPage.QUICK, QuickSettingsGroup.CONTROLS)
 
-    data object Wifi : QuickSettingsItem("wifi", QuickSettingsPage.QUICK, QuickSettingsGroup.CONNECTIONS) {
-        override fun isFocusable(state: QuickSettingsState): Boolean = state.radiosSwitchable
-    }
-    data object Bluetooth : QuickSettingsItem("bluetooth", QuickSettingsPage.QUICK, QuickSettingsGroup.CONNECTIONS) {
-        override fun isFocusable(state: QuickSettingsState): Boolean = state.radiosSwitchable
-    }
-
     data object DeviceAccess : QuickSettingsItem(
         "deviceAccess", QuickSettingsPage.PERFORMANCE,
         visibleWhen = { it.deviceControlsLocked }
@@ -175,13 +165,14 @@ sealed class QuickSettingsItem(
         visibleWhen = { it.isSocialLinked || it.isSocialConnected }
     )
 
+    data object ConnectionsPage : QuickSettingsItem("connectionsPage", QuickSettingsPage.CONNECTIONS)
+
     data object MusicPlayer : QuickSettingsItem("musicPlayer", QuickSettingsPage.MUSIC)
 
     companion object {
         private val DisplayHeader = Header(QuickSettingsGroup.DISPLAY)
         private val SoundHeader = Header(QuickSettingsGroup.SOUND)
         private val ControlsHeader = Header(QuickSettingsGroup.CONTROLS)
-        private val ConnectionsHeader = Header(QuickSettingsGroup.CONNECTIONS)
         private val PerformanceHeader = Header(QuickSettingsGroup.PERFORMANCE)
         private val FanHeader = Header(QuickSettingsGroup.FAN)
         private val OverlayHeader = Header(QuickSettingsGroup.OVERLAY)
@@ -192,11 +183,11 @@ sealed class QuickSettingsItem(
                 DisplayHeader, Theme, Accent, ScreenBrightness, SecondScreenBrightness, SwapDisplays,
                 SoundHeader, SystemVolume, UISounds,
                 ControlsHeader, Haptic, SwapAB, SwapXY, SwapStartSelect,
-                ConnectionsHeader, Wifi, Bluetooth,
                 DeviceAccess,
                 PerformanceHeader, Performance, Refresh,
                 FanHeader, Fan, FanSpeed,
                 OverlayHeader, HudOverlay,
+                ConnectionsPage,
                 MusicPlayer
             )
     }

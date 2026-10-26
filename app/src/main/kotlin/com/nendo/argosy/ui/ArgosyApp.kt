@@ -72,6 +72,10 @@ import com.nendo.argosy.ui.components.MainDrawer
 import com.nendo.argosy.ui.components.QuickSettingsInputRouter
 import com.nendo.argosy.ui.components.QuickSettingsPage
 import com.nendo.argosy.ui.components.QuickSettingsPanel
+import com.nendo.argosy.ui.components.connections.QuickConnectionsEffects
+import com.nendo.argosy.ui.components.connections.QuickConnectionsInputHandler
+import com.nendo.argosy.ui.components.connections.QuickConnectionsModals
+import com.nendo.argosy.ui.components.connections.QuickSettingsConnectionsPage
 import com.nendo.argosy.ui.components.friends.QuickFriendsInputHandler
 import com.nendo.argosy.ui.components.friends.QuickFriendsModals
 import com.nendo.argosy.ui.components.friends.QuickSettingsFriendsPage
@@ -154,6 +158,7 @@ fun ArgosyApp(
     val quickSettingsPage by viewModel.quickSettings.page.collectAsState()
     val quickSettingsState by viewModel.quickSettings.state.collectAsState()
     val quickFriendsState by viewModel.quickFriends.state.collectAsState()
+    val quickConnectionsState by viewModel.quickConnections.state.collectAsState()
     val musicPlayerUiState by musicPlayerViewModel.uiState.collectAsState()
     val screenDimmerPrefs by viewModel.screenDimmerPreferences.collectAsState()
     val isEmulatorRunning by viewModel.isEmulatorRunning.collectAsState()
@@ -488,8 +493,16 @@ fun ArgosyApp(
         )
     }
 
+    val quickConnectionsInputHandler = remember(viewModel) {
+        QuickConnectionsInputHandler(
+            controller = viewModel.quickConnections,
+            wrapMode = { viewModel.uiState.value.menuWrapMode }
+        )
+    }
+
     val quickSettingsInputHandler = remember(
-        viewModel, musicPlayerViewModel, inputDispatcher, openRommSignIn, openDeviceAccess, quickFriendsInputHandler
+        viewModel, musicPlayerViewModel, inputDispatcher, openRommSignIn, openDeviceAccess, quickFriendsInputHandler,
+        quickConnectionsInputHandler
     ) {
         QuickSettingsInputRouter(
             panelHandler = viewModel.quickSettings.createInputHandler(
@@ -501,6 +514,7 @@ fun ArgosyApp(
             ),
             pageHandlers = mapOf(
                 QuickSettingsPage.FRIENDS to quickFriendsInputHandler,
+                QuickSettingsPage.CONNECTIONS to quickConnectionsInputHandler,
                 QuickSettingsPage.MUSIC to MusicPlayerInputHandler(musicPlayerViewModel, openRommSignIn)
             ),
             activePage = { viewModel.quickSettings.activePage() }
@@ -511,6 +525,11 @@ fun ArgosyApp(
     LaunchedEffect(musicPageVisible) {
         if (!musicPageVisible) musicPlayerViewModel.onPageHidden()
     }
+
+    QuickConnectionsEffects(
+        controller = viewModel.quickConnections,
+        pageVisible = isQuickSettingsOpen && quickSettingsPage == QuickSettingsPage.CONNECTIONS
+    )
 
     val openQuickSettings = remember(quickSettingsInputHandler) {
         wizardGuard@{
@@ -1383,6 +1402,13 @@ fun ArgosyApp(
                         onActionClick = { index, action -> quickFriendsInputHandler.tapAction(index, action) }
                     )
                 },
+                connectionsPage = {
+                    QuickSettingsConnectionsPage(
+                        state = quickConnectionsState,
+                        onRowClick = quickConnectionsInputHandler::tapRow,
+                        onForget = quickConnectionsInputHandler::tapForget
+                    )
+                },
                 musicPage = {
                     QuickSettingsMusicPage(viewModel = musicPlayerViewModel, onOpenRommSignIn = openRommSignIn)
                 },
@@ -1398,6 +1424,8 @@ fun ArgosyApp(
                 onOpenProfile = quickFriendsInputHandler::openProfile,
                 onEditAvatar = quickFriendsInputHandler::editAvatar
             )
+
+            QuickConnectionsModals(state = quickConnectionsState, controller = viewModel.quickConnections)
 
             saveConflictInfo?.let { info ->
                 SaveConflictModal(

@@ -1215,8 +1215,6 @@
     <!-- Row of that panel, on a device with two screens. Verb phrase: puts each screen in the
          other's role. -->
     <string name="ui_quick_settings_swap_displays">Swap screens</string>
-    <!-- Section header in that panel. Noun: the device's wireless radios. -->
-    <string name="ui_quick_settings_group_connections">Connections</string>
     <!-- Row of that panel. Name of the wireless network radio; usually kept as is. -->
     <string name="ui_quick_settings_wifi">Wi-Fi</string>
     <!-- Row of that panel. Name of the short-range radio for controllers and headphones. -->
@@ -1250,6 +1248,74 @@
     <string name="ui_quick_settings_page_performance">Performance</string>
     <!-- Title of the page of that panel holding the social rows. Noun, plural. -->
     <string name="ui_quick_settings_page_friends">Friends</string>
+    <!-- Title of the page of that panel holding the Wi-Fi and Bluetooth rows. Noun, plural: the
+         device's wireless links. -->
+    <string name="ui_quick_settings_page_connections">Connections</string>
+    <!-- Connections page, on a device where Argosy cannot switch the radios or join networks.
+         Shown alone below the Wi-Fi and Bluetooth status rows. Full sentence. -->
+    <string name="ui_quick_connections_unsupported">This device doesn\'t allow direct Wi-Fi and Bluetooth control</string>
+    <!-- Connections page heading over the Wi-Fi rows. Name of the wireless network radio. Shown
+         in capitals. -->
+    <string name="ui_quick_connections_group_wifi">Wi-Fi</string>
+    <!-- Connections page heading over the Bluetooth rows. Name of the short-range radio. Shown in
+         capitals. -->
+    <string name="ui_quick_connections_group_bluetooth">Bluetooth</string>
+    <!-- Connections page heading over the Wi-Fi networks in range that the device can join. Noun
+         phrase. Shown in capitals. -->
+    <string name="ui_quick_connections_nearby">Nearby networks</string>
+    <!-- Connections page heading over the Wi-Fi networks the device remembers. Noun phrase.
+         Shown in capitals. -->
+    <string name="ui_quick_connections_saved">Saved networks</string>
+    <!-- Connections page heading over the Bluetooth devices paired with this device. Noun
+         phrase. Shown in capitals. -->
+    <string name="ui_quick_connections_paired">Paired devices</string>
+    <!-- Connections page, under Nearby networks while the device looks for networks in range.
+         Verb phrase in progress. -->
+    <string name="ui_quick_connections_scanning">Searching for networks</string>
+    <!-- Connections page, under Nearby networks when the search found nothing to join. -->
+    <string name="ui_quick_connections_no_networks">No networks found</string>
+    <!-- Connections page, under Paired devices when no Bluetooth device is paired. -->
+    <string name="ui_quick_connections_no_paired">No paired devices</string>
+    <!-- Value beside a nearby network while the device joins it. Verb, in progress; keep
+         short. -->
+    <string name="ui_quick_connections_row_joining">Joining</string>
+    <!-- Value beside a nearby network the device could not join. Keep short. -->
+    <string name="ui_quick_connections_row_failed">Couldn\'t join</string>
+    <!-- Description of the lock icon beside a nearby network that needs a password.
+         Adjective. -->
+    <string name="ui_quick_connections_secured">Secured</string>
+    <!-- Button on a saved network that makes the device stop remembering it. Verb. -->
+    <string name="ui_quick_connections_forget">Forget</string>
+    <!-- Connections page notice when Argosy may not read the paired Bluetooth devices. Full
+         sentence. -->
+    <string name="ui_quick_connections_bluetooth_permission">Argosy needs permission to show paired devices.</string>
+    <!-- Button beside that notice that asks for the permission. Verb. -->
+    <string name="ui_quick_connections_bluetooth_permission_allow">Allow</string>
+    <!-- Value beside a paired Bluetooth device that is linked right now. Adjective. -->
+    <string name="ui_quick_connections_device_connected">Connected</string>
+    <!-- Value beside a paired Bluetooth device that is not linked right now. Adjective. -->
+    <string name="ui_quick_connections_device_not_connected">Not connected</string>
+    <!-- Battery charge of a connected controller, for example "80%". %1$d is the number. -->
+    <string name="ui_quick_connections_battery">%1$d%%</string>
+    <!-- Wi-Fi frequency band of the current network. Keep the unit abbreviation. -->
+    <string name="ui_quick_connections_band_2_4">2.4 GHz</string>
+    <!-- Wi-Fi frequency band of the current network. Keep the unit abbreviation. -->
+    <string name="ui_quick_connections_band_5">5 GHz</string>
+    <!-- Wi-Fi frequency band of the current network. Keep the unit abbreviation. -->
+    <string name="ui_quick_connections_band_6">6 GHz</string>
+    <!-- Title of the dialog that asks for a Wi-Fi password. %1$s is the network name. Verb
+         phrase: connect to that network. -->
+    <string name="ui_quick_connections_join_title">Join %1$s</string>
+    <!-- Label of the field in that dialog where the Wi-Fi password goes. Noun. -->
+    <string name="ui_quick_connections_join_password">Password</string>
+    <!-- Button in that dialog that connects to the network. Verb. -->
+    <string name="ui_quick_connections_join_confirm">Join</string>
+    <!-- That same button while the device is connecting. Verb, in progress. -->
+    <string name="ui_quick_connections_join_busy">Joining</string>
+    <!-- Button in that dialog that closes it without connecting. Verb. -->
+    <string name="ui_quick_connections_join_cancel">Cancel</string>
+    <!-- Error in that dialog when the device refused to join the network. Full sentence. -->
+    <string name="ui_quick_connections_join_failed">The device couldn\'t join this network.</string>
     <!-- Title of the page of that panel holding the background music row. Noun. -->
     <string name="ui_quick_settings_page_music">Music</string>
     <!-- Section heading on that panel over the theme and brightness rows. Noun. Shown in

@@ -212,13 +212,28 @@ internal fun QuickStatusRow(
     label: String,
     valueText: String
 ) {
-    QuickRowFrame(isFocused = false, onClick = null) {
+    QuickDetailRow(icon = icon, label = label, isFocused = false, onClick = null, valueText = valueText)
+}
+
+@Composable
+internal fun QuickDetailRow(
+    icon: ImageVector,
+    label: String,
+    isFocused: Boolean,
+    onClick: (() -> Unit)?,
+    valueText: String? = null,
+    trailing: @Composable RowScope.() -> Unit = {}
+) {
+    QuickRowFrame(isFocused = isFocused, onClick = onClick) {
         QuickLabelLine(
             label = label,
-            leading = { QuickRowIcon(icon, isFocused = false) }
+            leading = { QuickRowIcon(icon, isFocused) }
         ) {
-            Spacer(modifier = Modifier.width(Dimens.spacingSm))
-            QuickValueText(valueText, isFocused = false)
+            if (valueText != null) {
+                Spacer(modifier = Modifier.width(Dimens.spacingSm))
+                QuickValueText(valueText, isFocused)
+            }
+            trailing()
         }
     }
 }

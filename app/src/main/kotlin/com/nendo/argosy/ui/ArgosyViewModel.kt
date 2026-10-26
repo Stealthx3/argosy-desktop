@@ -41,6 +41,7 @@ import com.nendo.argosy.hardware.DevicePerformanceResolver
 import com.nendo.argosy.hardware.VolumeController
 import com.nendo.argosy.ui.components.QuickSettingsController
 import com.nendo.argosy.ui.components.friends.QuickFriendsController
+import com.nendo.argosy.ui.components.connections.QuickConnectionsController
 import com.nendo.argosy.ui.components.InputButton
 import com.nendo.argosy.data.repository.GameRepository
 import com.nendo.argosy.ui.input.InputDispatcher.Companion.computeWrappedIndex
@@ -334,13 +335,14 @@ class ArgosyViewModel @Inject constructor(
 
     val quickFriends = QuickFriendsController(socialRepository, preferencesRepository, viewModelScope)
 
+    val quickConnections = QuickConnectionsController(radioController, viewModelScope)
+
     val quickSettings = QuickSettingsController(
         preferencesRepository = preferencesRepository,
         brightnessController = brightnessController,
         volumeController = volumeController,
         performanceResolver = performanceResolver,
         refreshController = displayRefreshController,
-        radioController = radioController,
         socialRepository = socialRepository,
         hapticManager = hapticManager,
         soundManager = soundManager,

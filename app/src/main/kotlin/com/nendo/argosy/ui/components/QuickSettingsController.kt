@@ -14,8 +14,6 @@ import com.nendo.argosy.hardware.DevicePerformanceResolver
 import com.nendo.argosy.hardware.DisplayRefreshController
 import com.nendo.argosy.hardware.FanController
 import com.nendo.argosy.hardware.PerformanceMode
-import com.nendo.argosy.hardware.RadioController
-import com.nendo.argosy.hardware.RadioStatus
 import com.nendo.argosy.hardware.VolumeController
 import com.nendo.argosy.ui.components.friends.QuickFriendsController
 import com.nendo.argosy.ui.input.HapticFeedbackManager
@@ -52,7 +50,6 @@ private const val BRIGHTNESS_ECHO_GUARD_MS = 750L
 private const val DEVICE_SETTLE_MS = 100L
 private const val SETTING_FAN_MODE = "fan_mode"
 private const val SETTING_FAN_SPEED = "fan_speed"
-private val RADIO_SETTLE_MS = listOf(1_000L, 2_000L, 3_000L)
 
 private data class DeviceSettings(
     val fanMode: FanMode = FanMode.SMART,
@@ -77,11 +74,6 @@ private data class DualScreenFlags(
     val rolesSwapped: Boolean = false
 )
 
-private data class RadioState(
-    val status: RadioStatus = RadioStatus(),
-    val switchable: Boolean = false
-)
-
 /**
  * State, actions and gamepad input of the quick settings panel. [state] is the single source the
  * panel renders and the input handler reads.
@@ -92,7 +84,6 @@ class QuickSettingsController(
     private val volumeController: VolumeController,
     private val performanceResolver: DevicePerformanceResolver,
     private val refreshController: DisplayRefreshController,
-    private val radioController: RadioController,
     socialRepository: SocialRepository,
     private val hapticManager: HapticFeedbackManager,
     private val soundManager: SoundFeedbackManager,
@@ -113,7 +104,6 @@ class QuickSettingsController(
     private val device = MutableStateFlow(DeviceSettings())
     private var performance: DevicePerformance? = null
     private val dualScreen = MutableStateFlow(DualScreenFlags())
-    private val radios = MutableStateFlow(RadioState())
     private val levels = MutableStateFlow(
         DisplayLevels(
             volume = QuickSettingsState().systemVolume,
@@ -136,9 +126,8 @@ class QuickSettingsController(
         preferencesRepository.userPreferences,
         hudEnabled,
         socialRepository.connectionState,
-        combine(device, levels, dualScreen) { d, l, s -> Triple(d, l, s) },
-        radios
-    ) { prefs, hud, social, (deviceSettings, displayLevels, screens), radioState ->
+        combine(device, levels, dualScreen) { d, l, s -> Triple(d, l, s) }
+    ) { prefs, hud, social, (deviceSettings, displayLevels, screens) ->
         QuickSettingsState(
             themeMode = prefs.themeMode,
             primaryColor = prefs.primaryColor,
@@ -165,11 +154,7 @@ class QuickSettingsController(
             hudEnabled = hud,
             isSocialLinked = prefs.isSocialLinked,
             isSocialConnected = social is SocialConnectionState.Connected,
-            quayPassEnabled = prefs.quayPassEnabled,
-            wifiEnabled = radioState.status.wifiEnabled,
-            wifiConnected = radioState.status.wifiConnected,
-            bluetoothEnabled = radioState.status.bluetoothEnabled,
-            radiosSwitchable = radioState.switchable
+            quayPassEnabled = prefs.quayPassEnabled
         )
     }.stateIn(
         scope = scope,
@@ -184,7 +169,6 @@ class QuickSettingsController(
             quickFriends.resetFocus()
             loadDeviceSettings()
             refreshDisplayLevels()
-            refreshRadios()
         } else {
             quickFriends.dismissModal()
         }
@@ -335,34 +319,6 @@ class QuickSettingsController(
             if (!brightnessController.setSecondaryBrightness(coerced)) {
                 val stored = brightnessController.secondaryBrightness()
                 levels.update { it.copy(secondaryBrightness = stored) }
-            }
-        }
-    }
-
-    private fun refreshRadios() {
-        scope.launch(deviceDispatcher) {
-            radios.update { RadioState(status = radioController.status(), switchable = radioController.canToggle) }
-        }
-    }
-
-    fun setWifiEnabled(enabled: Boolean) {
-        if (!radios.value.switchable) return
-        radios.update { it.copy(status = it.status.copy(wifiEnabled = enabled, wifiConnected = false)) }
-        switchRadio { radioController.setWifiEnabled(enabled) }
-    }
-
-    fun setBluetoothEnabled(enabled: Boolean) {
-        if (!radios.value.switchable) return
-        radios.update { it.copy(status = it.status.copy(bluetoothEnabled = enabled)) }
-        switchRadio { radioController.setBluetoothEnabled(enabled) }
-    }
-
-    private fun switchRadio(apply: () -> Boolean) {
-        scope.launch(deviceDispatcher) {
-            apply()
-            RADIO_SETTLE_MS.forEach { wait ->
-                delay(wait)
-                radios.update { it.copy(status = radioController.status()) }
             }
         }
     }
@@ -531,10 +487,6 @@ class QuickSettingsController(
                 toggleLeftRight(delta, snapshot.swapXY, ::setSwapXY)
             QuickSettingsItem.SwapStartSelect ->
                 toggleLeftRight(delta, snapshot.swapStartSelect, ::setSwapStartSelect)
-            QuickSettingsItem.Wifi ->
-                toggleLeftRight(delta, snapshot.wifiEnabled, ::setWifiEnabled)
-            QuickSettingsItem.Bluetooth ->
-                toggleLeftRight(delta, snapshot.bluetoothEnabled, ::setBluetoothEnabled)
             QuickSettingsItem.Performance -> stepOption(
                 snapshot.performanceModes,
                 snapshot.performanceMode ?: PerformanceMode.BALANCED,
@@ -583,16 +535,6 @@ class QuickSettingsController(
             QuickSettingsItem.SwapStartSelect -> {
                 val enabled = !snapshot.swapStartSelect
                 setSwapStartSelect(enabled)
-                InputResult.toggled(enabled)
-            }
-            QuickSettingsItem.Wifi -> {
-                val enabled = !snapshot.wifiEnabled
-                setWifiEnabled(enabled)
-                InputResult.toggled(enabled)
-            }
-            QuickSettingsItem.Bluetooth -> {
-                val enabled = !snapshot.bluetoothEnabled
-                setBluetoothEnabled(enabled)
                 InputResult.toggled(enabled)
             }
             QuickSettingsItem.HudOverlay -> {
