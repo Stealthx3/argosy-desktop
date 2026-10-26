@@ -71,7 +71,11 @@ data class QuickSettingsState(
     val hudEnabled: Boolean = false,
     val isSocialLinked: Boolean = false,
     val isSocialConnected: Boolean = false,
-    val quayPassEnabled: Boolean = false
+    val quayPassEnabled: Boolean = false,
+    val wifiEnabled: Boolean = false,
+    val wifiConnected: Boolean = false,
+    val bluetoothEnabled: Boolean = false,
+    val radiosSwitchable: Boolean = false
 ) {
     val deviceControlsLocked: Boolean get() = deviceSettingsSupported && !deviceSettingsEnabled
 }
@@ -87,6 +91,7 @@ enum class QuickSettingsGroup(val page: QuickSettingsPage, @StringRes val titleR
     DISPLAY(QuickSettingsPage.QUICK, R.string.ui_quick_settings_group_display),
     SOUND(QuickSettingsPage.QUICK, R.string.ui_quick_settings_group_audio),
     CONTROLS(QuickSettingsPage.QUICK, R.string.ui_quick_settings_group_controls),
+    CONNECTIONS(QuickSettingsPage.QUICK, R.string.ui_quick_settings_group_connections),
     PERFORMANCE(QuickSettingsPage.PERFORMANCE, R.string.ui_quick_settings_group_performance),
     FAN(QuickSettingsPage.PERFORMANCE, R.string.ui_quick_settings_group_fan),
     OVERLAY(QuickSettingsPage.PERFORMANCE, R.string.ui_quick_settings_group_overlay)
@@ -129,6 +134,13 @@ sealed class QuickSettingsItem(
     data object SwapXY : QuickSettingsItem("swapXY", QuickSettingsPage.QUICK, QuickSettingsGroup.CONTROLS)
     data object SwapStartSelect : QuickSettingsItem("swapStartSelect", QuickSettingsPage.QUICK, QuickSettingsGroup.CONTROLS)
 
+    data object Wifi : QuickSettingsItem("wifi", QuickSettingsPage.QUICK, QuickSettingsGroup.CONNECTIONS) {
+        override fun isFocusable(state: QuickSettingsState): Boolean = state.radiosSwitchable
+    }
+    data object Bluetooth : QuickSettingsItem("bluetooth", QuickSettingsPage.QUICK, QuickSettingsGroup.CONNECTIONS) {
+        override fun isFocusable(state: QuickSettingsState): Boolean = state.radiosSwitchable
+    }
+
     data object DeviceAccess : QuickSettingsItem(
         "deviceAccess", QuickSettingsPage.PERFORMANCE,
         visibleWhen = { it.deviceControlsLocked }
@@ -169,6 +181,7 @@ sealed class QuickSettingsItem(
         private val DisplayHeader = Header(QuickSettingsGroup.DISPLAY)
         private val SoundHeader = Header(QuickSettingsGroup.SOUND)
         private val ControlsHeader = Header(QuickSettingsGroup.CONTROLS)
+        private val ConnectionsHeader = Header(QuickSettingsGroup.CONNECTIONS)
         private val PerformanceHeader = Header(QuickSettingsGroup.PERFORMANCE)
         private val FanHeader = Header(QuickSettingsGroup.FAN)
         private val OverlayHeader = Header(QuickSettingsGroup.OVERLAY)
@@ -179,6 +192,7 @@ sealed class QuickSettingsItem(
                 DisplayHeader, Theme, Accent, ScreenBrightness, SecondScreenBrightness, SwapDisplays,
                 SoundHeader, SystemVolume, UISounds,
                 ControlsHeader, Haptic, SwapAB, SwapXY, SwapStartSelect,
+                ConnectionsHeader, Wifi, Bluetooth,
                 DeviceAccess,
                 PerformanceHeader, Performance, Refresh,
                 FanHeader, Fan, FanSpeed,

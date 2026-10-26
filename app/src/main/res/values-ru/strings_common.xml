@@ -1060,6 +1060,13 @@
     <string name="home_grid_local_video_row_title">Выбрать видео на этом устройстве</string>
     <string name="home_grid_local_video_row_subtitle">Воспроизводится прямо из хранилища</string>
     <string name="ui_quick_settings_swap_displays">Поменять экраны</string>
+    <string name="ui_quick_settings_group_connections">Подключения</string>
+    <string name="ui_quick_settings_wifi">Wi-Fi</string>
+    <string name="ui_quick_settings_bluetooth">Bluetooth</string>
+    <string name="ui_quick_settings_radio_on">Вкл.</string>
+    <string name="ui_quick_settings_radio_off">Выкл.</string>
+    <string name="ui_quick_settings_wifi_connected">Подключено</string>
+    <string name="ui_quick_settings_wifi_not_connected">Не подключено</string>
     <string name="ui_sibling_choice_title_download">ВАРИАНТ ДЛЯ ЗАГРУЗКИ</string>
     <string name="ui_sibling_choice_title_active">АКТИВНЫЙ ВАРИАНТ</string>
     <string name="ui_sibling_choice_automatic">Автоматически</string>

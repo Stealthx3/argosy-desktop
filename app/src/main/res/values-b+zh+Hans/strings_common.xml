@@ -949,6 +949,13 @@
     <string name="home_grid_local_video_row_title">选择此设备上的视频</string>
     <string name="home_grid_local_video_row_subtitle">直接从存储中播放</string>
     <string name="ui_quick_settings_swap_displays">交换显示屏</string>
+    <string name="ui_quick_settings_group_connections">连接</string>
+    <string name="ui_quick_settings_wifi">Wi-Fi</string>
+    <string name="ui_quick_settings_bluetooth">蓝牙</string>
+    <string name="ui_quick_settings_radio_on">开启</string>
+    <string name="ui_quick_settings_radio_off">关闭</string>
+    <string name="ui_quick_settings_wifi_connected">已连接</string>
+    <string name="ui_quick_settings_wifi_not_connected">未连接</string>
     <string name="ui_sibling_choice_title_download">选择要下载的变体</string>
     <string name="ui_sibling_choice_title_active">当前变体</string>
     <string name="ui_sibling_choice_automatic">自动</string>

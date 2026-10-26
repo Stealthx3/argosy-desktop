@@ -88,7 +88,7 @@ internal fun QuickSectionHeader(title: String) {
 @Composable
 internal fun QuickRowFrame(
     isFocused: Boolean,
-    onClick: () -> Unit,
+    onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     twoLine: Boolean = false,
@@ -96,10 +96,10 @@ internal fun QuickRowFrame(
     content: @Composable ColumnScope.() -> Unit
 ) {
     val shape = RoundedCornerShape(Dimens.radiusControl)
-    val click = if (onLongClick != null && enabled) {
-        Modifier.clickableNoFocus(onClick = onClick, onLongClick = onLongClick)
-    } else {
-        Modifier.clickableNoFocus(enabled = enabled, onClick = onClick)
+    val click = when {
+        onClick == null -> Modifier
+        onLongClick != null && enabled -> Modifier.clickableNoFocus(onClick = onClick, onLongClick = onLongClick)
+        else -> Modifier.clickableNoFocus(enabled = enabled, onClick = onClick)
     }
     Column(
         modifier = modifier
@@ -202,6 +202,23 @@ internal fun QuickToggleRow(
                     overflow = TextOverflow.Ellipsis
                 )
             }
+        }
+    }
+}
+
+@Composable
+internal fun QuickStatusRow(
+    icon: ImageVector,
+    label: String,
+    valueText: String
+) {
+    QuickRowFrame(isFocused = false, onClick = null) {
+        QuickLabelLine(
+            label = label,
+            leading = { QuickRowIcon(icon, isFocused = false) }
+        ) {
+            Spacer(modifier = Modifier.width(Dimens.spacingSm))
+            QuickValueText(valueText, isFocused = false)
         }
     }
 }

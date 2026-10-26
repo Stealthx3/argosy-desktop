@@ -973,6 +973,13 @@
     <string name="home_grid_local_video_row_title">選擇此裝置上的影片</string>
     <string name="home_grid_local_video_row_subtitle">直接從您的儲存空間播放</string>
     <string name="ui_quick_settings_swap_displays">交換顯示器</string>
+    <string name="ui_quick_settings_group_connections">連線</string>
+    <string name="ui_quick_settings_wifi">Wi-Fi</string>
+    <string name="ui_quick_settings_bluetooth">藍牙</string>
+    <string name="ui_quick_settings_radio_on">開啟</string>
+    <string name="ui_quick_settings_radio_off">關閉</string>
+    <string name="ui_quick_settings_wifi_connected">已連線</string>
+    <string name="ui_quick_settings_wifi_not_connected">未連線</string>
     <string name="ui_sibling_choice_title_download">選擇要下載的版本</string>
     <string name="ui_sibling_choice_title_active">目前版本</string>
     <string name="ui_sibling_choice_automatic">自動</string>

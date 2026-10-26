@@ -1045,6 +1045,13 @@
     <string name="home_grid_local_video_row_title">Elige un video en este dispositivo</string>
     <string name="home_grid_local_video_row_subtitle">Se reproduce directamente desde tu almacenamiento</string>
     <string name="ui_quick_settings_swap_displays">Intercambiar pantallas</string>
+    <string name="ui_quick_settings_group_connections">Conexiones</string>
+    <string name="ui_quick_settings_wifi">Wi-Fi</string>
+    <string name="ui_quick_settings_bluetooth">Bluetooth</string>
+    <string name="ui_quick_settings_radio_on">Activado</string>
+    <string name="ui_quick_settings_radio_off">Desactivado</string>
+    <string name="ui_quick_settings_wifi_connected">Conectado</string>
+    <string name="ui_quick_settings_wifi_not_connected">Sin conexión</string>
     <string name="ui_sibling_choice_title_download">ELEGIR VARIANTE</string>
     <string name="ui_sibling_choice_title_active">VARIANTE ACTIVA</string>
     <string name="ui_sibling_choice_automatic">Automática</string>

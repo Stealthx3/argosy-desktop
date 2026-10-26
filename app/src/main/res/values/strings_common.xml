@@ -1215,6 +1215,20 @@
     <!-- Row of that panel, on a device with two screens. Verb phrase: puts each screen in the
          other's role. -->
     <string name="ui_quick_settings_swap_displays">Swap screens</string>
+    <!-- Section header in that panel. Noun: the device's wireless radios. -->
+    <string name="ui_quick_settings_group_connections">Connections</string>
+    <!-- Row of that panel. Name of the wireless network radio; usually kept as is. -->
+    <string name="ui_quick_settings_wifi">Wi-Fi</string>
+    <!-- Row of that panel. Name of the short-range radio for controllers and headphones. -->
+    <string name="ui_quick_settings_bluetooth">Bluetooth</string>
+    <!-- Value of a radio row. Adjective: the radio is switched on. -->
+    <string name="ui_quick_settings_radio_on">On</string>
+    <!-- Value of a radio row. Adjective: the radio is switched off. -->
+    <string name="ui_quick_settings_radio_off">Off</string>
+    <!-- Value of the Wi-Fi row. Adjective: joined to a wireless network. -->
+    <string name="ui_quick_settings_wifi_connected">Connected</string>
+    <!-- Value of the Wi-Fi row. Adjective: switched on but not joined to any network. -->
+    <string name="ui_quick_settings_wifi_not_connected">Not connected</string>
     <!-- Row of that panel. "QuayPass" is the name of an Argosy feature; leave it
          untranslated. -->
     <string name="ui_quick_settings_quaypass">QuayPass</string>
