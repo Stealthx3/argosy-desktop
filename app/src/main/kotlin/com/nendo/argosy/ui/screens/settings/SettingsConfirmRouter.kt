@@ -760,7 +760,6 @@ private fun routeDisplaysConfirm(vm: SettingsViewModel, state: SettingsUiState):
         }
         DisplaysItem.DimLevel -> vm.cycleScreenDimmerLevel()
         DisplaysItem.LidSleep -> vm.setLidSleepEnabled(!state.display.lidSleepEnabled)
-        DisplaysItem.LidSleepService -> vm.openAccessibilitySettings()
         DisplaysItem.DualScreenEnabled -> vm.setDualScreenEnabled(!state.display.dualScreenEnabled)
         DisplaysItem.DualScreenMatchSize -> vm.setDualScreenMatchSize(!state.display.dualScreenMatchSize)
         DisplaysItem.DisplayRoles -> {

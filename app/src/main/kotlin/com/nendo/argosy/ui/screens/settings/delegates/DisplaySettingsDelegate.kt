@@ -1073,12 +1073,4 @@ class DisplaySettingsDelegate @Inject constructor(
             }
         }
     }
-
-    fun observeLidSleepService(scope: CoroutineScope, serviceReady: kotlinx.coroutines.flow.Flow<Boolean>) {
-        scope.launch {
-            serviceReady.collect { ready ->
-                _state.update { it.copy(lidSleepServiceReady = ready) }
-            }
-        }
-    }
 }

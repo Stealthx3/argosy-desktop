@@ -304,7 +304,6 @@ class SettingsViewModel @Inject constructor(
         raDelegate.initialize(viewModelScope)
         displayDelegate.loadPreviewGame(viewModelScope)
         displayDelegate.observeScreenCapturePermission(viewModelScope)
-        displayDelegate.observeLidSleepService(viewModelScope, lidSleepGuard.serviceReady)
         permissionsDelegate.observeLockScreenArt(viewModelScope)
         routeStartControllerDetectionPolling(this)
         installerDelegate.observeJobs(viewModelScope)
@@ -1609,7 +1608,6 @@ class SettingsViewModel @Inject constructor(
     fun showInstallerImePicker() = installerDelegate.showImePicker()
     fun openNotificationSettings() = permissionsDelegate.openNotificationSettings()
     fun openWriteSettings() = permissionsDelegate.openWriteSettings()
-    fun openAccessibilitySettings() = permissionsDelegate.openAccessibilitySettings()
     fun openDisplayOverlaySettings() = permissionsDelegate.openDisplayOverlaySettings()
 
     fun openLiveWallpaperPicker() = permissionsDelegate.openLiveWallpaperPicker()

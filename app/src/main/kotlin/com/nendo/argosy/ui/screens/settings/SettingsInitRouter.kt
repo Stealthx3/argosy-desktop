@@ -641,9 +641,8 @@ internal fun routeLoadSettings(vm: SettingsViewModel) {
             hasScreenCapturePermission = vm.displayDelegate.hasScreenCapturePermission(),
             hasSecondaryDisplay = vm.displayAffinityHelper.hasSecondaryDisplay,
             hasPhysicalSecondaryDisplay = vm.displayAffinityHelper.hasPhysicalSecondaryDisplay,
-            hasLidSensor = vm.lidSleepGuard.isSupported,
+            lidSleepSupported = vm.lidSleepGuard.isSupported,
             lidSleepEnabled = prefs.lidSleepEnabled,
-            lidSleepServiceReady = vm.lidSleepGuard.isServiceReady,
             dualScreenEnabled = prefs.dualScreenEnabled,
             dualScreenMatchSize = vm.libretroSettingsRepo.getBuiltinEmulatorSettings().first().dualScreenMatchSize,
             dualScreenMatchSizeAvailable = vm.displayAffinityHelper.hasPhysicalSecondaryDisplay &&

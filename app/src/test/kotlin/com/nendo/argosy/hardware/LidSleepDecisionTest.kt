@@ -1,168 +1,83 @@
 package com.nendo.argosy.hardware
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class LidSleepDecisionTest {
 
-    private val closedAt = 10_000L
-    private val wokeAt = 11_200L
-    private val refreshedAt = 11_500L
+    private fun thorDump(switchValues: Int) = listOf(
+        "  Device 6: fts_ts_3",
+        "    Switch Input Mapper:",
+        "      SwitchValues: 0",
+        "  Device 5: hall_switch",
+        "    EventHub Devices: [ 5 ] ",
+        "    Generation: 15",
+        "    IsExternal: false",
+        "    Sources: 0x80000000",
+        "    Switch Input Mapper:",
+        "      SwitchValues: $switchValues",
+        "  Device 3: pmic_pwrkey"
+    )
 
     private fun strayWake(
         enabled: Boolean = true,
         lidClosed: Boolean = true,
-        closeConfirmed: Boolean = true,
         interactive: Boolean = true,
-        lidReadAt: Long = refreshedAt,
-        screenOnAt: Long = wokeAt,
-        staleRetries: Int = 0,
         externalDisplayInUse: Boolean = false,
-        attemptsInWindow: Int = 0,
-        serviceReady: Boolean = true
-    ) = LidSleepState(
-        enabled = enabled,
-        lidClosed = lidClosed,
-        closeConfirmed = closeConfirmed,
-        interactive = interactive,
-        lidReadAt = lidReadAt,
-        screenOnAt = screenOnAt,
-        staleRetries = staleRetries,
-        externalDisplayInUse = externalDisplayInUse,
-        attemptsInWindow = attemptsInWindow,
-        serviceReady = serviceReady
-    )
-
-    private fun verdict(state: LidSleepState) = LidSleepDecision.decide(state)
+        attemptsInWindow: Int = 0
+    ) = LidSleepState(enabled, lidClosed, interactive, externalDisplayInUse, attemptsInWindow)
 
     @Test
-    fun `a button wake under a closed lid is answered with sleep`() {
-        assertEquals(LidSleepVerdict.SLEEP, verdict(strayWake()))
+    fun `the hall switch reports a closed lid`() {
+        assertTrue(LidSleepDecision.parseLidClosed(thorDump(1))!!)
     }
 
     @Test
-    fun `the close itself sleeps once the system has confirmed it sleeps on close`() {
-        assertEquals(LidSleepVerdict.SLEEP, verdict(strayWake(lidReadAt = closedAt, screenOnAt = 0L)))
+    fun `the hall switch reports an open lid`() {
+        assertFalse(LidSleepDecision.parseLidClosed(thorDump(0))!!)
     }
 
     @Test
-    fun `an open lid is left alone`() {
-        assertEquals(LidSleepVerdict.IDLE, verdict(strayWake(lidClosed = false)))
-    }
-
-    @Test
-    fun `a close the system never slept on is left alone`() {
-        assertEquals(LidSleepVerdict.IDLE, verdict(strayWake(closeConfirmed = false)))
-    }
-
-    @Test
-    fun `a sleeping device is left alone`() {
-        assertEquals(LidSleepVerdict.IDLE, verdict(strayWake(interactive = false)))
-    }
-
-    @Test
-    fun `the setting off is left alone`() {
-        assertEquals(LidSleepVerdict.IDLE, verdict(strayWake(enabled = false)))
-    }
-
-    @Test
-    fun `a reading older than the wake is refreshed before acting`() {
-        assertEquals(LidSleepVerdict.RETRY_READING, verdict(strayWake(lidReadAt = closedAt)))
-    }
-
-    @Test
-    fun `a reading that never refreshes after the wake does not sleep`() {
-        assertEquals(
-            LidSleepVerdict.STALE_READING,
-            verdict(strayWake(lidReadAt = closedAt, staleRetries = LidSleepDecision.MAX_STALE_RETRIES))
+    fun `another device's switch values are never read as the lid`() {
+        val dump = listOf(
+            "  Device 5: hall_switch",
+            "    Sources: 0x80000000",
+            "  Device 7: headset",
+            "    Switch Input Mapper:",
+            "      SwitchValues: 1"
         )
+        assertNull(LidSleepDecision.parseLidClosed(dump))
     }
 
     @Test
-    fun `a lit external display keeps the device awake`() {
-        assertEquals(LidSleepVerdict.EXTERNAL_DISPLAY, verdict(strayWake(externalDisplayInUse = true)))
+    fun `a dump without the hall switch gives no lid state`() {
+        assertNull(LidSleepDecision.parseLidClosed(listOf("  Device 3: pmic_pwrkey")))
     }
 
     @Test
-    fun `attempts are rate limited per window`() {
-        assertEquals(
-            LidSleepVerdict.RATE_LIMITED,
-            verdict(strayWake(attemptsInWindow = LidSleepDecision.MAX_ATTEMPTS_PER_WINDOW))
-        )
-        assertEquals(
-            LidSleepVerdict.SLEEP,
-            verdict(strayWake(attemptsInWindow = LidSleepDecision.MAX_ATTEMPTS_PER_WINDOW - 1))
-        )
+    fun `a screen on under a closed lid sleeps`() {
+        assertEquals(LidSleepVerdict.SLEEP, LidSleepDecision.decide(strayWake()))
     }
 
     @Test
-    fun `without the accessibility service nothing is requested`() {
-        assertEquals(LidSleepVerdict.SERVICE_OFF, verdict(strayWake(serviceReady = false)))
+    fun `an open lid, a disabled setting or a screen already off does nothing`() {
+        assertEquals(LidSleepVerdict.IDLE, LidSleepDecision.decide(strayWake(lidClosed = false)))
+        assertEquals(LidSleepVerdict.IDLE, LidSleepDecision.decide(strayWake(enabled = false)))
+        assertEquals(LidSleepVerdict.IDLE, LidSleepDecision.decide(strayWake(interactive = false)))
     }
 
     @Test
-    fun `a screen-off right after the close arms the guard`() {
-        assertEquals(true, LidSleepDecision.armsOnScreenOff(closedAt = closedAt, screenOffAt = closedAt + 200))
-        assertEquals(
-            true,
-            LidSleepDecision.armsOnScreenOff(closedAt = closedAt, screenOffAt = closedAt + LidSleepDecision.ARM_WINDOW_MS)
-        )
+    fun `an external display in use keeps the device awake`() {
+        assertEquals(LidSleepVerdict.EXTERNAL_DISPLAY, LidSleepDecision.decide(strayWake(externalDisplayInUse = true)))
     }
 
     @Test
-    fun `a screen-off long after a closed reading does not arm the guard`() {
-        assertEquals(false, LidSleepDecision.armsOnScreenOff(closedAt = closedAt, screenOffAt = closedAt + 60_000))
-    }
-
-    @Test
-    fun `a screen-off before any closed reading does not arm the guard`() {
-        assertEquals(false, LidSleepDecision.armsOnScreenOff(closedAt = 0L, screenOffAt = closedAt))
-        assertEquals(false, LidSleepDecision.armsOnScreenOff(closedAt = closedAt, screenOffAt = closedAt - 1))
-    }
-
-    @Test
-    fun `a same-state closed reading that lands after both stale checks still ends in sleep`() {
-        val lateReadAt = wokeAt + 2 * LidSleepDecision.WAKE_GRACE_MS + 500
-        assertEquals(LidSleepVerdict.RETRY_READING, verdict(strayWake(lidReadAt = closedAt, staleRetries = 0)))
-        assertEquals(
-            LidSleepVerdict.STALE_READING,
-            verdict(strayWake(lidReadAt = closedAt, staleRetries = LidSleepDecision.MAX_STALE_RETRIES))
-        )
-        assertEquals(true, LidSleepDecision.readingResolvesStale(previousReadAt = closedAt, screenOnAt = wokeAt))
-        assertEquals(
-            LidSleepVerdict.SLEEP,
-            verdict(strayWake(lidReadAt = lateReadAt, staleRetries = LidSleepDecision.MAX_STALE_RETRIES))
-        )
-    }
-
-    @Test
-    fun `the first reading after a wake resolves the stale reading`() {
-        assertEquals(true, LidSleepDecision.readingResolvesStale(previousReadAt = closedAt, screenOnAt = wokeAt))
-    }
-
-    @Test
-    fun `a reading after one that already followed the wake does not resolve anything`() {
-        assertEquals(false, LidSleepDecision.readingResolvesStale(previousReadAt = refreshedAt, screenOnAt = wokeAt))
-    }
-
-    @Test
-    fun `a reading before any screen-on does not resolve anything`() {
-        assertEquals(false, LidSleepDecision.readingResolvesStale(previousReadAt = closedAt, screenOnAt = 0L))
-    }
-
-    @Test
-    fun `a reading during a normal close after an older wake does not resolve anything`() {
-        assertEquals(
-            false,
-            LidSleepDecision.readingResolvesStale(previousReadAt = closedAt + 30_000, screenOnAt = wokeAt)
-        )
-    }
-
-    @Test
-    fun `the external display check comes before the service check`() {
-        assertEquals(
-            LidSleepVerdict.EXTERNAL_DISPLAY,
-            verdict(strayWake(externalDisplayInUse = true, serviceReady = false))
-        )
+    fun `sleep requests stop at the per-minute limit`() {
+        val limit = LidSleepDecision.MAX_ATTEMPTS_PER_WINDOW
+        assertEquals(LidSleepVerdict.SLEEP, LidSleepDecision.decide(strayWake(attemptsInWindow = limit - 1)))
+        assertEquals(LidSleepVerdict.RATE_LIMITED, LidSleepDecision.decide(strayWake(attemptsInWindow = limit)))
     }
 }

@@ -67,7 +67,7 @@ object KnownPanels {
      * The built-in panels of [model] whose physical sizes are known, or an empty list.
      */
     fun forModel(model: String = Build.MODEL): List<PanelSpec> =
-        if (model.contains("thor", ignoreCase = true)) THOR else emptyList()
+        if (com.nendo.argosy.util.AynThor.matches(model)) THOR else emptyList()
 
     /**
      * The panel among [panels] that a display of [widthPx] x [heightPx] is, in either orientation.
