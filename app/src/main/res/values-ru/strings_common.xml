@@ -1062,6 +1062,10 @@
     <string name="ui_quick_settings_swap_displays">Поменять экраны</string>
     <string name="ui_quick_settings_page_connections">Подключения</string>
     <string name="ui_quick_connections_unsupported">Это устройство не позволяет напрямую управлять Wi-Fi и Bluetooth</string>
+    <string name="ui_quick_connections_tab_wifi">Wi-Fi</string>
+    <string name="ui_quick_connections_tab_bluetooth">Bluetooth</string>
+    <string name="ui_quick_connections_wifi_off">Wi-Fi выключен</string>
+    <string name="ui_quick_connections_bluetooth_off">Bluetooth выключен</string>
     <string name="ui_quick_connections_nearby">Сети поблизости</string>
     <string name="ui_quick_connections_saved">Сохранённые сети</string>
     <string name="ui_quick_connections_paired">Сопряжённые устройства</string>

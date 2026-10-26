@@ -1047,6 +1047,10 @@
     <string name="ui_quick_settings_swap_displays">Intercambiar pantallas</string>
     <string name="ui_quick_settings_page_connections">Conexiones</string>
     <string name="ui_quick_connections_unsupported">Este dispositivo no permite controlar directamente el Wi-Fi y el Bluetooth</string>
+    <string name="ui_quick_connections_tab_wifi">Wi-Fi</string>
+    <string name="ui_quick_connections_tab_bluetooth">Bluetooth</string>
+    <string name="ui_quick_connections_wifi_off">El Wi-Fi está desactivado</string>
+    <string name="ui_quick_connections_bluetooth_off">El Bluetooth está desactivado</string>
     <string name="ui_quick_connections_nearby">Redes cercanas</string>
     <string name="ui_quick_connections_saved">Redes guardadas</string>
     <string name="ui_quick_connections_paired">Dispositivos vinculados</string>

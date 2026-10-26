@@ -46,6 +46,8 @@ import com.nendo.argosy.hardware.WifiBand
 import com.nendo.argosy.ui.components.InputButton
 import com.nendo.argosy.ui.components.QuickDetailRow
 import com.nendo.argosy.ui.components.QuickNoticeRow
+import com.nendo.argosy.ui.components.QuickRowFrame
+import com.nendo.argosy.ui.primitives.SegmentedControl
 import com.nendo.argosy.ui.components.QuickSectionHeader
 import com.nendo.argosy.ui.components.QuickStatusRow
 import com.nendo.argosy.ui.components.QuickToggleRow
@@ -58,6 +60,7 @@ import com.nendo.argosy.ui.theme.LocalArgosyTheme
 fun QuickSettingsConnectionsPage(
     state: QuickConnectionsState,
     onRowClick: (QuickConnectionsRow) -> Unit,
+    onShowList: (ConnectionsList) -> Unit,
     onForget: (QuickConnectionsRow.Saved) -> Unit
 ) {
     if (!state.switchable) {
@@ -80,6 +83,7 @@ fun QuickSettingsConnectionsPage(
                 state = state,
                 isFocused = row.key == focusedKey,
                 onClick = { onRowClick(row) },
+                onShowList = onShowList,
                 onForget = onForget
             )
         }
@@ -137,9 +141,24 @@ private fun ConnectionsRow(
     state: QuickConnectionsState,
     isFocused: Boolean,
     onClick: () -> Unit,
+    onShowList: (ConnectionsList) -> Unit,
     onForget: (QuickConnectionsRow.Saved) -> Unit
 ) {
     when (row) {
+        QuickConnectionsRow.ListTabs -> QuickRowFrame(isFocused = isFocused, onClick = null) {
+            SegmentedControl(
+                options = listOf(
+                    stringResource(R.string.ui_quick_connections_tab_wifi),
+                    stringResource(R.string.ui_quick_connections_tab_bluetooth)
+                ),
+                selectedIndex = ConnectionsList.entries.indexOf(state.list),
+                onSelect = { onShowList(ConnectionsList.entries[it]) },
+                focused = isFocused,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+        QuickConnectionsRow.WifiOffPlaceholder -> PlaceholderText(R.string.ui_quick_connections_wifi_off)
+        QuickConnectionsRow.BluetoothOffPlaceholder -> PlaceholderText(R.string.ui_quick_connections_bluetooth_off)
         QuickConnectionsRow.WifiStatus -> WifiStatusRow(state)
         QuickConnectionsRow.BluetoothStatus -> BluetoothStatusRow(state)
         QuickConnectionsRow.WifiToggle -> QuickToggleRow(

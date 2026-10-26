@@ -36,6 +36,8 @@ data class WifiJoinDraft(
     }
 }
 
+enum class ConnectionsList { WIFI, BLUETOOTH }
+
 data class QuickConnectionsState(
     val loaded: Boolean = false,
     val switchable: Boolean = false,
@@ -51,13 +53,17 @@ data class QuickConnectionsState(
     val bluetoothPermitted: Boolean = true,
     val paired: List<BluetoothPairedUi> = emptyList(),
     val focusIndex: Int = 0,
-    val join: WifiJoinDraft? = null
+    val join: WifiJoinDraft? = null,
+    val list: ConnectionsList = ConnectionsList.WIFI
 )
 
 sealed class QuickConnectionsRow(val key: String, val focusable: Boolean) {
     data object WifiStatus : QuickConnectionsRow("wifiStatus", focusable = false)
     data object BluetoothStatus : QuickConnectionsRow("bluetoothStatus", focusable = false)
     data object WifiToggle : QuickConnectionsRow("wifiToggle", focusable = true)
+    data object ListTabs : QuickConnectionsRow("listTabs", focusable = true)
+    data object WifiOffPlaceholder : QuickConnectionsRow("wifiOff", focusable = false)
+    data object BluetoothOffPlaceholder : QuickConnectionsRow("bluetoothOff", focusable = false)
     data class CurrentNetwork(val network: WifiCurrentUi) : QuickConnectionsRow("wifiCurrent", focusable = false)
     data object NearbyHeader : QuickConnectionsRow("nearbyHeader", focusable = false)
     data object NearbyPlaceholder : QuickConnectionsRow("nearbyPlaceholder", focusable = false)
@@ -83,20 +89,33 @@ fun quickConnectionsRows(state: QuickConnectionsState): List<QuickConnectionsRow
     }
     add(QuickConnectionsRow.WifiToggle)
     add(QuickConnectionsRow.BluetoothToggle)
-    if (state.wifiEnabled) {
-        state.current?.let { add(QuickConnectionsRow.CurrentNetwork(it)) }
-        add(QuickConnectionsRow.NearbyHeader)
-        if (state.nearby.isEmpty()) add(QuickConnectionsRow.NearbyPlaceholder)
-        state.nearby.forEach { add(QuickConnectionsRow.Nearby(it)) }
-        if (state.saved.isNotEmpty()) {
-            add(QuickConnectionsRow.SavedHeader)
-            state.saved.forEach { add(QuickConnectionsRow.Saved(it)) }
-        }
+    add(QuickConnectionsRow.ListTabs)
+    when (state.list) {
+        ConnectionsList.WIFI -> addWifiRows(state)
+        ConnectionsList.BLUETOOTH -> addBluetoothRows(state)
     }
-    if (state.bluetoothEnabled) {
-        if (!state.bluetoothPermitted) {
-            add(QuickConnectionsRow.BluetoothPermission)
-        } else {
+}
+
+private fun MutableList<QuickConnectionsRow>.addWifiRows(state: QuickConnectionsState) {
+    if (!state.wifiEnabled) {
+        add(QuickConnectionsRow.WifiOffPlaceholder)
+        return
+    }
+    state.current?.let { add(QuickConnectionsRow.CurrentNetwork(it)) }
+    add(QuickConnectionsRow.NearbyHeader)
+    if (state.nearby.isEmpty()) add(QuickConnectionsRow.NearbyPlaceholder)
+    state.nearby.forEach { add(QuickConnectionsRow.Nearby(it)) }
+    if (state.saved.isNotEmpty()) {
+        add(QuickConnectionsRow.SavedHeader)
+        state.saved.forEach { add(QuickConnectionsRow.Saved(it)) }
+    }
+}
+
+private fun MutableList<QuickConnectionsRow>.addBluetoothRows(state: QuickConnectionsState) {
+    when {
+        !state.bluetoothEnabled -> add(QuickConnectionsRow.BluetoothOffPlaceholder)
+        !state.bluetoothPermitted -> add(QuickConnectionsRow.BluetoothPermission)
+        else -> {
             add(QuickConnectionsRow.PairedHeader)
             if (state.paired.isEmpty()) add(QuickConnectionsRow.PairedPlaceholder)
             state.paired.forEach { add(QuickConnectionsRow.Paired(it)) }

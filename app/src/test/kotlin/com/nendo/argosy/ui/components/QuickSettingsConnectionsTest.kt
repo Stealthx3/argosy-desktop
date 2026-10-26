@@ -5,6 +5,7 @@ import com.nendo.argosy.data.preferences.MenuWrapMode
 import com.nendo.argosy.hardware.BluetoothDeviceKind
 import com.nendo.argosy.hardware.WifiSecurity
 import com.nendo.argosy.ui.components.connections.BluetoothPairedUi
+import com.nendo.argosy.ui.components.connections.ConnectionsList
 import com.nendo.argosy.ui.components.connections.QuickConnectionsController
 import com.nendo.argosy.ui.components.connections.QuickConnectionsRow
 import com.nendo.argosy.ui.components.connections.QuickConnectionsState
@@ -75,40 +76,54 @@ class QuickSettingsConnectionsTest {
     }
 
     @Test
-    fun `with the root route the toggles and lists take focus`() {
-        val focusable = quickConnectionsFocusableRows(rootState)
-
+    fun `the wifi list shows networks and no bluetooth devices`() {
         assertEquals(
             listOf(
                 QuickConnectionsRow.WifiToggle,
                 QuickConnectionsRow.BluetoothToggle,
+                QuickConnectionsRow.ListTabs,
                 QuickConnectionsRow.Nearby(rootState.nearby.single()),
-                QuickConnectionsRow.Saved(rootState.saved.single()),
-                QuickConnectionsRow.Paired(rootState.paired.single())
+                QuickConnectionsRow.Saved(rootState.saved.single())
             ),
-            focusable
+            quickConnectionsFocusableRows(rootState)
         )
     }
 
     @Test
-    fun `radios switched off hide their lists`() {
-        val rows = quickConnectionsRows(rootState.copy(wifiEnabled = false, bluetoothEnabled = false))
-
+    fun `the bluetooth list shows paired devices and no networks`() {
         assertEquals(
             listOf(
                 QuickConnectionsRow.WifiToggle,
-                QuickConnectionsRow.BluetoothToggle
+                QuickConnectionsRow.BluetoothToggle,
+                QuickConnectionsRow.ListTabs,
+                QuickConnectionsRow.Paired(rootState.paired.single())
             ),
-            rows
+            quickConnectionsFocusableRows(rootState.copy(list = ConnectionsList.BLUETOOTH))
         )
     }
 
     @Test
-    fun `missing bluetooth permission replaces the paired list with the request row`() {
-        val rows = quickConnectionsRows(rootState.copy(bluetoothPermitted = false))
+    fun `a radio switched off shows its off line in place of its list`() {
+        val off = rootState.copy(wifiEnabled = false, bluetoothEnabled = false)
 
-        assertTrue(QuickConnectionsRow.BluetoothPermission in rows)
-        assertFalse(rows.any { it is QuickConnectionsRow.Paired || it == QuickConnectionsRow.PairedHeader })
+        assertEquals(
+            QuickConnectionsRow.WifiOffPlaceholder,
+            quickConnectionsRows(off).last()
+        )
+        assertEquals(
+            QuickConnectionsRow.BluetoothOffPlaceholder,
+            quickConnectionsRows(off.copy(list = ConnectionsList.BLUETOOTH)).last()
+        )
+    }
+
+    @Test
+    fun `the bluetooth permission request shows only on the bluetooth list`() {
+        val unpermitted = rootState.copy(bluetoothPermitted = false)
+
+        assertFalse(QuickConnectionsRow.BluetoothPermission in quickConnectionsRows(unpermitted))
+        val bluetoothRows = quickConnectionsRows(unpermitted.copy(list = ConnectionsList.BLUETOOTH))
+        assertTrue(QuickConnectionsRow.BluetoothPermission in bluetoothRows)
+        assertFalse(bluetoothRows.any { it is QuickConnectionsRow.Paired || it == QuickConnectionsRow.PairedHeader })
     }
 
     @Test

@@ -1012,6 +1012,10 @@
     <string name="ui_quick_settings_swap_displays">डिस्प्ले बदलें</string>
     <string name="ui_quick_settings_page_connections">कनेक्शन</string>
     <string name="ui_quick_connections_unsupported">यह डिवाइस वाई-फ़ाई और ब्लूटूथ को सीधे नियंत्रित करने की अनुमति नहीं देता</string>
+    <string name="ui_quick_connections_tab_wifi">वाई-फ़ाई</string>
+    <string name="ui_quick_connections_tab_bluetooth">ब्लूटूथ</string>
+    <string name="ui_quick_connections_wifi_off">वाई-फ़ाई बंद है</string>
+    <string name="ui_quick_connections_bluetooth_off">ब्लूटूथ बंद है</string>
     <string name="ui_quick_connections_nearby">आस-पास के नेटवर्क</string>
     <string name="ui_quick_connections_saved">सहेजे गए नेटवर्क</string>
     <string name="ui_quick_connections_paired">पेयर किए गए डिवाइस</string>

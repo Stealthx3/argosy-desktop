@@ -1406,6 +1406,7 @@ fun ArgosyApp(
                     QuickSettingsConnectionsPage(
                         state = quickConnectionsState,
                         onRowClick = quickConnectionsInputHandler::tapRow,
+                        onShowList = quickConnectionsInputHandler::tapList,
                         onForget = quickConnectionsInputHandler::tapForget
                     )
                 },

@@ -4,6 +4,7 @@ import com.nendo.argosy.core.input.SoundType
 import com.nendo.argosy.data.preferences.MenuWrapMode
 import com.nendo.argosy.ui.input.InputHandler
 import com.nendo.argosy.ui.input.InputResult
+import com.nendo.argosy.ui.input.stepOption
 import com.nendo.argosy.ui.screens.settings.sections.input.toggleLeftRight
 
 class QuickConnectionsInputHandler(
@@ -27,6 +28,8 @@ class QuickConnectionsInputHandler(
             QuickConnectionsRow.WifiToggle -> toggleLeftRight(delta, state.wifiEnabled, controller::setWifiEnabled)
             QuickConnectionsRow.BluetoothToggle ->
                 toggleLeftRight(delta, state.bluetoothEnabled, controller::setBluetoothEnabled)
+            QuickConnectionsRow.ListTabs ->
+                stepOption(ConnectionsList.entries, state.list, delta, controller::showList)
             else -> InputResult.UNHANDLED
         }
     }
@@ -45,6 +48,11 @@ class QuickConnectionsInputHandler(
     fun tapRow(row: QuickConnectionsRow) {
         if (!focusOn(row)) return
         activate(row)
+    }
+
+    fun tapList(list: ConnectionsList) {
+        focusOn(QuickConnectionsRow.ListTabs)
+        controller.showList(list)
     }
 
     fun tapForget(row: QuickConnectionsRow.Saved) {

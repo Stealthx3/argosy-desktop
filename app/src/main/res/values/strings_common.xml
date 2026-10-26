@@ -1254,6 +1254,14 @@
     <!-- Connections page, on a device where Argosy cannot switch the radios or join networks.
          Shown alone below the Wi-Fi and Bluetooth status rows. Full sentence. -->
     <string name="ui_quick_connections_unsupported">This device doesn\'t allow direct Wi-Fi and Bluetooth control</string>
+    <!-- Connections page switcher option that shows the Wi-Fi network lists. Name of the radio. -->
+    <string name="ui_quick_connections_tab_wifi">Wi-Fi</string>
+    <!-- Connections page switcher option that shows the paired Bluetooth devices. Name of the radio. -->
+    <string name="ui_quick_connections_tab_bluetooth">Bluetooth</string>
+    <!-- Shown in place of the network lists while Wi-Fi is switched off. -->
+    <string name="ui_quick_connections_wifi_off">Wi-Fi is off</string>
+    <!-- Shown in place of the paired device list while Bluetooth is switched off. -->
+    <string name="ui_quick_connections_bluetooth_off">Bluetooth is off</string>
     <!-- Connections page heading over the Wi-Fi networks in range that the device can join. Noun
          phrase. Shown in capitals. -->
     <string name="ui_quick_connections_nearby">Nearby networks</string>

@@ -71,6 +71,10 @@ class QuickConnectionsController(
         _state.update { it.copy(focusIndex = index) }
     }
 
+    fun showList(list: ConnectionsList) {
+        _state.update { it.copy(list = list) }
+    }
+
     fun moveFocus(delta: Int, wrapMode: MenuWrapMode): InputResult {
         val snapshot = _state.value
         val current = quickConnectionsFocusIndex(snapshot)

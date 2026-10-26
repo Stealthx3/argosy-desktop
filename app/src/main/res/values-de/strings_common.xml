@@ -1012,6 +1012,10 @@
     <string name="ui_quick_settings_swap_displays">Displays tauschen</string>
     <string name="ui_quick_settings_page_connections">Verbindungen</string>
     <string name="ui_quick_connections_unsupported">Dieses Gerät erlaubt keine direkte Steuerung von WLAN und Bluetooth</string>
+    <string name="ui_quick_connections_tab_wifi">WLAN</string>
+    <string name="ui_quick_connections_tab_bluetooth">Bluetooth</string>
+    <string name="ui_quick_connections_wifi_off">WLAN ist aus</string>
+    <string name="ui_quick_connections_bluetooth_off">Bluetooth ist aus</string>
     <string name="ui_quick_connections_nearby">Netzwerke in der Nähe</string>
     <string name="ui_quick_connections_saved">Gespeicherte Netzwerke</string>
     <string name="ui_quick_connections_paired">Gekoppelte Geräte</string>
