@@ -139,11 +139,7 @@ internal fun CompactGameListRow(
         isFocused = isFocused,
         onClick = onClick,
         onLongClick = onLongClick,
-        containerColor = if (isFocused) {
-            MaterialTheme.colorScheme.primaryContainer
-        } else {
-            MaterialTheme.colorScheme.surfaceVariant
-        },
+        containerColor = if (isFocused) MaterialTheme.colorScheme.primaryContainer else Color.Transparent,
         modifier = modifier
     ) {
         Box(
