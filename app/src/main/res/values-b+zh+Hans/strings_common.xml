@@ -951,8 +951,6 @@
     <string name="ui_quick_settings_swap_displays">交换显示屏</string>
     <string name="ui_quick_settings_page_connections">连接</string>
     <string name="ui_quick_connections_unsupported">此设备不允许直接控制 Wi-Fi 和蓝牙</string>
-    <string name="ui_quick_connections_group_wifi">Wi-Fi</string>
-    <string name="ui_quick_connections_group_bluetooth">蓝牙</string>
     <string name="ui_quick_connections_nearby">附近的网络</string>
     <string name="ui_quick_connections_saved">已保存的网络</string>
     <string name="ui_quick_connections_paired">已配对的设备</string>

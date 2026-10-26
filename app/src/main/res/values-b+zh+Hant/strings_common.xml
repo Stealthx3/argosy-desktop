@@ -975,8 +975,6 @@
     <string name="ui_quick_settings_swap_displays">交換顯示器</string>
     <string name="ui_quick_settings_page_connections">連線</string>
     <string name="ui_quick_connections_unsupported">此裝置不允許直接控制 Wi-Fi 和藍牙</string>
-    <string name="ui_quick_connections_group_wifi">Wi-Fi</string>
-    <string name="ui_quick_connections_group_bluetooth">藍牙</string>
     <string name="ui_quick_connections_nearby">附近的網路</string>
     <string name="ui_quick_connections_saved">已儲存的網路</string>
     <string name="ui_quick_connections_paired">已配對的裝置</string>

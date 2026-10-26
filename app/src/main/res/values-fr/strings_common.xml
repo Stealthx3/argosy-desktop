@@ -1058,8 +1058,6 @@
     <string name="ui_quick_settings_swap_displays">Permuter les écrans</string>
     <string name="ui_quick_settings_page_connections">Connexions</string>
     <string name="ui_quick_connections_unsupported">Cet appareil n\'autorise pas le contrôle direct du Wi-Fi et du Bluetooth</string>
-    <string name="ui_quick_connections_group_wifi">Wi-Fi</string>
-    <string name="ui_quick_connections_group_bluetooth">Bluetooth</string>
     <string name="ui_quick_connections_nearby">Réseaux à proximité</string>
     <string name="ui_quick_connections_saved">Réseaux enregistrés</string>
     <string name="ui_quick_connections_paired">Appareils associés</string>

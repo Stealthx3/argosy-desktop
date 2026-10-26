@@ -57,7 +57,6 @@ data class QuickConnectionsState(
 sealed class QuickConnectionsRow(val key: String, val focusable: Boolean) {
     data object WifiStatus : QuickConnectionsRow("wifiStatus", focusable = false)
     data object BluetoothStatus : QuickConnectionsRow("bluetoothStatus", focusable = false)
-    data object WifiHeader : QuickConnectionsRow("wifiHeader", focusable = false)
     data object WifiToggle : QuickConnectionsRow("wifiToggle", focusable = true)
     data class CurrentNetwork(val network: WifiCurrentUi) : QuickConnectionsRow("wifiCurrent", focusable = false)
     data object NearbyHeader : QuickConnectionsRow("nearbyHeader", focusable = false)
@@ -65,7 +64,6 @@ sealed class QuickConnectionsRow(val key: String, val focusable: Boolean) {
     data class Nearby(val network: WifiNearbyUi) : QuickConnectionsRow("nearby_${network.ssid}", focusable = true)
     data object SavedHeader : QuickConnectionsRow("savedHeader", focusable = false)
     data class Saved(val network: WifiSavedUi) : QuickConnectionsRow("saved_${network.networkId}", focusable = true)
-    data object BluetoothHeader : QuickConnectionsRow("bluetoothHeader", focusable = false)
     data object BluetoothToggle : QuickConnectionsRow("bluetoothToggle", focusable = true)
     data object BluetoothPermission : QuickConnectionsRow("bluetoothPermission", focusable = true)
     data object PairedHeader : QuickConnectionsRow("pairedHeader", focusable = false)
@@ -83,8 +81,8 @@ fun quickConnectionsRows(state: QuickConnectionsState): List<QuickConnectionsRow
         add(QuickConnectionsRow.BluetoothStatus)
         return@buildList
     }
-    add(QuickConnectionsRow.WifiHeader)
     add(QuickConnectionsRow.WifiToggle)
+    add(QuickConnectionsRow.BluetoothToggle)
     if (state.wifiEnabled) {
         state.current?.let { add(QuickConnectionsRow.CurrentNetwork(it)) }
         add(QuickConnectionsRow.NearbyHeader)
@@ -95,8 +93,6 @@ fun quickConnectionsRows(state: QuickConnectionsState): List<QuickConnectionsRow
             state.saved.forEach { add(QuickConnectionsRow.Saved(it)) }
         }
     }
-    add(QuickConnectionsRow.BluetoothHeader)
-    add(QuickConnectionsRow.BluetoothToggle)
     if (state.bluetoothEnabled) {
         if (!state.bluetoothPermitted) {
             add(QuickConnectionsRow.BluetoothPermission)

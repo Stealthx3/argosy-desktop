@@ -142,8 +142,6 @@ private fun ConnectionsRow(
     when (row) {
         QuickConnectionsRow.WifiStatus -> WifiStatusRow(state)
         QuickConnectionsRow.BluetoothStatus -> BluetoothStatusRow(state)
-        QuickConnectionsRow.WifiHeader ->
-            QuickSectionHeader(title = stringResource(R.string.ui_quick_connections_group_wifi))
         QuickConnectionsRow.WifiToggle -> QuickToggleRow(
             icon = if (state.wifiEnabled) Icons.Default.Wifi else Icons.Default.WifiOff,
             label = stringResource(R.string.ui_quick_settings_wifi),
@@ -202,8 +200,6 @@ private fun ConnectionsRow(
                 glyph = InputButton.X
             )
         }
-        QuickConnectionsRow.BluetoothHeader ->
-            QuickSectionHeader(title = stringResource(R.string.ui_quick_connections_group_bluetooth))
         QuickConnectionsRow.BluetoothToggle -> QuickToggleRow(
             icon = if (state.bluetoothEnabled) Icons.Default.Bluetooth else Icons.Default.BluetoothDisabled,
             label = stringResource(R.string.ui_quick_settings_bluetooth),

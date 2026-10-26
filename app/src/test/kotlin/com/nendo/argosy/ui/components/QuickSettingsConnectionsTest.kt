@@ -81,9 +81,9 @@ class QuickSettingsConnectionsTest {
         assertEquals(
             listOf(
                 QuickConnectionsRow.WifiToggle,
+                QuickConnectionsRow.BluetoothToggle,
                 QuickConnectionsRow.Nearby(rootState.nearby.single()),
                 QuickConnectionsRow.Saved(rootState.saved.single()),
-                QuickConnectionsRow.BluetoothToggle,
                 QuickConnectionsRow.Paired(rootState.paired.single())
             ),
             focusable
@@ -96,9 +96,7 @@ class QuickSettingsConnectionsTest {
 
         assertEquals(
             listOf(
-                QuickConnectionsRow.WifiHeader,
                 QuickConnectionsRow.WifiToggle,
-                QuickConnectionsRow.BluetoothHeader,
                 QuickConnectionsRow.BluetoothToggle
             ),
             rows
