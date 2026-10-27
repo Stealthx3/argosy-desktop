@@ -265,6 +265,8 @@ class LibretroActivity : ComponentActivity() {
     private var rollingSaveJob: Job? = null
     private var saveWriteWatchJob: Job? = null
     private var saveWrittenAt by mutableStateOf(0L)
+    private var backHoldJob: Job? = null
+    private var backHoldFired = false
     private lateinit var romPath: String
 
     private lateinit var saveStateManager: SaveStateManager
@@ -3373,7 +3375,7 @@ class LibretroActivity : ComponentActivity() {
         }
 
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            showMenu()
+            if (event.repeatCount == 0) startBackHold()
             return true
         }
         if (keyCode == KeyEvent.KEYCODE_BUTTON_MODE) return true
@@ -3381,7 +3383,30 @@ class LibretroActivity : ComponentActivity() {
         return super.onKeyDown(keyCode, event)
     }
 
+    private fun startBackHold() {
+        backHoldJob?.cancel()
+        backHoldFired = false
+        backHoldJob = lifecycleScope.launch {
+            delay(BACK_HOLD_MS)
+            backHoldFired = true
+            onBackHeld()
+        }
+    }
+
+    private fun releaseBackHold(): Boolean {
+        val job = backHoldJob ?: return false
+        job.cancel()
+        backHoldJob = null
+        if (!backHoldFired && !isAnyMenuOpen) showMenu()
+        return true
+    }
+
+    private fun onBackHeld() {
+        if (!isAnyMenuOpen) showMenu()
+    }
+
     override fun onKeyUp(keyCode: Int, event: KeyEvent): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_BACK && releaseBackHold()) return true
         if (isAnyMenuOpen) return super.onKeyUp(keyCode, event)
 
         if (deferredCoreKeys.release(keyCode, event)) return true
@@ -3952,6 +3977,7 @@ class LibretroActivity : ComponentActivity() {
         private const val SAVE_SCREENSHOT_DELAY_MS = 250L
         private const val SAVE_WRITE_CHECK_INTERVAL_MS = 5_000L
         private const val SAVE_INDICATOR_MERGE_MS = 5_000L
+        private const val BACK_HOLD_MS = 500L
 
         private const val FPS_SAMPLE_INTERVAL_MS = 1_000L
 
