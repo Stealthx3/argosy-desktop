@@ -425,7 +425,7 @@ private fun ToolSelector(
                         if (isSelected) MaterialTheme.colorScheme.primary
                         else MaterialTheme.colorScheme.surface
                     )
-                    .clickable { onToolSelect() },
+                    .clickableNoFocus { onToolSelect() },
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
@@ -507,7 +507,7 @@ private fun PaletteGrid(
                                         else -> Modifier
                                     }
                                 )
-                                .clickable { onColorSelect(color) }
+                                .clickableNoFocus { onColorSelect(color) }
                         )
                     }
                 }
@@ -553,7 +553,7 @@ private fun SizeSelector(
                             else -> Color.Transparent
                         }
                     )
-                    .clickable { onSizeSelect(size) }
+                    .clickableNoFocus { onSizeSelect(size) }
                     .padding(horizontal = 8.dp, vertical = 4.dp),
                 contentAlignment = Alignment.Center
             ) {

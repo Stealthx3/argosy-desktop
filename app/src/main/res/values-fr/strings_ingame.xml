@@ -435,6 +435,7 @@
     <string name="ingame_libretro_quickaction_load_unsupported_core">États de sauvegarde indisponibles pour ce core</string>
     <string name="ingame_libretro_quickaction_load_success">État chargé</string>
     <string name="ingame_libretro_quickaction_load_failure">Échec du chargement de l\'état</string>
+    <string name="ingame_libretro_quickaction_load_replaced">Cet état a été remplacé. Sélectionnez-le à nouveau.</string>
     <string name="ingame_libretro_quickaction_screenshot_capture_failed">Échec de la capture</string>
     <string name="ingame_libretro_quickaction_screenshot_success">Capture d\'écran enregistrée</string>
     <string name="ingame_libretro_quickaction_screenshot_failure">Échec de la capture d\'écran</string>

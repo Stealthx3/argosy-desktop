@@ -426,6 +426,7 @@
     <string name="ingame_libretro_quickaction_load_unsupported_core">इस कोर के लिए सेव स्टेट उपलब्ध नहीं हैं</string>
     <string name="ingame_libretro_quickaction_load_success">स्टेट लोड हुआ</string>
     <string name="ingame_libretro_quickaction_load_failure">स्टेट लोड करने में विफल</string>
+    <string name="ingame_libretro_quickaction_load_replaced">यह स्टेट बदल दी गई। इसे फिर से चुनें।</string>
     <string name="ingame_libretro_quickaction_screenshot_capture_failed">कैप्चर विफल</string>
     <string name="ingame_libretro_quickaction_screenshot_success">स्क्रीनशॉट सेव हुआ</string>
     <string name="ingame_libretro_quickaction_screenshot_failure">स्क्रीनशॉट विफल</string>

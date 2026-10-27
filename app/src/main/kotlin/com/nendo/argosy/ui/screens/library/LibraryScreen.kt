@@ -735,7 +735,8 @@ fun LibraryScreen(
                 getFocusIndex = { uiState.discPickerFocusIndex },
                 onFocusChange = { viewModel.setDiscPickerFocusIndex(it) },
                 onSelect = { viewModel.selectDisc(it) },
-                onDismiss = { viewModel.dismissDiscPicker() }
+                onDismiss = { viewModel.dismissDiscPicker() },
+                wrapMode = { viewModel.menuWrapMode }
             )
         }
 
@@ -764,7 +765,8 @@ fun LibraryScreen(
                 getFocusIndex = { uiState.variantPickerFocusIndex },
                 onFocusChange = { viewModel.setVariantPickerFocusIndex(it) },
                 onSelect = { viewModel.selectVariant(it) },
-                onDismiss = { viewModel.dismissVariantPicker() }
+                onDismiss = { viewModel.dismissVariantPicker() },
+                wrapMode = { viewModel.menuWrapMode }
             )
         }
 
@@ -803,7 +805,8 @@ fun LibraryScreen(
                 getFocusIndex = { uiState.memcardPickerFocusIndex },
                 onFocusChange = { viewModel.setMemcardPickerFocusIndex(it) },
                 onSelect = { viewModel.selectMemcard(it) },
-                onDismiss = { viewModel.dismissMemcardPicker() }
+                onDismiss = { viewModel.dismissMemcardPicker() },
+                wrapMode = { viewModel.menuWrapMode }
             )
         }
 
@@ -1271,12 +1274,7 @@ private fun LibraryGameCard(
         modifier = modifier
             .fillMaxWidth()
             .then(if (cardHeight != null) Modifier.height(cardHeight) else Modifier)
-            .combinedClickable(
-                onClick = onClick,
-                onLongClick = onLongClick,
-                indication = null,
-                interactionSource = remember { MutableInteractionSource() }
-            )
+            .clickableNoFocus(onClick = onClick, onLongClick = onLongClick)
     )
 }
 

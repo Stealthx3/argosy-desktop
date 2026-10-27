@@ -900,6 +900,7 @@
     <string name="ingame_libretro_quickaction_load_unsupported_core">Save states unavailable for this core</string>
     <string name="ingame_libretro_quickaction_load_success">State loaded</string>
     <string name="ingame_libretro_quickaction_load_failure">Failed to load state</string>
+    <string name="ingame_libretro_quickaction_load_replaced">That state was replaced. Pick it again.</string>
     <!-- Social-overlay toast for the cross-app screenshot hotkey/button. -->
     <string name="ingame_libretro_quickaction_screenshot_capture_failed">Capture failed</string>
     <string name="ingame_libretro_quickaction_screenshot_success">Screenshot saved</string>

@@ -2312,6 +2312,8 @@ class HomeViewModel @Inject constructor(
 
     fun selectDisc(discPath: String) = gameLaunchDelegate.selectDisc(viewModelScope, discPath)
     fun dismissDiscPicker() = gameLaunchDelegate.dismissDiscPicker()
+    val menuWrapMode get() = preferencesRepository.menuWrapMode
+
     fun setDiscPickerFocusIndex(index: Int) { _uiState.update { it.copy(discPickerFocusIndex = index) } }
 
     fun selectMemcard(cardPath: String) = gameLaunchDelegate.selectMemcard(viewModelScope, cardPath)

@@ -3744,7 +3744,7 @@ class LibretroActivity : ComponentActivity() {
             }
         }
 
-        override fun loadState(slotNumber: Int) {
+        override fun loadState(slotNumber: Int, savedAtMillis: Long) {
             runOnUiThread {
                 if (coreDestroyed || !::retroView.isInitialized) return@runOnUiThread
                 if (netplay.inSession) {
@@ -3760,6 +3760,11 @@ class LibretroActivity : ComponentActivity() {
                     return@runOnUiThread
                 }
                 lifecycleScope.launch(Dispatchers.IO) {
+                    if (saveStateManager.slotSavedAtMillis(slotNumber) != savedAtMillis) {
+                        publishSessionControls()
+                        notifyQuickAction(false, "", getString(R.string.ingame_libretro_quickaction_load_replaced))
+                        return@launch
+                    }
                     val ok = try {
                         saveStateManager.performSlotLoad(retroView, slotNumber)
                     } catch (_: Exception) {

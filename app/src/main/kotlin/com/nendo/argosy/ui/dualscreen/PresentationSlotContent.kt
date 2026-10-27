@@ -241,7 +241,7 @@ internal fun PresentationControlHints(hints: List<CompanionHint>) {
 private fun dashboardActions(manager: com.nendo.argosy.DualScreenManager) =
     com.nendo.argosy.ui.dualscreen.dashboard.DashboardActions(
         onQuickSave = { manager.sessionQuickActions?.quickSave() },
-        onLoadState = { manager.sessionQuickActions?.loadState(it) },
+        onLoadState = { manager.sessionQuickActions?.loadState(it.slotNumber, it.savedAtMillis) },
         onScreenshot = { manager.sessionQuickActions?.screenshot() },
         onOpenCheats = { manager.sessionQuickActions?.openCheats() },
         onOpenSettings = { manager.sessionQuickActions?.openGameSettings() },

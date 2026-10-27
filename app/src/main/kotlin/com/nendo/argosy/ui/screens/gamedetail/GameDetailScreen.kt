@@ -66,6 +66,7 @@ import com.nendo.argosy.ui.components.FooterSpacer
 import com.nendo.argosy.ui.components.InputButton
 import com.nendo.argosy.ui.components.SyncOverlay
 import com.nendo.argosy.ui.input.LocalInputDispatcher
+import com.nendo.argosy.ui.input.ModalInputEffect
 import com.nendo.argosy.ui.navigation.Screen
 import com.nendo.argosy.ui.screens.gamedetail.components.AchievementListOverlay
 import com.nendo.argosy.ui.screens.gamedetail.components.AchievementsSection
@@ -195,7 +196,7 @@ fun GameDetailScreen(
         relatedListState.scrollToItem(0)
     }
 
-    val inputHandler = remember(onBack, uiState.menuFocusIndex, screenshotCount, achievementColumnCount) {
+    val inputHandler = remember(onBack) {
         viewModel.createInputHandler(
             onBack = onBack,
             onNavigateToPlatformSettings = onNavigateToPlatformSettings,
@@ -279,25 +280,16 @@ fun GameDetailScreen(
             getFocusIndex = { uiState.memcardPickerFocusIndex },
             onFocusChange = { viewModel.setMemcardPickerFocusIndex(it) },
             onSelect = { viewModel.selectMemcard(it) },
-            onDismiss = { viewModel.dismissMemcardPicker() }
+            onDismiss = { viewModel.dismissMemcardPicker() },
+            wrapMode = { viewModel.menuWrapMode }
         )
     }
 
     val showMemcardPicker = uiState.memcardPickerState != null
     LaunchedEffect(showMemcardPicker) {
-        if (showMemcardPicker) {
-            viewModel.setMemcardPickerFocusIndex(0)
-            inputDispatcher.pushModal(memcardPickerInputHandler)
-        }
+        if (showMemcardPicker) viewModel.setMemcardPickerFocusIndex(0)
     }
-
-    DisposableEffect(showMemcardPicker) {
-        onDispose {
-            if (showMemcardPicker) {
-                inputDispatcher.removeModal(memcardPickerInputHandler)
-            }
-        }
-    }
+    ModalInputEffect(active = showMemcardPicker, handler = memcardPickerInputHandler)
 
     val launchVariantPickerInputHandler = remember(viewModel) {
         com.nendo.argosy.ui.input.VariantPickerInputHandler(
@@ -305,62 +297,25 @@ fun GameDetailScreen(
             getFocusIndex = { uiState.launchVariantPickerFocusIndex },
             onFocusChange = { viewModel.setLaunchVariantPickerFocusIndex(it) },
             onSelect = { viewModel.selectLaunchVariant(it) },
-            onDismiss = { viewModel.dismissLaunchVariantPicker() }
+            onDismiss = { viewModel.dismissLaunchVariantPicker() },
+            wrapMode = { viewModel.menuWrapMode }
         )
     }
 
     val showLaunchVariantPicker = uiState.launchVariantPickerState != null
     LaunchedEffect(showLaunchVariantPicker) {
-        if (showLaunchVariantPicker) {
-            viewModel.setLaunchVariantPickerFocusIndex(0)
-            inputDispatcher.pushModal(launchVariantPickerInputHandler)
-        }
+        if (showLaunchVariantPicker) viewModel.setLaunchVariantPickerFocusIndex(0)
     }
-
-    DisposableEffect(showLaunchVariantPicker) {
-        onDispose {
-            if (showLaunchVariantPicker) {
-                inputDispatcher.removeModal(launchVariantPickerInputHandler)
-            }
-        }
-    }
+    ModalInputEffect(active = showLaunchVariantPicker, handler = launchVariantPickerInputHandler)
 
     val perGameSettingsInputHandler = remember(viewModel, onNavigateToPlatformSettings) {
         viewModel.createPerGameSettingsInputHandler(onNavigateToPlatformSettings)
     }
 
-    val showPerGameSettings = uiState.perGameSettings.visible
-    LaunchedEffect(showPerGameSettings) {
-        if (showPerGameSettings) {
-            inputDispatcher.pushModal(perGameSettingsInputHandler)
-        }
-    }
-
-    DisposableEffect(showPerGameSettings) {
-        onDispose {
-            if (showPerGameSettings) {
-                inputDispatcher.removeModal(perGameSettingsInputHandler)
-            }
-        }
-    }
+    ModalInputEffect(active = uiState.perGameSettings.visible, handler = perGameSettingsInputHandler)
 
     val documentReader by viewModel.documentReader.collectAsState()
-    val documentReaderOpen = documentReader != null
-    val documentReaderInputHandler = viewModel.documentReaderInput
-
-    LaunchedEffect(documentReaderOpen) {
-        if (documentReaderOpen) {
-            inputDispatcher.pushModal(documentReaderInputHandler)
-        }
-    }
-
-    DisposableEffect(documentReaderOpen) {
-        onDispose {
-            if (documentReaderOpen) {
-                inputDispatcher.removeModal(documentReaderInputHandler)
-            }
-        }
-    }
+    ModalInputEffect(active = documentReader != null, handler = viewModel.documentReaderInput)
 
     Box(modifier = Modifier.fillMaxSize()) {
         if (uiState.isLoading || game == null) {

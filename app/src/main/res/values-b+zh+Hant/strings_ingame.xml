@@ -418,6 +418,7 @@
     <string name="ingame_libretro_quickaction_load_unsupported_core">此核心無法使用即時存檔</string>
     <string name="ingame_libretro_quickaction_load_success">已載入即時存檔</string>
     <string name="ingame_libretro_quickaction_load_failure">無法載入即時存檔</string>
+    <string name="ingame_libretro_quickaction_load_replaced">該即時存檔已被取代，請重新選擇。</string>
     <string name="ingame_libretro_quickaction_screenshot_capture_failed">擷取失敗</string>
     <string name="ingame_libretro_quickaction_screenshot_success">截圖已儲存</string>
     <string name="ingame_libretro_quickaction_screenshot_failure">截圖失敗</string>

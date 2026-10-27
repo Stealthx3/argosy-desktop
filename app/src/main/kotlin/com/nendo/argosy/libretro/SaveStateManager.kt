@@ -676,6 +676,8 @@ class SaveStateManager(
         }
     }
 
+    fun slotSavedAtMillis(slotNumber: Int): Long = getSlotFile(slotNumber).lastModified()
+
     fun performSlotLoad(retroView: GLRetroView, slotNumber: Int): Boolean {
         return try {
             val stateFile = getSlotFile(slotNumber)

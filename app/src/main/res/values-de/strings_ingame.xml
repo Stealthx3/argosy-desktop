@@ -426,6 +426,7 @@
     <string name="ingame_libretro_quickaction_load_unsupported_core">Savestates für diesen Core nicht verfügbar</string>
     <string name="ingame_libretro_quickaction_load_success">Savestate geladen</string>
     <string name="ingame_libretro_quickaction_load_failure">Savestate konnte nicht geladen werden</string>
+    <string name="ingame_libretro_quickaction_load_replaced">Dieser Savestate wurde ersetzt. Wähle ihn erneut.</string>
     <string name="ingame_libretro_quickaction_screenshot_capture_failed">Aufnahme fehlgeschlagen</string>
     <string name="ingame_libretro_quickaction_screenshot_success">Screenshot gespeichert</string>
     <string name="ingame_libretro_quickaction_screenshot_failure">Screenshot fehlgeschlagen</string>

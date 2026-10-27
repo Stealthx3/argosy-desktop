@@ -139,7 +139,7 @@ internal fun StatesSection(content: DashboardContent, wide: Boolean) {
                     onTap = {
                         if (armed.isArmed(quickState.slotNumber)) {
                             armed = ArmedState()
-                            content.actions.onLoadState(quickState.slotNumber)
+                            content.actions.onLoadState(quickState)
                         } else {
                             armed = ArmedState(quickState.slotNumber, now() + CONFIRM_WINDOW_MS)
                         }
@@ -356,7 +356,7 @@ private fun RecentStates(content: DashboardContent) {
                         onTap = {
                             if (armed.isArmed(quickState.slotNumber)) {
                                 armed = ArmedState()
-                                content.actions.onLoadState(quickState.slotNumber)
+                                content.actions.onLoadState(quickState)
                             } else {
                                 armed = ArmedState(quickState.slotNumber, now() + CONFIRM_WINDOW_MS)
                             }

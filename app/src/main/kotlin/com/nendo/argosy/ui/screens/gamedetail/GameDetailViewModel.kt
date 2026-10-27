@@ -2102,6 +2102,8 @@ class GameDetailViewModel @Inject constructor(
 
     fun selectMemcard(cardPath: String) = gameLaunchDelegate.selectMemcard(viewModelScope, cardPath)
     fun dismissMemcardPicker() = gameLaunchDelegate.dismissMemcardPicker()
+    val menuWrapMode get() = preferencesRepository.menuWrapMode
+
     fun setMemcardPickerFocusIndex(index: Int) {
         _uiState.update { it.copy(memcardPickerFocusIndex = index) }
     }

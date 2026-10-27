@@ -402,7 +402,8 @@ fun HomeScreen(
             getFocusIndex = { uiState.discPickerFocusIndex },
             onFocusChange = { viewModel.setDiscPickerFocusIndex(it) },
             onSelect = { viewModel.selectDisc(it) },
-            onDismiss = { viewModel.dismissDiscPicker() }
+            onDismiss = { viewModel.dismissDiscPicker() },
+            wrapMode = { viewModel.menuWrapMode }
         )
     }
 
@@ -412,7 +413,8 @@ fun HomeScreen(
             getFocusIndex = { uiState.memcardPickerFocusIndex },
             onFocusChange = { viewModel.setMemcardPickerFocusIndex(it) },
             onSelect = { viewModel.selectMemcard(it) },
-            onDismiss = { viewModel.dismissMemcardPicker() }
+            onDismiss = { viewModel.dismissMemcardPicker() },
+            wrapMode = { viewModel.menuWrapMode }
         )
     }
 
@@ -2123,12 +2125,14 @@ private fun GameSelectOverlay(
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
-            .background(overlayColor),
+            .background(overlayColor)
+            .clickableNoFocus(onClick = onDismiss),
         contentAlignment = Alignment.Center
     ) {
         Column(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(Dimens.radiusLg))
+                .clickableNoFocus {}
                 .padding(Dimens.spacingLg)
                 .width(Dimens.modalWidth)
                 .heightIn(max = maxHeight * 0.85f)

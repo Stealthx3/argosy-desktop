@@ -291,6 +291,8 @@ class UserPreferencesRepository @Inject constructor(
      */
     val latest: UserPreferences? get() = hotPreferences.replayCache.firstOrNull()
 
+    val menuWrapMode: MenuWrapMode get() = (latest ?: UserPreferences()).menuWrapMode
+
     // --- Display delegates ---
 
     suspend fun setThemeMode(mode: ThemeMode) = displayPrefs.setThemeMode(mode)
@@ -836,15 +838,15 @@ data class UserPreferences(
     val tertiaryColor: Int? = null,
     val surfaceTintBleed: Int = 0,
     val backdropEnabled: Boolean = false,
-    val backdropPreset: BackdropPreset = BackdropPreset.PLATFORMS,
+    val backdropPreset: BackdropPreset = BackdropPreset.DOTS,
     val backdropCellSize: Int = ComponentDefaults.SurfaceBackdrop.cellSizeDefaultDp,
     val backdropScatter: Int = 200,
     val backdropScaleJitter: Int = 100,
     val backdropStrength: Int = 20,
-    val backdropEdgeStyle: BackdropEdgeStyle = BackdropEdgeStyle.CONNECTIONS,
+    val backdropEdgeStyle: BackdropEdgeStyle = BackdropEdgeStyle.NONE,
     val backdropVertexIcons: BackdropVertexIcon = BackdropVertexIcon.NONE,
     val backdropSeed: Long = 0L,
-    val backdropMotion: BackdropMotion = BackdropMotion.SWAY,
+    val backdropMotion: BackdropMotion = BackdropMotion.OFF,
     val backdropMotionSpeed: Int = 75,
     val backdropDriftAngle: Float = 45f,
     val displayFontPath: String? = null,
@@ -904,7 +906,7 @@ data class UserPreferences(
     val libraryDefaultPlayers: com.nendo.argosy.domain.model.PlayerCountBucket? = null,
     val soundConfigs: Map<SoundType, SoundConfig> = emptyMap(),
     val betaUpdatesEnabled: Boolean = false,
-    val closeEmulatorOnSessionEnd: Boolean = true,
+    val closeEmulatorOnSessionEnd: Boolean = false,
     val appLanguage: AppLanguage = AppLanguage.SYSTEM,
     val preLaunchRecapsEnabled: Boolean = true,
     val monthlyRecapEnabled: Boolean = true,
@@ -914,7 +916,7 @@ data class UserPreferences(
     val secureSaves: Boolean = true,
     val stateCacheEnabled: Boolean = true,
     val saveCacheLimit: Int = 10,
-    val backgroundBlur: Int = 0,
+    val backgroundBlur: Int = 40,
     val backgroundSaturation: Int = 100,
     val backgroundOpacity: Int = 100,
     val useGameBackground: Boolean = true,
@@ -940,14 +942,14 @@ data class UserPreferences(
     val boxArtShape: BoxArtShape = BoxArtShape.STANDARD,
     val boxArtCornerRadius: BoxArtCornerRadius = BoxArtCornerRadius.MEDIUM,
     val boxArtBorderThickness: BoxArtBorderThickness = BoxArtBorderThickness.MEDIUM,
-    val boxArtBorderStyle: BoxArtBorderStyle = BoxArtBorderStyle.GLASS,
-    val glassBorderTint: GlassBorderTint = GlassBorderTint.TINT_20,
+    val boxArtBorderStyle: BoxArtBorderStyle = BoxArtBorderStyle.SOLID,
+    val glassBorderTint: GlassBorderTint = GlassBorderTint.OFF,
     val boxArtGlowStrength: BoxArtGlowStrength = BoxArtGlowStrength.MEDIUM,
     val boxArtOuterEffect: BoxArtOuterEffect = BoxArtOuterEffect.GLOW,
-    val boxArtOuterEffectThickness: BoxArtOuterEffectThickness = BoxArtOuterEffectThickness.THIN,
+    val boxArtOuterEffectThickness: BoxArtOuterEffectThickness = BoxArtOuterEffectThickness.MEDIUM,
     val glowColorMode: GlowColorMode = GlowColorMode.AUTO,
-    val boxArtInnerEffect: BoxArtInnerEffect = BoxArtInnerEffect.GLASS,
-    val boxArtInnerEffectThickness: BoxArtInnerEffectThickness = BoxArtInnerEffectThickness.THICK,
+    val boxArtInnerEffect: BoxArtInnerEffect = BoxArtInnerEffect.SHADOW,
+    val boxArtInnerEffectThickness: BoxArtInnerEffectThickness = BoxArtInnerEffectThickness.MEDIUM,
     val gradientPreset: GradientPreset = GradientPreset.BALANCED,
     val gradientAdvancedMode: Boolean = false,
     val systemIconPosition: SystemIconPosition = SystemIconPosition.TOP_LEFT,

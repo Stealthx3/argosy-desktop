@@ -418,12 +418,7 @@ private fun AppCard(
         modifier = modifier
             .then(borderModifier)
             .clip(RoundedCornerShape(Dimens.radiusMd))
-            .combinedClickable(
-                onClick = onClick,
-                onLongClick = onLongClick,
-                indication = null,
-                interactionSource = remember { MutableInteractionSource() }
-            )
+            .clickableNoFocus(onClick = onClick, onLongClick = onLongClick)
             .background(backgroundColor)
             .padding(Dimens.radiusLg),
         horizontalAlignment = Alignment.CenterHorizontally

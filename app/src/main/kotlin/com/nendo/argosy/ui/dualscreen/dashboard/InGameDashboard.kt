@@ -87,7 +87,7 @@ enum class DashboardSection(@StringRes val labelRes: Int, val icon: ImageVector)
  */
 class DashboardActions(
     val onQuickSave: () -> Unit,
-    val onLoadState: (Int) -> Unit,
+    val onLoadState: (DashboardQuickState) -> Unit,
     val onScreenshot: () -> Unit,
     val onOpenCheats: () -> Unit,
     val onOpenSettings: () -> Unit,

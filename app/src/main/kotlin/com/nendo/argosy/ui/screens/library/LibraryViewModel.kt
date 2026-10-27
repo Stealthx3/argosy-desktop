@@ -771,6 +771,8 @@ class LibraryViewModel @Inject constructor(
         gameLaunchDelegate.dismissDiscPicker()
     }
 
+    val menuWrapMode get() = preferencesRepository.menuWrapMode
+
     fun setDiscPickerFocusIndex(index: Int) {
         _uiState.update { it.copy(discPickerFocusIndex = index) }
     }

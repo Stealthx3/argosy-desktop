@@ -830,7 +830,7 @@ class DualScreenManager(
 
     interface SessionQuickActions {
         fun quickSave()
-        fun loadState(slotNumber: Int)
+        fun loadState(slotNumber: Int, savedAtMillis: Long)
         fun screenshot()
         fun openCheats()
         fun openGameSettings()
