@@ -2307,12 +2307,10 @@
     <!-- ===== Controller order modal (Settings > components > ControllerOrderModal) ===== -->
 
     <string name="settings_controller_order_title">Порядок контроллеров</string>
-    <string name="settings_controller_order_claim_subtitle">Нажмите кнопку на каждом контроллере в порядке игроков. Нажмите ещё раз, чтобы освободить место.</string>
-    <string name="settings_controller_order_seat_waiting">Нажмите кнопку</string>
-    <string name="settings_controller_order_seat_open">Свободно</string>
+    <string name="settings_controller_order_prompt">Нажмите %1$s + %2$s или %3$s на контроллере, который хотите использовать</string>
+    <string name="settings_controller_order_ready">Нажмите %1$s, когда будете готовы</string>
     <string name="settings_controller_order_hint_clear_all">Очистить все</string>
     <string name="settings_controller_order_default_name">Контроллер</string>
-    <string name="settings_controller_order_slot_label">P%1$d</string>
 
     <!-- ===== Grip controller modal (Settings > components > GripControllerModal) ===== -->
 

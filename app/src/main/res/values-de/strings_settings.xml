@@ -2208,12 +2208,10 @@
     <!-- ===== Controller order modal (Settings > components > ControllerOrderModal) ===== -->
 
     <string name="settings_controller_order_title">Controller-Reihenfolge</string>
-    <string name="settings_controller_order_claim_subtitle">Drücke an jedem Controller in Spielerreihenfolge eine Taste. Erneut drücken gibt den Platz frei.</string>
-    <string name="settings_controller_order_seat_waiting">Taste drücken</string>
-    <string name="settings_controller_order_seat_open">Frei</string>
+    <string name="settings_controller_order_prompt">Drücke %1$s + %2$s oder %3$s auf dem Controller, den du verwenden möchtest</string>
+    <string name="settings_controller_order_ready">Drücke %1$s, wenn du bereit bist</string>
     <string name="settings_controller_order_hint_clear_all">Alle löschen</string>
     <string name="settings_controller_order_default_name">Controller</string>
-    <string name="settings_controller_order_slot_label">P%1$d</string>
 
     <!-- ===== Grip controller modal (Settings > components > GripControllerModal) ===== -->
 

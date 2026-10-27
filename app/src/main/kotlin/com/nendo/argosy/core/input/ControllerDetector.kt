@@ -143,8 +143,21 @@ object ControllerDetector {
         return DetectionResult(null, device.name, vendorId, DetectionSource.UNKNOWN)
     }
 
+    /**
+     * True for the handheld's own controls. Some firmware (Retroid) attaches them over an internal
+     * USB bus that reports external, so a pad named after the device's own brand also counts.
+     */
     fun isBuiltInPad(device: InputDevice): Boolean =
-        android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q && !device.isExternal
+        (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q && !device.isExternal) ||
+            padNamedForDevice(device.name, android.os.Build.MODEL)
+
+    internal fun padNamedForDevice(padName: String?, deviceModel: String?): Boolean {
+        val brand = deviceModel?.trim()?.substringBefore(' ')?.lowercase().orEmpty()
+        if (brand.length < MIN_BRAND_LENGTH) return false
+        return padName?.trim()?.substringBefore(' ')?.lowercase() == brand
+    }
+
+    private const val MIN_BRAND_LENGTH = 3
 
     /** Built-in pads on handhelds often report generic names (virtual_gamepad) and junk vendor ids; fall back to the device build. */
     private fun detectFromBuildIdentity(): DetectedLayout? {

@@ -57,8 +57,6 @@ import com.nendo.argosy.ui.components.SwitchPreference
 import com.nendo.argosy.ui.screens.settings.CoreOptionViewItem
 import com.nendo.argosy.ui.input.InputHandler
 import com.nendo.argosy.ui.input.InputResult
-import com.nendo.argosy.ui.screens.settings.components.ControllerOrderModal
-import com.nendo.argosy.ui.screens.settings.components.ControllerSeatController
 import com.nendo.argosy.ui.screens.settings.components.GripSettingsModal
 import com.nendo.argosy.ui.screens.settings.components.HotkeysModal
 import com.nendo.argosy.data.repository.MappingPlatforms
@@ -178,7 +176,6 @@ sealed class InGameControlsAction {
 }
 
 data class InGameModalCallbacks(
-    val controllerSeats: ControllerSeatController,
     val hotkeys: List<HotkeyEntity>,
     val connectedControllers: StateFlow<List<ControllerInfo>>,
     val activeController: StateFlow<ActiveController?>,
@@ -335,7 +332,6 @@ fun InGameSettingsScreen(
     val videoListState = rememberLazyListState()
     val controlsListState = rememberLazyListState()
     val coreOptionsListState = rememberLazyListState()
-    var showControllerOrderModal by remember { mutableStateOf(false) }
     var showInputMappingModal by remember { mutableStateOf(false) }
     var showHotkeysModal by remember { mutableStateOf(false) }
     var showGripSettingsModal by remember { mutableStateOf(false) }
@@ -441,8 +437,7 @@ fun InGameSettingsScreen(
     }
 
     fun openControllerOrder() {
-        modalCallbacks.controllerSeats.open()
-        showControllerOrderModal = true
+        currentOnControlsAction.value(InGameControlsAction.ShowControllerOrder)
     }
 
     fun cycleControlsItem(direction: Int): Boolean {
@@ -736,13 +731,6 @@ fun InGameSettingsScreen(
                         else -> {}
                     }
                 }
-            )
-        }
-
-        if (showControllerOrderModal) {
-            ControllerOrderModal(
-                controller = modalCallbacks.controllerSeats,
-                onDismiss = { showControllerOrderModal = false }
             )
         }
 

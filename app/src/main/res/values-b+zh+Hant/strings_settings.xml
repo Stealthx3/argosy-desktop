@@ -2032,12 +2032,10 @@
     <string name="settings_app_picker_empty">找不到可啟動的應用程式。</string>
 
     <string name="settings_controller_order_title">控制器順序</string>
-    <string name="settings_controller_order_claim_subtitle">依玩家順序在每個控制器上按一個按鍵。再按一次即可讓出位置。</string>
-    <string name="settings_controller_order_seat_waiting">請按一個按鍵</string>
-    <string name="settings_controller_order_seat_open">空位</string>
+    <string name="settings_controller_order_prompt">在要使用的控制器上按 %1$s + %2$s 或 %3$s</string>
+    <string name="settings_controller_order_ready">準備好後按 %1$s</string>
     <string name="settings_controller_order_hint_clear_all">全部清除</string>
     <string name="settings_controller_order_default_name">控制器</string>
-    <string name="settings_controller_order_slot_label">P%1$d</string>
 
     <string name="settings_grip_controller_default_name">控制器</string>
     <string name="settings_grip_controller_title">控制器握把</string>

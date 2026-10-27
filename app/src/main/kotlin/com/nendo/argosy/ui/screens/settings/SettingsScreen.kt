@@ -62,6 +62,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import com.nendo.argosy.ui.common.rememberStorageAccessRequest
 import com.nendo.argosy.ui.components.CustomTileMenuModal
 import com.nendo.argosy.ui.components.FooterHints
+import com.nendo.argosy.ui.screens.settings.components.ControllerOrderModal
 import com.nendo.argosy.ui.components.FooterSpacer
 import com.nendo.argosy.ui.components.InputButton
 import com.nendo.argosy.ui.components.TextEntryModal
@@ -758,6 +759,13 @@ fun SettingsScreen(
                         else -> Unit
                     }
                 }
+            )
+        }
+
+        if (uiState.builtinControls.showControllerOrderModal) {
+            ControllerOrderModal(
+                controller = viewModel.controllerSeats,
+                onDismiss = { viewModel.hideControllerOrderModal() }
             )
         }
 

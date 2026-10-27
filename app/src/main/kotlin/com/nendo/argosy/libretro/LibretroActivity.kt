@@ -1753,7 +1753,8 @@ class LibretroActivity : ComponentActivity() {
                     activeMenuHandler = seatPromptInputHandler
                     com.nendo.argosy.ui.screens.settings.components.ControllerOrderModal(
                         controller = controllerSeats,
-                        onDismiss = ::closeSeatPrompt
+                        onDismiss = ::closeSeatPrompt,
+                        drawsOwnFooter = true
                     )
                 }
                 if (!isAnyMenuOpen) {
@@ -2432,7 +2433,6 @@ class LibretroActivity : ComponentActivity() {
     private fun buildModalCallbacks(): InGameModalCallbacks {
         val repo = inputConfig.inputConfigRepository
         return InGameModalCallbacks(
-            controllerSeats = controllerSeats,
             hotkeys = inputConfig.hotkeyList,
             connectedControllers = connectedControllers,
             activeController = connectedControllerTracker.activeController,
@@ -3140,7 +3140,7 @@ class LibretroActivity : ComponentActivity() {
                     preferencesRepository.setBuiltinFastForwardPreservePitch(action.enabled)
                 }
             }
-            InGameControlsAction.ShowControllerOrder,
+            InGameControlsAction.ShowControllerOrder -> openSeatScreen()
             InGameControlsAction.ShowInputMapping,
             InGameControlsAction.ShowGripSettings,
             InGameControlsAction.ShowHotkeys -> {}
@@ -3250,10 +3250,14 @@ class LibretroActivity : ComponentActivity() {
             .distinctBy { it.controllerId }
         val savedIds = savedOrder.mapTo(mutableSetOf()) { it.controllerId }
         if (!ControllerSeating.shouldPromptForSeats(connected, savedIds)) return
-        controllerSeats.open()
-        seatPromptVisible = true
+        openSeatScreen()
         retroView.suppressAutoResume = true
         if (firstFrameRendered) retroView.pauseEmulation()
+    }
+
+    private fun openSeatScreen() {
+        controllerSeats.open()
+        seatPromptVisible = true
     }
 
     private fun closeSeatPrompt() {

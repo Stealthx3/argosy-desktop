@@ -39,7 +39,6 @@ import com.nendo.argosy.ui.screens.gamedetail.components.OptionItem
 import com.nendo.argosy.ui.screens.settings.BuiltinControlsState
 import com.nendo.argosy.ui.screens.settings.SettingsUiState
 import com.nendo.argosy.ui.screens.settings.SettingsViewModel
-import com.nendo.argosy.ui.screens.settings.components.ControllerOrderModal
 import com.nendo.argosy.ui.screens.settings.components.HotkeysModal
 import com.nendo.argosy.ui.screens.settings.components.InputMappingModal
 import com.nendo.argosy.ui.screens.settings.menu.SettingsLayout
@@ -529,13 +528,6 @@ fun BuiltinControlsSection(
 
                 else -> {}
             }
-        }
-
-        if (controlsState.showControllerOrderModal) {
-            ControllerOrderModal(
-                controller = viewModel.controllerSeats,
-                onDismiss = { viewModel.hideControllerOrderModal() }
-            )
         }
 
         if (controlsState.showInputMappingModal) {

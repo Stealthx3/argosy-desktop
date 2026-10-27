@@ -4246,18 +4246,14 @@
 
     <!-- Modal title. Noun phrase: assigning controllers to player ports. -->
     <string name="settings_controller_order_title">Controller Order</string>
-    <!-- Modal subtitle. Seats fill in the order controllers press a button. -->
-    <string name="settings_controller_order_claim_subtitle">Press a button on each controller in player order. Press again to give up a seat.</string>
-    <!-- Seat row text for the next open seat, the one the next button press takes. -->
-    <string name="settings_controller_order_seat_waiting">Press a button</string>
-    <!-- Seat row text for an open seat after the next one. -->
-    <string name="settings_controller_order_seat_open">Open</string>
+    <!-- Instruction above the player cards. %1$s, %2$s and %3$s are drawn as the L, R and A button icons; keep all three. Pressing L and R together, or A, gives that controller the next player seat. -->
+    <string name="settings_controller_order_prompt">Press %1$s + %2$s or %3$s on the controller you want to use</string>
+    <!-- Line below the player cards. %1$s is drawn as the A button icon. Pressing it on a seated controller finishes. -->
+    <string name="settings_controller_order_ready">Press %1$s when you\'re ready</string>
     <!-- Footer hint. Removes every controller's player seat. -->
     <string name="settings_controller_order_hint_clear_all">Clear all</string>
     <!-- Fallback name for a controller that reports no name of its own. -->
     <string name="settings_controller_order_default_name">Controller</string>
-    <!-- Seat option for a player port. %1$d is the port number (1-4). -->
-    <string name="settings_controller_order_slot_label">P%1$d</string>
 
     <!-- ===== Grip controller modal (Settings > components > GripControllerModal) =====
          "Grip" is a controller attachment that clips onto the device; the UI shifts to make

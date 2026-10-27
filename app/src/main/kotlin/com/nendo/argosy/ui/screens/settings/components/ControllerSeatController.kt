@@ -16,26 +16,26 @@ import kotlinx.coroutines.sync.withLock
 
 data class SeatHolder(
     val controllerId: String,
-    val name: String?
+    val name: String?,
+    val deviceId: Int? = null
 )
 
 data class ControllerSeatState(
     val seats: List<SeatHolder?> = List(ControllerSeating.PORT_COUNT) { null }
-) {
-    val nextOpenSeat: Int? get() = seats.indexOfFirst { it == null }.takeIf { it >= 0 }
-}
+)
 
-fun claimOrRelease(seats: List<SeatHolder?>, controllerId: String, name: String?): List<SeatHolder?> {
-    val held = seats.indexOfFirst { it?.controllerId == controllerId }
-    if (held >= 0) return seats.toMutableList().also { it[held] = null }
+enum class SeatKeyOutcome { NONE, CLAIMED, CLEARED, READY, CLOSE }
+
+fun claimSeat(seats: List<SeatHolder?>, holder: SeatHolder): List<SeatHolder?> {
+    if (seats.any { it?.controllerId == holder.controllerId }) return seats
     val open = seats.indexOfFirst { it == null }
     if (open < 0) return seats
-    return seats.toMutableList().also { it[open] = SeatHolder(controllerId, name) }
+    return seats.toMutableList().also { it[open] = holder }
 }
 
 /**
- * Switch-style seating: each controller takes the first open seat by pressing a button, and
- * gives it up by pressing again. Each change is written to the saved controller order.
+ * Switch-style seating: a controller takes the next open seat with L and R held together, or
+ * with A. A on a seated controller finishes. Each change is written to the saved controller order.
  */
 class ControllerSeatController(
     private val repository: InputConfigRepository,
@@ -45,38 +45,59 @@ class ControllerSeatController(
     private val _state = MutableStateFlow(ControllerSeatState())
     val state: StateFlow<ControllerSeatState> = _state.asStateFlow()
     private val writes = Mutex()
+    private val heldShoulders = mutableMapOf<String, Set<GamepadEvent>>()
     private var replacesSavedOrder = false
 
     fun open() {
         replacesSavedOrder = true
+        heldShoulders.clear()
         _state.value = ControllerSeatState()
     }
 
+    fun onPadKey(event: GamepadEvent?, isDown: Boolean, pad: InputDevice?): SeatKeyOutcome =
+        onPadKey(event, isDown, pad?.let { SeatHolder(controllerIdOf(it), it.name, it.id) })
+
     /**
-     * Applies one press from the seat modal. A face or shoulder button claims or releases the
-     * pressing pad's seat, Y clears every seat, and Back closes. True when the press closes the
-     * modal.
+     * Applies one key transition from the seat screen, from [pad] or from a source that is not a
+     * controller when null.
      */
-    fun onPadPress(event: GamepadEvent?, pressingController: InputDevice?): Boolean {
-        when (event) {
-            GamepadEvent.Back -> return true
-            GamepadEvent.SecondaryAction -> clearAll()
-            GamepadEvent.Confirm,
-            GamepadEvent.ContextMenu,
-            GamepadEvent.PrevSection,
-            GamepadEvent.NextSection -> pressingController?.let { claimOrRelease(controllerIdOf(it), it.name) }
-            else -> Unit
+    fun onPadKey(event: GamepadEvent?, isDown: Boolean, pad: SeatHolder?): SeatKeyOutcome {
+        if (event == GamepadEvent.PrevSection || event == GamepadEvent.NextSection) {
+            return pad?.let { trackShoulder(it, event, isDown) } ?: SeatKeyOutcome.NONE
         }
-        return false
+        if (!isDown) return SeatKeyOutcome.NONE
+        return when (event) {
+            GamepadEvent.Back -> SeatKeyOutcome.CLOSE
+            GamepadEvent.SecondaryAction -> {
+                clearAll()
+                SeatKeyOutcome.CLEARED
+            }
+            GamepadEvent.Confirm -> when {
+                pad == null || isSeated(pad.controllerId) -> SeatKeyOutcome.READY
+                else -> claim(pad)
+            }
+            else -> SeatKeyOutcome.NONE
+        }
     }
 
-    fun claimOrRelease(controllerId: String, name: String?) {
+    private fun trackShoulder(pad: SeatHolder, shoulder: GamepadEvent, isDown: Boolean): SeatKeyOutcome {
+        val held = heldShoulders[pad.controllerId].orEmpty()
+        val now = if (isDown) held + shoulder else held - shoulder
+        heldShoulders[pad.controllerId] = now
+        val chord = isDown && GamepadEvent.PrevSection in now && GamepadEvent.NextSection in now
+        return if (chord) claim(pad) else SeatKeyOutcome.NONE
+    }
+
+    private fun isSeated(controllerId: String): Boolean =
+        _state.value.seats.any { it?.controllerId == controllerId }
+
+    private fun claim(pad: SeatHolder): SeatKeyOutcome {
         val before = _state.value.seats
-        val after = claimOrRelease(before, controllerId, name)
-        if (after == before) return
+        val after = claimSeat(before, pad)
+        if (after == before) return SeatKeyOutcome.NONE
         _state.update { it.copy(seats = after) }
-        val port = after.indexOfFirst { it?.controllerId == controllerId }.takeIf { it >= 0 }
-        persist(controllerId, name ?: controllerId, port)
+        persist(pad.controllerId, pad.name ?: pad.controllerId, after.indexOfFirst { it?.controllerId == pad.controllerId })
+        return SeatKeyOutcome.CLAIMED
     }
 
     fun releaseSeat(port: Int) {
