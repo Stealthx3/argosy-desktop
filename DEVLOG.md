@@ -1307,10 +1307,8 @@ Mapped ids: retroarch, dolphin, cemu, azahar, ryujinx (Ryubing), eden, melonds, 
 1. **Wizard emulator step wording.** The desktop first-run step listing emulator Flatpaks is titled and described as "Emulators Argosy should manage" instead of permissions.
 2. **Close Argosy in Quick Settings.** A desktop-only "Close Argosy" entry that asks for confirmation and then shuts the app down gracefully (input, sync and players stopped, window closed).
 3. **Game thumbnails from sync.** Cover art for games on Home and the platform selection screens is fetched and cached during the library sync on desktop (the desktop image cache is a stub today).
-4. **Steam Game Mode compatibility.** Re-assess gamescope sessions: emulator and game launches from Argosy, and a clean exit when closed from the Steam overlay (today it hangs the system and crashes Steam).
-5. **Side-by-side checks against Android.** Testers compare both apps; fix every difference outside the listed desktop divergences.
-6. **GNOME, KDE and SteamOS testing.** Install, wizard, launches and save sync on each.
-7. **Flathub submission.** Lint clean (folder grants, `flatpak-spawn`, screenshots, app id), offline from-source build in CI for x86_64 and aarch64, Flathub PR.
+4. **Linux desktop and Steam Game Mode compatibility.** Gamescope sessions: emulator and game launches from Argosy, and a clean exit when closed from the Steam overlay (fixes shipped in alpha 5.4). GNOME, KDE and SteamOS: install, wizard, sync, downloads, launches, save sync and a clean exit on each (VM test lab for Fedora GNOME, Fedora KDE and Ubuntu GNOME; the owner's Deck for Game Mode).
+5. **Flathub submission.** Lint clean (folder grants, `flatpak-spawn`, screenshots, app id), offline from-source build in CI for x86_64 and aarch64, Flathub PR.
 
 ### 2026-10-24 — Step 1: wizard emulator step wording; step closed
 
@@ -1493,3 +1491,13 @@ The owner's tests are the step 5 side-by-side checklist and the alpha 5.4 Game M
 - A clean snapshot per run.
 - Per desktop: install from the alpha repo, wizard, sign-in and sync, covers, download and launch in Flathub RetroArch, Close Argosy, SIGTERM exit, XWayland and HiDPI.
 - Game Mode is out of scope for VMs (no Vulkan GPU). An optional Bazzite VM is only a session-start check; launch and overlay exit stay on the owner's Deck.
+
+### 2026-10-27 — Phase 5 re-planned: Linux compatibility, no Android side-by-side (owner decision)
+
+**Owner decision (2026-10-27):** "Merge the Steam Game Mode compatibility step, and the GNOME, KDE, and SteamOS testing step into a single step, and remove the side-by-side checks against android. At this point in development, the goal should be linux adaptation and compatibility, not a 1:1 clone of the android app."
+**Action:**
+- The Phase 5 plan has five steps now. The old step 4 (Steam Game Mode) and step 6 (GNOME, KDE and SteamOS testing) become step 4, "Linux desktop and Steam Game Mode compatibility". The old step 5 (side-by-side against Android) is dropped. Flathub submission moves from step 7 to step 5.
+- Step 4 reopens: its Game Mode fixes stay (alpha 5.4), and it closes when the VM lab runs and the owner's Game Mode checks pass. It republishes with `--step-close 5.4`.
+- Removed `docs/desktop/side-by-side-checklist.md` and `scripts/desktop/check/side-by-side.sh`. The fixes the side-by-side pass produced stay: dual-screen gated off, About without the APK updater and System section, Flatpak update wording.
+- Phase 5 exit criterion (`PORT_PLAN.md`) and the Roadmap scope now name Linux compatibility instead of parity with Android. The `CLAUDE.md` goal line says the same.
+**Reasoning:** the owner's tests no longer include the side-by-side checklist, so the pause waits only on the Game Mode checks; the VM lab supplies the desktop-environment results. The Brightness question stays open as a Linux feature question (backlight control on desktops and handhelds), not as an Android difference.

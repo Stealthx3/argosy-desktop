@@ -1,6 +1,6 @@
-# Flathub submission plan (Phase 5, step 7)
+# Flathub submission plan (Phase 5, step 5)
 
-Started 2026-10-27, while step 5 waits for the owner's checklist (owner OK). Flathub builds offline in its own sandbox from sources listed in the manifest, then lints the manifest, the repo and the metainfo.
+Started 2026-10-27, while step 4 waits for the owner's Game Mode checks (owner OK). Flathub builds offline in its own sandbox from sources listed in the manifest, then lints the manifest, the repo and the metainfo.
 
 ## Lint status (`flatpak-builder-lint`, alpha manifest)
 
