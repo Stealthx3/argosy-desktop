@@ -336,7 +336,10 @@ grep -rn "hardcore" app/src/main/kotlin/com/nendo/argosy/libretro/speedrun/
   Emulator Warning, blank MemAddr) because both go through `armAchievements`.
   Queued ACHIEVEMENT rows leave `pending_sync_queue` only when RA accepts them,
   reports them already awarded, or rejects them under a status
-  `rc_client_should_retry` does not retry (auth refusals excepted);
+  `rc_client_should_retry` does not retry. Auth refusals stay queued in both
+  forms RA sends them: HTTP 401/403, and a body `Code` of `invalid_credentials`,
+  `expired_token` or `access_denied` (the codes `rc_json_convert_error_code`
+  maps to auth results), which can arrive on HTTP 200.
   `SyncCoordinator.processQueue` never touches them.
 
 ```bash
@@ -349,9 +352,11 @@ grep -n "SyncType.ACHIEVEMENT" app/src/main/kotlin/com/nendo/argosy/data/sync/Sy
 
 ## 5. Adjacent gates
 
-- **Netplay guests force NEW_CASUAL**: `LibretroActivity.parseIntentExtras` -
-  a join intent overrides launchMode to `NEW_CASUAL`; guests never earn
-  hardcore on a host's snapshot. Netplay also blocks state operations in
+- **Netplay guests force casual**: `LibretroActivity.parseIntentExtras` first
+  applies the Secure Saves downgrade, then a join intent sets launchMode to
+  `NEW_CASUAL` and `hardcoreMode = false`; guests never earn hardcore on a
+  host's snapshot. Netplay is hidden and refused in hardcore, so a hardcore
+  session never hosts. Netplay also blocks state operations in
   `HotkeyDispatcher` and hides state rows in `InGameMenu`
   (`!isInNetplaySession` in showStates) - but the netplay gates are NOT
   uniform:
@@ -359,8 +364,17 @@ grep -n "SyncType.ACHIEVEMENT" app/src/main/kotlin/com/nendo/argosy/data/sync/Sy
     (`isNetplayInSession() && getNetplayRole() != NetplayMenuRole.Host`); the
     host CAN quick-save mid-netplay.
   - `QUICK_LOAD` and `RESET_GAME` are blocked for everyone in session.
-  The hardcore gate is unconditional in all three cases and sits after the
-  netplay check, so hardcore compliance does not depend on the role.
+  `QUICK_SAVE` and `QUICK_LOAD` then check hardcore unconditionally, after the
+  netplay check. `RESET_GAME` has no hardcore gate on purpose: RA allows a reset
+  in hardcore.
+- **Core options the rcheevos client disallows**: after the first frame,
+  `enforceHardcoreCoreSettings` checks every active core option through
+  `LibretroDroid.isCoreSettingAllowed` (rcheevos
+  `rc_libretro_is_setting_allowed` against the core's disallowed list) and
+  abandons hardcore if one fails. In session, `cycleCoreOption` refuses a
+  disallowed value, and the CYCLE_CORE_OPTION hotkey goes through the same
+  function. Cheats are refused in hardcore by `CheatSessionManager`'s
+  `isHardcore` gate on every mutator.
 - **RA session carries the flag, not the heartbeat**:
   `RetroAchievementsSessionManager` starts the session with `requestedHardcore`
   (`raRepository.startSession(raId, requestedHardcore)`, sent as

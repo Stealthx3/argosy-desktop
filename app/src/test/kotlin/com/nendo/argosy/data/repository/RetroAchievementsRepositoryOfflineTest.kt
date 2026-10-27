@@ -162,6 +162,22 @@ class RetroAchievementsRepositoryOfflineTest {
     }
 
     @Test
+    fun `an auth refusal in the body keeps the unlock queued`() = runTest {
+        stubAward(
+            Response.success(
+                RAAwardResponse(success = false, error = "The access token has expired.", code = "expired_token")
+            )
+        )
+        repository.submitPendingAchievements()
+
+        stubAward(httpError(422, """{"Success":false,"Error":"Credentials invalid (0)","Code":"invalid_credentials"}"""))
+        repository.submitPendingAchievements()
+
+        coVerify(exactly = 2) { pendingSyncQueueDao.recordRetryableFailure(5L, any(), any()) }
+        coVerify(exactly = 0) { pendingSyncQueueDao.deleteById(any()) }
+    }
+
+    @Test
     fun `a definitive server rejection removes the unlock`() = runTest {
         stubAward(Response.success(RAAwardResponse(success = false, error = "Achievement not found")))
         repository.submitPendingAchievements()

@@ -36,6 +36,7 @@ private const val UNLOCKS_COOLDOWN_MS = 5 * 60 * 1000L
 private const val WARNING_UNLOCK_ID = 101000001L
 private val RETRYABLE_HTTP_CODES = setOf(429, 502, 503, 504, 521, 522, 523, 524, 525)
 private val AUTH_HTTP_CODES = setOf(401, 403)
+private val AUTH_SERVER_CODES = setOf("invalid_credentials", "expired_token", "access_denied")
 const val RA_BADGE_BASE_URL = "https://media.retroachievements.org/Badge/"
 
 sealed class RALoginResult {
@@ -321,7 +322,8 @@ class RetroAchievementsRepository @Inject constructor(
                 )
 
                 val success = response.isSuccessful && response.body()?.success == true
-                val serverError = serverErrorMessage(response)
+                val failure = serverFailure(response)
+                val serverError = failure?.error
                 val alreadyHas = serverError?.contains("already has", ignoreCase = true) == true
 
                 when {
@@ -330,7 +332,7 @@ class RetroAchievementsRepository @Inject constructor(
                         successCount++
                         Logger.debug(TAG, "Pending achievement ${payload.achievementRaId} submitted")
                     }
-                    isDefinitiveRejection(response.code(), serverError) -> {
+                    isDefinitiveRejection(response.code(), serverError, failure?.code) -> {
                         pendingSyncQueueDao.deleteById(entity.id)
                         Logger.warn(
                             TAG,
@@ -356,18 +358,23 @@ class RetroAchievementsRepository @Inject constructor(
         return successCount
     }
 
-    private fun serverErrorMessage(response: Response<RAAwardResponse>): String? {
-        response.body()?.error?.takeIf { it.isNotBlank() }?.let { return it }
+    private fun serverFailure(response: Response<RAAwardResponse>): RABaseResponse? {
+        response.body()?.let { body ->
+            if (!body.error.isNullOrBlank()) return RABaseResponse(body.success, body.error, body.code)
+        }
         val errorBody = response.errorBody() ?: return null
         return try {
-            errorBodyAdapter.fromJson(errorBody.string())?.error?.takeIf { it.isNotBlank() }
+            errorBodyAdapter.fromJson(errorBody.string())?.takeIf { !it.error.isNullOrBlank() }
         } catch (e: Exception) {
             null
         }
     }
 
-    private fun isDefinitiveRejection(httpCode: Int, serverError: String?): Boolean =
-        serverError != null && httpCode !in RETRYABLE_HTTP_CODES && httpCode !in AUTH_HTTP_CODES
+    internal fun isDefinitiveRejection(httpCode: Int, serverError: String?, serverCode: String?): Boolean =
+        serverError != null &&
+            httpCode !in RETRYABLE_HTTP_CODES &&
+            httpCode !in AUTH_HTTP_CODES &&
+            serverCode !in AUTH_SERVER_CODES
 
     data class RASessionResult(
         val success: Boolean,

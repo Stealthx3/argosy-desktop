@@ -11,7 +11,7 @@ exception is legitimate, and the boundary where it becomes a violation again.
 
 - Layers: ui/ -> domain/ -> data/. Dependencies flow inward only.
   - domain/ is Compose-free (hard rule). Android-framework-free is
-    aspirational with known debt across 13 files (Intent in LaunchGameUseCase,
+    aspirational with known debt (Intent in LaunchGameUseCase,
     Log in several use cases, and a whole media-codec pipeline in
     MeasureTrackLoudnessUseCase); grep `^import android\.` under domain/ for
     the current list. Existing debt is not a licence - do not add new
