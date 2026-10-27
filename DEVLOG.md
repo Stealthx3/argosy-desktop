@@ -1416,3 +1416,16 @@ Mapped ids: retroarch, dolphin, cemu, azahar, ryujinx (Ryubing), eden, melonds, 
 - installing `org.freedesktop.Sdk.Extension.openjdk21` for local offline builds;
 - screenshots from the owner's library;
 - the Flathub PR itself.
+
+### 2026-10-27 — Step 7 groundwork, unit 2: desktop build with no Android SDK
+
+**Action:** I tested from a clean copy of the tracked files (no `local.properties`) to find what an SDK-less build needs:
+- With no SDK at all, `:libretrodroid` stops at configure ("SDK location not found").
+- With `ANDROID_HOME` pointing at an empty folder, the plugin's existence check passes. `:libretrodroid`, and then `:sigil`, stop asking for NDK 27.
+- Result: `settings.gradle.kts` includes `:sigil` and `:libretrodroid` only without `-Pargosy.desktopOnly=true`. `shared`'s androidMain and `app` reference them through `findProject`, so the default build is unchanged. `:app` stays included because `shared` reads its Android config at configure time; it needs only the SDK folder, not the NDK.
+
+**Verification:**
+- `ANDROID_HOME=<empty> ./gradlew -Pargosy.desktopOnly=true :desktopApp:createDistributable` builds from the clean copy (4 m 23 s, 125 files in `lib/app`).
+- Default gate: `:app:assembleDebug` and `:desktopApp:assemble` rebuild with both modules; tests were up to date (131 + 4,426, 0 failures).
+
+**Next (plan step 3):** list every artifact the desktop-only build resolves and turn it into flatpak sources for an `--offline` build. This needs the openjdk21 SDK extension for a local `flatpak-builder` test (owner OK pending).

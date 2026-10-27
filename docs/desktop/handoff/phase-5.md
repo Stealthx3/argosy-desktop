@@ -2,7 +2,7 @@
 
 Rewritten (not appended) at the end of every work unit, so a fresh session can start from it alone. History and reasoning live in `DEVLOG.md`. Earlier phases: `phase-0.md` … `phase-4.md` (closed summaries).
 
-**Updated:** 2026-10-27 (step 7 groundwork unit 1 committed; step 5 open, waiting for the owner's checklist). Steps 1–4 done; step 5 in progress.
+**Updated:** 2026-10-27 (step 7 groundwork unit 2 committed; step 5 open, waiting for the owner's checklist). Steps 1–4 done; step 5 in progress.
 
 ## Scope and exit criterion
 
@@ -39,7 +39,8 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 
 - Plan and lint status: `docs/desktop/flathub-plan.md`. Wayland socket dropped (lint error fixed).
 - Owner decisions open: the app-id rename `io.github.Stealthx3.argosy_desktop`, installing the openjdk21 SDK extension, screenshots from the owner's library, and the Flathub PR.
-- **Next action:** the `-Pargosy.desktopOnly=true` switch. `settings.gradle.kts` skips `:app`, `:sigil`, `:libretrodroid` and `:graphics-shim-android`, and the KMP modules skip their Android target. Prove it with `./gradlew -Pargosy.desktopOnly=true :desktopApp:createDistributable` and no `local.properties`/`ANDROID_HOME`. The default build must stay unchanged (the gate passes).
+- Unit 2: SDK-less desktop build works with `ANDROID_HOME=<empty dir>` and `-Pargosy.desktopOnly=true`, which leaves out `:sigil` and `:libretrodroid` (they want the NDK at configure time). Proven from a clean copy; the default gate is unchanged.
+- **Next action:** plan step 3. Generate the desktop-only build's Maven artifact list as flatpak `file` sources: try `flatpak-gradle-generator`, or Gradle `--write-verification-metadata sha256` turned into JSON by a small script. Then write a from-source manifest variant (`build-options.env.ANDROID_HOME`, openjdk21 `sdk-extensions`, `--offline`). Running it locally needs the owner's OK to install `org.freedesktop.Sdk.Extension.openjdk21//25.08`; until then, only generate and review the files.
 
 ## Gotchas
 
