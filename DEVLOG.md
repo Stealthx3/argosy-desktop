@@ -1429,3 +1429,19 @@ Mapped ids: retroarch, dolphin, cemu, azahar, ryujinx (Ryubing), eden, melonds, 
 - Default gate: `:app:assembleDebug` and `:desktopApp:assemble` rebuild with both modules; tests were up to date (131 + 4,426, 0 failures).
 
 **Next (plan step 3):** list every artifact the desktop-only build resolves and turn it into flatpak sources for an `--offline` build. This needs the openjdk21 SDK extension for a local `flatpak-builder` test (owner OK pending).
+
+### 2026-10-27 — Step 7 groundwork, unit 3: offline Gradle sources and the from-source manifest
+
+**Action:**
+- A fresh desktop-only build (empty Gradle home, empty `ANDROID_HOME`, `--debug`) logged every download: 1,809 GETs, all from `dl.google.com` and `repo.maven.apache.org`, 1.2 GB.
+- `scripts/desktop/flatpak/gradle-sources.py` turns them into `desktopApp/flatpak/generated/gradle-sources.json`. It writes 1,448 flatpak `file` sources laid out as one Maven repository, with each sha256 taken from Gradle's cache. 404s and `maven-metadata.xml` are skipped; none were present.
+- `regen-gradle-sources.sh` repeats the whole thing.
+- `desktopApp/flatpak/offline.init.gradle.kts` points plugins and dependencies at that repository, plus the in-tree `libs/maven`.
+- New `io.github.stealthx3.ArgosyDesktop.flathub.yml`:
+  - same finish-args and native modules as the alpha manifest;
+  - `sdk-extensions: openjdk21`;
+  - `sigil-jni` takes JNI headers from the extension instead of the staged host headers;
+  - `argosy-desktop` builds from a git source with the Gradle 8.9 distribution (published sha256) and the generated sources, `--offline`.
+
+**Verification:** a host-side offline proof. The repository was laid out from the sources (checksums: 0 mismatches), then `--offline` with a fresh Gradle home and only that repository built the full distributable (125 files in `lib/app`). The Flathub manifest parses, but has not been run, because that needs `org.freedesktop.Sdk.Extension.openjdk21//25.08` (owner OK pending).
+**Gotcha:** the git sources use `path: ../..` for local tests. On Flathub they become the release tag and commit. Recursive submodules bring in libretrodroid's too, which is harmless but larger.

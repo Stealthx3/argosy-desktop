@@ -1,0 +1,160 @@
+# Flathub manifest: builds Argosy Desktop from source with no network. Gradle runs --offline against
+# offline-repository/, laid out from generated/gradle-sources.json (scripts/desktop/flatpak/
+# gradle-sources.py); -Pargosy.desktopOnly=true with an empty ANDROID_HOME skips everything Android.
+# For Flathub, the two git sources take the release tag and commit instead of path: ../..
+app-id: io.github.stealthx3.ArgosyDesktop
+runtime: org.freedesktop.Platform
+runtime-version: '25.08'
+sdk: org.freedesktop.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.openjdk21
+command: argosy-desktop
+finish-args:
+  - --share=network
+  - --share=ipc
+  - --socket=x11
+  - --device=dri
+  - --device=all
+  - --socket=pulseaudio
+  - --filesystem=~/Games/Argosy:create
+  - --talk-name=org.freedesktop.Flatpak
+  # Emulator save and state folders save sync reads and writes in place (HostSavePaths,
+  # RetroArchHostLayout): EmuDeck links, each mapped emulator's Flatpak tree, then native folders.
+  - --filesystem=~/Emulation
+  - --filesystem=~/.var/app/org.libretro.RetroArch
+  - --filesystem=~/.var/app/org.DolphinEmu.dolphin-emu
+  - --filesystem=~/.var/app/info.cemu.Cemu
+  - --filesystem=~/.var/app/org.azahar_emu.Azahar
+  - --filesystem=~/.var/app/io.github.ryubing.Ryujinx
+  - --filesystem=~/.var/app/dev.eden_emu.eden
+  - --filesystem=~/.var/app/org.duckstation.DuckStation
+  - --filesystem=~/.var/app/net.pcsx2.PCSX2
+  - --filesystem=~/.var/app/org.ppsspp.PPSSPP
+  - --filesystem=~/.var/app/net.rpcs3.RPCS3
+  - --filesystem=xdg-config/retroarch
+  - --filesystem=xdg-config/Ryujinx
+  - --filesystem=xdg-config/PCSX2
+  - --filesystem=xdg-config/ppsspp
+  - --filesystem=xdg-config/rpcs3
+  - --filesystem=xdg-data/Cemu
+  - --filesystem=xdg-data/azahar-emu
+  - --filesystem=xdg-data/eden
+  - --filesystem=xdg-data/duckstation
+  - --filesystem=xdg-data/Vita3K
+  - --filesystem=xdg-data/dolphin-emu
+  - --filesystem=~/.dolphin-emu
+add-extensions:
+  # Full codecs (H.264, HEVC, VP9, AV1) for libmpv: the runtime's own ffmpeg leaves them out.
+  org.freedesktop.Platform.ffmpeg-full:
+    directory: lib/ffmpeg
+    version: '25.08'
+    add-ld-path: .
+cleanup-commands:
+  - mkdir -p /app/lib/ffmpeg
+modules:
+  # libmpv for video wallpaper and trailers (Phase 4 step 9), library only: no player, no Lua.
+  - name: libass
+    config-opts:
+      - --disable-static
+    cleanup:
+      - /include
+      - /lib/pkgconfig
+      - '*.la'
+    sources:
+      - type: archive
+        url: https://github.com/libass/libass/releases/download/0.17.5/libass-0.17.5.tar.xz
+        sha256: 2dca25c0e0c837ddf00b52011b3f82cac1e4ddd3ad018227806b0c2288864acc
+  - name: libplacebo
+    buildsystem: meson
+    config-opts:
+      - -Dvulkan=disabled
+      - -Dopengl=enabled
+      - -Dd3d11=disabled
+      - -Ddemos=false
+      - -Dtests=false
+    cleanup:
+      - /include
+      - /lib/pkgconfig
+    sources:
+      - type: git
+        url: https://code.videolan.org/videolan/libplacebo.git
+        tag: v7.360.1
+        commit: 719cc95244a1f1d648dd72459822e026e6530f22
+  - name: mpv
+    buildsystem: meson
+    config-opts:
+      - -Dlibmpv=true
+      - -Dcplayer=false
+      - -Dlua=disabled
+      - -Djavascript=disabled
+      - -Dvulkan=disabled
+      - -Duchardet=disabled
+      - -Dzimg=disabled
+      - -Dlibarchive=disabled
+      - -Dcdda=disabled
+      - -Ddvdnav=disabled
+      - -Dlibbluray=disabled
+      - -Dmanpage-build=disabled
+      - -Dhtml-build=disabled
+      - -Dpdf-build=disabled
+    cleanup:
+      - /include
+      - /lib/pkgconfig
+      - /share
+    sources:
+      - type: git
+        url: https://github.com/mpv-player/mpv.git
+        tag: v0.41.0
+        commit: 41f6a645068483470267271e1d09966ca3b9f413
+  # Sigil's JNI library (title ids and save layouts), built with sigil's own CMake against the
+  # runtime; FindJNI needs only the headers, the JVM and AWT library paths are never linked.
+  - name: sigil-jni
+    buildsystem: simple
+    build-commands:
+      - cmake -S sigil -B build -DSIGIL_BUILD_JNI_HOST=ON -DCMAKE_BUILD_TYPE=Release
+          -DJAVA_INCLUDE_PATH=$JDK/include -DJAVA_INCLUDE_PATH2=$JDK/include/linux
+          -DJAVA_AWT_INCLUDE_PATH=$JDK/include -DJAVA_AWT_LIBRARY=unused -DJAVA_JVM_LIBRARY=unused
+      - cmake --build build --target sigil_jni_host -j $FLATPAK_BUILDER_N_JOBS
+      - install -Dm755 build/bindings/libsigil-jni.so -t /app/lib/argosy-desktop/lib/app
+    build-options:
+      env:
+        JDK: /usr/lib/sdk/openjdk21/jvm/openjdk-21
+    sources:
+      - type: git
+        path: ../../sigil
+        branch: HEAD
+        dest: sigil
+  - name: argosy-desktop
+    buildsystem: simple
+    build-options:
+      append-path: /usr/lib/sdk/openjdk21/bin
+      env:
+        JAVA_HOME: /usr/lib/sdk/openjdk21/jvm/openjdk-21
+        GRADLE_USER_HOME: /run/build/argosy-desktop/gradle-home
+        ANDROID_HOME: /run/build/argosy-desktop/empty-sdk
+        ARGOSY_OFFLINE_REPOSITORY: /run/build/argosy-desktop/offline-repository
+    build-commands:
+      - mkdir -p empty-sdk
+      - gradle-dist/bin/gradle --no-daemon --offline --console=plain
+          --init-script desktopApp/flatpak/offline.init.gradle.kts
+          -Pargosy.desktopOnly=true :desktopApp:createDistributable
+      - mkdir -p /app/lib/argosy-desktop
+      - cp -a desktopApp/build/compose/binaries/main/app/argosy-desktop/. /app/lib/argosy-desktop/
+      - install -Dm755 desktopApp/flatpak/argosy-desktop.sh /app/bin/argosy-desktop
+      - install -Dm644 desktopApp/flatpak/io.github.stealthx3.ArgosyDesktop.desktop -t /app/share/applications
+      - install -Dm644 desktopApp/flatpak/io.github.stealthx3.ArgosyDesktop.metainfo.xml -t /app/share/metainfo
+      - install -Dm644 argosy_icon.svg /app/share/icons/hicolor/scalable/apps/io.github.stealthx3.ArgosyDesktop.svg
+      - for size in 128 256; do
+          mkdir -p /app/share/icons/hicolor/${size}x${size}/apps;
+          rsvg-convert -w $size -h $size argosy_icon.svg
+            -o /app/share/icons/hicolor/${size}x${size}/apps/io.github.stealthx3.ArgosyDesktop.png;
+        done
+    sources:
+      - type: git
+        path: ../..
+        branch: HEAD
+      - type: archive
+        url: https://services.gradle.org/distributions/gradle-8.9-bin.zip
+        sha256: d725d707bfabd4dfdc958c624003b3c80accc03f7037b5122c4b1d0ef15cecab
+        dest: gradle-dist
+      - generated/gradle-sources.json
