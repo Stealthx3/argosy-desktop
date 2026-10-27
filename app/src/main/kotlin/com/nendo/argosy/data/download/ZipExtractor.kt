@@ -587,7 +587,7 @@ object ZipExtractor {
         platformSlug: String,
         onProgress: ((bytesWritten: Long, totalBytes: Long) -> Unit)? = null
     ): ExtractedFolderRom {
-        val validExtensions = PlatformDefinitions.getBySlug(platformSlug)?.extensions ?: emptySet()
+        val validExtensions = PlatformDefinitions.definitionFor(platformSlug)?.extensions ?: emptySet()
         val sanitizedTitle = sanitizeFileName(gameTitle)
         val existingPlaylistFolder = File(platformDir, "$sanitizedTitle.m3u")
         val gameFolder = if (existingPlaylistFolder.isDirectory) {

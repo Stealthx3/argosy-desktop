@@ -197,6 +197,9 @@
     <string name="settings_shell_modal_purge_platform_fallback">平台</string>
     <string name="settings_shell_modal_purge_platform_message">这将删除全部%1$d个游戏及其本地ROM文件，且无法撤销。</string>
     <string name="settings_shell_modal_purge_platform_confirm">清空</string>
+    <string name="settings_shell_modal_purge_disabled_title">同时从此设备移除%1$s？</string>
+    <string name="settings_shell_modal_purge_disabled_message">其%1$d个游戏现已隐藏。清空还会删除这些游戏及其本地ROM文件，且无法撤销。</string>
+    <string name="settings_shell_modal_purge_disabled_keep">保留文件</string>
 
     <string name="settings_shell_modal_sync_first_title">请先同步存档</string>
     <string name="settings_shell_modal_sync_first_message">请先同步存档，还有%1$d个待处理。现在重置库会永久丢弃尚未上传的存档。</string>

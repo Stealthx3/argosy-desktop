@@ -63,7 +63,7 @@ class ArgosSocialService @Inject constructor(
         val reason: String?
     )
 
-    private val _playSessionSyncResult = MutableSharedFlow<List<SessionSyncResult>>(replay = 1)
+    private val _playSessionSyncResult = MutableSharedFlow<List<SessionSyncResult>>(extraBufferCapacity = 1)
     val playSessionSyncResult: SharedFlow<List<SessionSyncResult>> = _playSessionSyncResult.asSharedFlow()
 
     private val activeGamesReplies = MutableSharedFlow<List<ActiveGameRow>>(extraBufferCapacity = 1)

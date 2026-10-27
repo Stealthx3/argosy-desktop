@@ -70,7 +70,7 @@ class GameFileRelocator @Inject constructor(
             if (parent != null && parent.canonicalPath != platformFolder.canonicalPath && isUnder(parent, platformFolder)) {
                 return listOf(parent)
             }
-            val romExtensions = PlatformDefinitions.getBySlug(platformSlug)?.extensions.orEmpty()
+            val romExtensions = PlatformDefinitions.definitionFor(platformSlug)?.extensions.orEmpty()
             return listOf(launch) + DiscSheets.companions(launch, romExtensions)
         }
 

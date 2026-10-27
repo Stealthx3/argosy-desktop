@@ -678,7 +678,7 @@ class LibraryViewModel @Inject constructor(
         } else {
             mediaRepository.countsByLibrary()
         }
-        val cells = listOf(allGamesCell(counts.values.sum())) +
+        val cells = listOf(allGamesCell(cachedPlatformEntities.sumOf { counts[it.id] ?: 0 })) +
             cachedPlatformEntities.map { it.toLibraryCellUi(counts[it.id] ?: 0) } +
             cachedMediaLibraries.mapNotNull { library ->
                 mediaCounts[library.libraryId]?.let { library.toLibraryCellUi(it) }

@@ -275,6 +275,9 @@
     <string name="settings_shell_modal_purge_platform_fallback">Platform</string>
     <string name="settings_shell_modal_purge_platform_message">This will delete all %1$d games and their local ROM files. This cannot be undone.</string>
     <string name="settings_shell_modal_purge_platform_confirm">Purge</string>
+    <string name="settings_shell_modal_purge_disabled_title">Also remove %1$s from this device?</string>
+    <string name="settings_shell_modal_purge_disabled_message">Its %1$d games are now hidden. Purging also deletes them and their local ROM files. This cannot be undone.</string>
+    <string name="settings_shell_modal_purge_disabled_keep">Keep files</string>
 
     <string name="settings_shell_modal_sync_first_title">Sync Saves First</string>
     <string name="settings_shell_modal_sync_first_message">Sync saves first - %1$d pending. Resetting the library now would permanently discard saves that have not been uploaded.</string>

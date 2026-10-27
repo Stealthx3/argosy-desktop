@@ -845,8 +845,17 @@ class GameDetailViewModel @Inject constructor(
             var lastSeenLauncher: String? = null
             var lastSeenManual = false
             var launcherInitialized = false
+            var lastSeenInstall: Triple<GameSource, String?, Boolean>? = null
             gameRepository.observeById(gameId).collect { updatedGame ->
                 if (updatedGame == null) return@collect
+
+                val install = Triple(updatedGame.source, updatedGame.packageName, updatedGame.localPath != null)
+                val installChanged = lastSeenInstall != null && lastSeenInstall != install
+                lastSeenInstall = install
+                if (installChanged) {
+                    loadGame(gameId)
+                    return@collect
+                }
 
                 val launcherChanged = launcherInitialized &&
                     (lastSeenLauncher != updatedGame.steamLauncher || lastSeenManual != updatedGame.launcherSetManually)

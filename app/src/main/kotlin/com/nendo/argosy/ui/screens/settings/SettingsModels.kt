@@ -1015,6 +1015,7 @@ data class StorageState(
     val hasAllFilesAccess: Boolean = false,
     val platformConfigs: List<PlatformStorageConfig> = emptyList(),
     val showPurgePlatformConfirm: Long? = null,
+    val purgeOfferedAfterDisable: Boolean = false,
     val showMigratePlatformConfirm: PlatformMigrationInfo? = null,
     val platformSettingsModalId: Long? = null,
     val platformSettingsFocusIndex: Int = 0,

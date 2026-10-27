@@ -433,6 +433,7 @@ class StorageSettingsDelegate @Inject constructor(
         scope.launch {
             platformRepository.updateSyncEnabled(platformId, enabled)
             updatePlatformConfigInState(platformId) { it.copy(syncEnabled = enabled) }
+            if (!enabled) offerPurgeAfterDisable(platformId)
         }
     }
 
@@ -636,12 +637,20 @@ class StorageSettingsDelegate @Inject constructor(
     }
 
     fun requestPurgePlatform(platformId: Long) {
-        _state.update { it.copy(showPurgePlatformConfirm = platformId) }
+        _state.update { it.copy(showPurgePlatformConfirm = platformId, purgeOfferedAfterDisable = false) }
+    }
+
+    private fun offerPurgeAfterDisable(platformId: Long) {
+        _state.update { state ->
+            val hasGames = state.platformConfigs.any { it.platformId == platformId && it.gameCount > 0 }
+            if (!hasGames || state.showPurgePlatformConfirm != null) state
+            else state.copy(showPurgePlatformConfirm = platformId, purgeOfferedAfterDisable = true)
+        }
     }
 
     fun confirmPurgePlatform(scope: CoroutineScope) {
         val platformId = _state.value.showPurgePlatformConfirm ?: return
-        _state.update { it.copy(showPurgePlatformConfirm = null) }
+        _state.update { it.copy(showPurgePlatformConfirm = null, purgeOfferedAfterDisable = false) }
         val platformName = _state.value.platformConfigs
             .firstOrNull { it.platformId == platformId }?.platformName
             ?: platformId.toString()
@@ -701,7 +710,7 @@ class StorageSettingsDelegate @Inject constructor(
     }
 
     fun cancelPurgePlatform() {
-        _state.update { it.copy(showPurgePlatformConfirm = null) }
+        _state.update { it.copy(showPurgePlatformConfirm = null, purgeOfferedAfterDisable = false) }
     }
 
     fun openPlatformSettingsModal(platformId: Long) {

@@ -943,17 +943,28 @@ fun SettingsScreen(
     val purgePlatformConfig = uiState.storage.showPurgePlatformConfirm?.let { platformId ->
         uiState.storage.platformConfigs.find { it.platformId == platformId }
     }
+    val purgePlatformName = purgePlatformConfig?.platformName
+        ?: stringResource(R.string.settings_shell_modal_purge_platform_fallback)
+    val purgeGameCount = purgePlatformConfig?.gameCount ?: 0
+    val purgeAfterDisable = uiState.storage.purgeOfferedAfterDisable
     ArgosyConfirmModalHost(
         visible = uiState.storage.showPurgePlatformConfirm != null,
-        title = stringResource(
-            R.string.settings_shell_modal_purge_platform_title,
-            purgePlatformConfig?.platformName
-                ?: stringResource(R.string.settings_shell_modal_purge_platform_fallback)
-        ),
-        message = stringResource(
-            R.string.settings_shell_modal_purge_platform_message, purgePlatformConfig?.gameCount ?: 0
-        ),
+        title = if (purgeAfterDisable) {
+            stringResource(R.string.settings_shell_modal_purge_disabled_title, purgePlatformName)
+        } else {
+            stringResource(R.string.settings_shell_modal_purge_platform_title, purgePlatformName)
+        },
+        message = if (purgeAfterDisable) {
+            stringResource(R.string.settings_shell_modal_purge_disabled_message, purgeGameCount)
+        } else {
+            stringResource(R.string.settings_shell_modal_purge_platform_message, purgeGameCount)
+        },
         confirmLabel = stringResource(R.string.settings_shell_modal_purge_platform_confirm),
+        cancelLabel = if (purgeAfterDisable) {
+            stringResource(R.string.settings_shell_modal_purge_disabled_keep)
+        } else {
+            stringResource(R.string.ui_confirm_modal_cancel)
+        },
         destructive = true,
         onConfirm = { viewModel.confirmPurgePlatform() },
         onDismiss = { viewModel.cancelPurgePlatform() }

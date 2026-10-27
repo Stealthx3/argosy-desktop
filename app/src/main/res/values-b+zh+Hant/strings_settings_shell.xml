@@ -204,6 +204,9 @@
     <string name="settings_shell_modal_purge_platform_fallback">平台</string>
     <string name="settings_shell_modal_purge_platform_message">這會刪除全部%1$d款遊戲及其本機ROM檔案，且無法復原。</string>
     <string name="settings_shell_modal_purge_platform_confirm">清除</string>
+    <string name="settings_shell_modal_purge_disabled_title">同時從此裝置移除%1$s？</string>
+    <string name="settings_shell_modal_purge_disabled_message">其%1$d款遊戲現已隱藏。清除還會刪除這些遊戲及其本機ROM檔案，且無法復原。</string>
+    <string name="settings_shell_modal_purge_disabled_keep">保留檔案</string>
 
     <string name="settings_shell_modal_sync_first_title">請先同步存檔</string>
     <string name="settings_shell_modal_sync_first_message">請先同步存檔，目前還有%1$d個待處理。現在重設收藏庫會永久捨棄尚未上傳的存檔。</string>

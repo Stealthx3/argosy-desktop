@@ -206,6 +206,9 @@
     <string name="settings_shell_modal_purge_platform_fallback">Plattform</string>
     <string name="settings_shell_modal_purge_platform_message">Dadurch werden alle %1$d Spiele und ihre lokalen ROM-Dateien gelöscht. Dies kann nicht rückgängig gemacht werden.</string>
     <string name="settings_shell_modal_purge_platform_confirm">Bereinigen</string>
+    <string name="settings_shell_modal_purge_disabled_title">%1$s auch von diesem Gerät entfernen?</string>
+    <string name="settings_shell_modal_purge_disabled_message">Die %1$d Spiele sind jetzt ausgeblendet. Beim Bereinigen werden sie und ihre lokalen ROM-Dateien gelöscht. Dies kann nicht rückgängig gemacht werden.</string>
+    <string name="settings_shell_modal_purge_disabled_keep">Dateien behalten</string>
 
     <string name="settings_shell_modal_sync_first_title">Zuerst Spielstände synchronisieren</string>
     <string name="settings_shell_modal_sync_first_message">Synchronisieren Sie zuerst Ihre Spielstände - %1$d ausstehend. Ein Zurücksetzen der Bibliothek würde nicht hochgeladene Spielstände endgültig verwerfen.</string>

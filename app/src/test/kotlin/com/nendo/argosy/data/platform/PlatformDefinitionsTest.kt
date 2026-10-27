@@ -99,6 +99,16 @@ class PlatformDefinitionsTest {
     }
 
     @Test
+    fun `a suffixed sub-platform follows its parent's rom rules`() {
+        val neoGeoCd = requireNotNull(PlatformDefinitions.getBySlug("neogeocd"))
+        assertEquals(neoGeoCd, PlatformDefinitions.definitionFor("neo-geo-cd-hacks"))
+        assertEquals(PlatformDefinitions.getBySlug("snes"), PlatformDefinitions.definitionFor("snes-hacks"))
+        assertEquals(neoGeoCd, PlatformDefinitions.definitionFor("neogeocd"))
+        assertNull(PlatformDefinitions.getBySlug("neo-geo-cd-hacks"))
+        assertNull(PlatformDefinitions.definitionFor("notaplatform"))
+    }
+
+    @Test
     fun `a sub-platform is named from its effective slug`() {
         assertEquals(
             "SNES Hacks" to "SNES Hacks",

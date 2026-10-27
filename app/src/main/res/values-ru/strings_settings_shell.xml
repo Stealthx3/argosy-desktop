@@ -210,6 +210,9 @@
     <string name="settings_shell_modal_purge_platform_fallback">Платформа</string>
     <string name="settings_shell_modal_purge_platform_message">Это удалит все %1$d игр и их локальные файлы ROM. Действие необратимо.</string>
     <string name="settings_shell_modal_purge_platform_confirm">Очистить</string>
+    <string name="settings_shell_modal_purge_disabled_title">Также удалить %1$s с этого устройства?</string>
+    <string name="settings_shell_modal_purge_disabled_message">Игры этой платформы (%1$d) теперь скрыты. Очистка также удалит их и их локальные файлы ROM. Действие необратимо.</string>
+    <string name="settings_shell_modal_purge_disabled_keep">Оставить файлы</string>
 
     <string name="settings_shell_modal_sync_first_title">Сначала синхронизируйте сохранения</string>
     <string name="settings_shell_modal_sync_first_message">Сначала синхронизируйте сохранения - %1$d в ожидании. Сброс библиотеки сейчас безвозвратно удалит невыгруженные сохранения.</string>

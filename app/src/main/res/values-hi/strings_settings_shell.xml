@@ -199,6 +199,9 @@
     <string name="settings_shell_modal_purge_platform_fallback">प्लेटफ़ॉर्म</string>
     <string name="settings_shell_modal_purge_platform_message">इससे सभी %1$d गेम और उनकी लोकल ROM फ़ाइलें हट जाएँगी। यह पूर्ववत नहीं किया जा सकता।</string>
     <string name="settings_shell_modal_purge_platform_confirm">पर्ज करें</string>
+    <string name="settings_shell_modal_purge_disabled_title">क्या %1$s को इस डिवाइस से भी हटाएँ?</string>
+    <string name="settings_shell_modal_purge_disabled_message">इसके %1$d गेम अब छिपे हुए हैं। पर्ज करने से वे और उनकी लोकल ROM फ़ाइलें भी हट जाएँगी। यह पूर्ववत नहीं किया जा सकता।</string>
+    <string name="settings_shell_modal_purge_disabled_keep">फ़ाइलें रखें</string>
 
     <string name="settings_shell_modal_sync_first_title">पहले सेव सिंक करें</string>
     <string name="settings_shell_modal_sync_first_message">पहले सेव सिंक करें - %1$d लंबित हैं। अभी लाइब्रेरी रीसेट करने से वे सेव हमेशा के लिए मिट जाएँगे जो अपलोड नहीं हुए हैं।</string>

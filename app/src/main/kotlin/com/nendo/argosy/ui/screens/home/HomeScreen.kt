@@ -121,6 +121,7 @@ import coil.request.ImageRequest
 import coil.size.Size
 import com.nendo.argosy.R
 import com.nendo.argosy.ui.input.LocalInputDispatcher
+import com.nendo.argosy.ui.input.ModalInputEffect
 import com.nendo.argosy.ui.input.ModalPresenceEffect
 import com.nendo.argosy.ui.navigation.Screen
 import com.nendo.argosy.domain.model.RequiredAction
@@ -415,50 +416,31 @@ fun HomeScreen(
         )
     }
 
-    LaunchedEffect(uiState.changelogEntry) {
-        if (uiState.changelogEntry != null) {
-            inputDispatcher.pushModal(changelogInputHandler)
-        }
-    }
+    ModalInputEffect(
+        active = uiState.changelogEntry != null,
+        handler = changelogInputHandler,
+        inputDispatcher = inputDispatcher
+    )
 
-    LaunchedEffect(uiState.discPickerState) {
-        if (uiState.discPickerState != null) {
-            viewModel.setDiscPickerFocusIndex(0)
-            inputDispatcher.pushModal(discPickerInputHandler)
-        }
+    val showDiscPicker = uiState.discPickerState != null
+    LaunchedEffect(showDiscPicker) {
+        if (showDiscPicker) viewModel.setDiscPickerFocusIndex(0)
     }
-
-    DisposableEffect(uiState.discPickerState) {
-        onDispose {
-            if (uiState.discPickerState != null) {
-                inputDispatcher.removeModal(discPickerInputHandler)
-            }
-        }
-    }
+    ModalInputEffect(
+        active = showDiscPicker,
+        handler = discPickerInputHandler,
+        inputDispatcher = inputDispatcher
+    )
 
     val showMemcardPicker = uiState.memcardPickerState != null
     LaunchedEffect(showMemcardPicker) {
-        if (showMemcardPicker) {
-            viewModel.setMemcardPickerFocusIndex(0)
-            inputDispatcher.pushModal(memcardPickerInputHandler)
-        }
+        if (showMemcardPicker) viewModel.setMemcardPickerFocusIndex(0)
     }
-
-    DisposableEffect(showMemcardPicker) {
-        onDispose {
-            if (showMemcardPicker) {
-                inputDispatcher.removeModal(memcardPickerInputHandler)
-            }
-        }
-    }
-
-    DisposableEffect(uiState.changelogEntry) {
-        onDispose {
-            if (uiState.changelogEntry != null) {
-                inputDispatcher.removeModal(changelogInputHandler)
-            }
-        }
-    }
+    ModalInputEffect(
+        active = showMemcardPicker,
+        handler = memcardPickerInputHandler,
+        inputDispatcher = inputDispatcher
+    )
 
     LaunchedEffect(uiState.focusedGame?.id) {
         val currentGameId = uiState.focusedGame?.id

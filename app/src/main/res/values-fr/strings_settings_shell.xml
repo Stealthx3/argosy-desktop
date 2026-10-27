@@ -208,6 +208,9 @@
     <string name="settings_shell_modal_purge_platform_fallback">Plateforme</string>
     <string name="settings_shell_modal_purge_platform_message">Cela supprimera les %1$d jeux et leurs fichiers ROM locaux. Cette action est irréversible.</string>
     <string name="settings_shell_modal_purge_platform_confirm">Purger</string>
+    <string name="settings_shell_modal_purge_disabled_title">Retirer aussi %1$s de cet appareil ?</string>
+    <string name="settings_shell_modal_purge_disabled_message">Ses %1$d jeux sont maintenant masqués. Purger les supprime aussi, avec leurs fichiers ROM locaux. Cette action est irréversible.</string>
+    <string name="settings_shell_modal_purge_disabled_keep">Garder les fichiers</string>
 
     <string name="settings_shell_modal_sync_first_title">Synchroniser les sauvegardes d\'abord</string>
     <string name="settings_shell_modal_sync_first_message">Synchronisez les sauvegardes d\'abord : %1$d en attente. Réinitialiser la bibliothèque maintenant supprimerait définitivement les sauvegardes non envoyées.</string>

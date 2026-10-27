@@ -65,7 +65,7 @@ class PurgePlatformUseCase @Inject constructor(
                     val file = File(localPath)
                     if (file.exists()) {
                         if (DiscSheets.isLoader(file.name)) {
-                            val romExtensions = PlatformDefinitions.getBySlug(game.platformSlug)?.extensions.orEmpty()
+                            val romExtensions = PlatformDefinitions.definitionFor(game.platformSlug)?.extensions.orEmpty()
                             DiscSheets.companions(file, romExtensions).forEach { track ->
                                 val size = track.length()
                                 if (track.delete()) bytesFreed += size

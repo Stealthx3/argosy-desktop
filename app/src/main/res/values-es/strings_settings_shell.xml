@@ -208,6 +208,9 @@
     <string name="settings_shell_modal_purge_platform_fallback">Plataforma</string>
     <string name="settings_shell_modal_purge_platform_message">Esto eliminará los %1$d juegos y sus archivos ROM locales. Esta acción no se puede deshacer.</string>
     <string name="settings_shell_modal_purge_platform_confirm">Purgar</string>
+    <string name="settings_shell_modal_purge_disabled_title">¿Quitar también %1$s de este dispositivo?</string>
+    <string name="settings_shell_modal_purge_disabled_message">Sus %1$d juegos ahora están ocultos. Purgar también los elimina junto con sus archivos ROM locales. Esta acción no se puede deshacer.</string>
+    <string name="settings_shell_modal_purge_disabled_keep">Conservar archivos</string>
 
     <string name="settings_shell_modal_sync_first_title">Sincronizar guardados primero</string>
     <string name="settings_shell_modal_sync_first_message">Sincroniza los guardados primero: %1$d pendientes. Restablecer la biblioteca ahora descartaría permanentemente los guardados que no se han subido.</string>

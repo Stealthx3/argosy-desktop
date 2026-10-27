@@ -185,6 +185,7 @@ interface GameDao {
         FROM games
         WHERE isGroupVisible = 1
         AND NOT EXISTS (SELECT 1 FROM user_roms_hidden h WHERE h.gameId = games.id AND (h.ownerUserId IS NULL OR h.ownerUserId IS :ownerUserId))
+        AND $ENABLED_PLATFORM_SQL
         ORDER BY sortTitle ASC
     """)
     fun observeAllList(ownerUserId: Long?): Flow<List<GameListItem>>
@@ -227,6 +228,7 @@ interface GameDao {
         AND NOT EXISTS (SELECT 1 FROM user_roms_hidden h WHERE h.gameId = games.id AND (h.ownerUserId IS NULL OR h.ownerUserId IS :ownerUserId))
         AND (source = 'LOCAL_ONLY' OR source = 'ROMM_SYNCED' OR source = 'STEAM' OR source = 'ANDROID_APP')
         AND (source != 'STEAM' OR localPath IS NOT NULL OR (steamLauncher IS NOT NULL AND steamLauncher != 'native'))
+        AND $ENABLED_PLATFORM_SQL
         ORDER BY sortTitle ASC
     """)
     fun observePlayableList(ownerUserId: Long?): Flow<List<GameListItem>>
@@ -240,6 +242,7 @@ interface GameDao {
         FROM games
         WHERE isFavorite = 1
         AND NOT EXISTS (SELECT 1 FROM user_roms_hidden h WHERE h.gameId = games.id AND (h.ownerUserId IS NULL OR h.ownerUserId IS :ownerUserId))
+        AND $ENABLED_PLATFORM_SQL
         ORDER BY (source = 'ROMM_REMOTE') ASC, sortTitle ASC
     """)
     fun observeFavoritesList(ownerUserId: Long?): Flow<List<GameListItem>>
@@ -291,12 +294,14 @@ interface GameDao {
     @Query("""
         SELECT id, genre, gameModes FROM games
         WHERE NOT EXISTS (SELECT 1 FROM user_roms_hidden h WHERE h.gameId = games.id AND (h.ownerUserId IS NULL OR h.ownerUserId IS :ownerUserId))
+        AND $ENABLED_PLATFORM_SQL
     """)
     fun observeAllCategoryInfo(ownerUserId: Long?): Flow<List<GameCategoryInfo>>
 
     @Query("""
         SELECT id, genre, gameModes FROM games
         WHERE NOT EXISTS (SELECT 1 FROM user_roms_hidden h WHERE h.gameId = games.id AND (h.ownerUserId IS NULL OR h.ownerUserId IS :ownerUserId))
+        AND $ENABLED_PLATFORM_SQL
     """)
     suspend fun getAllCategoryInfo(ownerUserId: Long?): List<GameCategoryInfo>
 
@@ -341,6 +346,7 @@ interface GameDao {
                achievementCount, earnedAchievementCount, completion, status, developer, igdbId, timeToBeatMainSec
         FROM games
         WHERE EXISTS (SELECT 1 FROM user_roms_hidden h WHERE h.gameId = games.id AND (h.ownerUserId IS NULL OR h.ownerUserId IS :ownerUserId))
+        AND $ENABLED_PLATFORM_SQL
         ORDER BY sortTitle ASC
     """)
     fun observeHiddenList(ownerUserId: Long?): Flow<List<GameListItem>>
@@ -391,6 +397,7 @@ interface GameDao {
         SELECT * FROM games
         WHERE isFavorite = 1
         AND NOT EXISTS (SELECT 1 FROM user_roms_hidden h WHERE h.gameId = games.id AND (h.ownerUserId IS NULL OR h.ownerUserId IS :ownerUserId))
+        AND $ENABLED_PLATFORM_SQL
         ORDER BY (source = 'ROMM_REMOTE') ASC, sortTitle ASC
     """)
     suspend fun getFavorites(ownerUserId: Long?): List<GameEntity>
@@ -399,6 +406,7 @@ interface GameDao {
         SELECT id FROM games
         WHERE isFavorite = 1
         AND NOT EXISTS (SELECT 1 FROM user_roms_hidden h WHERE h.gameId = games.id AND (h.ownerUserId IS NULL OR h.ownerUserId IS :ownerUserId))
+        AND $ENABLED_PLATFORM_SQL
         ORDER BY (source = 'ROMM_REMOTE') ASC, sortTitle ASC
     """)
     suspend fun getFavoriteIds(ownerUserId: Long?): List<Long>
@@ -512,6 +520,7 @@ interface GameDao {
         WHERE searchTitle LIKE '%' || :query || '%'
         AND isGroupVisible = 1
         AND NOT EXISTS (SELECT 1 FROM user_roms_hidden h WHERE h.gameId = games.id AND (h.ownerUserId IS NULL OR h.ownerUserId IS :ownerUserId))
+        AND $ENABLED_PLATFORM_SQL
         ORDER BY sortTitle ASC
     """)
     fun search(query: String, ownerUserId: Long?): Flow<List<GameEntity>>
@@ -1150,6 +1159,15 @@ interface GameDao {
     @Query("SELECT * FROM games WHERE titleId = :titleId AND platformId = :platformId LIMIT 1")
     suspend fun getByTitleIdAndPlatform(titleId: String, platformId: Long): GameEntity?
 
+    @Query("""
+        SELECT * FROM games
+        WHERE platformId = :platformId
+        AND titleId IS NOT NULL
+        AND localPath LIKE '%.apk'
+        AND (packageName IS NULL OR source != 'ANDROID_APP')
+    """)
+    suspend fun getDownloadedApksAwaitingInstall(platformId: Long): List<GameEntity>
+
     @Query("SELECT titleId FROM games WHERE id = :gameId")
     suspend fun getTitleId(gameId: Long): String?
 
@@ -1201,6 +1219,7 @@ interface GameDao {
         SELECT * FROM games
         WHERE NOT EXISTS (SELECT 1 FROM user_roms_hidden h WHERE h.gameId = games.id AND (h.ownerUserId IS NULL OR h.ownerUserId IS :ownerUserId))
         AND (status IS NULL OR status NOT IN ('retired', 'never_playing'))
+        AND $ENABLED_PLATFORM_SQL
         ORDER BY RANDOM()
         LIMIT 1
     """)
@@ -1213,6 +1232,7 @@ interface GameDao {
         AND (:downloadedOnly = 0 OR localPath IS NOT NULL)
         AND (:neverPlayed = 0 OR (playCount = 0 AND lastPlayed IS NULL))
         AND (:platformCount = 0 OR platformId IN (:platformIds))
+        AND $ENABLED_PLATFORM_SQL
     """)
     suspend fun getRandomCandidates(
         ownerUserId: Long?,
@@ -1236,6 +1256,7 @@ interface GameDao {
                 AND (source != 'STEAM' OR localPath IS NOT NULL OR (steamLauncher IS NOT NULL AND steamLauncher != 'native'))
             )
         )
+        AND $ENABLED_PLATFORM_SQL
         ORDER BY sortTitle ASC
     """)
     suspend fun getLibraryLinkCandidates(
@@ -1249,6 +1270,7 @@ interface GameDao {
         SELECT * FROM games
         WHERE searchTitle LIKE '%' || :query || '%'
         AND NOT EXISTS (SELECT 1 FROM user_roms_hidden h WHERE h.gameId = games.id AND (h.ownerUserId IS NULL OR h.ownerUserId IS :ownerUserId))
+        AND $ENABLED_PLATFORM_SQL
         ORDER BY
             CASE WHEN searchTitle LIKE :query || '%' THEN 0 ELSE 1 END,
             CASE WHEN rating IS NULL THEN 1 ELSE 0 END,
@@ -1272,6 +1294,7 @@ interface GameDao {
             OR localPath IS NOT NULL
             OR (steamLauncher IS NOT NULL AND steamLauncher != 'native')
         )
+        AND $ENABLED_PLATFORM_SQL
         ORDER BY
             CASE WHEN searchTitle LIKE :query || '%' THEN 0 ELSE 1 END,
             CASE WHEN rating IS NULL THEN 1 ELSE 0 END,
@@ -1291,6 +1314,7 @@ interface GameDao {
         WHERE (raId IS NOT NULL OR verifiedRaId IS NOT NULL)
         AND searchTitle LIKE '%' || :query || '%'
         AND NOT EXISTS (SELECT 1 FROM user_roms_hidden h WHERE h.gameId = games.id AND (h.ownerUserId IS NULL OR h.ownerUserId IS :ownerUserId))
+        AND $ENABLED_PLATFORM_SQL
         ORDER BY
             CASE WHEN source = 'ANDROID_APP'
                 OR localPath IS NOT NULL
@@ -1322,6 +1346,7 @@ interface GameDao {
         WHERE isGroupVisible = 1
         AND NOT EXISTS (SELECT 1 FROM user_roms_hidden h WHERE h.gameId = games.id AND (h.ownerUserId IS NULL OR h.ownerUserId IS :ownerUserId))
         AND (status IS NULL OR status NOT IN ('retired', 'never_playing'))
+        AND $ENABLED_PLATFORM_SQL
     """)
     suspend fun getSearchCandidates(ownerUserId: Long?): List<SearchCandidate>
 

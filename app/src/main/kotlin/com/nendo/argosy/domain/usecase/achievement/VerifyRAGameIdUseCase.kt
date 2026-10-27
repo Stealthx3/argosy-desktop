@@ -7,6 +7,8 @@ import com.nendo.argosy.data.remote.ra.RAConsoleIds
 import com.nendo.argosy.data.repository.RetroAchievementsRepository
 import com.nendo.argosy.util.Logger
 import com.swordfish.libretrodroid.LibretroDroid
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.zip.ZipFile
 import javax.inject.Inject
@@ -17,7 +19,10 @@ class VerifyRAGameIdUseCase @Inject constructor(
     private val gameDao: GameDao,
     private val raRepository: RetroAchievementsRepository
 ) {
-    suspend operator fun invoke(gameId: Long, forceRehash: Boolean = false): Long? {
+    suspend operator fun invoke(gameId: Long, forceRehash: Boolean = false): Long? =
+        withContext(Dispatchers.IO) { verify(gameId, forceRehash) }
+
+    private suspend fun verify(gameId: Long, forceRehash: Boolean): Long? {
         val game = gameDao.getById(gameId) ?: return null
 
         if (game.raIdVerified && !forceRehash) {

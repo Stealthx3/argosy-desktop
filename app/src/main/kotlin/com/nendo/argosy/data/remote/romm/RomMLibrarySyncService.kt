@@ -1039,6 +1039,7 @@ class RomMLibrarySyncService @Inject constructor(
         }
         val existing = platformDao.getById(platformId)
         val platformDef = PlatformDefinitions.getBySlug(effectiveSlug)
+        val romRules = PlatformDefinitions.definitionFor(effectiveSlug)
         val isSubPlatform = !effectiveSlug.equals(remote.slug, ignoreCase = true)
 
         val logoUrl = apiClient.buildMediaUrl(remote.logoUrl)
@@ -1057,11 +1058,11 @@ class RomMLibrarySyncService @Inject constructor(
             fsSlug = remote.fsSlug,
             name = normalizedName,
             shortName = resolvedShortName,
-            romExtensions = platformDef?.extensions?.joinToString(",") ?: "",
+            romExtensions = romRules?.extensions?.joinToString(",") ?: "",
             gameCount = remote.romCount,
             isVisible = existing?.isVisible ?: true,
             logoPath = logoUrl ?: existing?.logoPath,
-            sortOrder = existing?.sortOrder ?: platformDef?.sortOrder ?: 999,
+            sortOrder = existing?.sortOrder ?: romRules?.sortOrder ?: 999,
             lastScanned = existing?.lastScanned,
             syncEnabled = existing?.syncEnabled ?: true,
             customRomPath = existing?.customRomPath,

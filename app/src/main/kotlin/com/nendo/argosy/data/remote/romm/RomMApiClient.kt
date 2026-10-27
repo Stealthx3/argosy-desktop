@@ -416,6 +416,7 @@ class RomMApiClient @Inject constructor(
                         ?: platformDao.getBySlugAndFsSlug(remote.slug, remote.fsSlug)
                         ?: platformDao.getBySlug(remote.slug)
                     val platformDef = PlatformDefinitions.getBySlug(effectiveSlug)
+                    val romRules = PlatformDefinitions.definitionFor(effectiveSlug)
                     val logoUrl = buildMediaUrl(remote.logoUrl)
                     val derivedNames = PlatformDefinitions.importDisplayNames(remote.slug, remote.fsSlug, effectiveSlug)
                     val normalizedName = if (isSubPlatform) {
@@ -432,11 +433,11 @@ class RomMApiClient @Inject constructor(
                         fsSlug = remote.fsSlug,
                         name = normalizedName,
                         shortName = resolvedShortName,
-                        romExtensions = platformDef?.extensions?.joinToString(",") ?: "",
+                        romExtensions = romRules?.extensions?.joinToString(",") ?: "",
                         gameCount = remote.romCount,
                         isVisible = existing?.isVisible ?: true,
                         logoPath = logoUrl ?: existing?.logoPath,
-                        sortOrder = platformDef?.sortOrder ?: existing?.sortOrder ?: 999,
+                        sortOrder = romRules?.sortOrder ?: existing?.sortOrder ?: 999,
                         lastScanned = existing?.lastScanned,
                         syncEnabled = existing?.syncEnabled ?: defaultSyncEnabled,
                         customRomPath = existing?.customRomPath,

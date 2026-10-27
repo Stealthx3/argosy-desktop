@@ -123,6 +123,7 @@ import com.nendo.argosy.ui.input.DiscPickerInputHandler
 import com.nendo.argosy.ui.input.MemcardPickerInputHandler
 import com.nendo.argosy.ui.input.VariantPickerInputHandler
 import com.nendo.argosy.ui.input.LocalInputDispatcher
+import com.nendo.argosy.ui.input.ModalInputEffect
 import com.nendo.argosy.ui.input.ModalPresenceEffect
 import com.nendo.argosy.ui.navigation.Screen
 import com.nendo.argosy.ui.theme.LocalBoxArtStyle
@@ -738,20 +739,15 @@ fun LibraryScreen(
             )
         }
 
-        LaunchedEffect(uiState.discPickerState) {
-            if (uiState.discPickerState != null) {
-                viewModel.setDiscPickerFocusIndex(0)
-                inputDispatcher.pushModal(discPickerInputHandler)
-            }
+        val showDiscPicker = uiState.discPickerState != null
+        LaunchedEffect(showDiscPicker) {
+            if (showDiscPicker) viewModel.setDiscPickerFocusIndex(0)
         }
-
-        DisposableEffect(uiState.discPickerState) {
-            onDispose {
-                if (uiState.discPickerState != null) {
-                    inputDispatcher.removeModal(discPickerInputHandler)
-                }
-            }
-        }
+        ModalInputEffect(
+            active = showDiscPicker,
+            handler = discPickerInputHandler,
+            inputDispatcher = inputDispatcher
+        )
 
         uiState.variantPickerState?.let { pickerState ->
             com.nendo.argosy.ui.screens.gamedetail.modals.VariantPickerModal(
@@ -772,20 +768,15 @@ fun LibraryScreen(
             )
         }
 
-        LaunchedEffect(uiState.variantPickerState) {
-            if (uiState.variantPickerState != null) {
-                viewModel.setVariantPickerFocusIndex(0)
-                inputDispatcher.pushModal(variantPickerInputHandler)
-            }
+        val showVariantPicker = uiState.variantPickerState != null
+        LaunchedEffect(showVariantPicker) {
+            if (showVariantPicker) viewModel.setVariantPickerFocusIndex(0)
         }
-
-        DisposableEffect(uiState.variantPickerState) {
-            onDispose {
-                if (uiState.variantPickerState != null) {
-                    inputDispatcher.removeModal(variantPickerInputHandler)
-                }
-            }
-        }
+        ModalInputEffect(
+            active = showVariantPicker,
+            handler = variantPickerInputHandler,
+            inputDispatcher = inputDispatcher
+        )
 
         val siblingChoiceState by viewModel.siblingChoiceState.collectAsState()
         com.nendo.argosy.ui.screens.common.SiblingChoiceModalHost(
@@ -818,19 +809,13 @@ fun LibraryScreen(
 
         val showMemcardPicker = uiState.memcardPickerState != null
         LaunchedEffect(showMemcardPicker) {
-            if (showMemcardPicker) {
-                viewModel.setMemcardPickerFocusIndex(0)
-                inputDispatcher.pushModal(memcardPickerInputHandler)
-            }
+            if (showMemcardPicker) viewModel.setMemcardPickerFocusIndex(0)
         }
-
-        DisposableEffect(showMemcardPicker) {
-            onDispose {
-                if (showMemcardPicker) {
-                    inputDispatcher.removeModal(memcardPickerInputHandler)
-                }
-            }
-        }
+        ModalInputEffect(
+            active = showMemcardPicker,
+            handler = memcardPickerInputHandler,
+            inputDispatcher = inputDispatcher
+        )
 
 
         LetterOverlay(

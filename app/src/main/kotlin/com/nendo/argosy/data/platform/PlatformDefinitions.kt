@@ -643,6 +643,14 @@ object PlatformDefinitions {
         return platformMap[slugAliases[lower] ?: lower]
     }
 
+    /**
+     * The definition whose ROM rules a platform follows. A suffixed sub-platform such as
+     * `neo-geo-cd-hacks` has no definition of its own and inherits its parent's; [getBySlug]
+     * stays exact so names and badges keep the sub-platform's identity.
+     */
+    fun definitionFor(slug: String): PlatformDef? =
+        getBySlug(slug) ?: splitSuffixedSlug(slug.lowercase())?.first?.let { platformMap[it] }
+
     fun shortNameForDisplayName(displayName: String): String? =
         platforms.firstOrNull { it.name.equals(displayName, ignoreCase = true) }?.shortName
 

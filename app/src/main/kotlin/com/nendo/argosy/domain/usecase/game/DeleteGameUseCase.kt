@@ -132,7 +132,7 @@ class DeleteGameUseCase @Inject constructor(
 
     private suspend fun deleteDiscCompanions(launchFile: File, platformSlug: String) {
         if (!DiscSheets.isLoader(launchFile.name)) return
-        val romExtensions = PlatformDefinitions.getBySlug(platformSlug)?.extensions ?: return
+        val romExtensions = PlatformDefinitions.definitionFor(platformSlug)?.extensions ?: return
         for (companion in DiscSheets.companions(launchFile, romExtensions)) {
             if (!companion.delete()) {
                 Logger.warn(TAG, "Failed to delete disc track ${companion.name}, adding to orphan index")
