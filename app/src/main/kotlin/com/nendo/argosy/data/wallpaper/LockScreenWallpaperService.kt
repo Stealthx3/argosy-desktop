@@ -2,6 +2,7 @@ package com.nendo.argosy.data.wallpaper
 
 import android.animation.ValueAnimator
 import android.app.KeyguardManager
+import android.app.WallpaperColors
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
@@ -23,6 +24,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 private const val SURFACE_RELEASE_WAIT_MS = 500L
+private val FIXED_COLORS = WallpaperColors(Color.valueOf(Color.BLACK), null, null)
 
 @AndroidEntryPoint
 class LockScreenWallpaperService : WallpaperService() {
@@ -57,6 +59,8 @@ class LockScreenWallpaperService : WallpaperService() {
             }
             if (isPreview) preview = artManager.prepareLivePreview() else artManager.onLiveWallpaperBound()
         }
+
+        override fun onComputeColors(): WallpaperColors = FIXED_COLORS
 
         override fun onDestroy() {
             preview?.cancel()
