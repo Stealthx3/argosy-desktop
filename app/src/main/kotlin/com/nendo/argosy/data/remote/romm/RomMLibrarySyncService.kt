@@ -1377,7 +1377,12 @@ class RomMLibrarySyncService @Inject constructor(
     ) {
         batch.decidedRomIds.add(rom.id)
 
-        if (!RomMSyncFilter.shouldSyncRom(rom, filters)) return
+        if (!RomMSyncFilter.shouldSyncRom(rom, filters)) {
+            if (gameDao.keepDownloadedRomLinked(rom.id) > 0) {
+                Logger.debug(TAG, "syncRomInBatch: ${rom.name} is filtered out but downloaded; keeping it linked")
+            }
+            return
+        }
 
         if (rom.id in batch.skipIndividualDiscIds) {
             Logger.debug(TAG, "syncRomInBatch: skipping individual disc ${rom.name} - folder-based version preferred")

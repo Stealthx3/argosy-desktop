@@ -229,9 +229,15 @@ class GameNativeStoreSync @Inject constructor(
         val markerIds = markers.map { it.first.toLong() }.toSet()
 
         var removed = 0
-        existing.filter { it.steamAppId !in markerIds }.forEach { stale ->
-            Logger.debug(TAG, "reconcile: removing uninstalled | store=${store.slug}, title=${stale.title}")
-            gameDao.delete(stale.id)
+        val stale = if (markerIds.isEmpty() && existing.isNotEmpty()) {
+            Logger.warn(TAG, "reconcile: ${store.slug} folder lists no markers; keeping ${existing.size} games")
+            emptyList()
+        } else {
+            existing.filter { it.steamAppId !in markerIds }
+        }
+        stale.forEach { game ->
+            Logger.debug(TAG, "reconcile: removing uninstalled | store=${store.slug}, title=${game.title}")
+            gameDao.delete(game.id)
             removed++
         }
 

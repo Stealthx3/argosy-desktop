@@ -21,6 +21,7 @@ import com.nendo.argosy.data.storage.StorageAttributionRepository
 import com.nendo.argosy.data.storage.StorageCategory
 import com.nendo.argosy.data.sync.SyncPayloadCodec
 import com.nendo.argosy.util.DiscSheets
+import com.nendo.argosy.util.FileNames
 import com.nendo.argosy.util.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -84,16 +85,15 @@ class DeleteGameUseCase @Inject constructor(
                 if (!file.exists()) return@withContext
 
                 val deleted = if (file.isDirectory) {
-                    file.deleteRecursively()
+                    if (!FileNames.isWithin(platformFolder, file)) {
+                        file.deleteRecursively()
+                    } else {
+                        Logger.warn(TAG, "Refusing to delete folder $path: it holds the platform folder ${platformFolder.path}")
+                        false
+                    }
                 } else {
                     val parent = file.parentFile
-                    val platformCanonical = platformFolder.canonicalPath
-                    val parentCanonical = parent?.canonicalPath
-
-                    val isPlatformFolder = parentCanonical == platformCanonical
-                    val isInsidePlatformFolder = parentCanonical?.startsWith(platformCanonical) == true
-
-                    if (parent != null && !isPlatformFolder && isInsidePlatformFolder) {
+                    if (parent != null && FileNames.isInside(parent, platformFolder)) {
                         parent.deleteRecursively()
                     } else {
                         deleteDiscCompanions(file, game.platformSlug)
@@ -119,11 +119,10 @@ class DeleteGameUseCase @Inject constructor(
 
     private fun deleteRecordedFiles(paths: List<String>, platformFolder: File) {
         if (paths.isEmpty()) return
-        val platformCanonical = runCatching { platformFolder.canonicalPath }.getOrNull() ?: return
         for (path in paths) {
             val file = File(path)
-            val parentCanonical = runCatching { file.parentFile?.canonicalPath }.getOrNull() ?: continue
-            if (!parentCanonical.startsWith(platformCanonical)) continue
+            val parent = file.parentFile ?: continue
+            if (!runCatching { FileNames.isWithin(parent, platformFolder) }.getOrDefault(false)) continue
             if (file.isFile && !file.delete()) {
                 Logger.warn(TAG, "Failed to delete ${file.name}")
             }

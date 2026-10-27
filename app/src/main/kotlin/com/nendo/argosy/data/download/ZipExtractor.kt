@@ -900,11 +900,5 @@ object ZipExtractor {
         }
     }
 
-    private fun sanitizeFileName(name: String): String {
-        return name
-            .replace(Regex("[\\\\/:*?\"<>|]"), "_")
-            .replace(Regex("\\s+"), " ")
-            .trim()
-            .take(200)
-    }
+    private fun sanitizeFileName(name: String): String = FileNames.gameFolderName(name)
 }

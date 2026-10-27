@@ -732,11 +732,16 @@ class GameRepository @Inject constructor(
 
     suspend fun deleteLocalFilesForPlatform(platformId: Long): Int = withContext(Dispatchers.IO) {
         val games = gameDao.getDownloadedByPlatform(platformId)
+        val platformDir = getDownloadDirForPlatformId(platformId)
         var deleted = 0
         for (game in games) {
             val path = game.localPath ?: continue
             try {
                 val file = java.io.File(path)
+                if (file.isDirectory && FileNames.isWithin(platformDir, file)) {
+                    Log.w(TAG, "Refusing to delete folder $path: it holds the platform folder ${platformDir.path}")
+                    continue
+                }
                 if (file.exists()) {
                     if (file.isDirectory) file.deleteRecursively() else file.delete()
                 }

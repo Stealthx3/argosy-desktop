@@ -819,11 +819,23 @@ class DownloadManager internal constructor(
         return File(platformDir, names.first())
     }
 
-    private fun sanitizeFolderName(name: String): String = name
-        .replace(Regex("[\\\\/:*?\"<>|]"), "_")
-        .replace(Regex("\\s+"), " ")
-        .trim()
-        .take(200)
+    private fun sanitizeFolderName(name: String): String = FileNames.gameFolderName(name)
+
+    private suspend fun separateFromOtherOwner(
+        downloadDir: File,
+        platformDir: File,
+        unstaged: Boolean,
+        progress: DownloadProgress
+    ): File {
+        if (!unstaged || downloadDir.absolutePath != platformDir.absolutePath) return downloadDir
+        val shared = File(downloadDir, progress.fileName)
+        if (!shared.exists()) return downloadDir
+        val owner = gameDao.getByPath(shared.absolutePath) ?: return downloadDir
+        if (owner.id == progress.gameId) return downloadDir
+        val own = File(platformDir, sanitizeFolderName(progress.gameTitle)).also { it.mkdirs() }
+        Log.w(TAG, "${shared.name} belongs to game ${owner.id}; downloading game ${progress.gameId} into ${own.name}")
+        return own
+    }
 
     /** Server dir of this file relative to the rom root, or null for root files. */
     /**
@@ -1109,8 +1121,9 @@ class DownloadManager internal constructor(
                     else -> platformDir
                 }
 
-                val tempFile = File(downloadDir, "${progress.fileName}.tmp")
-                val targetFile = File(downloadDir, progress.fileName)
+                val fileDir = separateFromOtherOwner(downloadDir, platformDir, stagingArea == null, progress)
+                val tempFile = File(fileDir, "${progress.fileName}.tmp")
+                val targetFile = File(fileDir, progress.fileName)
 
                 if (targetFile.exists() && targetFile.length() >= progress.totalBytes && progress.totalBytes > 0) {
                     Log.d(TAG, "Target file already complete (${targetFile.length()} bytes), finalizing")

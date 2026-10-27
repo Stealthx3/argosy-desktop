@@ -16,6 +16,7 @@ import com.nendo.argosy.data.storage.StorageAttributionRepository
 import com.nendo.argosy.data.storage.StorageCategory
 import com.nendo.argosy.ui.input.SoundFeedbackManager
 import com.nendo.argosy.util.AppPaths
+import com.nendo.argosy.util.FileNames
 import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -83,7 +84,8 @@ class DatabaseAdminRepository @Inject constructor(
     private val mediaDownloadManager: Lazy<MediaDownloadManager>,
     private val socialRepository: Lazy<SocialRepository>,
     private val soundFeedbackManager: Lazy<SoundFeedbackManager>,
-    private val hardResetRecorder: HardResetRecorder
+    private val hardResetRecorder: HardResetRecorder,
+    private val gameRepository: Lazy<GameRepository>
 ) {
     private val sessionStateStore by lazy { SessionStateStore(context) }
 
@@ -235,7 +237,12 @@ class DatabaseAdminRepository @Inject constructor(
                         deleted++
                         continue
                     }
-                    val removed = if (file.isDirectory) file.deleteRecursively() else file.delete()
+                    val removed = if (file.isDirectory) {
+                        val platformDir = gameRepository.get().getDownloadDirForPlatformId(target.game.platformId)
+                        !FileNames.isWithin(platformDir, file) && file.deleteRecursively()
+                    } else {
+                        file.delete()
+                    }
                     if (removed) {
                         session.recordDeleted(target.game.id)
                         deleted++

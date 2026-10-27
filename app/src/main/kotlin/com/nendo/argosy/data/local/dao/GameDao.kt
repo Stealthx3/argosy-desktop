@@ -1443,6 +1443,9 @@ interface GameDao {
     @Query("UPDATE games SET syncDirty = 0 WHERE platformId = :platformId AND source IN (:sources)")
     suspend fun clearSyncDirty(platformId: Long, sources: List<GameSource>)
 
+    @Query("UPDATE games SET syncDirty = 0 WHERE rommId = :rommId AND localPath IS NOT NULL")
+    suspend fun keepDownloadedRomLinked(rommId: Long): Int
+
     @Query("SELECT * FROM games WHERE platformId = :platformId AND syncDirty = 1 AND source IN (:sources)")
     suspend fun getSyncDirtyGames(platformId: Long, sources: List<GameSource>): List<GameEntity>
 
