@@ -2,7 +2,7 @@
 
 Rewritten (not appended) at the end of every work unit, so a fresh session can start from it alone. History and reasoning live in `DEVLOG.md`. Earlier phases: `phase-0.md` … `phase-4.md` (closed summaries).
 
-**Updated:** 2026-10-27 (step 7 groundwork unit 5 committed; step 5 open, waiting for the owner's checklist). Steps 1–4 done; step 5 in progress.
+**Updated:** 2026-10-27 (paused for the owner's testing; step 7 groundwork unit 5 committed; step 5 open, waiting for the owner's checklist). Steps 1–4 done; step 5 in progress.
 
 ## Scope and exit criterion
 
@@ -15,6 +15,15 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 - Desktop leftovers: Displays → "Enable Dual-screen Mode", About → upstream APK update (in-app updater row: Flatpak performs the update).
 - Flathub lint: exceptions or alternatives for emulator folder grants and `flatpak-spawn` access, screenshots, the app id vs repository name; offline from-source build (Gradle dependencies as Flatpak sources).
 - YouTube trailers on desktop (deferred; needs yt-dlp and a JavaScript runtime).
+
+## Paused for the owner's testing (owner decision 2026-10-27)
+
+- Do not resume until the owner reports results for `docs/desktop/side-by-side-checklist.md` and the Game Mode checks below.
+- Then revisit together, in this order:
+  1. fix the differences the owner reports and close step 5;
+  2. the Brightness decision;
+  3. the Flathub startup abort (see the step 7 next action);
+  4. the app-id rename and screenshots.
 
 ## Owner checks pending (alpha 5.4)
 

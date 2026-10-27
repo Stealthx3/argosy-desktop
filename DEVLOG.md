@@ -1466,3 +1466,13 @@ It is limited to `Stealthx3/argosy-desktop` and triggers on pushes to `main` tha
 - Repo lint: the known three, all owner-gated (app id, `flatpak-spawn` exception, screenshots).
 - Smoke run: `flatpak-builder --run` needs rofiles-fuse, which fails here, so I used `flatpak build` with scratch `XDG_*`. The app stays up for 45 s and initialises its database on the scratch data.
 **Open item:** that run prints `pure virtual method called` / `terminate called without an active exception` at startup, while the app keeps running. The alpha build dir run the same way does not, and the line still appears when the run is ended with SIGKILL, so it happens at startup. Suspect: the extension JDK's jpackage launcher (21.0.13, against the alpha's host 21.0.12). Details and next checks are in `docs/desktop/flathub-plan.md`. I did not chase it further this unit (weekly usage near the cap).
+
+### 2026-10-27 — Remaining issues deferred until the owner's testing is done (owner decision)
+
+**Owner decision (2026-10-27):** "revisit the remaining issues after completing testing." The open items wait until the owner's tests come back:
+- the Flathub build's startup abort;
+- the app-id rename;
+- the screenshots;
+- the Quick Settings Brightness decision.
+
+The owner's tests are the step 5 side-by-side checklist and the alpha 5.4 Game Mode checks. Work pauses (pacer `waiting-owner`).
