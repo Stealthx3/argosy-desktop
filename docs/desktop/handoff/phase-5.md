@@ -2,7 +2,7 @@
 
 Rewritten (not appended) at the end of every work unit, so a fresh session can start from it alone. History and reasoning live in `DEVLOG.md`. Earlier phases: `phase-0.md` … `phase-4.md` (closed summaries).
 
-**Updated:** 2026-10-27 (step 7 groundwork unit 4 committed; step 5 open, waiting for the owner's checklist). Steps 1–4 done; step 5 in progress.
+**Updated:** 2026-10-27 (step 7 groundwork unit 5 committed; step 5 open, waiting for the owner's checklist). Steps 1–4 done; step 5 in progress.
 
 ## Scope and exit criterion
 
@@ -41,7 +41,8 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 - Owner decisions open: the app-id rename `io.github.Stealthx3.argosy_desktop`, installing the openjdk21 SDK extension, screenshots from the owner's library, and the Flathub PR.
 - Unit 2: SDK-less desktop build works with `ANDROID_HOME=<empty dir>` and `-Pargosy.desktopOnly=true`, which leaves out `:sigil` and `:libretrodroid` (they want the NDK at configure time). Proven from a clean copy; the default gate is unchanged.
 - Unit 3: offline sources done (`generated/gradle-sources.json`, 1,448 files; regenerate with `scripts/desktop/flatpak/regen-gradle-sources.sh <scratch>`). The host `--offline` proof passes. Draft from-source manifest `io.github.stealthx3.ArgosyDesktop.flathub.yml` is not yet run.
-- **Next action:** with the owner's OK, install `org.freedesktop.Sdk.Extension.openjdk21//25.08` (user) and run `flatpak-builder` on the `.flathub.yml` into a scratch repo. Fix what breaks (likely: git `branch: HEAD`, submodules, Compose's jlink inside the sandbox), then lint it. Plan step 5 is done as a draft: `.github/workflows/flatpak.yml` (untested; its first run is the phase-close push). Without the extension OK, the remaining groundwork is screenshots, which need the owner's library, so wait for the owner.
+- Unit 5: openjdk21 extension installed (owner OK). The Flathub manifest builds offline locally (scratch state `scratchpad/flathub`, not installed); lint shows only the owner-gated items.
+- **Next action:** the startup abort (`pure virtual method called`) in the Flathub build only. Run the build-dir launcher under `strace -f -e trace=process` to see which process aborts. If it is the jpackage launcher, compare with a host 21.0.13 jpackage, or set Compose's `javaHome` to the extension JDK on the host. Smoke-run command: `flatpak build --socket=x11 --device=dri --share=network --env=XDG_{DATA,CONFIG,CACHE}_HOME=<scratch> <build-dir> /app/bin/argosy-desktop --windowed` (never the owner's data).
 
 ## Gotchas
 

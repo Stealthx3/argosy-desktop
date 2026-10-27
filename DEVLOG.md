@@ -1456,3 +1456,13 @@ Mapped ids: retroarch, dolphin, cemu, azahar, ryujinx (Ryubing), eden, melonds, 
 
 It is limited to `Stealthx3/argosy-desktop` and triggers on pushes to `main` that touch the desktop build, or on demand. No untrusted event fields are used in `run:` steps.
 **Verification:** the YAML parses (jobs `build` and `lint`). Not run: pushes happen only at phase close, and `actionlint` is not installed here. The first real run is the Phase 5 close push, or a manual dispatch after it.
+
+### 2026-10-27 — Step 7 groundwork, unit 5: the Flathub manifest builds offline
+
+**Owner OK (2026-10-27):** install `org.freedesktop.Sdk.Extension.openjdk21//25.08` (user) and test the Flathub manifest. Installed: JDK 21.0.13, 817 MB.
+**Result:**
+- `flatpak-builder` on `io.github.stealthx3.ArgosyDesktop.flathub.yml` (scratch state and repo, no install, so the alpha is untouched) builds every module from source, Gradle offline (`BUILD SUCCESSFUL in 4m 59s`).
+- Manifest lint: info only (the local git sources have no URL; runtime 26.08 is available).
+- Repo lint: the known three, all owner-gated (app id, `flatpak-spawn` exception, screenshots).
+- Smoke run: `flatpak-builder --run` needs rofiles-fuse, which fails here, so I used `flatpak build` with scratch `XDG_*`. The app stays up for 45 s and initialises its database on the scratch data.
+**Open item:** that run prints `pure virtual method called` / `terminate called without an active exception` at startup, while the app keeps running. The alpha build dir run the same way does not, and the line still appears when the run is ended with SIGKILL, so it happens at startup. Suspect: the extension JDK's jpackage launcher (21.0.13, against the alpha's host 21.0.12). Details and next checks are in `docs/desktop/flathub-plan.md`. I did not chase it further this unit (weekly usage near the cap).

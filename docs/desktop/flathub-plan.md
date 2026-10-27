@@ -32,7 +32,12 @@ Today's alpha packages a jlink distributable built on the host. Flathub needs th
    - `desktopApp/flatpak/offline.init.gradle.kts` replaces every repository with that one, plus the in-tree `libs/maven`.
    - Proof: a fresh Gradle home with `--offline` and only those files builds the full distributable, with every checksum matching.
    - Rerun the script after any dependency or plugin change.
-   - The from-source manifest is `desktopApp/flatpak/io.github.stealthx3.ArgosyDesktop.flathub.yml`, with the openjdk21 extension and the Gradle 8.9 zip pinned by its published sha256. **Untested** until the extension is installed here.
+   - The from-source manifest is `desktopApp/flatpak/io.github.stealthx3.ArgosyDesktop.flathub.yml`, with the openjdk21 extension and the Gradle 8.9 zip pinned by its published sha256.
+   - **Built locally 2026-10-27:** `flatpak-builder` ran all five modules offline inside the sandbox, and Gradle printed `BUILD SUCCESSFUL in 4m 59s`.
+     - Manifest lint gives info only: git sources without a URL (they become release URLs), and runtime 26.08 available.
+     - Repo lint shows the same three owner-gated errors as the alpha.
+     - Started with `flatpak build` on scratch XDG data, the app stays up and initialises.
+   - **Open:** the Flathub build prints `pure virtual method called` / `terminate called without an active exception` at startup, and the app keeps running. The alpha build dir run the same way does not, and it still appears when the run is ended with SIGKILL. Lead: the jpackage launcher of the extension's JDK 21.0.13, where the alpha uses the host's 21.0.12; it may abort in a process that is not the JVM. To check: run the build-dir launcher under `strace -f`, or compare against a host-JDK 21.0.13 jpackage.
 4. **Natives.** `sigil` (git submodule) and libmpv, libass and libplacebo already build from source as modules. SDL3 comes from the runtime. Skiko's native library ships inside its Maven jar, so it is covered by step 3.
 5. **CI (drafted 2026-10-27).** `.github/workflows/flatpak.yml` builds the `.flathub.yml` manifest for x86_64 and aarch64 (QEMU) in the freedesktop 25.08 builder image, using the `flatpak/flatpak-github-actions` flatpak-builder action. It uploads a bundle per architecture and lints the manifest in a separate job. It runs on pushes to `main` that touch the desktop build, and on demand. Pushes happen only at phase close, so its first run is the Phase 5 close push. **Untested.**
 6. **Submission.** Fork `flathub/flathub`, add the manifest, the generated sources and the metainfo on a `new-pr` branch, and open the PR. **Owner go-ahead needed** (it posts to a third-party repository).
