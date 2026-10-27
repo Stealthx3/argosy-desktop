@@ -1,0 +1,77 @@
+# Argosy Desktop: the Flathub from-source build, run offline the way Flathub runs it.
+#
+# Builds desktopApp/flatpak/io.github.stealthx3.ArgosyDesktop.flathub.yml for x86_64 and aarch64
+# (aarch64 under QEMU) in the freedesktop 25.08 builder image, uploads each bundle, then lints the
+# manifest. The manifest's Gradle dependencies come from generated/gradle-sources.json
+# (scripts/desktop/flatpak/regen-gradle-sources.sh), so the build itself needs no network.
+name: Flatpak (Flathub build)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "desktopApp/**"
+      - "shared/**"
+      - "desktop-libs/**"
+      - "sigil"
+      - "gradle/**"
+      - "*.gradle.kts"
+      - ".github/workflows/flatpak.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: flatpak-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    if: github.repository == 'Stealthx3/argosy-desktop'
+    name: Build (${{ matrix.arch }})
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:freedesktop-25.08
+      options: --privileged
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x86_64, aarch64]
+    steps:
+      - name: Check out with submodules
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Install Docker for the QEMU setup
+        if: matrix.arch == 'aarch64'
+        run: dnf -y install docker
+
+      - name: Set up QEMU
+        if: matrix.arch == 'aarch64'
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+
+      - name: Build the Flatpak
+        uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+        with:
+          bundle: argosy-desktop-${{ matrix.arch }}.flatpak
+          manifest-path: desktopApp/flatpak/io.github.stealthx3.ArgosyDesktop.flathub.yml
+          cache-key: flatpak-builder-${{ matrix.arch }}-${{ hashFiles('desktopApp/flatpak/generated/gradle-sources.json') }}
+          arch: ${{ matrix.arch }}
+
+  lint:
+    if: github.repository == 'Stealthx3/argosy-desktop'
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:freedesktop-25.08
+      options: --privileged
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Lint the manifest
+        run: |
+          flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+          flatpak install --user -y flathub org.flatpak.Builder
+          flatpak run --command=flatpak-builder-lint org.flatpak.Builder \
+            manifest desktopApp/flatpak/io.github.stealthx3.ArgosyDesktop.flathub.yml

@@ -1445,3 +1445,14 @@ Mapped ids: retroarch, dolphin, cemu, azahar, ryujinx (Ryubing), eden, melonds, 
 
 **Verification:** a host-side offline proof. The repository was laid out from the sources (checksums: 0 mismatches), then `--offline` with a fresh Gradle home and only that repository built the full distributable (125 files in `lib/app`). The Flathub manifest parses, but has not been run, because that needs `org.freedesktop.Sdk.Extension.openjdk21//25.08` (owner OK pending).
 **Gotcha:** the git sources use `path: ../..` for local tests. On Flathub they become the release tag and commit. Recursive submodules bring in libretrodroid's too, which is harmless but larger.
+
+### 2026-10-27 — Step 7 groundwork, unit 4: Flatpak CI workflow draft
+
+**Action:** the openjdk21 extension is still waiting on the owner's OK, so I drafted plan step 5 instead. `.github/workflows/flatpak.yml` has:
+- a build job for x86_64 and aarch64 in `ghcr.io/flathub-infra/flatpak-github-actions:freedesktop-25.08`, using `flatpak/flatpak-github-actions/flatpak-builder@v6` (aarch64 through `docker/setup-qemu-action`, as that action's README sets it up);
+- a recursive-submodule checkout;
+- a cache key on `gradle-sources.json`;
+- a lint job that runs `flatpak-builder-lint` from `org.flatpak.Builder` on the Flathub manifest.
+
+It is limited to `Stealthx3/argosy-desktop` and triggers on pushes to `main` that touch the desktop build, or on demand. No untrusted event fields are used in `run:` steps.
+**Verification:** the YAML parses (jobs `build` and `lint`). Not run: pushes happen only at phase close, and `actionlint` is not installed here. The first real run is the Phase 5 close push, or a manual dispatch after it.
