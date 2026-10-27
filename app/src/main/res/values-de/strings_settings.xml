@@ -2214,8 +2214,6 @@
     <string name="settings_controller_order_hint_clear_all">Alle löschen</string>
     <string name="settings_controller_order_default_name">Controller</string>
     <string name="settings_controller_order_slot_label">P%1$d</string>
-    <string name="settings_controller_order_seat_none">Keiner</string>
-    <string name="settings_controller_order_empty">Keine Controller verbunden</string>
 
     <!-- ===== Grip controller modal (Settings > components > GripControllerModal) ===== -->
 

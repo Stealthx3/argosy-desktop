@@ -378,8 +378,11 @@ class RetroAchievementsRepository @Inject constructor(
 
     data class RASessionResult(
         val success: Boolean,
-        val unlockedAchievements: Set<Long> = emptySet()
-    )
+        val hardcoreUnlocks: Set<Long> = emptySet(),
+        val allUnlocks: Set<Long> = emptySet()
+    ) {
+        fun unlocksFor(hardcore: Boolean): Set<Long> = if (hardcore) hardcoreUnlocks else allUnlocks
+    }
 
     suspend fun startSession(gameRaId: Long, hardcore: Boolean = false, gameHash: String? = null): RASessionResult {
         val credentials = getCredentials()
@@ -404,15 +407,10 @@ class RetroAchievementsRepository @Inject constructor(
                 if (!body.warning.isNullOrBlank()) {
                     Logger.warn(TAG, "RA session warning: ${body.warning}")
                 }
-                val unlocked = mutableSetOf<Long>()
-                if (hardcore) {
-                    body.hardcoreUnlocks?.mapTo(unlocked) { it.id }
-                } else {
-                    body.hardcoreUnlocks?.mapTo(unlocked) { it.id }
-                    body.unlocks?.mapTo(unlocked) { it.id }
-                }
-                Logger.debug(TAG, "Pre-unlocked achievements: ${unlocked.size}")
-                RASessionResult(true, unlocked)
+                val hardcoreUnlocks = body.hardcoreUnlocks.orEmpty().map { it.id }.toSet()
+                val allUnlocks = hardcoreUnlocks + body.unlocks.orEmpty().map { it.id }
+                Logger.debug(TAG, "Pre-unlocked achievements: hardcore=${hardcoreUnlocks.size} all=${allUnlocks.size}")
+                RASessionResult(true, hardcoreUnlocks, allUnlocks)
             } else {
                 Logger.error(TAG, "Failed to start session: ${body?.error}")
                 handleAuthFailure(response.code(), body?.error, "startSession")

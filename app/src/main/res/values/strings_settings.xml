@@ -4258,10 +4258,6 @@
     <string name="settings_controller_order_default_name">Controller</string>
     <!-- Seat option for a player port. %1$d is the port number (1-4). -->
     <string name="settings_controller_order_slot_label">P%1$d</string>
-    <!-- Seat option meaning the controller plays as no player. -->
-    <string name="settings_controller_order_seat_none">None</string>
-    <!-- Shown in place of the rows when no controller is connected. -->
-    <string name="settings_controller_order_empty">No controllers connected</string>
 
     <!-- ===== Grip controller modal (Settings > components > GripControllerModal) =====
          "Grip" is a controller attachment that clips onto the device; the UI shifts to make

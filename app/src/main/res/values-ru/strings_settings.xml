@@ -2313,8 +2313,6 @@
     <string name="settings_controller_order_hint_clear_all">Очистить все</string>
     <string name="settings_controller_order_default_name">Контроллер</string>
     <string name="settings_controller_order_slot_label">P%1$d</string>
-    <string name="settings_controller_order_seat_none">Нет</string>
-    <string name="settings_controller_order_empty">Контроллеры не подключены</string>
 
     <!-- ===== Grip controller modal (Settings > components > GripControllerModal) ===== -->
 

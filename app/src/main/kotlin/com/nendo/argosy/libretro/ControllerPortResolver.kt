@@ -9,10 +9,9 @@ import com.swordfish.libretrodroid.PortResolver
 
 /**
  * Seats each pad on its session seat, its settings-assigned port, or the port its first input
- * claims, in that order. A built-in pad leaves player one open while an external pad is connected
- * and unseated, gives its seat back once no external pad remains, and takes player one for the
- * session while it is the only pad and the saved player one is not connected. Session seats never
- * change settings assignments.
+ * claims, in that order. A built-in pad yields player one to an unseated external pad and takes
+ * it back when it is the only pad and the saved player one is absent. Session seats never change
+ * settings assignments.
  */
 class ControllerPortResolver : PortResolver {
     private var controllerOrder: Map<String, Int> = emptyMap()

@@ -2260,8 +2260,6 @@
     <string name="settings_controller_order_hint_clear_all">Tout effacer</string>
     <string name="settings_controller_order_default_name">Manette</string>
     <string name="settings_controller_order_slot_label">J%1$d</string>
-    <string name="settings_controller_order_seat_none">Aucune</string>
-    <string name="settings_controller_order_empty">Aucune manette connectée</string>
 
     <!-- ===== Fenetre du grip manette ===== -->
 

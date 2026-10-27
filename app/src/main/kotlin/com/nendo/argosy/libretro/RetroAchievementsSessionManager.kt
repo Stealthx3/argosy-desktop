@@ -146,7 +146,7 @@ class RetroAchievementsSessionManager(
             }
 
             val preUnlocked = if (sessionResult.success) {
-                sessionResult.unlockedAchievements
+                sessionResult.unlocksFor(claimsHardcore)
             } else {
                 raRepository.getCachedAchievements(gameId)
                     .filter { it.isUnlocked }

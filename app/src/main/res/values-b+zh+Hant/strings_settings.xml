@@ -2038,8 +2038,6 @@
     <string name="settings_controller_order_hint_clear_all">全部清除</string>
     <string name="settings_controller_order_default_name">控制器</string>
     <string name="settings_controller_order_slot_label">P%1$d</string>
-    <string name="settings_controller_order_seat_none">無</string>
-    <string name="settings_controller_order_empty">未連接控制器</string>
 
     <string name="settings_grip_controller_default_name">控制器</string>
     <string name="settings_grip_controller_title">控制器握把</string>
