@@ -930,7 +930,7 @@
         <item quantity="other">%d файла</item>
     </plurals>
     <string name="settings_storage_steam_tile_title">Steam и ПК</string>
-    <string name="settings_storage_steam_tile_subtitle">Магазины, установки и временные файлы</string>
+    <string name="settings_storage_steam_tile_subtitle">Магазины и установки</string>
 
     <string name="settings_storage_rom_path_title">Общий путь ROM</string>
     <string name="settings_storage_rom_path_free">Свободно: %1$s</string>
@@ -1283,11 +1283,11 @@
     <string name="settings_steam_reset_library_subtitle">Удалить все синхронизированные игры Steam</string>
 
     <string name="settings_steam_gn_required_title">Требуется GameNative</string>
-    <string name="settings_steam_gn_required_message">Игры Steam скачиваются Argosy и запускаются через GameNative. Установите GameNative и включите внешнее хранилище в его настройках, прежде чем продолжить.</string>
+    <string name="settings_steam_gn_required_message">Игры Steam устанавливаются и запускаются через GameNative, DroidDeck или GameHub. Установите одно из этих приложений, прежде чем продолжить.</string>
     <string name="settings_steam_gn_required_action">Установить GameNative</string>
 
     <string name="settings_steam_login_title">Войти в Steam</string>
-    <string name="settings_steam_login_message">Подключите аккаунт Steam, чтобы синхронизировать библиотеку и скачивать игры.</string>
+    <string name="settings_steam_login_message">Подключите аккаунт Steam, чтобы синхронизировать библиотеку.</string>
     <string name="settings_steam_login_action">Подключить</string>
     <string name="settings_steam_connecting">Подключение...</string>
 

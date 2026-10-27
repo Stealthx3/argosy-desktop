@@ -895,7 +895,7 @@
         <item quantity="other">%d फ़ाइलें</item>
     </plurals>
     <string name="settings_storage_steam_tile_title">Steam और PC</string>
-    <string name="settings_storage_steam_tile_subtitle">स्टोर, इंस्टॉल और स्टेजिंग</string>
+    <string name="settings_storage_steam_tile_subtitle">स्टोर और इंस्टॉल</string>
 
     <string name="settings_storage_rom_path_title">ग्लोबल ROM पाथ</string>
     <string name="settings_storage_rom_path_free">%1$s खाली</string>
@@ -1204,11 +1204,11 @@
     <string name="settings_steam_reset_library_subtitle">सभी सिंक किए गए Steam गेम हटाएँ</string>
 
     <string name="settings_steam_gn_required_title">GameNative आवश्यक है</string>
-    <string name="settings_steam_gn_required_message">Steam गेम Argosy द्वारा डाउनलोड होते हैं और GameNative के ज़रिए लॉन्च होते हैं। आगे बढ़ने से पहले GameNative इंस्टॉल करें और उसकी सेटिंग्स में एक्सटर्नल स्टोरेज चालू करें।</string>
+    <string name="settings_steam_gn_required_message">Steam गेम GameNative, DroidDeck या GameHub के ज़रिए इंस्टॉल और लॉन्च होते हैं। आगे बढ़ने से पहले इनमें से कोई एक ऐप इंस्टॉल करें।</string>
     <string name="settings_steam_gn_required_action">GameNative इंस्टॉल करें</string>
 
     <string name="settings_steam_login_title">Steam में लॉग इन करें</string>
-    <string name="settings_steam_login_message">अपनी लाइब्रेरी सिंक करने और गेम डाउनलोड करने के लिए अपना Steam अकाउंट कनेक्ट करें।</string>
+    <string name="settings_steam_login_message">अपनी लाइब्रेरी सिंक करने के लिए अपना Steam अकाउंट कनेक्ट करें।</string>
     <string name="settings_steam_login_action">कनेक्ट करें</string>
     <string name="settings_steam_connecting">कनेक्ट हो रहा है...</string>
 

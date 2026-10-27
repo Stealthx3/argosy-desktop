@@ -1759,7 +1759,7 @@
     <string name="settings_storage_steam_tile_title">Steam &amp; PC</string>
     <!-- Second line on that tile, listing what it covers. "Staging" is the working folder a
          download is unpacked in. -->
-    <string name="settings_storage_steam_tile_subtitle">Stores, installs, and staging</string>
+    <string name="settings_storage_steam_tile_subtitle">Stores and installs</string>
 
     <!-- Row naming the folder every game is downloaded into. "ROM" is the usual term for a game
          file; leave it untranslated. -->
@@ -2310,14 +2310,14 @@
     <!-- Heading of the panel shown before the helper app is installed. -->
     <string name="settings_steam_gn_required_title">GameNative Required</string>
     <!-- Body of that panel. "Argosy" is this app's name. -->
-    <string name="settings_steam_gn_required_message">Steam games are downloaded by Argosy and launched through GameNative. Install GameNative and enable external storage in its settings before continuing.</string>
+    <string name="settings_steam_gn_required_message">Steam games install and launch through GameNative, DroidDeck or GameHub. Install one of them before continuing.</string>
     <!-- Button on that panel. Verb phrase. -->
     <string name="settings_steam_gn_required_action">Install GameNative</string>
 
     <!-- Heading of the panel shown before signing in. Verb phrase. -->
     <string name="settings_steam_login_title">Log in to Steam</string>
     <!-- Body of that panel. -->
-    <string name="settings_steam_login_message">Connect your Steam account to sync your library and download games.</string>
+    <string name="settings_steam_login_message">Connect your Steam account to sync your library.</string>
     <!-- Button on that panel. Verb. -->
     <string name="settings_steam_login_action">Connect</string>
     <!-- Shown while the sign-in is in progress. -->

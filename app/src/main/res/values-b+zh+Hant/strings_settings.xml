@@ -834,7 +834,7 @@
         <item quantity="other">%d個檔案</item>
     </plurals>
     <string name="settings_storage_steam_tile_title">Steam與PC</string>
-    <string name="settings_storage_steam_tile_subtitle">商店、安裝與暫存</string>
+    <string name="settings_storage_steam_tile_subtitle">商店與安裝</string>
 
     <string name="settings_storage_rom_path_title">全域ROM路徑</string>
     <string name="settings_storage_rom_path_free">剩餘%1$s</string>
@@ -1111,11 +1111,11 @@
     <string name="settings_steam_reset_library_subtitle">移除所有已同步的Steam遊戲</string>
 
     <string name="settings_steam_gn_required_title">需要GameNative</string>
-    <string name="settings_steam_gn_required_message">Steam遊戲由Argosy下載，並透過GameNative啟動。請先安裝GameNative，並在其設定中啟用外部儲存空間後再繼續。</string>
+    <string name="settings_steam_gn_required_message">Steam遊戲透過GameNative、DroidDeck或GameHub安裝與啟動。請先安裝其中一個應用程式後再繼續。</string>
     <string name="settings_steam_gn_required_action">安裝GameNative</string>
 
     <string name="settings_steam_login_title">登入Steam</string>
-    <string name="settings_steam_login_message">連結您的Steam帳號以同步收藏庫並下載遊戲。</string>
+    <string name="settings_steam_login_message">連結您的Steam帳號以同步收藏庫。</string>
     <string name="settings_steam_login_action">連結</string>
     <string name="settings_steam_connecting">連線中&#8230;</string>
 

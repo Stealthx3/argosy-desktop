@@ -166,14 +166,19 @@ class ApkInstallManager @Inject constructor(
         kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { readApkSignerSha256(apkFile) }
 
     private fun readApkSignerSha256(apkFile: File): String? = try {
-        val flags = PackageManager.GET_SIGNING_CERTIFICATES
-        val info = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            context.packageManager.getPackageArchiveInfo(apkFile.absolutePath, PackageManager.PackageInfoFlags.of(flags.toLong()))
-        } else {
-            @Suppress("DEPRECATION")
-            context.packageManager.getPackageArchiveInfo(apkFile.absolutePath, flags)
+        val path = apkFile.absolutePath
+        val cert = when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> context.packageManager
+                .getPackageArchiveInfo(path, PackageManager.PackageInfoFlags.of(PackageManager.GET_SIGNING_CERTIFICATES.toLong()))
+                ?.signingInfo?.apkContentsSigners?.firstOrNull()
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.P -> @Suppress("DEPRECATION") context.packageManager
+                .getPackageArchiveInfo(path, PackageManager.GET_SIGNING_CERTIFICATES)
+                ?.signingInfo?.apkContentsSigners?.firstOrNull()
+            else -> @Suppress("DEPRECATION") context.packageManager
+                .getPackageArchiveInfo(path, PackageManager.GET_SIGNATURES)
+                ?.signatures?.firstOrNull()
         }
-        info?.signingInfo?.apkContentsSigners?.firstOrNull()?.toByteArray()?.let { cert ->
+        cert?.toByteArray()?.let { cert ->
             java.security.MessageDigest.getInstance("SHA-256").digest(cert)
                 .joinToString(":") { "%02X".format(it) }
         }

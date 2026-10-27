@@ -914,7 +914,7 @@
         <item quantity="other">%d fichiers</item>
     </plurals>
     <string name="settings_storage_steam_tile_title">Steam &amp; PC</string>
-    <string name="settings_storage_steam_tile_subtitle">Boutiques, installations et zone de préparation</string>
+    <string name="settings_storage_steam_tile_subtitle">Boutiques et installations</string>
 
     <string name="settings_storage_rom_path_title">Chemin ROM global</string>
     <string name="settings_storage_rom_path_free">%1$s libres</string>
@@ -1245,11 +1245,11 @@
     <string name="settings_steam_reset_library_subtitle">Retirer tous les jeux Steam synchronisés</string>
 
     <string name="settings_steam_gn_required_title">GameNative requis</string>
-    <string name="settings_steam_gn_required_message">Les jeux Steam sont téléchargés par Argosy et lancés via GameNative. Installez GameNative et activez le stockage externe dans ses paramètres avant de continuer.</string>
+    <string name="settings_steam_gn_required_message">Les jeux Steam s\'installent et se lancent via GameNative, DroidDeck ou GameHub. Installez l\'une de ces applications avant de continuer.</string>
     <string name="settings_steam_gn_required_action">Installer GameNative</string>
 
     <string name="settings_steam_login_title">Se connecter à Steam</string>
-    <string name="settings_steam_login_message">Connectez votre compte Steam pour synchroniser votre bibliothèque et télécharger des jeux.</string>
+    <string name="settings_steam_login_message">Connectez votre compte Steam pour synchroniser votre bibliothèque.</string>
     <string name="settings_steam_login_action">Connecter</string>
     <string name="settings_steam_connecting">Connexion...</string>
 

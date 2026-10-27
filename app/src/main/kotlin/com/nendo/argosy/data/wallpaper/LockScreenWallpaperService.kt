@@ -6,6 +6,7 @@ import android.app.WallpaperColors
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.os.Build
 import android.os.Handler
 import android.os.HandlerThread
 import android.os.SystemClock
@@ -24,7 +25,6 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 private const val SURFACE_RELEASE_WAIT_MS = 500L
-private val FIXED_COLORS = WallpaperColors(Color.valueOf(Color.BLACK), null, null)
 
 @AndroidEntryPoint
 class LockScreenWallpaperService : WallpaperService() {
@@ -60,7 +60,12 @@ class LockScreenWallpaperService : WallpaperService() {
             if (isPreview) preview = artManager.prepareLivePreview() else artManager.onLiveWallpaperBound()
         }
 
-        override fun onComputeColors(): WallpaperColors = FIXED_COLORS
+        override fun onComputeColors(): WallpaperColors? =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                WallpaperColors(Color.valueOf(Color.BLACK), null, null)
+            } else {
+                null
+            }
 
         override fun onDestroy() {
             preview?.cancel()
