@@ -38,13 +38,15 @@ class EmulatorLaunchTargetResolver @Inject constructor(
         emulatorPackage: String? = null
     ): Bundle? {
         val rolesSwapped = sessionStateStore.isRolesSwapped()
-        val displayId = overrideDisplayId ?: bothScreensDisplayId(emulatorPackage) ?: targetDisplayId(
-            stored = EmulatorDisplayTarget.fromString(
-                emulatorConfigRepository.getEffectiveDisplayTarget(gameId)
-            ),
-            gamesDefault = preferencesRepository.userPreferences.first().gamesDisplayTarget,
-            rolesSwapped = rolesSwapped
-        )
+        val displayId = displayAffinityHelper.usableDisplayId(overrideDisplayId)
+            ?: bothScreensDisplayId(emulatorPackage)
+            ?: targetDisplayId(
+                stored = EmulatorDisplayTarget.fromString(
+                    emulatorConfigRepository.getEffectiveDisplayTarget(gameId)
+                ),
+                gamesDefault = preferencesRepository.userPreferences.first().gamesDisplayTarget,
+                rolesSwapped = rolesSwapped
+            )
         DualScreenManagerHolder.instance?.setEmulatorDisplay(placedOn(displayId, rolesSwapped))
         return GameLaunchOptions.forDisplay(
             displayAffinityHelper.launchDisplayId(

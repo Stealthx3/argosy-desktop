@@ -980,13 +980,15 @@ class DualScreenManager(
      * The displays a viewer can hand input to, in screen-number order, each with the number the
      * badge draws for it.
      */
-    fun focusableDisplays(): List<com.nendo.argosy.util.AttachedScreen> = attachedScreens()
+    fun focusableDisplays(): List<com.nendo.argosy.util.AttachedScreen> =
+        attachedScreens().filter { displayAffinityHelper.usableDisplayId(it.displayId) != null }
 
     /**
      * Moves input focus to [displayId], through whichever surface of ours is rendered there.
      */
     fun focusDisplay(displayId: Int) {
         if (isKeyguardShowing) return
+        if (displayAffinityHelper.usableDisplayId(displayId) == null) return
         FocusDirectorActivity.launchOnDisplay(activityContext, displayId)
     }
 
@@ -1634,7 +1636,7 @@ class DualScreenManager(
             target = role,
             roleDisplayIds = displayAffinityHelper.getRoleDisplayIds(newSwapped),
             appScreenDisplayId = displayAffinityHelper.appScreenDisplayId(newSwapped)
-        )?.takeIf { it != gameDisplay }
+        )?.takeIf { it != gameDisplay }?.let(displayAffinityHelper::usableDisplayId)
     }
 
     private fun moveGameWithRoles(newSwapped: Boolean, commit: () -> Unit) {
@@ -2253,6 +2255,11 @@ class DualScreenManager(
     }
 
     private fun applyUserRoleChange(swapped: Boolean) {
+        val nextPrimary = displayAffinityHelper.getRoleDisplayIds(swapped)?.first
+        if (nextPrimary != null && displayAffinityHelper.usableDisplayId(nextPrimary) == null) {
+            Log.i(TAG, "Role swap refused: display $nextPrimary is off in the screen layout")
+            return
+        }
         commitRoleSwap(swapped)
         activityIndependentScope.launch {
             withContext(Dispatchers.IO) { persistPrimaryRole(swapped) }
