@@ -2,7 +2,7 @@
 
 Rewritten (not appended) at the end of every work unit, so a fresh session can start from it alone. History and reasoning live in `DEVLOG.md`. Earlier phases: `phase-0.md` … `phase-4.md` (closed summaries).
 
-**Updated:** 2026-10-27 (paused for the owner's testing; step 7 groundwork unit 5 committed; step 5 open, waiting for the owner's checklist). Steps 1–4 done; step 5 in progress.
+**Updated:** 2026-10-27 (VM test lab approved, starts after the 2026-10-29 05:00 UTC weekly reset; step 7 groundwork unit 5 committed; step 5 open, waiting for the owner's checklist). Steps 1–4 done; step 5 in progress.
 
 ## Scope and exit criterion
 
@@ -15,6 +15,18 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 - Desktop leftovers: Displays → "Enable Dual-screen Mode", About → upstream APK update (in-app updater row: Flatpak performs the update).
 - Flathub lint: exceptions or alternatives for emulator folder grants and `flatpak-spawn` access, screenshots, the app id vs repository name; offline from-source build (Gradle dependencies as Flatpak sources).
 - YouTube trailers on desktop (deferred; needs yt-dlp and a JavaScript runtime).
+
+## VM test lab (owner approved 2026-10-27; start after the weekly reset)
+
+- Scope: Fedora Workstation (GNOME, Wayland), Fedora KDE (Plasma, Wayland), Ubuntu LTS (GNOME). Downloads approved (about 10 GB).
+- Locations: disks under `/mnt/FileDrive/VMs/argosy-lab/`, libvirt `qemu:///system`, VM names `argosy-lab-*`. Never touch `debian13` or the Windows VMs.
+- **Next action (unit 1):**
+  - Check usage. Download the current cloud images (Fedora Cloud Base, Ubuntu LTS cloud) into the lab folder.
+  - Use `virt-customize`: install the desktop group, qemu-guest-agent and Flatpak with Flathub, create a test user with autologin, and set 1920x1080.
+  - `virt-install --import`, then a clean snapshot.
+  - Prove one VM end to end: guest-exec works, `virsh screenshot` shows the desktop, and the guest reaches 192.168.122.1:8093.
+  - Put the lab under `scripts/desktop/vmlab/` (build, reset, exec, shot).
+- Then (unit 2+): the test script per desktop (alpha repo install, wizard, sync, covers, download and RetroArch launch, Close Argosy, SIGTERM, HiDPI). It writes a report per desktop.
 
 ## Paused for the owner's testing (owner decision 2026-10-27)
 

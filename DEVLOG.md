@@ -1476,3 +1476,20 @@ It is limited to `Stealthx3/argosy-desktop` and triggers on pushes to `main` tha
 - the Quick Settings Brightness decision.
 
 The owner's tests are the step 5 side-by-side checklist and the alpha 5.4 Game Mode checks. Work pauses (pacer `waiting-owner`).
+
+### 2026-10-27 — VM test lab approved for the testing phase (owner decision)
+
+**Owner decision (2026-10-27):** build a KVM test lab for automated testing of common Linux setups: Fedora GNOME, Fedora KDE and Ubuntu GNOME. The downloads (about 10 GB: cloud images and desktop packages) are approved. Images go on `/mnt/FileDrive`. Work starts after the weekly usage reset (2026-10-29 05:00 UTC).
+**Survey:**
+- `/dev/kvm` is usable, and the user is in `libvirt`.
+- qemu, virsh, virt-install, virt-customize, guestfish and xorriso are present. cloud-localds, sshpass and VNC tools are not.
+- 16 cores, 125 GB RAM, `/mnt/FileDrive` 257 GB free (`/home` only 38 GB).
+- The RomM testbed listens on 0.0.0.0:8093, so guests reach it at 192.168.122.1.
+- The owner's own VMs (`debian13`, the Windows VMs) are not to be touched.
+**Design:**
+- Official cloud images, plus a desktop and autologin through `virt-customize`.
+- Drive the guests from the host through qemu-guest-agent (`guest-exec`) and `virsh screenshot`.
+- Argosy input through its `--key-pipe`.
+- A clean snapshot per run.
+- Per desktop: install from the alpha repo, wizard, sign-in and sync, covers, download and launch in Flathub RetroArch, Close Argosy, SIGTERM exit, XWayland and HiDPI.
+- Game Mode is out of scope for VMs (no Vulkan GPU). An optional Bazzite VM is only a session-start check; launch and overlay exit stay on the owner's Deck.
