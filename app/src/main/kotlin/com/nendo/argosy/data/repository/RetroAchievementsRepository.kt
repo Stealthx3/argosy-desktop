@@ -381,7 +381,7 @@ class RetroAchievementsRepository @Inject constructor(
         val unlockedAchievements: Set<Long> = emptySet()
     )
 
-    suspend fun startSession(gameRaId: Long, hardcore: Boolean = false): RASessionResult {
+    suspend fun startSession(gameRaId: Long, hardcore: Boolean = false, gameHash: String? = null): RASessionResult {
         val credentials = getCredentials()
         if (credentials == null) {
             Logger.warn(TAG, "Cannot start RA session - not logged in to RetroAchievements")
@@ -394,7 +394,8 @@ class RetroAchievementsRepository @Inject constructor(
                 username = credentials.username,
                 token = credentials.token,
                 gameId = gameRaId,
-                hardcore = if (hardcore) 1 else 0
+                hardcore = gameHash?.let { if (hardcore) 1 else 0 },
+                gameHash = gameHash
             )
 
             val body = response.body()
