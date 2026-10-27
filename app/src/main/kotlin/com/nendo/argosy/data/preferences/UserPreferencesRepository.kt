@@ -685,11 +685,12 @@ class UserPreferencesRepository @Inject constructor(
         isNetplayGuest: Boolean = false
     ) = sessionPrefs.persistActiveSession(gameId, emulatorPackage, startTime, coreName, isHardcore, channelName, variantFileId, origin, isNetplayGuest)
 
-    suspend fun clearActiveSession() = sessionPrefs.clearActiveSession()
+    suspend fun clearActiveSession(startedAt: Instant? = null) = sessionPrefs.clearActiveSession(startedAt)
 
     suspend fun getPersistedSession(): PersistedSession? = sessionPrefs.getPersistedSession()
 
-    suspend fun keepSessionForRetry(maxAttempts: Int): Boolean = sessionPrefs.keepSessionForRetry(maxAttempts)
+    suspend fun keepSessionForRetry(maxAttempts: Int, startedAt: Instant? = null): Boolean =
+        sessionPrefs.keepSessionForRetry(maxAttempts, startedAt)
 }
 
 data class BuiltinEmulatorSettings(

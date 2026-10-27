@@ -46,19 +46,8 @@ class PermissionHelper @Inject constructor() {
         return fresh
     }
 
-    fun lastForegroundTimestamp(context: Context, packageName: String): Long? {
-        if (!hasUsageStatsPermission(context)) return null
-        val usageStatsManager = context.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
-        val now = System.currentTimeMillis()
-        val stats = usageStatsManager.queryUsageStats(
-            UsageStatsManager.INTERVAL_BEST,
-            now - 24 * 60 * 60 * 1000L,
-            now
-        ) ?: return null
-        val target = stats.firstOrNull { it.packageName == packageName } ?: return null
-        val last = target.lastTimeUsed
-        return if (last <= 0) null else last
-    }
+    fun lastForegroundTimestamp(context: Context, packageName: String): Long? =
+        lastForegroundTimestamps(context, setOf(packageName))[packageName]
 
     /**
      * Last foreground time for each of [packageNames] that has any, from a single usage-stats
@@ -101,14 +90,16 @@ class PermissionHelper @Inject constructor() {
      * tracked separately because a package hands off between its own activities, and the one being
      * torn down can report STOPPED after its successor has already resumed.
      */
-    fun isPackageOnScreen(
-        context: Context,
-        packageName: String,
-        lookbackMs: Long = 10 * 60 * 1000L
-    ): Boolean? {
+    fun isPackageOnScreen(context: Context, packageName: String): Boolean? {
         if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.Q) return null
         if (!hasUsageStatsPermission(context)) return null
         val usm = context.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
+        return ON_SCREEN_LOOKBACKS_MS.firstNotNullOfOrNull { lookbackMs ->
+            lastLifecycleOnScreen(usm, packageName, lookbackMs)
+        }
+    }
+
+    private fun lastLifecycleOnScreen(usm: UsageStatsManager, packageName: String, lookbackMs: Long): Boolean? {
         val now = System.currentTimeMillis()
         val events = usm.queryEvents(now - lookbackMs, now)
         val event = UsageEvents.Event()
@@ -276,8 +267,8 @@ class PermissionHelper @Inject constructor() {
     }
 
     companion object {
-        // UsageEvents.Event.SCREEN_INTERACTIVE / SCREEN_NON_INTERACTIVE (API 29+)
         private const val SCREEN_INTERACTIVE = 15
         private const val SCREEN_NON_INTERACTIVE = 16
+        private val ON_SCREEN_LOOKBACKS_MS = listOf(10 * 60 * 1000L, 12 * 60 * 60 * 1000L)
     }
 }
