@@ -20,6 +20,7 @@
     <string name="settings_main_audio_subtitle">Звуки и музыка</string>
     <string name="settings_main_displays_title">Экраны</string>
     <string name="settings_main_displays_subtitle">Затемнение, два экрана, LED</string>
+    <string name="settings_main_displays_subtitle_single_screen">Затемнение экрана</string>
 
     <string name="settings_main_builtin_emulator_title">Встроенный эмулятор</string>
     <string name="settings_main_builtin_emulator_subtitle_on">Включено</string>

@@ -304,7 +304,10 @@ fun MainSettingsSection(uiState: SettingsUiState, viewModel: SettingsViewModel) 
         MainSettingsItem.Interface -> context.getString(R.string.settings_main_interface_subtitle)
         MainSettingsItem.Navigation -> context.getString(R.string.settings_main_navigation_subtitle)
         MainSettingsItem.Audio -> context.getString(R.string.settings_main_audio_subtitle)
-        MainSettingsItem.Displays -> context.getString(R.string.settings_main_displays_subtitle)
+        MainSettingsItem.Displays -> context.getString(
+            if (PlatformFeatures.dualScreen) R.string.settings_main_displays_subtitle
+            else R.string.settings_main_displays_subtitle_single_screen
+        )
         MainSettingsItem.Platforms -> context.resources.getQuantityString(
             R.plurals.settings_main_platforms_subtitle,
             uiState.emulators.platforms.size,

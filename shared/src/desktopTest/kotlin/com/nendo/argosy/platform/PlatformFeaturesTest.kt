@@ -24,6 +24,7 @@ class PlatformFeaturesTest {
         assertFalse(PlatformFeatures.social)
         assertFalse(PlatformFeatures.deviceSettings)
         assertFalse(PlatformFeatures.builtInEmulation)
+        assertFalse(PlatformFeatures.dualScreen)
     }
 
     @Test

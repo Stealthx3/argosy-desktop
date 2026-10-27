@@ -31,6 +31,7 @@
     <string name="settings_main_audio_subtitle">Sonidos y música</string>
     <string name="settings_main_displays_title">Pantallas</string>
     <string name="settings_main_displays_subtitle">Atenuador, doble pantalla, LED</string>
+    <string name="settings_main_displays_subtitle_single_screen">Atenuador de pantalla</string>
 
     <string name="settings_main_builtin_emulator_title">Emulador integrado</string>
     <string name="settings_main_builtin_emulator_subtitle_on">Activado</string>

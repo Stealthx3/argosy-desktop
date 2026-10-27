@@ -127,6 +127,7 @@
     <!-- Second line of that row, listing what is inside. "LED" is the light strip on some
          handhelds. -->
     <string name="settings_main_displays_subtitle">Dimmer, dual-screen, LED</string>
+    <string name="settings_main_displays_subtitle_single_screen">Screen dimmer</string>
 
     <!-- Row opening the settings for the emulator Argosy ships with, as opposed to separate
          emulator apps. Adjective phrase. -->

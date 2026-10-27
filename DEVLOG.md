@@ -1351,3 +1351,18 @@ Mapped ids: retroarch, dolphin, cemu, azahar, ryujinx (Ryubing), eden, melonds, 
 **Not verified here:** real Steam Game Mode. A nested-gamescope SIGTERM test was blocked by the session's permission classifier (its process match was too broad). A GameCube launch walk did not reach the game. Live Game Mode checks (launch, overlay exit) move to the owner and step 6 (SteamOS testing), with `argosy-run.log` requested from the owner.
 
 **Step 4 closed.** Alpha republished (`--step-close 5.4`).
+
+### 2026-10-26 — Step 5, unit 1: side-by-side tooling, first automated pass, dual-screen leftover
+
+**Action:**
+- `docs/desktop/side-by-side-checklist.md` is the testers' sheet: the approved divergences that do not count, then 17 areas to compare in both apps against the same RomM account.
+- `scripts/desktop/check/side-by-side.sh` walks the same screens on the check AVD and on fresh desktop data (never the owner's data, and no A on setting rows, so nothing is toggled). It tiles each pair into `<out>/pairs-*.png`. The screens are Home, drawer, Collections, Library, Downloads, Quick Settings, and Settings top and lower.
+- First pass (`build/desktop-check/p5s5/`): layouts, rows, empty states and footers match. These differences are data, not code:
+  - Theme and accent (AVD Auto/orange, desktop data Dark/default).
+  - The Home "Picks" row (`GenerateRecommendationsUseCase` needs played games, and the fresh desktop data has none).
+  - Download counts.
+- Real differences found:
+  - Desktop Displays still offered "Enable Dual-screen Mode", and its subtitle read "Dimmer, dual-screen, LED" (a carried-forward item). Fixed: a `PlatformFeatures.dualScreen` capability (Android true, desktop false) gates the row and the Displays header and spacer. The header and spacer stay visible when a physical secondary display or an ambient LED exists. Desktop shows a new label, `settings_main_displays_subtitle_single_screen` ("Screen dimmer", eight locales). Dual-screen is an approved removal, so this is a capability gate, not a ghost setting.
+  - Quick Settings has no Brightness row on desktop. It is hidden by `screenBrightnessAvailable` (the desktop cannot set the panel brightness). This is not in the approved divergence list, so it is left for the owner to approve or ask for (backlight control through logind on laptops and the Deck).
+
+**Verification:** gate `:shared:desktopTest` 131 (now also asserts `dualScreen` false) + `:app:testDebugUnitTest` 4,426, 0 failures; translation check complete in all locales; smell check clean. Desktop walk `build/desktop-check/fresh-p5s3/settings-main.png` and `displays.png`: the subtitle reads "Screen dimmer", and Displays shows only Screen Safety. Android: same values as before (`dualScreen` true).

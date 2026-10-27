@@ -21,6 +21,7 @@
     <string name="settings_main_audio_subtitle">साउंड और संगीत</string>
     <string name="settings_main_displays_title">डिस्प्ले</string>
     <string name="settings_main_displays_subtitle">डिमर, डुअल-स्क्रीन, LED</string>
+    <string name="settings_main_displays_subtitle_single_screen">स्क्रीन डिमर</string>
 
     <string name="settings_main_builtin_emulator_title">बिल्ट-इन एमुलेटर</string>
     <string name="settings_main_builtin_emulator_subtitle_on">चालू</string>

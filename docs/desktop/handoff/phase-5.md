@@ -2,7 +2,7 @@
 
 Rewritten (not appended) at the end of every work unit, so a fresh session can start from it alone. History and reasoning live in `DEVLOG.md`. Earlier phases: `phase-0.md` … `phase-4.md` (closed summaries).
 
-**Updated:** 2026-10-26 (step 4 closed, alpha 5.4). Steps 1–4 done; step 5 next.
+**Updated:** 2026-10-26 (step 5 unit 1 committed). Steps 1–4 done; step 5 in progress.
 
 ## Scope and exit criterion
 
@@ -26,9 +26,12 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 - `libsigil-jni`: `:desktopApp:sigilJni` (host, dev runs, via a JVM argument provider on `run`) and the Flatpak `sigil-jni` module (built in the SDK; `build-alpha.sh` stages JDK headers into `desktopApp/build/jni-include`). The Flathub offline build will need the openjdk SDK extension in place of those staged headers.
 - Shutdown hook (`Main.kt` `shutDown`): `DesktopGamepadDispatcher.stop()` plus a 3 s halt watchdog. SIGTERM exits in about 0.4 s.
 
-## Next action (step 5: side-by-side checks against Android)
+## Step 5 (side-by-side): in progress
 
-- Read the Phase 5 plan's step 5 in `DEVLOG.md` and start it.
+- Done: tester sheet `docs/desktop/side-by-side-checklist.md`; `scripts/desktop/check/side-by-side.sh <out> <fresh-name>` (AVD + fresh desktop data, tiles `pairs-*.png`); first pass in `build/desktop-check/p5s5/`; dual-screen row and subtitle gated off on desktop (`PlatformFeatures.dualScreen`).
+- Owner question: Quick Settings Brightness is hidden on desktop (`screenBrightnessAvailable`). Should it be an approved divergence, or should desktop get backlight control?
+- **Next action:** extend the automated pass to Game details, Search, Collections create, and each Settings section (open, shoot, back; no A on rows). For a fair Home comparison, give the fresh desktop data a played game. Then, from the owner's checklist results, fix every difference outside the divergences. Close step 5 when the checklist comes back clean, and republish (`--step-close 5.5`).
+- The other carried-forward leftover: About → upstream APK update row.
 
 ## Gotchas
 

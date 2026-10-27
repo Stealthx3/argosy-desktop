@@ -1,5 +1,6 @@
 package com.nendo.argosy.ui.screens.settings.sections
 
+import com.nendo.argosy.platform.PlatformFeatures
 import com.nendo.argosy.platform.PlatformContext as Context
 import com.nendo.argosy.platform.startActivity
 import com.nendo.argosy.platform.getApplicationInfo
@@ -103,7 +104,9 @@ internal sealed class DisplaysItem(
     data object DimAfter : DisplaysItem("dimAfter", "screenSafety")
     data object DimLevel : DisplaysItem("dimLevel", "screenSafety")
 
-    data object DualScreenEnabled : DisplaysItem("dualScreenEnabled", "displays")
+    data object DualScreenEnabled : DisplaysItem(
+        "dualScreenEnabled", "displays", visibleWhen = { PlatformFeatures.dualScreen }
+    )
     data object DisplayRoles : DisplaysItem(
         key = "displayRoles",
         section = "displays",
@@ -139,9 +142,12 @@ internal sealed class DisplaysItem(
     companion object {
         private val ScreenSafetyHeader =
             Header("screenSafetyHeader", "screenSafety", R.string.settings_displays_section_screen_safety)
-        private val DisplaysSpacer = SectionSpacer("displaysSpacer", "displays")
+        private val hasDisplaysRows: (DisplaysLayoutState) -> Boolean = {
+            PlatformFeatures.dualScreen || it.hasPhysicalSecondaryDisplay || it.display.ambientLedAvailable
+        }
+        private val DisplaysSpacer = SectionSpacer("displaysSpacer", "displays", hasDisplaysRows)
         private val DisplaysHeader =
-            Header("displaysHeader", "displays", R.string.settings_displays_section_displays)
+            Header("displaysHeader", "displays", R.string.settings_displays_section_displays, hasDisplaysRows)
         private val DisplayTargetsSpacer = SectionSpacer(
             "displayTargetsSpacer",
             DISPLAY_TARGETS_SECTION,

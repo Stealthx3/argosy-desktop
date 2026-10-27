@@ -21,6 +21,7 @@
     <string name="settings_main_audio_subtitle">Sons et musique</string>
     <string name="settings_main_displays_title">Écrans</string>
     <string name="settings_main_displays_subtitle">Gradateur, double écran, LED</string>
+    <string name="settings_main_displays_subtitle_single_screen">Gradateur d\'écran</string>
 
     <string name="settings_main_builtin_emulator_title">Émulateur intégré</string>
     <string name="settings_main_builtin_emulator_subtitle_on">Activé</string>

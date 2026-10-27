@@ -18,6 +18,7 @@
     <string name="settings_main_audio_subtitle">音效與音樂</string>
     <string name="settings_main_displays_title">顯示器</string>
     <string name="settings_main_displays_subtitle">螢幕調光、雙螢幕、LED</string>
+    <string name="settings_main_displays_subtitle_single_screen">螢幕調光</string>
 
     <string name="settings_main_builtin_emulator_title">內建模擬器</string>
     <string name="settings_main_builtin_emulator_subtitle_on">已啟用</string>

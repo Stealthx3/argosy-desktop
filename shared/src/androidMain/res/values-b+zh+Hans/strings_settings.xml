@@ -21,6 +21,7 @@
     <string name="settings_main_audio_subtitle">音效与音乐</string>
     <string name="settings_main_displays_title">显示屏</string>
     <string name="settings_main_displays_subtitle">变暗、双屏、LED</string>
+    <string name="settings_main_displays_subtitle_single_screen">屏幕变暗</string>
 
     <string name="settings_main_builtin_emulator_title">内置模拟器</string>
     <string name="settings_main_builtin_emulator_subtitle_on">已启用</string>

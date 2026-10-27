@@ -31,6 +31,7 @@
     <string name="settings_main_audio_subtitle">Sounds und Musik</string>
     <string name="settings_main_displays_title">Bildschirme</string>
     <string name="settings_main_displays_subtitle">Dimmer, Dual-Screen, LED</string>
+    <string name="settings_main_displays_subtitle_single_screen">Bildschirmdimmer</string>
 
     <string name="settings_main_builtin_emulator_title">Integrierter Emulator</string>
     <string name="settings_main_builtin_emulator_subtitle_on">Aktiviert</string>
