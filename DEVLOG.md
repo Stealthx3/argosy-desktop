@@ -1402,3 +1402,17 @@ Mapped ids: retroarch, dolphin, cemu, azahar, ryujinx (Ryubing), eden, melonds, 
 **Action:** `side-by-side.sh <out> <fresh> collections` opens Collections and the New Collection dialog (`build/desktop-check/p5s5d/`). The standalone Search screen (`Screen.Search`) has no navigation entry in either app; search is reached inside collection and category browsers, so it is not a separate row.
 **Result:** the dialog, fields, buttons, focus order and footer match. One platform difference: Android raises the system on-screen keyboard for the name field, and the desktop has none of its own. A physical keyboard types directly, and in Steam Game Mode text entry depends on Steam's on-screen keyboard (Steam + X). This is added to the owner's Game Mode checks. No code change.
 **Automated pass complete:** every main screen, game details, all Settings sections, Quick Settings and New Collection have been compared. Fixed along the way: the dual-screen row and subtitle (unit 1), and About's APK updater and system-app tools (unit 3). Step 5 now waits for the owner's checklist (`docs/desktop/side-by-side-checklist.md`) and the Brightness decision.
+
+### 2026-10-27 — Step 7 groundwork, unit 1: lint pass and the Flathub plan (owner OK, step 5 stays open)
+
+**Owner decision (2026-10-27):** while step 5 waits for the checklist, start the Flathub groundwork (lint fixes, offline from-source build) and keep step 5 open.
+**Action:**
+- `docs/desktop/flathub-plan.md` covers the lint status, the `flatpak-spawn` exception justification, and six steps for the offline build. The core of it: a `-Pargosy.desktopOnly=true` Gradle switch that leaves the Android modules and targets out, because the Flathub sandbox has no Android SDK.
+- Fixed `finish-args-contains-both-x11-and-wayland` by dropping `--socket=wayland`. AWT on JDK 21 is X11-only and runs through XWayland under Wayland and gamescope. Gamescope detection reads an environment variable, not the socket.
+
+**Verification:** local `build-alpha.sh` passes, and lint now reports only `appid-url-not-reachable`, `finish-args-flatpak-spawn-access`, `metainfo-missing-screenshots` (errors) and the screenshot-mirror warning. The Flatpak starts and renders Home (`build/desktop-check/p7a/home.png`). Not published, because step 7 is open.
+**Owner decisions recorded in the plan:**
+- app-id rename to `io.github.Stealthx3.argosy_desktop` (moves the data folder; alpha users reinstall);
+- installing `org.freedesktop.Sdk.Extension.openjdk21` for local offline builds;
+- screenshots from the owner's library;
+- the Flathub PR itself.

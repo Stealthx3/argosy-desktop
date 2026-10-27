@@ -2,7 +2,7 @@
 
 Rewritten (not appended) at the end of every work unit, so a fresh session can start from it alone. History and reasoning live in `DEVLOG.md`. Earlier phases: `phase-0.md` … `phase-4.md` (closed summaries).
 
-**Updated:** 2026-10-26 (step 5 unit 4 committed; waiting for the owner). Steps 1–4 done; step 5 in progress.
+**Updated:** 2026-10-27 (step 7 groundwork unit 1 committed; step 5 open, waiting for the owner's checklist). Steps 1–4 done; step 5 in progress.
 
 ## Scope and exit criterion
 
@@ -34,6 +34,12 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 - Unit 3: `settings2` plan covers the remaining sections (`build/desktop-check/p5s5c/`). Fixed: About's APK updater and System App section are off on desktop (`selfUpdate`, `systemApp`); the Check row says Flatpak updates the app.
 - Unit 4: Collections create matches (`build/desktop-check/p5s5d/`). Search has no nav entry of its own. Automated pass complete.
 - **Next action:** wait for the owner. Needed: the checklist results, the Brightness decision, and the Game Mode checks. Fix every reported difference, then close step 5 (`--step-close 5.5`). For a fair Home comparison, give the fresh desktop data a played game. Then, from the owner's checklist results, fix every difference outside the divergences. Close step 5 when the checklist comes back clean, and republish (`--step-close 5.5`).
+
+## Step 7 groundwork (owner OK 2026-10-27, step 5 stays open)
+
+- Plan and lint status: `docs/desktop/flathub-plan.md`. Wayland socket dropped (lint error fixed).
+- Owner decisions open: the app-id rename `io.github.Stealthx3.argosy_desktop`, installing the openjdk21 SDK extension, screenshots from the owner's library, and the Flathub PR.
+- **Next action:** the `-Pargosy.desktopOnly=true` switch. `settings.gradle.kts` skips `:app`, `:sigil`, `:libretrodroid` and `:graphics-shim-android`, and the KMP modules skip their Android target. Prove it with `./gradlew -Pargosy.desktopOnly=true :desktopApp:createDistributable` and no `local.properties`/`ANDROID_HOME`. The default build must stay unchanged (the gate passes).
 
 ## Gotchas
 
