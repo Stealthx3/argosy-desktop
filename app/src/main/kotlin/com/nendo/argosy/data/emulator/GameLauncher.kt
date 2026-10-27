@@ -428,7 +428,7 @@ class GameLauncher @Inject constructor(
                     variantFileId = variant.id
                 )
             }
-            return LaunchResult.Error("Variant M3U file not found")
+            Logger.debug(TAG, "launchVariantFile: no playlist for multi-disc variant ${variant.id}; launching its own disc")
         }
 
         return launchResolvedRom(

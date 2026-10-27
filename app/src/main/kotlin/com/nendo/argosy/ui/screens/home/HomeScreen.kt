@@ -304,7 +304,9 @@ fun HomeScreen(
                 is HomeEvent.LaunchIntent -> {
                     try {
                         context.startActivity(event.intent, event.options)
-                    } catch (_: Exception) { }
+                    } catch (e: Exception) {
+                        android.util.Log.e("HomeScreen", "Failed to start activity", e)
+                    }
                 }
                 is HomeEvent.NavigateToLibrary -> {
                     onNavigateToLibrary(

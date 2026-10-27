@@ -65,7 +65,7 @@ class ShaderRegistry(private val context: Context) {
         ),
         ShaderEntry(
             "crt-hyllian", "CRT Hyllian", Category.CRT, Source.CATALOG,
-            githubPath = "crt/shaders/crt-hyllian.glsl", preInstall = true,
+            githubPath = "crt/shaders/hyllian/crt-hyllian.glsl", preInstall = true,
             description = "CRT with phosphor glow"
         ),
         ShaderEntry(
@@ -91,7 +91,7 @@ class ShaderRegistry(private val context: Context) {
         // --- CRT: Extended catalog ---
         ShaderEntry(
             "crt-hyllian-fast", "CRT Hyllian Fast", Category.CRT, Source.CATALOG,
-            githubPath = "crt/shaders/crt-hyllian-fast.glsl"
+            githubPath = "crt/shaders/hyllian/crt-hyllian-fast.glsl"
         ),
         ShaderEntry(
             "crt-lottes-fast", "CRT Lottes Fast", Category.CRT, Source.CATALOG,
@@ -127,7 +127,7 @@ class ShaderRegistry(private val context: Context) {
         ),
         ShaderEntry(
             "crt-1tap", "CRT 1-Tap", Category.CRT, Source.CATALOG,
-            githubPath = "crt/shaders/crt-1tap.glsl"
+            githubPath = "crt/shaders/crt-Ntap/crt-1tap.glsl"
         ),
         ShaderEntry(
             "crt-beam", "CRT Beam", Category.CRT, Source.CATALOG,

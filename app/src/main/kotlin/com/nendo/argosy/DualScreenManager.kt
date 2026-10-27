@@ -2443,7 +2443,8 @@ class DualScreenManager(
 
     companion object {
         private const val EMULATOR_SETTLE_MS = 2_000L
-        private const val EMULATOR_SETTLE_CHECKS = 8
+        private const val EMULATOR_SETTLE_CHECKS =
+            (com.nendo.argosy.util.PermissionHelper.RECENT_USE_WINDOW_MS / EMULATOR_SETTLE_MS).toInt() + 2
         private const val EMULATOR_RELEASE_ATTEMPTS = 6
         private const val EMULATOR_RELEASE_INTERVAL_MS = 5_000L
         const val ACTION_WIZARD_STATE = "com.nendo.argosy.WIZARD_STATE"
