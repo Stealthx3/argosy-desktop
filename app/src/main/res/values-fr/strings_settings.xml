@@ -2550,6 +2550,7 @@
     <string name="settings_libretro_def_audio_volume_subtitle" formatted="false">Niveau de sortie de l\'émulateur (100 % est non modifié)</string>
     <string name="settings_libretro_def_vsync_title">VSync</string>
     <string name="settings_libretro_def_vsync_subtitle">Synchroniser avec le taux de rafraîchissement de l\'écran</string>
+    <string name="settings_libretro_applies_next_launch">S\'applique au prochain lancement d\'un jeu</string>
     <string name="settings_libretro_def_auto_save_state_title">État de sauvegarde à la sortie</string>
     <string name="settings_libretro_def_auto_save_state_subtitle">S\'applique uniquement aux jeux en mode Casual</string>
     <string name="settings_libretro_def_auto_restore_state_title">Restaurer l\'état au lancement</string>

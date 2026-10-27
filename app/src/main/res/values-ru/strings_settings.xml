@@ -2609,6 +2609,7 @@
     <string name="settings_libretro_def_audio_volume_subtitle" formatted="false">Уровень выхода эмулятора (100% - без изменений)</string>
     <string name="settings_libretro_def_vsync_title">VSync</string>
     <string name="settings_libretro_def_vsync_subtitle">Синхронизация с частотой обновления экрана</string>
+    <string name="settings_libretro_applies_next_launch">Вступит в силу при следующем запуске игры</string>
     <string name="settings_libretro_def_auto_save_state_title">Сохранять состояние при выходе</string>
     <string name="settings_libretro_def_auto_save_state_subtitle">Применяется только к обычным играм</string>
     <string name="settings_libretro_def_auto_restore_state_title">Восстанавливать состояние при запуске</string>

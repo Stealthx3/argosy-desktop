@@ -48,6 +48,7 @@
 #include "achievements_test.h"
 #include "stateloadpolicy_test.h"
 #include <rc_hash.h>
+#include <rc_libretro.h>
 
 namespace libretrodroid {
 
@@ -316,17 +317,16 @@ JNIEXPORT jboolean JNICALL Java_com_swordfish_libretrodroid_LibretroDroid_unseri
         jbyte* data = env->GetByteArrayElements(sram, &isCopy);
         jsize size = env->GetArrayLength(sram);
 
-        LibretroDroid::getInstance().unserializeSRAM(data, size);
+        jboolean loaded = LibretroDroid::getInstance().unserializeSRAM(data, size);
 
         env->ReleaseByteArrayElements(sram, data, JNI_ABORT);
+        return loaded;
 
     } catch (std::exception &exception) {
         LOGE("Error in unserializeSRAM: %s", exception.what());
         JavaUtils::throwRetroException(env, ERROR_SERIALIZATION);
         return JNI_FALSE;
     }
-
-    return JNI_TRUE;
 }
 
 JNIEXPORT jbyteArray JNICALL Java_com_swordfish_libretrodroid_LibretroDroid_serializeSRAM(
@@ -1141,6 +1141,23 @@ JNIEXPORT jstring JNICALL Java_com_swordfish_libretrodroid_LibretroDroid_compute
 
     LOGI("Computed hash for %s: %s", path, hash);
     return env->NewStringUTF(hash);
+}
+
+JNIEXPORT jboolean JNICALL Java_com_swordfish_libretrodroid_LibretroDroid_isCoreSettingAllowed(
+    JNIEnv* env,
+    jclass obj,
+    jstring key,
+    jstring value
+) {
+    if (key == nullptr || value == nullptr) return JNI_TRUE;
+    const std::string libraryName = LibretroDroid::getInstance().coreLibraryName();
+    if (libraryName.empty()) return JNI_TRUE;
+    const rc_disallowed_setting_t* disallowed = rc_libretro_get_disallowed_settings(libraryName.c_str());
+    if (disallowed == nullptr) return JNI_TRUE;
+    JniString keyStr(env, key);
+    JniString valueStr(env, value);
+    return rc_libretro_is_setting_allowed(disallowed, keyStr.stdString().c_str(), valueStr.stdString().c_str())
+        ? JNI_TRUE : JNI_FALSE;
 }
 
 }

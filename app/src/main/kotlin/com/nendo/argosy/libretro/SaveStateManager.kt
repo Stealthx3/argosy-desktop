@@ -423,6 +423,19 @@ class SaveStateManager(
         Log.i(TAG, "[SRAM] unit members ${if (ok) "placed" else "NOT placed"} | cache=${entity.id}")
     }
 
+    /**
+     * Keeps the on-disk save the core refused at load as a rollback entry, so the session's first
+     * write cannot be the only copy left. True when a copy exists in the cache afterwards.
+     */
+    suspend fun preserveUnloadedSave(): Boolean {
+        val sramFile = primarySaveFile
+        if (!sramFile.exists()) return true
+        return when (saveCacheManager.cacheAsRollback(gameId, EmulatorRegistry.BUILTIN_ID, sramFile.absolutePath)) {
+            is SaveCacheManager.CacheResult.Created, is SaveCacheManager.CacheResult.Duplicate -> true
+            is SaveCacheManager.CacheResult.Failed -> false
+        }
+    }
+
     private suspend fun clearSaveForFreshStart() {
         val sramFile = primarySaveFile
         val members = saveCacheManager.unitMemberPaths(gameId, EmulatorRegistry.BUILTIN_ID, sramFile.absolutePath)
@@ -545,7 +558,7 @@ class SaveStateManager(
                     Log.w(TAG, "[SRAM] saves dir missing, creating ${dir.absolutePath} -> ${dir.mkdirs()}")
                 }
             }
-            target.writeBytes(sramData)
+            writeAtomically(target, sramData)
             lastSramHash = currentHash
             Log.i(
                 TAG,
@@ -559,13 +572,22 @@ class SaveStateManager(
 
     private var lastRtcHash: String? = null
 
+    private fun writeAtomically(target: File, bytes: ByteArray) {
+        val temp = File(target.parentFile, "${target.name}.tmp")
+        temp.writeBytes(bytes)
+        if (!temp.renameTo(target)) {
+            target.writeBytes(bytes)
+            temp.delete()
+        }
+    }
+
     private fun saveRtc(retroView: GLRetroView) {
         val target = getRtcFile()
         try {
             val rtc = retroView.getRtcData() ?: return
             val hash = hashBytes(rtc)
             if (hash == lastRtcHash) return
-            target.writeBytes(rtc)
+            writeAtomically(target, rtc)
             lastRtcHash = hash
             Log.i(TAG, "[RTC] wrote ${rtc.size} bytes -> ${target.absolutePath}")
         } catch (e: Exception) {
@@ -630,10 +652,14 @@ class SaveStateManager(
     }
 
     fun performSlotSave(slotNumber: Int, stateData: ByteArray, screenshot: Bitmap? = null): Boolean {
+        if (stateData.isEmpty()) {
+            Log.e(TAG, "Refusing to save an empty state to slot $slotNumber; the core produced nothing")
+            return false
+        }
         return try {
             statesDir.mkdirs()
             val stateFile = getSlotFile(slotNumber)
-            stateFile.writeBytes(stateData)
+            writeAtomically(stateFile, stateData)
 
             writeScreenshot(slotNumber, screenshot)
 

@@ -711,11 +711,8 @@ class LibretroActivity : ComponentActivity() {
         val joinSessionId = intent.getStringExtra(EXTRA_NETPLAY_JOIN_SESSION_ID)
         val joinHostUserId = intent.getStringExtra(EXTRA_NETPLAY_JOIN_HOST_USER_ID)
         if (netplay.parseJoinIntent(joinSessionId, joinHostUserId)) {
-            // Guests joining a netplay session do not fetch, create, or sync
-            // local saves/states. The runtime state is bound to the host's
-            // snapshot for the duration of the session. Force a fresh launch
-            // so nothing tries to auto-restore.
             launchMode = LaunchMode.NEW_CASUAL
+            hardcoreMode = false
         }
 
         return true
@@ -1064,10 +1061,15 @@ class LibretroActivity : ComponentActivity() {
                             Log.i(TAG, "[Startup] First frame rendered - emulation running successfully")
                             Log.d(TAG, "[Startup] gameId=$gameId, core=$coreName, hardcore=$hardcoreMode")
                             checkStateSupport()
+                            enforceHardcoreCoreSettings()
                             cheatManager.applyAllEnabledCheats(hardcoreMode)
                             if (retroView.sramLoadFailed) {
                                 Log.w(TAG, "[Startup] SRAM failed to load (size mismatch); booting with a fresh save")
                                 inGameMessage = getString(R.string.ingame_libretro_sram_load_failed_fresh_save)
+                                lifecycleScope.launch(Dispatchers.IO) {
+                                    val kept = saveStateManager.preserveUnloadedSave()
+                                    Log.i(TAG, "[Startup] Kept the unloaded save as a rollback: $kept")
+                                }
                             }
                             corePortDevices = readCorePortDevices()
                             applyControllerTypes()
@@ -1096,6 +1098,7 @@ class LibretroActivity : ComponentActivity() {
             gameDao = gameDao,
             cheatsRepository = cheatsRepository,
             canSerialize = { canSerialize },
+            isHardcore = { hardcoreMode },
             scope = lifecycleScope
         )
         cheatManager.setRetroView(retroView)
@@ -1571,7 +1574,7 @@ class LibretroActivity : ComponentActivity() {
                         isHardcoreMode = hardcoreMode,
                         hardcoreConfirmed = hardcoreConfirmed,
                         availableDiscs = menuDiscCount,
-                        netplaySupported = netplay.isCoreSupported(),
+                        netplaySupported = netplay.isCoreSupported() && !hardcoreMode,
                         isInNetplaySession = netplay.inSession,
                         touchControlsVisible = touchSettingsState.showTouchControlsWhenNoGamepad && !isGamepadConnectedState,
                         speedrunAvailable = isGamepadConnectedState &&
@@ -2085,6 +2088,10 @@ class LibretroActivity : ComponentActivity() {
         val current = stored?.let { def.resolveStored(it) } ?: def.defaultValue
         val currentIndex = rotation.indexOf(current).coerceAtLeast(0)
         val newValue = rotation[(currentIndex + direction).mod(rotation.size)]
+        if (hardcoreMode && !LibretroDroid.isCoreSettingAllowed(optionKey, newValue)) {
+            inGameMessage = getString(R.string.ingame_libretro_core_option_blocked_hardcore)
+            return
+        }
         val inherited = (if (perGame) coreOptionOverrides[optionKey] else null)
             ?.let { def.resolveStored(it) } ?: def.defaultValue
         if (newValue == inherited) {
@@ -2730,7 +2737,9 @@ class LibretroActivity : ComponentActivity() {
                     }
                 }
             }
-            InGameMenuAction.Netplay -> openMenuSection(com.nendo.argosy.libretro.ui.InGameMenuSection.NETPLAY)
+            InGameMenuAction.Netplay -> if (!hardcoreMode) {
+                openMenuSection(com.nendo.argosy.libretro.ui.InGameMenuSection.NETPLAY)
+            }
         }
     }
 
@@ -3868,6 +3877,17 @@ class LibretroActivity : ComponentActivity() {
     private fun rightStickDeadzoneForPlatform(): Float {
         val canonical = com.nendo.argosy.data.platform.PlatformDefinitions.getCanonicalSlug(platformSlug)
         return if (canonical in PLATFORMS_WITH_DIGITAL_RIGHT_STICK) DIGITAL_RIGHT_STICK_DEADZONE else 0f
+    }
+
+    private fun enforceHardcoreCoreSettings() {
+        if (!hardcoreMode) return
+        val blocked = coreVariablesFromIntent().firstOrNull { variable ->
+            val key = variable.key ?: return@firstOrNull false
+            val value = variable.value ?: return@firstOrNull false
+            !LibretroDroid.isCoreSettingAllowed(key, value)
+        } ?: return
+        achievementBridge.sessionManager?.abandonHardcore("${blocked.key}=${blocked.value}")
+        inGameMessage = getString(R.string.ingame_libretro_hardcore_off_core_setting, blocked.key, blocked.value)
     }
 
     private fun coreVariablesFromIntent(): Array<Variable> {

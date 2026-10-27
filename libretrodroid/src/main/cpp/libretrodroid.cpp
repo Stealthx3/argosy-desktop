@@ -1213,6 +1213,13 @@ void LibretroDroid::resetCheat() {
     core->retro_cheat_reset();
 }
 
+std::string LibretroDroid::coreLibraryName() {
+    if (!core || !core->retro_get_system_info) return "";
+    struct retro_system_info info {};
+    core->retro_get_system_info(&info);
+    return info.library_name ? std::string(info.library_name) : "";
+}
+
 void LibretroDroid::setCheat(unsigned index, bool enabled, const std::string& code) {
     core->retro_cheat_set(index, enabled, Utils::cloneToCString(code));
 }

@@ -733,14 +733,21 @@ class GLRetroView(
 
         val latch = CountDownLatch(1)
         var result: T? = null
+        var failure: Throwable? = null
         queueEvent {
-            result = block()
-            latch.countDown()
+            try {
+                result = block()
+            } catch (t: Throwable) {
+                failure = t
+            } finally {
+                latch.countDown()
+            }
         }
 
         check(latch.awaitUninterruptibly(GL_THREAD_OP_TIMEOUT_MS)) {
             "runOnGLThread: GL thread did not drain within ${GL_THREAD_OP_TIMEOUT_MS}ms"
         }
+        failure?.let { throw it }
         @Suppress("UNCHECKED_CAST")
         return result as T
     }
@@ -752,9 +759,12 @@ class GLRetroView(
         }
 
         val latch = CountDownLatch(1)
+        var failure: Throwable? = null
         queueEvent {
             try {
                 block()
+            } catch (t: Throwable) {
+                failure = t
             } finally {
                 latch.countDown()
             }
@@ -763,6 +773,7 @@ class GLRetroView(
         if (!latch.awaitUninterruptibly(GL_THREAD_OP_TIMEOUT_MS)) {
             Log.w(TAG_LOG, "runOnGLThreadVoid: GL thread did not drain within ${GL_THREAD_OP_TIMEOUT_MS}ms")
         }
+        failure?.let { throw it }
     }
 
     private fun buildShader(config: ShaderConfig): GLRetroShader {

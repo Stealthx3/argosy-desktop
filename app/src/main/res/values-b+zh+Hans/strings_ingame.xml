@@ -356,6 +356,8 @@
     <string name="ingame_libretro_core_error_unknown">发生了意外错误</string>
 
     <string name="ingame_libretro_sram_load_failed_fresh_save">加载存档失败，已使用新存档</string>
+    <string name="ingame_libretro_hardcore_off_core_setting">本次游戏已关闭硬核模式：%1$s 设为 %2$s</string>
+    <string name="ingame_libretro_core_option_blocked_hardcore">硬核模式下不允许此值</string>
     <string name="ingame_libretro_casual_save_in_hardcore">正在硬核模式下继续休闲存档</string>
 
     <string name="ingame_libretro_disc_swap_inserted">已插入%1$s</string>

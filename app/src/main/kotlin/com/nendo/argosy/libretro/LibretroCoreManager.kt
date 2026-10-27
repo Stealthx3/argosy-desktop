@@ -24,6 +24,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 private const val TAG = "LibretroCoreManager"
+private val ELF_MAGIC = byteArrayOf(0x7F, 'E'.code.toByte(), 'L'.code.toByte(), 'F'.code.toByte())
 private const val CORE_HISTORY_LIMIT = 10
 
 @Singleton
@@ -232,30 +233,47 @@ class LibretroCoreManager @Inject constructor(
                         return n
                     }
                 }
-                countingInput.use { input ->
-                    ZipInputStream(input).use { zip ->
-                        val entry = zip.nextEntry
-                        if (entry != null && entry.name == coreInfo.fileName) {
-                            targetFile.outputStream().use { output ->
-                                zip.copyTo(output)
+                val partFile = File(downloadedCoresDir, "${coreInfo.fileName}.part")
+                try {
+                    countingInput.use { input ->
+                        ZipInputStream(input).use { zip ->
+                            val entry = zip.nextEntry
+                            if (entry != null && entry.name == coreInfo.fileName) {
+                                partFile.outputStream().use { output ->
+                                    zip.copyTo(output)
+                                }
+                                if (entry.size > 0 && partFile.length() != entry.size) {
+                                    throw CoreDownloadException(
+                                        CoreDownloadFailure.Corrupted,
+                                        "Downloaded core is truncated: ${partFile.length()} of ${entry.size} bytes"
+                                    )
+                                }
+                            } else {
+                                throw IllegalStateException("Expected ${coreInfo.fileName} in zip, got ${entry?.name}")
                             }
-                        } else {
-                            throw IllegalStateException("Expected ${coreInfo.fileName} in zip, got ${entry?.name}")
                         }
                     }
-                }
-                connection.disconnect()
+                    connection.disconnect()
 
-                val fileSize = targetFile.length()
-                val minExpectedSize = coreInfo.estimatedSizeBytes / 4
-                if (fileSize < minExpectedSize) {
-                    targetFile.delete()
-                    throw CoreDownloadException(
-                        CoreDownloadFailure.Corrupted,
-                        "Downloaded core is corrupted: ${coreInfo.fileName} is $fileSize bytes, " +
-                            "expected at least $minExpectedSize bytes"
-                    )
+                    val partSize = partFile.length()
+                    val minExpectedSize = coreInfo.estimatedSizeBytes / 4
+                    if (partSize < minExpectedSize || !isElf(partFile)) {
+                        throw CoreDownloadException(
+                            CoreDownloadFailure.Corrupted,
+                            "Downloaded core is corrupted: ${coreInfo.fileName} is $partSize bytes, " +
+                                "expected an ELF library of at least $minExpectedSize bytes"
+                        )
+                    }
+                    if (!partFile.renameTo(targetFile)) {
+                        throw CoreDownloadException(
+                            CoreDownloadFailure.Unknown("Could not install ${coreInfo.fileName}"),
+                            "Could not move the downloaded core into place"
+                        )
+                    }
+                } finally {
+                    partFile.delete()
                 }
+                val fileSize = targetFile.length()
 
                 if (!targetFile.setExecutable(true)) {
                     Log.w(TAG, "Failed to set executable permission")
@@ -388,6 +406,12 @@ class LibretroCoreManager @Inject constructor(
             coreVersionDao.setCorrupt(coreInfo.coreId, !intact)
             intact
         }
+
+    private fun isElf(file: File): Boolean {
+        val magic = ByteArray(ELF_MAGIC.size)
+        val read = file.inputStream().use { it.read(magic) }
+        return read == ELF_MAGIC.size && magic.contentEquals(ELF_MAGIC)
+    }
 
     private fun computeFileHash(file: File): String {
         val digest = MessageDigest.getInstance("SHA-256")

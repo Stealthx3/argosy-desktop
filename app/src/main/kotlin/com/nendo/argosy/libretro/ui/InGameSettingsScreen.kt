@@ -676,6 +676,7 @@ fun InGameSettingsScreen(
                             canEnableBFI = canEnableBFI,
                             listState = videoListState,
                             enablePicker = false,
+                            inSession = true,
                             trailingContent = { InGameHudHeader() },
                             trailingFocusCount = InGameHudItem.entries.size,
                             trailingItems = {

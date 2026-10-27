@@ -123,7 +123,7 @@ class RetroAchievementsSessionManager(
 
             val raId = gameRaId!!
             Log.d(TAG, "Starting RA session for raId=$raId, hardcore=$requestedHardcore")
-            val sessionResult = raRepository.startSession(raId, requestedHardcore)
+            val sessionResult = raRepository.startSession(raId, requestedHardcore && !hardcoreAbandoned)
             if (sessionResult.success) {
                 raSessionActive = true
             } else {
@@ -133,7 +133,7 @@ class RetroAchievementsSessionManager(
             val livePatch = (raRepository.fetchPatchData(raId) as? RAPatchFetchResult.Fetched)?.patchData
             val patchData = livePatch ?: raRepository.getCachedPatchData(raId)
             val armedFromCache = livePatch == null && patchData != null
-            val claimsHardcore = requestedHardcore && sessionResult.success && !armedFromCache
+            val claimsHardcore = requestedHardcore && sessionResult.success && !armedFromCache && !hardcoreAbandoned
             val fellBackFromHardcore = requestedHardcore && !claimsHardcore
             if (claimsHardcore) {
                 _sessionMode.value = RASessionMode.HARDCORE
@@ -234,6 +234,20 @@ class RetroAchievementsSessionManager(
         } else {
             Log.d(TAG, "No achievements to watch (all pre-unlocked)")
         }
+    }
+
+    @Volatile
+    private var hardcoreAbandoned = false
+
+    /**
+     * Ends any hardcore claim for the rest of the session, including one RetroAchievements has
+     * not confirmed yet. Casual unlocks still count.
+     */
+    fun abandonHardcore(reason: String) {
+        hardcoreAbandoned = true
+        if (_sessionMode.value == RASessionMode.CASUAL) return
+        Log.w(TAG, "Hardcore abandoned: $reason")
+        _sessionMode.value = RASessionMode.CASUAL
     }
 
     private fun resolveWithoutHardcore() {

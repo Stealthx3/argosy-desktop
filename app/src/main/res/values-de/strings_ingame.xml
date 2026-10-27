@@ -364,6 +364,8 @@
     <string name="ingame_libretro_core_error_unknown">Ein unerwarteter Fehler ist aufgetreten</string>
 
     <string name="ingame_libretro_sram_load_failed_fresh_save">Spielstand konnte nicht geladen werden, neuer Spielstand wird verwendet</string>
+    <string name="ingame_libretro_hardcore_off_core_setting">Hardcore ist für diese Sitzung aus: %1$s steht auf %2$s</string>
+    <string name="ingame_libretro_core_option_blocked_hardcore">Dieser Wert ist im Hardcore-Modus nicht erlaubt</string>
     <string name="ingame_libretro_casual_save_in_hardcore">Fortsetzung eines Casual-Spielstands im Hardcore-Modus</string>
 
     <string name="ingame_libretro_disc_swap_inserted">%1$s eingelegt</string>

@@ -2436,6 +2436,7 @@
     <string name="settings_libretro_def_audio_volume_subtitle" formatted="false">模拟器输出电平 (100%是未经调整的水平)</string>
     <string name="settings_libretro_def_vsync_title">垂直同步</string>
     <string name="settings_libretro_def_vsync_subtitle">与显示屏刷新率同步</string>
+    <string name="settings_libretro_applies_next_launch">下次启动游戏时生效</string>
     <string name="settings_libretro_def_auto_save_state_title">退出时保存即时存档</string>
     <string name="settings_libretro_def_auto_save_state_subtitle">仅适用于休闲模式游戏</string>
     <string name="settings_libretro_def_auto_restore_state_title">启动时恢复即时存档</string>

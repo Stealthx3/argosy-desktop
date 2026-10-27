@@ -227,4 +227,11 @@ public class LibretroDroid {
      * @return The 32-character MD5 hash, or null if hashing failed
      */
     public static native String computeRomHash(String romPath, int consoleId);
+
+    /**
+     * Whether RetroAchievements hardcore allows the loaded core to run with this option value,
+     * per rcheevos' disallowed-settings table. True when no core is loaded or the core has no
+     * restrictions.
+     */
+    public static native boolean isCoreSettingAllowed(String key, String value);
 }

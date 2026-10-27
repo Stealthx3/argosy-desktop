@@ -799,6 +799,8 @@
          did not match what the core expected and a fresh save was used instead. "save" is a
          noun (the save data), not a verb. -->
     <string name="ingame_libretro_sram_load_failed_fresh_save">Failed to load save, using new save instead</string>
+    <string name="ingame_libretro_hardcore_off_core_setting">Hardcore is off for this session: %1$s is set to %2$s</string>
+    <string name="ingame_libretro_core_option_blocked_hardcore">That value is not allowed in hardcore</string>
     <!-- Shown when a hardcore-mode session had to resume from a casual save. "save" is a noun. -->
     <string name="ingame_libretro_casual_save_in_hardcore">Continuing casual save in hardcore</string>
 

@@ -2272,6 +2272,7 @@
     <string name="settings_libretro_def_audio_volume_subtitle" formatted="false">模擬器輸出等級（100%表示未經調整）</string>
     <string name="settings_libretro_def_vsync_title">VSync</string>
     <string name="settings_libretro_def_vsync_subtitle">與顯示器更新率同步</string>
+    <string name="settings_libretro_applies_next_launch">下次啟動遊戲時生效</string>
     <string name="settings_libretro_def_auto_save_state_title">結束時儲存即時存檔</string>
     <string name="settings_libretro_def_auto_save_state_subtitle">僅適用於一般模式的遊戲</string>
     <string name="settings_libretro_def_auto_restore_state_title">啟動時還原即時存檔</string>

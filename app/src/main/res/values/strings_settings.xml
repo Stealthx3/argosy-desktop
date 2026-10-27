@@ -4794,6 +4794,7 @@
     <string name="settings_libretro_def_vsync_title">VSync</string>
     <!-- Second line of that row. -->
     <string name="settings_libretro_def_vsync_subtitle">Sync to display refresh rate</string>
+    <string name="settings_libretro_applies_next_launch">Takes effect the next time a game starts</string>
     <!-- Row title. "State" here is a save state (an emulator snapshot), not a completion status.
          "Save" is an adjective describing that snapshot, not the save-sync feature. -->
     <string name="settings_libretro_def_auto_save_state_title">Save State on Exit</string>

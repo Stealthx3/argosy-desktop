@@ -355,6 +355,8 @@
     <string name="ingame_libretro_core_error_unknown">發生未預期的錯誤</string>
 
     <string name="ingame_libretro_sram_load_failed_fresh_save">無法載入存檔，已改用新存檔</string>
+    <string name="ingame_libretro_hardcore_off_core_setting">本次遊戲已關閉硬派模式：%1$s 設為 %2$s</string>
+    <string name="ingame_libretro_core_option_blocked_hardcore">硬派模式下不允許此值</string>
     <string name="ingame_libretro_casual_save_in_hardcore">在硬核模式中繼續一般存檔</string>
 
     <string name="ingame_libretro_disc_swap_inserted">已放入%1$s</string>

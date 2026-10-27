@@ -373,6 +373,8 @@
     <string name="ingame_libretro_core_error_unknown">Ocurrió un error inesperado</string>
 
     <string name="ingame_libretro_sram_load_failed_fresh_save">No se pudo cargar la partida guardada; se usó una nueva</string>
+    <string name="ingame_libretro_hardcore_off_core_setting">El modo hardcore está desactivado en esta sesión: %1$s está en %2$s</string>
+    <string name="ingame_libretro_core_option_blocked_hardcore">Ese valor no está permitido en modo hardcore</string>
     <string name="ingame_libretro_casual_save_in_hardcore">Continuando una partida casual en hardcore</string>
 
     <string name="ingame_libretro_disc_swap_inserted">%1$s insertado</string>

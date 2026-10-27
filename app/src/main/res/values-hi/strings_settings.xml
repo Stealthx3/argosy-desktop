@@ -2493,6 +2493,7 @@
     <string name="settings_libretro_def_audio_volume_subtitle" formatted="false">एमुलेटर आउटपुट स्तर (100% असंशोधित है)</string>
     <string name="settings_libretro_def_vsync_title">VSync</string>
     <string name="settings_libretro_def_vsync_subtitle">डिस्प्ले रीफ़्रेश रेट से सिंक करें</string>
+    <string name="settings_libretro_applies_next_launch">अगली बार गेम शुरू होने पर लागू होगा</string>
     <string name="settings_libretro_def_auto_save_state_title">बाहर निकलने पर सेव स्टेट बनाएँ</string>
     <string name="settings_libretro_def_auto_save_state_subtitle">केवल कैज़ुअल गेम पर लागू</string>
     <string name="settings_libretro_def_auto_restore_state_title">लॉन्च पर स्टेट बहाल करें</string>
