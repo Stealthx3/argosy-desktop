@@ -27,7 +27,11 @@ object TreeRelocator {
         failed: MutableList<String>
     ) {
         destination.mkdirs()
-        val files = source.listFiles() ?: return
+        val files = source.listFiles() ?: run {
+            Logger.warn(TAG, "Left ${source.absolutePath} in place; it could not be listed")
+            failed.add(source.absolutePath)
+            return
+        }
         for (file in files) {
             if (file.absolutePath == destinationRoot) continue
             val target = File(destination, file.name)

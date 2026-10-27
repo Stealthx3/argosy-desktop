@@ -731,6 +731,56 @@ class SaveStateManagerTest {
         verify(exactly = 0) { view.unserializeState(any()) }
     }
 
+    private fun refusedSaveManager(cache: SaveCacheManager, refused: ByteArray): SaveStateManager {
+        val mgr = manager(mockk(relaxed = true), cache)
+        mgr.getSramFile().apply { parentFile?.mkdirs() }.writeBytes(refused)
+        mgr.initializeFromExistingSave(null)
+        return mgr
+    }
+
+    private fun coreSram(bytes: ByteArray): GLRetroView = mockk(relaxed = true) {
+        every { serializeSRAM() } returns bytes
+    }
+
+    @Test
+    fun `a refused save is not overwritten before its copy exists`() {
+        val refused = byteArrayOf(4, 4, 4)
+        val mgr = refusedSaveManager(mockk(relaxed = true), refused)
+
+        mgr.holdWritesForRefusedSave()
+        mgr.saveSram(coreSram(byteArrayOf(0, 0, 0)))
+
+        assertArrayEquals(refused, mgr.getSramFile().readBytes())
+    }
+
+    @Test
+    fun `a refused save that could not be copied stays untouched`() = runBlocking {
+        val refused = byteArrayOf(4, 4, 4)
+        val cache = mockk<SaveCacheManager>(relaxed = true)
+        coEvery { cache.cacheAsRollback(any(), any(), any()) } returns SaveCacheManager.CacheResult.Failed
+        val mgr = refusedSaveManager(cache, refused)
+
+        mgr.holdWritesForRefusedSave()
+        assertFalse(mgr.preserveUnloadedSave())
+        mgr.saveSram(coreSram(byteArrayOf(0, 0, 0)))
+
+        assertArrayEquals(refused, mgr.getSramFile().readBytes())
+    }
+
+    @Test
+    fun `writes resume once the refused save is copied`() = runBlocking {
+        val cache = mockk<SaveCacheManager>(relaxed = true)
+        coEvery { cache.cacheAsRollback(any(), any(), any()) } returns SaveCacheManager.CacheResult.Created(0L, 1L)
+        val mgr = refusedSaveManager(cache, byteArrayOf(4, 4, 4))
+        val fresh = byteArrayOf(7, 7, 7)
+
+        mgr.holdWritesForRefusedSave()
+        assertTrue(mgr.preserveUnloadedSave())
+        mgr.saveSram(coreSram(fresh))
+
+        assertArrayEquals(fresh, mgr.getSramFile().readBytes())
+    }
+
     private fun fillRing(mgr: SaveStateManager) {
         repeat(SaveStateManager.QUICK_RING_SIZE) { index ->
             val file = mgr.getSlotFile(SaveStateManager.QUICK_SLOT_BASE + index)

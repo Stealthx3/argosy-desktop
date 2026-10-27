@@ -1065,6 +1065,7 @@ class LibretroActivity : ComponentActivity() {
                             if (retroView.sramLoadFailed) {
                                 Log.w(TAG, "[Startup] SRAM failed to load (size mismatch); booting with a fresh save")
                                 inGameMessage = getString(R.string.ingame_libretro_sram_load_failed_fresh_save)
+                                saveStateManager.holdWritesForRefusedSave()
                                 lifecycleScope.launch(Dispatchers.IO) {
                                     val kept = saveStateManager.preserveUnloadedSave()
                                     Log.i(TAG, "[Startup] Kept the unloaded save as a rollback: $kept")

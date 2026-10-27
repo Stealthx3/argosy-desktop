@@ -47,6 +47,18 @@ class RelocateMusicLibraryUseCaseTest {
     }
 
     @Test
+    fun `files under a folder that stayed behind keep their paths`() = runTest {
+        val source = temp.newFolder("old-root")
+        val target = File(temp.root, "new-root")
+        val stayedFolder = File(source, "Locked").absolutePath
+        coEvery { musicDirectoryManager.relocate(any(), any()) } returns TreeRelocator.Result(emptyList(), listOf(stayedFolder))
+
+        useCase(source.absolutePath, target.absolutePath, moveFiles = true)
+
+        coVerify { gameFileDao.rewriteLocalPathPrefix(File(target, "Locked").absolutePath, stayedFolder) }
+    }
+
+    @Test
     fun `choosing another folder stores it as the override`() = runTest {
         useCase("/storage/emulated/0/Music/RomM", "/storage/75D7-DC5F/Music", moveFiles = false)
 

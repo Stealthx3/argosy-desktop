@@ -427,13 +427,27 @@ class SaveStateManager(
      * Keeps the on-disk save the core refused at load as a rollback entry, so the session's first
      * write cannot be the only copy left. True when a copy exists in the cache afterwards.
      */
+    @Volatile private var sramWritesHeld = false
+
+    /**
+     * Holds every save memory write from the moment the core refuses the save on disk. The hold
+     * lifts only once [preserveUnloadedSave] has kept a copy, so the refused save is never
+     * overwritten without one.
+     */
+    fun holdWritesForRefusedSave() {
+        sramWritesHeld = true
+    }
+
     suspend fun preserveUnloadedSave(): Boolean {
         val sramFile = primarySaveFile
-        if (!sramFile.exists()) return true
-        return when (saveCacheManager.cacheAsRollback(gameId, EmulatorRegistry.BUILTIN_ID, sramFile.absolutePath)) {
-            is SaveCacheManager.CacheResult.Created, is SaveCacheManager.CacheResult.Duplicate -> true
-            is SaveCacheManager.CacheResult.Failed -> false
-        }
+        val kept = !sramFile.exists() ||
+            when (saveCacheManager.cacheAsRollback(gameId, EmulatorRegistry.BUILTIN_ID, sramFile.absolutePath)) {
+                is SaveCacheManager.CacheResult.Created, is SaveCacheManager.CacheResult.Duplicate -> true
+                is SaveCacheManager.CacheResult.Failed -> false
+            }
+        if (kept) sramWritesHeld = false
+        else Log.e(TAG, "[SRAM] refused save could not be copied; save memory writes stay held this session")
+        return kept
     }
 
     private suspend fun clearSaveForFreshStart() {
@@ -530,6 +544,10 @@ class SaveStateManager(
         )
         if (usesExternalMemcard) {
             Log.w(TAG, "[SRAM] saveSram SKIP | external memcard platform, nothing written")
+            return
+        }
+        if (sramWritesHeld) {
+            Log.w(TAG, "[SRAM] saveSram SKIP | the refused save has no copy yet, file left alone")
             return
         }
         saveRtc(retroView)

@@ -13,6 +13,21 @@ class TreeRelocatorTest {
     val temp = TemporaryFolder()
 
     @Test
+    fun `a folder that cannot be listed is reported as left behind`() {
+        val source = temp.newFolder("library")
+        val locked = File(source, "locked").apply { mkdirs() }
+        File(locked, "track.mp3").writeText("a")
+        locked.setReadable(false)
+        try {
+            val result = TreeRelocator.relocate(source, File(temp.root, "moved"))
+
+            assertTrue(locked.absolutePath in result.failed)
+        } finally {
+            locked.setReadable(true)
+        }
+    }
+
+    @Test
     fun `a destination inside the source is never walked into`() {
         val source = temp.newFolder("music")
         File(source, "a/track.mp3").apply { parentFile!!.mkdirs(); writeText("a") }

@@ -113,7 +113,7 @@ class RetroAchievementsSessionManagerTest {
         val verifyRAGameIdUseCase = mockk<VerifyRAGameIdUseCase>()
         coEvery { raRepository.isLoggedIn() } returns loggedIn
         coEvery { gameDao.getById(1L) } returns game(raId)
-        coEvery { verifyRAGameIdUseCase.verifyHash(any()) } returns HashVerification(raId, matchedHash)
+        coEvery { verifyRAGameIdUseCase.verifyHash(any(), any()) } returns HashVerification(raId, matchedHash)
         coEvery { raRepository.startSession(any(), any(), any()) } returns
             RetroAchievementsRepository.RASessionResult(
                 success = startSucceeds,

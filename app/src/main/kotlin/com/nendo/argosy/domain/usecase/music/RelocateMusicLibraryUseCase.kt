@@ -49,6 +49,7 @@ class RelocateMusicLibraryUseCase @Inject constructor(
     private suspend fun repointFile(oldPath: String, newPath: String) {
         bgmPlaylistRepository.rewritePathPrefix(oldPath, newPath)
         gameFileDao.updateLocalPathByOldPath(oldPath, newPath)
+        gameFileDao.rewriteLocalPathPrefix(oldPath, newPath)
         controlsPreferencesRepository.rewriteSoundConfigPathPrefix(oldPath, newPath)
     }
 }

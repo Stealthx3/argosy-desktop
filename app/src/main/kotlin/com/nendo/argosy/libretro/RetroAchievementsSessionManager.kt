@@ -113,7 +113,7 @@ class RetroAchievementsSessionManager(
             gameIgdbId = game.igdbId
             gameTitle = game.title
 
-            val verification = verifyRAGameIdUseCase.verifyHash(gameId)
+            val verification = verifyRAGameIdUseCase.verifyHash(gameId, romPath)
             gameRaId = verification.raId ?: game.effectiveRaId ?: game.raId
             Log.d(TAG, "Game loaded: title=${game.title}, resolvedRaId=$gameRaId, raId=${game.raId}, verifiedRaId=${game.verifiedRaId}")
 

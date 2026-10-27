@@ -124,6 +124,8 @@ class UserProfileViewModel @Inject constructor(
             socialRepository.connectionState.collect { state ->
                 if (state !is SocialConnectionState.Connected) {
                     _uiState.update { it.copy(isLoading = false) }
+                } else if (_uiState.value.profile == null) {
+                    loadProfile()
                 }
             }
         }
@@ -291,7 +293,18 @@ fun UserProfileScreen(
                         color = MaterialTheme.colorScheme.primary
                     )
                 }
-            } else if (profile != null) {
+            } else if (profile == null) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = stringResource(R.string.social_profile_unavailable_offline),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                    )
+                }
+            } else {
                 val mostPlayed = profile.mostPlayed
                 val mostPlayedFocusIndex = uiState.focusedMostPlayedIndex
                 val highlightMostPlayed = uiState.focusOnMostPlayed
