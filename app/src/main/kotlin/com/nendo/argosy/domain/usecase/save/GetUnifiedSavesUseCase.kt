@@ -7,8 +7,10 @@ import com.nendo.argosy.data.remote.romm.RomMSave
 import com.nendo.argosy.data.repository.SaveCacheManager
 import com.nendo.argosy.data.repository.SaveSyncApiClient
 import com.nendo.argosy.data.repository.SaveSyncApiClient.Companion.equalsNormalized
+import com.nendo.argosy.data.repository.SaveInventoryUnavailableException
 import com.nendo.argosy.data.repository.SaveSyncRepository
 import com.nendo.argosy.domain.model.UnifiedSaveEntry
+import com.nendo.argosy.util.Logger
 import java.io.File
 import java.time.Instant
 import java.time.ZonedDateTime
@@ -16,6 +18,8 @@ import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 private const val LATEST_SLOT_KEY = "__latest__"
+
+private const val TAG = "GetUnifiedSaves"
 
 class GetUnifiedSavesUseCase @Inject constructor(
     private val saveCacheManager: SaveCacheManager,
@@ -42,7 +46,12 @@ class GetUnifiedSavesUseCase @Inject constructor(
         val romBaseName = game?.localPath?.let { File(it).nameWithoutExtension }
 
         val serverSaves = if (rommId != null && includeServer) {
-            saveSyncRepository.checkSavesForGame(gameId, rommId)
+            try {
+                saveSyncRepository.checkSavesForGame(gameId, rommId)
+            } catch (e: SaveInventoryUnavailableException) {
+                Logger.warn(TAG, "Server saves unavailable for gameId=$gameId, showing local saves: ${e.message}")
+                emptyList()
+            }
         } else {
             emptyList()
         }

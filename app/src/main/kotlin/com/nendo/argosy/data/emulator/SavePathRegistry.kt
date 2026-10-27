@@ -3,6 +3,7 @@ package com.nendo.argosy.data.emulator
 import android.os.Environment
 import com.nendo.argosy.data.platform.PlatformDefinitions
 import com.nendo.argosy.util.AppPaths
+import com.nendo.argosy.util.Logger
 import com.nendo.argosy.util.RootShell
 
 data class SavePathConfig(
@@ -32,6 +33,7 @@ private const val BUILTIN_EMULATOR_ID = EmulatorRegistry.BUILTIN_ID
  * a caller that has no resolved base gets the packaged default under `{filesDir}`.
  */
 const val BUILTIN_SAVES_TOKEN = "{builtinSaves}"
+internal val UNRESOLVED_TOKEN = Regex("""\{[A-Za-z]+\}""")
 
 object SavePathRegistry {
 
@@ -942,13 +944,18 @@ object SavePathRegistry {
             else -> listOf(path)
         }
         val builtinBase = builtinSavesDir ?: filesDir?.let { "$it/${AppPaths.LIBRETRO_SAVES_SUBDIR}" }
-        return results.map { p ->
+        return results.mapNotNull { p ->
             var r = p
             if (packageName != null) r = r.replace("{package}", packageName)
             if (core != null) r = r.replace("{core}", core)
             if (filesDir != null) r = r.replace("{filesDir}", filesDir)
             if (builtinBase != null) r = r.replace(BUILTIN_SAVES_TOKEN, builtinBase)
-            r
+            if (UNRESOLVED_TOKEN.containsMatchIn(r)) {
+                Logger.warn("SavePathRegistry", "Dropping save path with an unresolved template: $r")
+                null
+            } else {
+                r
+            }
         }
     }
 
@@ -966,9 +973,14 @@ object SavePathRegistry {
             null
         }
 
+        val packageName = if (config.usesPackageTemplate) {
+            EmulatorRegistry.getById(config.emulatorId)?.packageName
+        } else null
+
         val paths = config.defaultPaths.flatMap { path ->
             expandPath(
                 path,
+                packageName = packageName,
                 core = core,
                 filesDir = filesDir,
                 externalStorageRoots = externalStorageRoots,
@@ -980,6 +992,7 @@ object SavePathRegistry {
             val withoutCore = config.defaultPaths.flatMap { path ->
                 expandPath(
                     path.replace("/{core}", "").replace("{core}", ""),
+                    packageName = packageName,
                     filesDir = filesDir,
                     externalStorageRoots = externalStorageRoots,
                     builtinSavesDir = builtinSavesDir

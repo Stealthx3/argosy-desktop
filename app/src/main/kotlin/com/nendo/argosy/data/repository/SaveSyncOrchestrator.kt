@@ -569,8 +569,12 @@ class SaveSyncOrchestrator @Inject constructor(
         if (!prefs.saveSyncEnabled) return@withContext
 
         val client = apiClient.get()
-        val serverSaves = client.checkSavesForGame(gameId, rommId)
-            .filterNot { SaveSyncApiClient.isStateShapedSave(it) }
+        val serverSaves = try {
+            client.checkSavesForGame(gameId, rommId)
+        } catch (e: SaveInventoryUnavailableException) {
+            Logger.warn(TAG, "[SaveSync] NEW_DOWNLOAD gameId=$gameId | Server saves unavailable, skipping: ${e.message}")
+            return@withContext
+        }.filterNot { SaveSyncApiClient.isStateShapedSave(it) }
         if (serverSaves.isEmpty()) return@withContext
 
         val game = gameDao.getById(gameId) ?: return@withContext
@@ -634,7 +638,12 @@ class SaveSyncOrchestrator @Inject constructor(
             val emulatorId = client.resolveEmulatorForGame(game) ?: continue
             val romBaseName = game.localPath?.let { File(it).nameWithoutExtension }
             val heldHashByRow = saveSyncDao.getByGame(game.id, ownerUserId).associate { it.id to it.lastUploadedHash }
-            val serverSaves = client.checkSavesForGame(game.id, rommId)
+            val serverSaves = try {
+                client.checkSavesForGame(game.id, rommId)
+            } catch (e: SaveInventoryUnavailableException) {
+                Logger.warn(TAG, "[SaveSync] RECONCILE gameId=${game.id} | Server saves unavailable, skipping: ${e.message}")
+                continue
+            }
             if (serverSaves.isEmpty()) continue
             inspected++
 

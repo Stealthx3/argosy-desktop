@@ -154,13 +154,11 @@ class RestoreCachedStatesUseCase @Inject constructor(
                         continue
                     }
                 }
-                existingFile.delete()
-                val screenshotFile = File("$existingPath.png")
-                if (screenshotFile.exists()) {
-                    screenshotFile.delete()
+                if (!stateCacheManager.displaceLiveState(existingFile)) {
+                    Log.w(TAG, "Leaving ${existingFile.name} in place: could not move it aside")
+                    continue
                 }
                 stateOwnershipTracker.clear(existingPath, emulatorId)
-                Log.d(TAG, "Deleted existing state: ${existingFile.name}")
             }
 
             var restoredCount = 0

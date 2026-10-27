@@ -85,6 +85,8 @@ class StateCacheManager @Inject constructor(
         private const val UNKNOWN_CORE_DIR = "unknown"
         private const val MIN_UNLOCKED_SLOTS = 3
         private const val BUFFER_SIZE = 8192
+        private const val DISPLACED_DIR = "displaced"
+        private const val DISPLACED_RETENTION_DAYS = 14L
         private val LOCAL_ONLY_STATUSES = setOf(StateCacheEntity.STATUS_LOCAL_NEWER, StateCacheEntity.STATUS_PENDING_UPLOAD)
         private val UPLOAD_TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss")
         private val STATE_NAME_TIMESTAMP =
@@ -892,14 +894,40 @@ class StateCacheManager @Inject constructor(
     private fun deleteLiveStates(files: List<File>, romPath: String): Boolean {
         var deletedAny = false
         for (file in files) {
-            if (file.delete()) {
-                File("${file.absolutePath}.png").takeIf { it.exists() }?.delete()
-                Log.d(TAG, "Deleted live state: ${file.absolutePath}")
-                deletedAny = true
-            }
+            if (displaceLiveState(file)) deletedAny = true
         }
         if (!deletedAny) Log.d(TAG, "deleteLiveStates: nothing to delete for ${File(romPath).name}")
         return deletedAny
+    }
+
+    /**
+     * Moves a live state and its screenshot out of the emulator's folder into the displaced-state
+     * store, where it stays for [DISPLACED_RETENTION_DAYS] days. False when nothing was moved.
+     */
+    fun displaceLiveState(file: File): Boolean {
+        if (!file.exists()) return false
+        val displacedDir = File(cacheBaseDir, "$DISPLACED_DIR/${System.currentTimeMillis()}")
+        return try {
+            displacedDir.mkdirs()
+            val screenshot = File("${file.absolutePath}.png")
+            file.copyTo(File(displacedDir, file.name), overwrite = true)
+            if (screenshot.exists()) screenshot.copyTo(File(displacedDir, screenshot.name), overwrite = true)
+            file.delete()
+            screenshot.delete()
+            Log.d(TAG, "Displaced live state ${file.absolutePath} to ${displacedDir.absolutePath}")
+            pruneDisplacedStates()
+            true
+        } catch (e: Exception) {
+            Log.w(TAG, "Could not displace ${file.absolutePath}, leaving it in place", e)
+            false
+        }
+    }
+
+    private fun pruneDisplacedStates() {
+        val cutoff = System.currentTimeMillis() - DISPLACED_RETENTION_DAYS * 24 * 60 * 60 * 1000L
+        File(cacheBaseDir, DISPLACED_DIR).listFiles()
+            ?.filter { it.isDirectory && (it.name.toLongOrNull() ?: Long.MAX_VALUE) < cutoff }
+            ?.forEach { it.deleteRecursively() }
     }
 
     private suspend fun autoResumeStateFiles(

@@ -89,7 +89,8 @@ class GetUnifiedStatesUseCase @Inject constructor(
     ): List<RomMState> {
         val api = saveSyncRepository.getApi() ?: return emptyList()
 
-        saveSyncRepository.checkSavesForGame(gameId, rommId)
+        runCatching { saveSyncRepository.checkSavesForGame(gameId, rommId) }
+            .onFailure { if (it is kotlinx.coroutines.CancellationException) throw it }
 
         val serverStates = stateCacheManager.checkServerStates(rommId, api)
 
