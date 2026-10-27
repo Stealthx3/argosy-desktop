@@ -708,6 +708,7 @@
     <string name="settings_about_update_title_downloading">डाउनलोड हो रहा है...</string>
     <string name="settings_about_update_title_available">अपडेट उपलब्ध है</string>
     <string name="settings_about_update_subtitle_debug">डीबग बिल्ड में बंद है</string>
+    <string name="settings_about_update_subtitle_flatpak">Flatpak, Argosy Desktop को अपडेट रखता है</string>
     <string name="settings_about_update_subtitle_progress">%1$d%%</string>
     <string name="settings_about_update_subtitle_checking">जाँचा जा रहा है...</string>
     <string name="settings_about_update_subtitle_error">त्रुटि: %1$s</string>

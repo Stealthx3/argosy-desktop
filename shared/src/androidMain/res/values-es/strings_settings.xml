@@ -732,6 +732,7 @@
     <string name="settings_about_update_title_downloading">Descargando...</string>
     <string name="settings_about_update_title_available">Actualización disponible</string>
     <string name="settings_about_update_subtitle_debug">Desactivado en compilaciones de depuración</string>
+    <string name="settings_about_update_subtitle_flatpak">Flatpak mantiene Argosy Desktop actualizado</string>
     <string name="settings_about_update_subtitle_progress">%1$d%%</string>
     <string name="settings_about_update_subtitle_checking">Comprobando...</string>
     <string name="settings_about_update_subtitle_error">Error: %1$s</string>

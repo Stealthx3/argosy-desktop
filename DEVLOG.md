@@ -1376,3 +1376,23 @@ Mapped ids: retroarch, dolphin, cemu, azahar, ryujinx (Ryubing), eden, melonds, 
 - Navigation: desktop adds Input Mode and Button Mapping. Vibration Strength sits below the fold on both.
 - Displays: desktop has no section rail, since only Screen Safety remains after unit 1.
 - Theme and Audio: same rows and order.
+
+### 2026-10-26 — Step 5, unit 3: remaining Settings sections; About's APK updater off on desktop
+
+**Action:** `side-by-side.sh <out> <fresh> settings2` opens the Settings sections after Displays by name. The two apps order them differently: Android 6–20 includes Built-in Emulator, Steam, Jellyfin, Social and Device Settings, while desktop 5–15 does not. Run: `build/desktop-check/p5s5c/`.
+
+**Result:** Saves, RetroAchievements, BIOS and RomM match. These differences are approved divergences or data:
+- Platforms: Android lists its Android row, and desktop names the external emulator instead of "Built-in".
+- GPU Drivers: shows host GPU info on desktop.
+- Permissions: Flatpak folder access on desktop.
+- Managed Installers: Linux emulators on desktop.
+- Play Time: the "most played on" device name.
+- Storage: volumes and sizes.
+
+**Real difference, fixed:** About on desktop offered upstream's Android APK ("Update Available v2.26.1 → Download"), the beta-update switch and the What's New preview. It also showed the System App section (root systemize helper; Restart does nothing on desktop). This was the carried-forward "About → upstream APK update" item.
+- New capabilities `PlatformFeatures.selfUpdate` and `systemApp`: Android true, desktop false. They hide Beta Updates, the What's New preview, and the System App header, spacer and rows.
+- `routeCheckForUpdates` and `routeDownloadAndInstallUpdate` return early without `selfUpdate`, so no path reaches the updater. Android's `UpdateCheckWorker` never runs on desktop.
+- The Check for Updates row stays, following upstream's debug-build pattern: Check is disabled and the subtitle reads "Flatpak keeps Argosy Desktop up to date" (`settings_about_update_subtitle_flatpak`, eight locales). This keeps the Version section, so the version number stays on screen, and keeps the gamepad route to Changelog. A first try hid the row, which emptied the Version section, so the list opened scrolled past the version number.
+- The `PlatformFeatures` KDoc was cut to two lines (smell rule).
+
+**Verification:** gate 131 (asserts `selfUpdate` and `systemApp` false) + 4,426, 0 failures; translations complete (6,372 keys); smell check clean. Desktop walk `build/desktop-check/p5s5c/about-desktop-small.png`.

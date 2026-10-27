@@ -1,5 +1,6 @@
 package com.nendo.argosy.ui.screens.settings.sections
 
+import com.nendo.argosy.platform.PlatformFeatures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -92,21 +93,26 @@ internal sealed class AboutItem(
         else -> true
     }
 
-    class Header(key: String, section: String, val titleRes: Int) : AboutItem(key, section)
+    class Header(
+        key: String,
+        section: String,
+        val titleRes: Int,
+        visibleWhen: (AboutLayoutState) -> Boolean = { true }
+    ) : AboutItem(key, section, visibleWhen)
     data object VersionInfo : AboutItem("versionInfo", "version")
     data object CheckUpdates : AboutItem("checkUpdates", "version")
     data object ChangelogPreview : AboutItem(
         key = "changelogPreview",
         section = "version",
-        visibleWhen = { it.hasChangelog }
+        visibleWhen = { PlatformFeatures.selfUpdate && it.hasChangelog }
     )
-    data object BetaUpdates : AboutItem("betaUpdates", "version")
+    data object BetaUpdates : AboutItem("betaUpdates", "version", { PlatformFeatures.selfUpdate })
     data object BackupSpacer : AboutItem("backupSpacer", "backup")
     data object ExportSettings : AboutItem("exportSettings", "backup")
     data object ImportSettings : AboutItem("importSettings", "backup")
-    data object SystemSpacer : AboutItem("systemSpacer", "system")
-    data object SystemizeHelper : AboutItem("systemizeHelper", "system")
-    data object RestartApp : AboutItem("restartApp", "system")
+    data object SystemSpacer : AboutItem("systemSpacer", "system", { PlatformFeatures.systemApp })
+    data object SystemizeHelper : AboutItem("systemizeHelper", "system", { PlatformFeatures.systemApp })
+    data object RestartApp : AboutItem("restartApp", "system", { PlatformFeatures.systemApp })
     data object SectionSpacer : AboutItem("spacer", "debug")
     data object FileLogging : AboutItem("fileLogging", "debug")
     data object LogLevel : AboutItem(
@@ -123,7 +129,8 @@ internal sealed class AboutItem(
     companion object {
         private val VersionHeader = Header("versionHeader", "version", R.string.settings_about_section_version)
         private val BackupHeader = Header("backupHeader", "backup", R.string.settings_about_section_backup)
-        private val SystemHeader = Header("systemHeader", "system", R.string.settings_about_section_system_app)
+        private val SystemHeader =
+            Header("systemHeader", "system", R.string.settings_about_section_system_app) { PlatformFeatures.systemApp }
         private val DebugHeader = Header("debugHeader", "debug", R.string.settings_about_section_debug)
 
         val ALL: List<AboutItem>
@@ -219,6 +226,8 @@ fun AboutSection(uiState: SettingsUiState, viewModel: SettingsViewModel) {
                 AboutItem.CheckUpdates -> {
                     val checkTitle = stringResource(R.string.settings_about_update_title_check)
                     val (title, subtitle) = when {
+                        !PlatformFeatures.selfUpdate -> checkTitle to
+                            stringResource(R.string.settings_about_update_subtitle_flatpak)
                         isDebug -> checkTitle to
                             stringResource(R.string.settings_about_update_subtitle_debug)
                         updateCheck.isDownloading ->
@@ -254,7 +263,8 @@ fun AboutSection(uiState: SettingsUiState, viewModel: SettingsViewModel) {
                         } else {
                             stringResource(R.string.settings_about_update_action_check)
                         },
-                        primaryEnabled = !isDebug && !updateCheck.isChecking && !updateCheck.isDownloading,
+                        primaryEnabled = PlatformFeatures.selfUpdate && !isDebug &&
+                            !updateCheck.isChecking && !updateCheck.isDownloading,
                         isFocused = isFocused(item),
                         actionIndex = uiState.aboutUpdateActionIndex,
                         onPrimary = {

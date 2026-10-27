@@ -735,6 +735,7 @@
     <string name="settings_about_update_title_downloading">Загрузка...</string>
     <string name="settings_about_update_title_available">Доступно обновление</string>
     <string name="settings_about_update_subtitle_debug">Отключено в отладочных сборках</string>
+    <string name="settings_about_update_subtitle_flatpak">Flatpak обновляет Argosy Desktop</string>
     <string name="settings_about_update_subtitle_progress">%1$d%%</string>
     <string name="settings_about_update_subtitle_checking">Проверка...</string>
     <string name="settings_about_update_subtitle_error">Ошибка: %1$s</string>

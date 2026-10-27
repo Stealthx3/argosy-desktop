@@ -718,6 +718,7 @@
     <string name="settings_about_update_title_downloading">Wird heruntergeladen…</string>
     <string name="settings_about_update_title_available">Update verfügbar</string>
     <string name="settings_about_update_subtitle_debug">In Debug-Builds deaktiviert</string>
+    <string name="settings_about_update_subtitle_flatpak">Flatpak hält Argosy Desktop aktuell</string>
     <string name="settings_about_update_subtitle_progress">%1$d%%</string>
     <string name="settings_about_update_subtitle_checking">Wird geprüft…</string>
     <string name="settings_about_update_subtitle_error">Fehler: %1$s</string>

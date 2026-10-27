@@ -663,6 +663,7 @@
     <string name="settings_about_update_title_downloading">下載中&#8230;</string>
     <string name="settings_about_update_title_available">有可用更新</string>
     <string name="settings_about_update_subtitle_debug">偵錯版本已停用此功能</string>
+    <string name="settings_about_update_subtitle_flatpak">Flatpak 會讓 Argosy Desktop 保持最新</string>
     <string name="settings_about_update_subtitle_progress">%1$d%%</string>
     <string name="settings_about_update_subtitle_checking">檢查中&#8230;</string>
     <string name="settings_about_update_subtitle_error">錯誤：%1$s</string>

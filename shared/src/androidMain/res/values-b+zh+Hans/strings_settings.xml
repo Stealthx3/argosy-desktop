@@ -694,6 +694,7 @@
     <string name="settings_about_update_title_downloading">正在下载...</string>
     <string name="settings_about_update_title_available">有可用更新</string>
     <string name="settings_about_update_subtitle_debug">调试版本中已禁用</string>
+    <string name="settings_about_update_subtitle_flatpak">Flatpak 会让 Argosy Desktop 保持最新</string>
     <string name="settings_about_update_subtitle_progress">%1$d%%</string>
     <string name="settings_about_update_subtitle_checking">正在检查...</string>
     <string name="settings_about_update_subtitle_error">错误：%1$s</string>

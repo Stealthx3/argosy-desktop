@@ -7,6 +7,8 @@ actual object PlatformFeatures {
     actual val deviceSettings: Boolean = true
     actual val builtInEmulation: Boolean = true
     actual val dualScreen: Boolean = true
+    actual val selfUpdate: Boolean = true
+    actual val systemApp: Boolean = true
     actual val desktopWindow: Boolean = false
     actual val darkThemeByDefault: Boolean = false
 }

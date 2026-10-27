@@ -2,9 +2,10 @@
 # Desktop vs Android screens for the Phase 5 side-by-side check. Walks the same screens on the check
 # AVD (emulator-5556, testbed-signed) and on desktop fresh-walk data (never the owner's data), only
 # moving and opening screens (A only on rows that open a section), then tiles each pair into <out>/pairs-*.png.
-# usage: side-by-side.sh <out-dir> <fresh-walk-name>
+# usage: side-by-side.sh <out-dir> <fresh-walk-name> [settings2]; settings2 opens the Settings sections
+# after Displays by name (the two apps order them differently).
 set -u
-out=$1; fresh=$2
+out=$1; fresh=$2; plan=${3:-main}
 cd /mnt/FileDrive/Personal/Projects/Git/argosy-desktop
 mkdir -p "$out/android" "$out/desktop"
 ADB="$HOME/Android/Sdk/platform-tools/adb -s emulator-5556"
@@ -38,8 +39,26 @@ common=(shot:home X wait:4 shot:details B wait:3 START wait:2 shot:drawer B wait
 sections=(shot:settings)
 for s in theme interface navigation audio displays; do sections+=(A wait:3 "shot:set-$s" B wait:2 DOWN wait:1); done
 sections+=(DOWN*7 wait:1 shot:settings-lower)
-android "${common[@]}" START wait:2 DOWN*8 A wait:3 "${sections[@]}"
-desktop "${common[@]}" START wait:2 DOWN*7 A wait:3 "${sections[@]}"
+route() {
+  local at=0 steps=()
+  while [ $# -gt 0 ]; do
+    local name=$1 idx=$2; shift 2
+    [ "$idx" -gt "$at" ] && steps+=("DOWN*$((idx - at))")
+    steps+=(wait:1 A wait:4 "shot:set-$name" B wait:2); at=$idx
+  done
+  echo "${steps[@]}"
+}
+if [ "$plan" = settings2 ]; then
+  names=(saves retroachievements bios drivers platforms storage playtime romm permissions installers about)
+  a_idx=(6 7 8 9 10 11 12 13 17 18 20); d_idx=(5 6 7 8 9 10 11 12 13 14 15)
+  a=(); d=()
+  for i in "${!names[@]}"; do a+=("${names[$i]}" "${a_idx[$i]}"); d+=("${names[$i]}" "${d_idx[$i]}"); done
+  android START wait:2 DOWN*8 A wait:3 $(route "${a[@]}")
+  desktop START wait:2 DOWN*7 A wait:3 $(route "${d[@]}")
+else
+  android "${common[@]}" START wait:2 DOWN*8 A wait:3 "${sections[@]}"
+  desktop "${common[@]}" START wait:2 DOWN*7 A wait:3 "${sections[@]}"
+fi
 python3 -I - "$out" <<'PY'
 import sys
 from pathlib import Path

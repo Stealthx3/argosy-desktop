@@ -1,5 +1,6 @@
 package com.nendo.argosy.ui.screens.settings
 
+import com.nendo.argosy.platform.PlatformFeatures
 import com.nendo.argosy.util.PlatformLog as Log
 import androidx.lifecycle.viewModelScope
 import com.nendo.argosy.data.preferences.AppLanguage
@@ -178,7 +179,7 @@ internal fun routeSetSaveDebugLoggingEnabled(vm: SettingsViewModel, enabled: Boo
 }
 
 internal fun routeCheckForUpdates(vm: SettingsViewModel) {
-    if (com.nendo.argosy.config.AppBuildConfig.DEBUG) return
+    if (com.nendo.argosy.config.AppBuildConfig.DEBUG || !PlatformFeatures.selfUpdate) return
 
     vm.viewModelScope.launch {
         vm._uiState.update { it.copy(updateCheck = it.updateCheck.copy(isChecking = true, error = null)) }
@@ -284,6 +285,7 @@ internal fun routeLoadChangelogPage(vm: SettingsViewModel) {
 }
 
 internal fun routeDownloadAndInstallUpdate(vm: SettingsViewModel, context: com.nendo.argosy.platform.PlatformContext) {
+    if (!PlatformFeatures.selfUpdate) return
     val state = vm._uiState.value.updateCheck
     val url = state.downloadUrl ?: return
     val version = state.latestVersion ?: return

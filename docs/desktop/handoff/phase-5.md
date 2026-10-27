@@ -2,7 +2,7 @@
 
 Rewritten (not appended) at the end of every work unit, so a fresh session can start from it alone. History and reasoning live in `DEVLOG.md`. Earlier phases: `phase-0.md` … `phase-4.md` (closed summaries).
 
-**Updated:** 2026-10-26 (step 5 unit 2 committed). Steps 1–4 done; step 5 in progress.
+**Updated:** 2026-10-26 (step 5 unit 3 committed). Steps 1–4 done; step 5 in progress.
 
 ## Scope and exit criterion
 
@@ -31,8 +31,8 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 - Done: tester sheet `docs/desktop/side-by-side-checklist.md`; `scripts/desktop/check/side-by-side.sh <out> <fresh-name>` (AVD + fresh desktop data, tiles `pairs-*.png`); first pass in `build/desktop-check/p5s5/`; dual-screen row and subtitle gated off on desktop (`PlatformFeatures.dualScreen`).
 - Owner question: Quick Settings Brightness is hidden on desktop (`screenBrightnessAvailable`). Should it be an approved divergence, or should desktop get backlight control?
 - Unit 2: the pass now covers game details and the Theme, Interface, Navigation, Audio and Displays sections (`build/desktop-check/p5s5b/`); no new real differences.
-- **Next action:** cover the remaining Settings sections, which differ in order between the apps, so route each one by name. Then Search and Collections create. For a fair Home comparison, give the fresh desktop data a played game. Then, from the owner's checklist results, fix every difference outside the divergences. Close step 5 when the checklist comes back clean, and republish (`--step-close 5.5`).
-- The other carried-forward leftover: About → upstream APK update row.
+- Unit 3: `settings2` plan covers the remaining sections (`build/desktop-check/p5s5c/`). Fixed: About's APK updater and System App section are off on desktop (`selfUpdate`, `systemApp`); the Check row says Flatpak updates the app.
+- **Next action:** Search and Collections create in the pass. After that, step 5 waits for the owner's checklist results. For a fair Home comparison, give the fresh desktop data a played game. Then, from the owner's checklist results, fix every difference outside the divergences. Close step 5 when the checklist comes back clean, and republish (`--step-close 5.5`).
 
 ## Gotchas
 

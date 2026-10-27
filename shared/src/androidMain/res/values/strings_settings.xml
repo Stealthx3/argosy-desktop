@@ -1347,6 +1347,7 @@
     <string name="settings_about_update_title_available">Update Available</string>
     <!-- Second line of that row in a development build, where updating is switched off. -->
     <string name="settings_about_update_subtitle_debug">Disabled in debug builds</string>
+    <string name="settings_about_update_subtitle_flatpak">Flatpak keeps Argosy Desktop up to date</string>
     <!-- Second line of that row while downloading. %1$d is a percentage. -->
     <string name="settings_about_update_subtitle_progress">%1$d%%</string>
     <!-- Second line of that row while asking the update server. -->
