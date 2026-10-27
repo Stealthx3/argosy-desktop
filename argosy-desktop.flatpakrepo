@@ -1,0 +1,8 @@
+[Flatpak Repo]
+Title=Argosy Desktop
+Url=https://stealthx3.github.io/argosy-desktop/repo/
+Homepage=https://github.com/Stealthx3/argosy-desktop
+Comment=Argosy Desktop alpha builds
+Description=Flatpak repository of Argosy Desktop, the Linux port of the Argosy launcher
+Icon=https://raw.githubusercontent.com/Stealthx3/argosy-desktop/main/argosy_icon.svg
+GPGKey=mDMEatu0rRYJKwYBBAHaRw8BAQdAcH5J+GkRCbmsIU5ETY7y7ZiJXb7+PByVP5Zepl2lP2O0L0FyZ29zeSBEZXNrdG9wIEZsYXRwYWsgcmVwbyAoYWxwaGEgc2lnbmluZyBrZXkpiJAEExYKADgWIQRcyIxWO8vNT3HQlid93uWWrrXxhgUCatu0rQIbAwULCQgHAgYVCgkICwIEFgIDAQIeAQIXgAAKCRB93uWWrrXxhv6GAQD8hG7wX8VvgcMHnN2hzhmaFhm+EfUXBuuPYVSTBSNN8gEAslNhXMtXJjDisMDUYcs1PTYErHKZJp88cffP++SeDQs=
