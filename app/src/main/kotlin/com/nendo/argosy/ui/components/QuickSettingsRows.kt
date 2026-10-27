@@ -375,9 +375,10 @@ internal fun QuickNoticeRow(
     message: String,
     actionLabel: String,
     isFocused: Boolean,
-    onAction: () -> Unit
+    onAction: () -> Unit,
+    enabled: Boolean = true
 ) {
-    QuickRowFrame(isFocused = isFocused, onClick = onAction) {
+    QuickRowFrame(isFocused = isFocused, onClick = onAction, enabled = enabled) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(Dimens.spacingSm)
@@ -388,7 +389,7 @@ internal fun QuickNoticeRow(
                 color = LocalArgosyTheme.current.textPrimary,
                 modifier = Modifier.weight(1f)
             )
-            ActionButton(label = actionLabel, onClick = onAction, focused = isFocused)
+            ActionButton(label = actionLabel, onClick = onAction, focused = isFocused && enabled, enabled = enabled)
         }
     }
 }

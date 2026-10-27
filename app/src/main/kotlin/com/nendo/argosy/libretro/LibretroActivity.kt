@@ -190,6 +190,7 @@ class LibretroActivity : ComponentActivity() {
 
     @Inject lateinit var triggerAxisKeyEmitter: com.nendo.argosy.ui.input.TriggerAxisKeyEmitter
     @Inject lateinit var playSessionTracker: PlaySessionTracker
+    @Inject lateinit var quickPanelOverlay: com.nendo.argosy.ui.quickpanel.QuickPanelOverlay
     @Inject lateinit var preferencesRepository: UserPreferencesRepository
     @Inject lateinit var touchLayoutRepository: com.nendo.argosy.data.repository.TouchLayoutRepository
     @Inject lateinit var inputConfigRepository: InputConfigRepository
@@ -258,6 +259,7 @@ class LibretroActivity : ComponentActivity() {
         )
     }
     private var seatPromptVisible by mutableStateOf(false)
+    private var quickPanelOpen by mutableStateOf(false)
     private lateinit var hotkeyDispatcher: LibretroHotkeyDispatcher
     private lateinit var motionProcessor: MotionEventProcessor
     private var vibrator: Vibrator? = null
@@ -421,7 +423,7 @@ class LibretroActivity : ComponentActivity() {
 
     private val isAnyMenuOpen: Boolean
         get() = menuVisible || shaderChainEditorVisible || frameEditorVisible || autoRestorePromptVisible || discMenuVisible ||
-            seatPromptVisible ||
+            seatPromptVisible || quickPanelOpen ||
             speedrunPickerVisible || readerKind != null || isClosing || netplay.isAnyDialogVisible
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -604,6 +606,9 @@ class LibretroActivity : ComponentActivity() {
             isDocked = isDockedDark()
         )
         inputConfig.initialize(onControllerOrderLoaded = ::promptForSeatsIfNeeded)
+        lifecycleScope.launch {
+            quickPanelOverlay.isOpen.collect { open -> if (!open) quickPanelOpen = false }
+        }
 
         if (settings.rumbleEnabled) {
             setupRumble()
@@ -3419,7 +3424,19 @@ class LibretroActivity : ComponentActivity() {
     }
 
     private fun onBackHeld() {
-        if (!isAnyMenuOpen) showMenu()
+        if (isAnyMenuOpen) return
+        if (!quickPanelOverlay.show(gameDisplayId(), resultOwner = this)) {
+            showMenu()
+            return
+        }
+        quickPanelOpen = true
+        if (!netplay.inSession) pauseForMenu()
+    }
+
+    private fun gameDisplayId(): Int {
+        val current = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) display else null
+        @Suppress("DEPRECATION")
+        return (current ?: windowManager.defaultDisplay).displayId
     }
 
     override fun onKeyUp(keyCode: Int, event: KeyEvent): Boolean {
@@ -3901,6 +3918,7 @@ class LibretroActivity : ComponentActivity() {
 
     override fun onDestroy() {
         Log.d(TAG, "onDestroy: isFinishing=$isFinishing, isChangingConfigurations=$isChangingConfigurations")
+        quickPanelOverlay.hideNow()
         hideSecondScreen()
         if (!coreDestroyed && ::retroView.isInitialized) retroView.destroyNative()
         coreDestroyed = true

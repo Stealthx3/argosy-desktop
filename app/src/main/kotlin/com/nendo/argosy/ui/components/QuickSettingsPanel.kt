@@ -2,6 +2,10 @@ package com.nendo.argosy.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
@@ -81,7 +85,7 @@ fun QuickSettingsPanel(
     page: QuickSettingsPage,
     focusedIndex: Int,
     controller: QuickSettingsController,
-    onOpenDeviceAccess: () -> Unit,
+    onOpenDeviceAccess: (() -> Unit)?,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
     friendsPage: @Composable () -> Unit = {},
@@ -95,16 +99,21 @@ fun QuickSettingsPanel(
     val pages = remember(state) { quickSettingsVisiblePages(state) }
     val activePage = remember(page, state) { quickSettingsEffectivePage(page, state) }
 
+    val phase = if (reduced) 0 else Motion.durationSlide
     Box(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.CenterEnd
     ) {
-        if (isVisible) {
-            val scrim = if (theme.isDark) {
-                Color.Black.copy(alpha = ComponentDefaults.Launcher.overlayDarkAlpha)
-            } else {
-                Color.White.copy(alpha = ComponentDefaults.Launcher.overlayLightAlpha)
-            }
+        val scrim = if (theme.isDark) {
+            Color.Black.copy(alpha = ComponentDefaults.Launcher.overlayDarkAlpha)
+        } else {
+            Color.White.copy(alpha = ComponentDefaults.Launcher.overlayLightAlpha)
+        }
+        AnimatedVisibility(
+            visible = isVisible,
+            enter = fadeIn(tween(phase)),
+            exit = fadeOut(tween(phase, delayMillis = phase))
+        ) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -120,18 +129,27 @@ fun QuickSettingsPanel(
         )
         AnimatedVisibility(
             visible = isVisible,
-            enter = slideInHorizontally(initialOffsetX = { it }),
-            exit = slideOutHorizontally(targetOffsetX = { it })
+            enter = slideInHorizontally(tween(phase, easing = Motion.argosyEase)) { it },
+            exit = slideOutHorizontally(tween(phase, delayMillis = phase, easing = Motion.argosyEase)) { it }
         ) {
             Row(
                 modifier = Modifier
-                    .width(panelWidth)
                     .fillMaxHeight()
                     .background(theme.surfaceBase)
             ) {
                 Column(
                     modifier = Modifier
-                        .weight(1f)
+                        .animateEnterExit(
+                            enter = expandHorizontally(
+                                animationSpec = tween(phase, delayMillis = phase, easing = Motion.argosyEase),
+                                expandFrom = Alignment.End
+                            ),
+                            exit = shrinkHorizontally(
+                                animationSpec = tween(phase, easing = Motion.argosyEase),
+                                shrinkTowards = Alignment.End
+                            )
+                        )
+                        .width(panelWidth - Dimens.quickPanelRailWidth)
                         .fillMaxHeight()
                 ) {
                     QuickPanelHeader(title = stringResource(activePage.titleRes))
@@ -284,7 +302,7 @@ private fun QuickSettingsList(
     state: QuickSettingsState,
     focusedIndex: Int,
     controller: QuickSettingsController,
-    onOpenDeviceAccess: () -> Unit
+    onOpenDeviceAccess: (() -> Unit)?
 ) {
     val visibleItems = remember(page, state) { quickSettingsVisibleItems(page, state) }
     val focusable = remember(page, state) { quickSettingsFocusableItems(page, state) }
@@ -321,7 +339,7 @@ private fun QuickSettingsItemRow(
     state: QuickSettingsState,
     isFocused: Boolean,
     controller: QuickSettingsController,
-    onOpenDeviceAccess: () -> Unit
+    onOpenDeviceAccess: (() -> Unit)?
 ) {
     val focus = { controller.focusItem(item) }
     val enabled = !item.isLocked(state)
@@ -449,8 +467,9 @@ private fun QuickSettingsItemRow(
             isFocused = isFocused,
             onAction = {
                 focus()
-                onOpenDeviceAccess()
-            }
+                onOpenDeviceAccess?.invoke()
+            },
+            enabled = onOpenDeviceAccess != null
         )
 
         QuickSettingsItem.Performance -> QuickSegmentedRow(
