@@ -317,6 +317,11 @@ void Video::renderFrame(bool force) {
 
         auto passWidth = static_cast<float>(passData.width.value_or(videoLayout.getScreenWidth()));
         auto passHeight = static_cast<float>(passData.height.value_or(videoLayout.getScreenHeight()));
+        if (isLastPass && !passData.width.has_value()) {
+            auto& bounds = videoLayout.getRelativeForegroundBounds();
+            passWidth = static_cast<float>(videoLayout.getScreenWidth()) * (bounds[2] - bounds[0]);
+            passHeight = static_cast<float>(videoLayout.getScreenHeight()) * (bounds[3] - bounds[1]);
+        }
 
         if (shader.gOutputSizeHandle != -1)
             glUniform2f(shader.gOutputSizeHandle, passWidth, passHeight);

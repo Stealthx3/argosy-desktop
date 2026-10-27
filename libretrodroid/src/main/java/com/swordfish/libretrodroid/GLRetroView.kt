@@ -62,7 +62,7 @@ class GLRetroView(
     }
 
     var frameSpeed: Int by Delegates.observable(1) { _, _, value ->
-        LibretroDroid.setFrameSpeed(value)
+        queueEvent { LibretroDroid.setFrameSpeed(value) }
     }
 
     var rotation: Int by Delegates.observable(-1) { _, _, value ->
@@ -448,8 +448,8 @@ class GLRetroView(
     }
 
     fun updateVariables(vararg variables: Variable) {
-        variables.forEach {
-            LibretroDroid.updateVariable(it)
+        queueEvent {
+            variables.forEach { LibretroDroid.updateVariable(it) }
         }
     }
 
