@@ -180,6 +180,7 @@
     <!-- ================= Steam launcher picker "no override" option ================= -->
 
     <string name="gamedetail_steam_launcher_auto">Auto</string>
+    <string name="gamedetail_steam_launcher_auto_uses">Verwendet %1$s</string>
 
     <!-- ================= Memcard picker "use the inherited default" entry ================= -->
 

@@ -259,6 +259,7 @@ fun GameDetailScreen(
             if (event == Lifecycle.Event.ON_RESUME) {
                 inputDispatcher.subscribeView(inputHandler, forRoute = Screen.ROUTE_GAME_DETAIL)
                 viewModel.republishCompanionDetail()
+                viewModel.refreshSteamLauncher()
             } else if (event == Lifecycle.Event.ON_STOP) {
                 viewModel.clearCompanionDetail()
             }
@@ -1111,6 +1112,7 @@ private fun GameDetailModals(
         SteamLauncherPickerModal(
             availableLaunchers = pickerState.availableSteamLaunchers,
             currentLauncherName = game.steamLauncherName,
+            isAutomatic = !game.steamLauncherSetManually,
             focusIndex = pickerState.steamLauncherPickerFocusIndex,
             onSelectLauncher = viewModel.pickerModalDelegate::selectSteamLauncher,
             onDismiss = viewModel.pickerModalDelegate::dismissSteamLauncherPicker

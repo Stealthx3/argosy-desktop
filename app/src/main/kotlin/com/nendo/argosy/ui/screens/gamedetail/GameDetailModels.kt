@@ -103,13 +103,8 @@ data class GameDetailUi(
     val canManageSaves: Boolean = false,
     val canManageStates: Boolean = false,
     val isSteamGame: Boolean = false,
-    /**
-     * Display name of the explicitly resolved Steam launcher, or null when no
-     * launcher override is stored (renders as the localized "Auto" label).
-     * Never compare this against a literal display string; the stored value
-     * this derives from is [com.nendo.argosy.data.local.entity.GameEntity.steamLauncher].
-     */
     val steamLauncherName: String? = null,
+    val steamLauncherSetManually: Boolean = false,
     val isExternallyManaged: Boolean = false,
     val managingLauncherDisplayName: String? = null,
     val isAndroidApp: Boolean = false,

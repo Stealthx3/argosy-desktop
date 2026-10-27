@@ -9,6 +9,9 @@ import coil.ImageLoaderFactory
 import com.nendo.argosy.core.service.startServiceSafely
 import com.nendo.argosy.data.local.dao.GameDao
 import com.nendo.argosy.data.local.dao.PlatformDao
+import com.nendo.argosy.data.launcher.GameNativeStoreSync
+import com.nendo.argosy.data.launcher.SteamLaunchers
+import com.nendo.argosy.data.repository.AppsRepository
 import com.nendo.argosy.data.platform.PlatformDefinitions
 import com.nendo.argosy.data.cheats.CheatsDownloadObserver
 import com.nendo.argosy.data.emulator.TitleIdDownloadObserver
@@ -35,6 +38,8 @@ import com.nendo.argosy.ui.coil.AppIconFetcher
 import dagger.hilt.android.HiltAndroidApp
 import okhttp3.OkHttpClient
 import com.nendo.argosy.util.SafeCoroutineScope
+import com.nendo.argosy.util.Logger
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -171,9 +176,16 @@ class ArgosyApp : Application(), Configuration.Provider, ImageLoaderFactory {
     @Inject
     lateinit var homeAppAvailability: com.nendo.argosy.util.HomeAppAvailability
 
-    private val quayPassForegroundObserver = object : androidx.lifecycle.DefaultLifecycleObserver {
+    @Inject
+    lateinit var appsRepository: AppsRepository
+
+    @Inject
+    lateinit var gameNativeStoreSync: GameNativeStoreSync
+
+    private val foregroundObserver = object : androidx.lifecycle.DefaultLifecycleObserver {
         override fun onStart(owner: androidx.lifecycle.LifecycleOwner) {
             appScope.launch { quayPassCredentialManager.refreshIfNeeded() }
+            appScope.launch { gameNativeStoreSync.refreshSteamInstallations() }
         }
     }
 
@@ -189,7 +201,8 @@ class ArgosyApp : Application(), Configuration.Provider, ImageLoaderFactory {
         SocialSyncWorker.schedule(this)
         CoreUpdateCheckWorker.schedule(this)
         com.nendo.argosy.data.quaypass.QuayPassCredentialRefreshWorker.schedule(this)
-        ProcessLifecycleOwner.get().lifecycle.addObserver(quayPassForegroundObserver)
+        ProcessLifecycleOwner.get().lifecycle.addObserver(foregroundObserver)
+        appScope.launch { observeSteamPackageChanges() }
         saveSyncDownloadObserver.start()
         cheatsDownloadObserver.start()
         titleIdDownloadObserver.start()
@@ -237,6 +250,20 @@ class ArgosyApp : Application(), Configuration.Provider, ImageLoaderFactory {
             putExtra(SteamService.EXTRA_AUTO_CONNECT, true)
         }
         startServiceSafely(intent)
+    }
+
+    internal suspend fun observeSteamPackageChanges() {
+        appsRepository.packageChanges.collect { packageName ->
+            if (SteamLaunchers.getByPackage(packageName) != null) {
+                try {
+                    gameNativeStoreSync.refreshSteamInstallations()
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    Logger.error("ArgosyApp", "Failed to refresh Steam installations after package change", e)
+                }
+            }
+        }
     }
 
     /**

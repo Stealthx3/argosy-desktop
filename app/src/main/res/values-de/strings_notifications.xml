@@ -135,6 +135,9 @@
     <string name="notif_gamelaunch_no_emulator">Kein Emulator für diese Plattform installiert</string>
     <string name="notif_gamelaunch_no_rom_file">ROM-Datei nicht gefunden</string>
     <string name="notif_gamelaunch_no_steam_launcher">Steam-Launcher nicht installiert</string>
+    <string name="notif_gamelaunch_no_steam_launcher_installed">Kein Steam-Launcher installiert. Installiere einen unter Einstellungen &gt; Steam.</string>
+    <string name="notif_gamelaunch_steam_launcher_unavailable">Steam-Launcher nicht verfügbar. Wähle einen Launcher unter Spieldetails &gt; Launcher ändern.</string>
+    <string name="notif_gamelaunch_steam_launcher_updating">Launcher wird aktualisiert. Versuche es gleich noch einmal.</string>
     <string name="notif_gamelaunch_no_core_base">Kein Core für %1$s verfügbar</string>
     <string name="notif_gamelaunch_no_core_with_reason">Kein Core für %1$s verfügbar: %2$s</string>
     <string name="notif_gamelaunch_missing_discs">Fehlende Discs: %1$s. Öffnen Sie die Spieldetails zur Reparatur.</string>

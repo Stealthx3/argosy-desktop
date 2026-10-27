@@ -1095,6 +1095,8 @@ class GameRepository @Inject constructor(
         setManually: Boolean
     ) = gameDao.updateSteamLauncher(gameId, launcher, setManually)
 
+    suspend fun clearSteamLauncherPin(gameId: Long) = gameDao.clearSteamLauncherPin(gameId)
+
     suspend fun updateAchievementsFetchedAt(gameId: Long, timestamp: Long) =
         gameDao.updateAchievementsFetchedAt(gameId, timestamp)
 

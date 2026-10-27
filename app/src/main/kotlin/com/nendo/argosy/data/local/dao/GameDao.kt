@@ -534,6 +534,61 @@ interface GameDao {
     @Query("UPDATE games SET steamLauncher = :launcherPackage WHERE id = :gameId")
     suspend fun setSteamLauncher(gameId: Long, launcherPackage: String?)
 
+    @Query("""
+        UPDATE games SET description = COALESCE(:description, description),
+            genre = COALESCE(:genre, genre), rating = COALESCE(:rating, rating)
+        WHERE id = :gameId
+    """)
+    suspend fun updateSteamStoreMetadata(gameId: Long, description: String?, genre: String?, rating: Float?)
+
+    @Query("""
+        UPDATE games SET steamLauncher = COALESCE(steamLauncher, 'native'),
+            steamInstallDir = COALESCE(:installDir, steamInstallDir)
+        WHERE id = :gameId
+            AND (steamLauncher IS NULL OR (:installDir IS NOT NULL AND steamInstallDir IS NOT :installDir))
+    """)
+    suspend fun updateSteamInstallInfo(gameId: Long, installDir: String?)
+
+    @Query("""
+        UPDATE games SET title = COALESCE(:title, title), sortTitle = COALESCE(:sortTitle, sortTitle),
+            developer = COALESCE(:developer, developer), publisher = COALESCE(:publisher, publisher),
+            releaseYear = COALESCE(:releaseYear, releaseYear), genre = COALESCE(:genre, genre),
+            steamLauncher = COALESCE(steamLauncher, 'native'),
+            steamInstallDir = COALESCE(:installDir, steamInstallDir), storeEnrichStatus = 0, igdbId = NULL
+        WHERE id = :gameId
+    """)
+    suspend fun updateSteamLibraryMetadata(
+        gameId: Long,
+        title: String?,
+        sortTitle: String?,
+        developer: String?,
+        publisher: String?,
+        releaseYear: Int?,
+        genre: String?,
+        installDir: String?
+    )
+
+    @Query("UPDATE games SET launcherSetManually = 0 WHERE id = :gameId AND source = 'STEAM'")
+    suspend fun clearSteamLauncherPin(gameId: Long)
+
+    @Query("""
+        UPDATE games SET steamLauncher = :launcher, launcherSetManually = :setManually
+        WHERE id = :gameId AND source = 'STEAM'
+          AND steamLauncher IS :expectedLauncher AND launcherSetManually = :expectedManually
+          AND id NOT IN (
+              SELECT gameId FROM game_user_overlay
+              WHERE ownerUserId = :ownerUserId AND isMember = 0
+          )
+    """)
+    suspend fun compareAndSetSteamLauncher(
+        gameId: Long,
+        expectedLauncher: String?,
+        expectedManually: Boolean,
+        launcher: String?,
+        setManually: Boolean,
+        ownerUserId: Long?
+    ): Int
+
     /**
      * Every caller states where the file came from: a download completion writes its download
      * origin, a scan writes ADOPTED, and a repair that re-points the same content passes the

@@ -141,6 +141,9 @@
     <string name="notif_gamelaunch_no_emulator">No hay ningún emulador instalado para esta plataforma</string>
     <string name="notif_gamelaunch_no_rom_file">Archivo ROM no encontrado</string>
     <string name="notif_gamelaunch_no_steam_launcher">Launcher de Steam no instalado</string>
+    <string name="notif_gamelaunch_no_steam_launcher_installed">No hay ningún launcher de Steam instalado. Instala uno en Ajustes &gt; Steam.</string>
+    <string name="notif_gamelaunch_steam_launcher_unavailable">El launcher de Steam no está disponible. Elige uno en los detalles del juego &gt; Cambiar launcher.</string>
+    <string name="notif_gamelaunch_steam_launcher_updating">El launcher se está actualizando. Inténtalo de nuevo en un momento.</string>
     <string name="notif_gamelaunch_no_core_base">No hay ningún núcleo disponible para %1$s</string>
     <string name="notif_gamelaunch_no_core_with_reason">No hay ningún núcleo disponible para %1$s: %2$s</string>
     <string name="notif_gamelaunch_missing_discs">Discos faltantes: %1$s. Consulta los detalles del juego para reparar.</string>

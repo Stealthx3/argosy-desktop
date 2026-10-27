@@ -274,31 +274,41 @@ class SteamSettingsDelegate @Inject constructor(
         }
     }
 
+    suspend fun refreshLauncherAvailability(context: Context) = withContext(Dispatchers.IO) {
+        val gnInstalled = isGnInstalled(context)
+        val installedLaunchers = SteamLaunchers.getInstalled(context).map { launcher ->
+            InstalledSteamLauncher(
+                packageName = launcher.packageName,
+                displayName = launcher.displayName,
+                gameCount = 0,
+                scanMayIncludeUninstalled = launcher.scanMayIncludeUninstalled
+            )
+        }
+        val installedPackages = installedLaunchers.map { it.packageName }.toSet()
+        val notInstalledLaunchers = EmulatorRegistry.getForPlatform("steam")
+            .filter { it.packageName !in installedPackages }
+            .map { def ->
+                NotInstalledSteamLauncher(
+                    emulatorId = def.id,
+                    displayName = def.displayName,
+                    hasDirectDownload = def.releaseSource != null
+                )
+            }
+        _state.update {
+            it.copy(
+                gnInstalled = gnInstalled,
+                installedLaunchers = installedLaunchers,
+                notInstalledLaunchers = notInstalledLaunchers
+            )
+        }
+    }
+
     fun loadSteamSettings(context: Context, scope: CoroutineScope) {
         bindScope = scope
         scope.launch {
-            val gnInstalled = isGnInstalled(context)
+            refreshLauncherAvailability(context)
             val gnStoragePath = withContext(Dispatchers.IO) { steamPathResolver.findGnStoragePath() }
             val hasPermission = StorageAccess.isGranted(context)
-
-            val installedLaunchers = SteamLaunchers.getInstalled(context).map { launcher ->
-                InstalledSteamLauncher(
-                    packageName = launcher.packageName,
-                    displayName = launcher.displayName,
-                    gameCount = 0,
-                    scanMayIncludeUninstalled = launcher.scanMayIncludeUninstalled
-                )
-            }
-            val installedPackages = installedLaunchers.map { it.packageName }.toSet()
-            val notInstalledLaunchers = EmulatorRegistry.getForPlatform("steam")
-                .filter { it.packageName !in installedPackages }
-                .map { def ->
-                    NotInstalledSteamLauncher(
-                        emulatorId = def.id,
-                        displayName = def.displayName,
-                        hasDirectDownload = def.releaseSource != null
-                    )
-                }
 
             val prefs = preferencesRepository.userPreferences.first()
             val storeSyncDirs = withContext(Dispatchers.IO) {
@@ -318,11 +328,8 @@ class SteamSettingsDelegate @Inject constructor(
 
             _state.update {
                 it.copy(
-                    gnInstalled = gnInstalled,
                     gnStoragePath = gnStoragePath,
                     hasStoragePermission = hasPermission,
-                    installedLaunchers = installedLaunchers,
-                    notInstalledLaunchers = notInstalledLaunchers,
                     steamInstallVolume = prefs.steamInstallVolume,
                     availableVolumes = volumes,
                     installedGamesByVolume = installedByVolume,

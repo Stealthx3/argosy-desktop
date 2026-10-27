@@ -161,6 +161,9 @@
     <string name="notif_gamelaunch_no_emulator">इस प्लेटफ़ॉर्म के लिए कोई एमुलेटर इंस्टॉल्ड नहीं है</string>
     <string name="notif_gamelaunch_no_rom_file">ROM फ़ाइल नहीं मिली</string>
     <string name="notif_gamelaunch_no_steam_launcher">Steam लॉन्चर इंस्टॉल्ड नहीं है</string>
+    <string name="notif_gamelaunch_no_steam_launcher_installed">कोई Steam लॉन्चर इंस्टॉल नहीं है। सेटिंग्स &gt; Steam में एक इंस्टॉल करें।</string>
+    <string name="notif_gamelaunch_steam_launcher_unavailable">Steam लॉन्चर उपलब्ध नहीं है। गेम विवरण &gt; लॉन्चर बदलें में एक लॉन्चर चुनें।</string>
+    <string name="notif_gamelaunch_steam_launcher_updating">लॉन्चर अपडेट हो रहा है। थोड़ी देर बाद फिर कोशिश करें।</string>
     <string name="notif_gamelaunch_no_core_base">%1$s के लिए कोई कोर उपलब्ध नहीं है</string>
     <string name="notif_gamelaunch_no_core_with_reason">%1$s के लिए कोई कोर उपलब्ध नहीं है: %2$s</string>
     <string name="notif_gamelaunch_missing_discs">गायब डिस्क: %1$s। ठीक करने के लिए गेम विवरण देखें।</string>

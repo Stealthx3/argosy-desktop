@@ -307,6 +307,15 @@ class SettingsViewModel @Inject constructor(
         permissionsDelegate.observeLockScreenArt(viewModelScope)
         routeStartControllerDetectionPolling(this)
         installerDelegate.observeJobs(viewModelScope)
+        viewModelScope.launch {
+            appsRepository.packageChanges.collect { packageName ->
+                if (com.nendo.argosy.data.launcher.SteamLaunchers.getByPackage(packageName) != null &&
+                    uiState.value.currentSection == SettingsSection.STEAM_SETTINGS
+                ) {
+                    refreshSteamLauncherAvailability()
+                }
+            }
+        }
 
         // TODO: Remove after testing manage=true Android/data access
         storageDelegate.testManagedStorageAccess(viewModelScope)
@@ -1039,6 +1048,10 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun refreshSteamSettings() = steamDelegate.loadSteamSettings(context, viewModelScope)
+
+    fun refreshSteamLauncherAvailability() = viewModelScope.launch {
+        steamDelegate.refreshLauncherAvailability(context)
+    }
 
     fun confirmLauncherAction() = routeConfirmLauncherAction(this)
 

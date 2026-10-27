@@ -491,13 +491,13 @@ class SteamLibraryManager @Inject constructor(
             ?.get("name")?.asString()
     }
 
-    private suspend fun updateExistingGame(existing: GameEntity, kv: KeyValue) {
+    internal suspend fun updateExistingGame(existing: GameEntity, kv: KeyValue) {
         val common = kv["common"]
         val installDir = kv["config"]?.get("installdir")?.asString()?.takeIf { it.isNotBlank() }
 
-        val updated = if (wasForceOverwrite) {
+        if (wasForceOverwrite) {
             val appId = existing.steamAppId ?: return
-            val name = common["name"]?.asString() ?: existing.title
+            val name = common["name"]?.asString()
             val libraryCapsuleUrl = "https://steamcdn-a.akamaihd.net/steam/apps/$appId/library_600x900.jpg"
             val libraryHeroUrl = "https://steamcdn-a.akamaihd.net/steam/apps/$appId/library_hero.jpg"
             val releaseDate = common["steam_release_date"]?.asString()
@@ -507,30 +507,22 @@ class SteamLibraryManager @Inject constructor(
                 ?.map { STEAM_GENRE_MAP[it] ?: it }
                 ?.joinToString(", ")
 
-            writeSteamArt(existing.id, appId, name, libraryCapsuleUrl, libraryHeroUrl)
-            existing.copy(
+            writeSteamArt(existing.id, appId, name ?: existing.title, libraryCapsuleUrl, libraryHeroUrl)
+            gameDao.updateSteamLibraryMetadata(
+                gameId = existing.id,
                 title = name,
-                sortTitle = createSortTitle(name),
-                developer = extractAssociation(common, "developer") ?: existing.developer,
-                publisher = extractAssociation(common, "publisher") ?: existing.publisher,
-                releaseYear = releaseYear ?: existing.releaseYear,
-                genre = genres ?: existing.genre,
-                steamLauncher = existing.steamLauncher ?: "native",
-                steamInstallDir = installDir ?: existing.steamInstallDir,
-                storeEnrichStatus = GameEntity.STORE_NOT_ATTEMPTED,
-                igdbId = null
+                sortTitle = name?.let(::createSortTitle),
+                developer = extractAssociation(common, "developer"),
+                publisher = extractAssociation(common, "publisher"),
+                releaseYear = releaseYear,
+                genre = genres,
+                installDir = installDir
             )
         } else {
-            existing.copy(
-                steamLauncher = existing.steamLauncher ?: "native",
-                steamInstallDir = installDir ?: existing.steamInstallDir
-            )
+            gameDao.updateSteamInstallInfo(existing.id, installDir)
         }
 
-        if (updated != existing) {
-            gameDao.update(updated)
-            Log.d(TAG, "Updated game: ${existing.title}")
-        }
+        Log.d(TAG, "Updated game: ${existing.title}")
     }
 
     fun requestLibrarySync() {
