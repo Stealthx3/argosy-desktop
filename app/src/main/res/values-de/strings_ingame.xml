@@ -404,6 +404,7 @@
     <string name="ingame_libretro_resume_success">Fortgesetzt</string>
     <string name="ingame_libretro_resume_restore_failure">Savestate konnte nicht wiederhergestellt werden</string>
     <string name="ingame_libretro_auto_restore_success">Savestate wiederhergestellt</string>
+    <string name="ingame_libretro_auto_restore_skipped_for_save">Vom Spielstand gestartet. Der Fortsetzungs-Savestate passte nicht dazu.</string>
     <string name="ingame_libretro_auto_restore_failure">Savestate konnte nicht wiederhergestellt werden</string>
     <string name="ingame_libretro_auto_restore_response_unsupported_core">Savestates für diesen Core nicht verfügbar</string>
     <string name="ingame_libretro_auto_restore_response_success">Savestate wiederhergestellt</string>

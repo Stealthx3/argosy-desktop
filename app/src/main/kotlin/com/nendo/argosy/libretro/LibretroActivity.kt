@@ -2922,12 +2922,20 @@ class LibretroActivity : ComponentActivity() {
 
         if (!settings.autoRestoreState || hardcoreMode || coreDestroyed) return
 
-        if (saveStateManager.performSlotLoad(retroView, SaveStateManager.AUTO_SLOT)) {
-            inGameMessage = getString(R.string.ingame_libretro_auto_restore_success)
-            Log.d(TAG, "Auto-restored state from auto slot")
-        } else {
-            inGameMessage = getString(R.string.ingame_libretro_auto_restore_failure)
-            Log.w(TAG, "Failed to auto-restore state from auto slot")
+        val outcome = withContext(Dispatchers.IO) { saveStateManager.loadAutoSlotMatchingSave(retroView) }
+        when (outcome) {
+            SaveStateManager.AutoLoadOutcome.LOADED -> {
+                inGameMessage = getString(R.string.ingame_libretro_auto_restore_success)
+                Log.d(TAG, "Auto-restored state from auto slot")
+            }
+            SaveStateManager.AutoLoadOutcome.KEPT_SAVE -> {
+                inGameMessage = getString(R.string.ingame_libretro_auto_restore_skipped_for_save)
+                Log.i(TAG, "Auto state does not match the save; started from the save")
+            }
+            SaveStateManager.AutoLoadOutcome.FAILED -> {
+                inGameMessage = getString(R.string.ingame_libretro_auto_restore_failure)
+                Log.w(TAG, "Failed to auto-restore state from auto slot")
+            }
         }
     }
 

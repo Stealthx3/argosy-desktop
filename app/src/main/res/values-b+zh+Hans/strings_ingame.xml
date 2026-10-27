@@ -397,6 +397,7 @@
     <string name="ingame_libretro_resume_success">已继续</string>
     <string name="ingame_libretro_resume_restore_failure">恢复即时存档失败</string>
     <string name="ingame_libretro_auto_restore_success">即时存档已恢复</string>
+    <string name="ingame_libretro_auto_restore_skipped_for_save">已从存档启动。续玩即时存档与存档不一致。</string>
     <string name="ingame_libretro_auto_restore_failure">恢复即时存档失败</string>
     <string name="ingame_libretro_auto_restore_response_unsupported_core">此核心不支持即时存档</string>
     <string name="ingame_libretro_auto_restore_response_success">即时存档已恢复</string>

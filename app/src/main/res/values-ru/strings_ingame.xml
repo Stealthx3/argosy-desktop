@@ -422,6 +422,7 @@
     <string name="ingame_libretro_resume_success">Продолжено</string>
     <string name="ingame_libretro_resume_restore_failure">Не удалось восстановить состояние</string>
     <string name="ingame_libretro_auto_restore_success">Состояние восстановлено</string>
+    <string name="ingame_libretro_auto_restore_skipped_for_save">Запущено с вашего сохранения. Состояние для продолжения ему не соответствовало.</string>
     <string name="ingame_libretro_auto_restore_failure">Не удалось восстановить состояние</string>
     <string name="ingame_libretro_auto_restore_response_unsupported_core">Состояния недоступны для этого ядра</string>
     <string name="ingame_libretro_auto_restore_response_success">Состояние восстановлено</string>

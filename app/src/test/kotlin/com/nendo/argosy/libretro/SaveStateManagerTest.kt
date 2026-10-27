@@ -683,6 +683,54 @@ class SaveStateManagerTest {
         assertArrayEquals(rtc, mgr.getRtcFile().readBytes())
     }
 
+    private fun autoSlotManager(saveOnDisk: ByteArray?): SaveStateManager {
+        val mgr = manager(mockk(relaxed = true), mockk(relaxed = true))
+        mgr.initializeFromExistingSave(saveOnDisk)
+        mgr.getSlotFile(SaveStateManager.AUTO_SLOT).apply { parentFile?.mkdirs() }.writeBytes(byteArrayOf(5, 5))
+        return mgr
+    }
+
+    private fun retroView(sramAfterLoad: ByteArray, bootState: ByteArray = byteArrayOf(8)): GLRetroView =
+        mockk(relaxed = true) {
+            every { serializeState() } returns bootState
+            every { unserializePersistedState(any()) } returns true
+            every { unserializeState(any()) } returns true
+            every { serializeSRAM() } returns sramAfterLoad
+        }
+
+    @Test
+    fun `an auto state carrying the save on disk loads`() {
+        val save = byteArrayOf(1, 2, 3)
+        val view = retroView(sramAfterLoad = save)
+
+        val outcome = autoSlotManager(save).loadAutoSlotMatchingSave(view)
+
+        assertEquals(SaveStateManager.AutoLoadOutcome.LOADED, outcome)
+        verify(exactly = 0) { view.unserializeState(any()) }
+    }
+
+    @Test
+    fun `an auto state carrying different save memory gives way to the save on disk`() {
+        val bootState = byteArrayOf(8, 8)
+        val view = retroView(sramAfterLoad = byteArrayOf(9, 9, 9), bootState = bootState)
+
+        val outcome = autoSlotManager(byteArrayOf(1, 2, 3)).loadAutoSlotMatchingSave(view)
+
+        assertEquals(SaveStateManager.AutoLoadOutcome.KEPT_SAVE, outcome)
+        verify(exactly = 1) { view.unserializeState(bootState) }
+    }
+
+    @Test
+    fun `with no save on disk the auto state loads without a comparison`() {
+        val view = retroView(sramAfterLoad = byteArrayOf(9))
+
+        val outcome = autoSlotManager(saveOnDisk = null).loadAutoSlotMatchingSave(view)
+
+        assertEquals(SaveStateManager.AutoLoadOutcome.LOADED, outcome)
+        verify(exactly = 0) { view.serializeState() }
+        verify(exactly = 0) { view.unserializeState(any()) }
+    }
+
     private fun fillRing(mgr: SaveStateManager) {
         repeat(SaveStateManager.QUICK_RING_SIZE) { index ->
             val file = mgr.getSlotFile(SaveStateManager.QUICK_SLOT_BASE + index)

@@ -866,6 +866,8 @@
     <string name="ingame_libretro_resume_restore_failure">Failed to restore state</string>
     <!-- Toast for the automatic-slot restore attempted at launch when auto-restore is on. -->
     <string name="ingame_libretro_auto_restore_success">State restored</string>
+    <!-- Shown at launch when the resume state is skipped because its in-game save differs from the save file. -->
+    <string name="ingame_libretro_auto_restore_skipped_for_save">Started from your save. The resume state did not match it.</string>
     <string name="ingame_libretro_auto_restore_failure">Failed to restore state</string>
     <!-- Toast for the player's own answer to the "restore your last state?" prompt. -->
     <string name="ingame_libretro_auto_restore_response_unsupported_core">Save states unavailable for this core</string>

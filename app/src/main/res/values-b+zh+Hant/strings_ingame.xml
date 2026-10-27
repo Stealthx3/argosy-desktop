@@ -396,6 +396,7 @@
     <string name="ingame_libretro_resume_success">已繼續</string>
     <string name="ingame_libretro_resume_restore_failure">無法還原即時存檔</string>
     <string name="ingame_libretro_auto_restore_success">即時存檔已還原</string>
+    <string name="ingame_libretro_auto_restore_skipped_for_save">已從存檔啟動。續玩即時存檔與存檔不一致。</string>
     <string name="ingame_libretro_auto_restore_failure">無法還原即時存檔</string>
     <string name="ingame_libretro_auto_restore_response_unsupported_core">此核心無法使用即時存檔</string>
     <string name="ingame_libretro_auto_restore_response_success">即時存檔已還原</string>

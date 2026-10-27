@@ -699,6 +699,34 @@ class SaveStateManager(
         }
     }
 
+    enum class AutoLoadOutcome { LOADED, KEPT_SAVE, FAILED }
+
+    /**
+     * Loads the auto slot only when the save memory it carries matches the save on disk. On a
+     * mismatch the freshly booted game comes back and the save on disk stays what the game plays.
+     */
+    fun loadAutoSlotMatchingSave(retroView: GLRetroView): AutoLoadOutcome {
+        val saveHash = lastSramHash
+        if (saveHash == null || usesExternalMemcard) {
+            return if (performSlotLoad(retroView, AUTO_SLOT)) AutoLoadOutcome.LOADED else AutoLoadOutcome.FAILED
+        }
+        val bootState = retroView.serializeState()
+        if (bootState.isEmpty()) {
+            Log.w(TAG, "[SRAM] auto state skipped | the core could not snapshot the booted game to compare against")
+            return AutoLoadOutcome.KEPT_SAVE
+        }
+        if (!performSlotLoad(retroView, AUTO_SLOT)) return AutoLoadOutcome.FAILED
+        val stateSram = retroView.serializeSRAM()
+        if (stateSram.isEmpty() || hashBytes(stateSram) == saveHash) return AutoLoadOutcome.LOADED
+
+        Log.i(TAG, "[SRAM] auto state skipped | its save memory ${hashBytes(stateSram)} differs from the save $saveHash")
+        if (!retroView.unserializeState(bootState)) {
+            Log.e(TAG, "[SRAM] booted game did not come back; writing the save on disk into the core")
+            getSramFile().takeIf { it.isFile }?.let { retroView.unserializeSRAM(it.readBytes()) }
+        }
+        return AutoLoadOutcome.KEPT_SAVE
+    }
+
     fun deleteSlot(slotNumber: Int): Boolean {
         return try {
             val stateFile = getSlotFile(slotNumber)
