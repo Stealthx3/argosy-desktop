@@ -2398,10 +2398,12 @@ class DualScreenManager(
     fun launchCompanionApp(packageName: String, pinnedScreenKey: String? = null) {
         val intent = appsRepository.getLaunchIntent(packageName) ?: return
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        scope.launch {
-            if (pinnedScreenKey != null) {
+        if (pinnedScreenKey != null) {
+            activityIndependentScope.launch {
                 preferencesRepository.setAppDisplayTarget(packageName, pinnedScreenKey)
             }
+        }
+        scope.launch {
             val prefs = preferencesRepository.userPreferences.first()
             val options = displayAffinityHelper.getAppLaunchOptions(
                 preferredScreenKey = pinnedScreenKey ?: prefs.appDisplayTargets[packageName],
