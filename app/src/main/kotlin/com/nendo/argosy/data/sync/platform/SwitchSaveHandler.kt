@@ -61,7 +61,6 @@ class SwitchSaveHandler @Inject constructor(
 
     override suspend fun extractDownload(tempFile: File, context: SaveContext): ExtractResult =
         withContext(Dispatchers.IO) {
-            // Use cached path if available, otherwise resolve from ZIP or construct
             val targetPath = context.localSavePath
                 ?: resolveSaveTargetPath(tempFile, context.config, context.emulatorPackage)
                 ?: run {
@@ -80,7 +79,6 @@ class SwitchSaveHandler @Inject constructor(
             fal.mkdirs(targetPath)
             val targetFolder = fal.getTransformedFile(targetPath)
 
-            // Detect JKSV format and extract appropriately
             val success = try {
                 if (saveArchiver.isJksvFormat(tempFile)) {
                     Logger.debug(TAG, "extractDownload: JKSV format detected, preserving structure")
@@ -117,9 +115,6 @@ class SwitchSaveHandler @Inject constructor(
 
     private fun resolveOverrideSaveBase(overridePath: String): String {
         val normalized = overridePath.trimEnd('/')
-        // Accept the path as-is if it already ends at the save directory level,
-        // or walk down known suffixes to find the actual save root.
-        // This handles users pointing at the NAND root, the user dir, or the save dir directly.
         val suffixes = listOf("", "/user/save", "/nand/user/save")
         return suffixes
             .map { "$normalized$it" }
@@ -327,13 +322,11 @@ class SwitchSaveHandler @Inject constructor(
         topLevelFolders?.forEach { userFolder ->
             if (!userFolder.isDirectory) return@forEach
 
-            // Skip device save folders (saveId directly under /save/) - we only support nested structure
             if (userFolder.name.equals(normalizedSaveId, ignoreCase = true)) {
                 Logger.debug(TAG, "findSaveFolderBySaveId: skipping device save format | path=${userFolder.path}")
                 return@forEach
             }
 
-            // Only process valid user folders (16 hex chars, typically 0000000000000000)
             if (!isValidUserFolderId(userFolder.name)) {
                 Logger.debug(TAG, "findSaveFolderBySaveId: skipping non-user folder | name=${userFolder.name}")
                 return@forEach
@@ -344,7 +337,6 @@ class SwitchSaveHandler @Inject constructor(
 
             userChildren?.forEach { profileFolder ->
                 if (!profileFolder.isDirectory) return@forEach
-                // Only process valid profile folders (16 or 32 hex chars)
                 if (!isValidProfileFolderId(profileFolder.name)) {
                     return@forEach
                 }

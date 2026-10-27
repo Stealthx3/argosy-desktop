@@ -323,7 +323,6 @@ class DisplayPreferencesRepository @Inject constructor(
             gradientAdvancedMode = prefs[Keys.GRADIENT_ADVANCED_MODE] ?: false,
             systemIconPosition = SystemIconPosition.fromString(prefs[Keys.SYSTEM_ICON_POSITION]),
             systemIconPadding = SystemIconPadding.fromString(prefs[Keys.SYSTEM_ICON_PADDING]),
-            // Migrate legacy systemIconPosition=OFF (pre-style enum) to platformIndicatorStyle=OFF.
             platformIndicatorStyle = if (prefs[Keys.SYSTEM_ICON_POSITION] == "OFF" && prefs[Keys.PLATFORM_INDICATOR_STYLE] == null) {
                 PlatformIndicatorStyle.OFF
             } else {

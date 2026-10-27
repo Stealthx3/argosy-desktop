@@ -93,13 +93,12 @@ object ControllerDetector {
         val vendorId = device.vendorId
         val deviceName = device.name?.lowercase() ?: ""
 
-        // Check for multi-mode devices (Odin, AYN) - use system property
         val isMultiModeDevice = MULTI_MODE_NAME_PATTERNS.any { deviceName.contains(it) }
         if (isMultiModeDevice) {
             val gamepadType = getGamepadTypeProperty()
             val layout = when (gamepadType) {
-                1 -> DetectedLayout.XBOX      // Alternate mode
-                else -> DetectedLayout.NINTENDO  // Default mode (0) or unknown
+                1 -> DetectedLayout.XBOX
+                else -> DetectedLayout.NINTENDO
             }
             return DetectionResult(layout, device.name, vendorId, DetectionSource.SYSTEM_PROPERTY)
         }

@@ -78,12 +78,6 @@ class LibretroCoreManager @Inject constructor(
         }
         val known = LibretroCoreRegistry.getCoreById(selectedCoreId)
         if (known != null && platformSlug in known.platforms) return known
-        // Registry is curated metadata (BIOS reqs, size hints, isDefault) not
-        // a capability gate -- Argosy downloads cores from the libretro
-        // buildbot, so the real constraint is whether buildbot ships a
-        // matching ABI. Synthesize a CoreInfo so the download path can run
-        // against an arbitrary libretro core id; display-name falls back to
-        // EmulatorRegistry's broader list.
         val displayName = com.nendo.argosy.data.emulator.EmulatorRegistry
             .getCoresForPlatform(platformSlug)
             .firstOrNull { it.id == selectedCoreId }
@@ -151,9 +145,6 @@ class LibretroCoreManager @Inject constructor(
             val coreInfo = LibretroCoreRegistry.getCoreByFileName(fileName)
             val minSize = (coreInfo?.estimatedSizeBytes ?: 0L) / 4
             if (minSize > 0 && downloadedCore.length() < minSize) {
-                // Soft warning only - don't delete. Auto-delete used to brick offline launches
-                // when an estimated size was too generous. dlopen will surface a real failure if
-                // the .so is genuinely broken; size alone isn't enough to throw away a working core.
                 Log.w(TAG, "Core $fileName is ${downloadedCore.length()} bytes (estimated >=$minSize). " +
                     "Using anyway; redownload from Core Management if it fails to load.")
             }

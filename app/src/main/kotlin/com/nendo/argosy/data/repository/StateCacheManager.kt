@@ -1292,8 +1292,6 @@ class StateCacheManager @Inject constructor(
             totalMigrated += migrated
         }
 
-        // Clean up stale local entries with bad channel names
-        // from before the fix (old slot names or filenames leaked into channelName)
         val staleChannelPattern = Regex("""^state_|\.state""")
         var cleaned = 0
 
@@ -1390,7 +1388,6 @@ class StateCacheManager @Inject constructor(
                         val serverState = uploadResponse.body()
                         api.deleteSaves(RomMDeleteSavesRequest(saves = listOf(save.id)))
 
-                        // Update local cache: remove old rommSaveId reference, set new state ID
                         val oldCache = save.id.let {
                             stateCacheDao.getByRommSaveId(it, syncPreferencesRepository.getRommUserId())
                         }
@@ -1515,15 +1512,12 @@ class StateCacheManager @Inject constructor(
         val slot = save.slot ?: return null
         val stateSlotMatch = Regex("""^state_(\w+)$""").find(slot) ?: return null
         val ext = save.fileExtension?.lowercase() ?: File(save.fileName).extension.lowercase()
-        // Skip SRAM save snapshots that were uploaded alongside states
         if (ext == "srm" || ext == "zip") return null
         val slotValue = stateSlotMatch.groupValues[1]
         val stateExt = when (slotValue) {
             "auto" -> "state.auto"
             else -> "state$slotValue"
         }
-        // Strip existing state/auto extensions from the original filename
-        // Handles: .state, .state1, .auto, and .state before a timestamp like .state [ts].auto
         val baseName = save.fileName
             .replace(Regex("""\.(state\d*|auto)$"""), "")
             .replace(Regex("""\.state(?= \[)"""), "")
@@ -1540,33 +1534,27 @@ class StateCacheManager @Inject constructor(
     fun parseStateFileName(fileName: String): ParsedStateFileName {
         val ts = """ \[\d{4}-\d{2}-\d{2}[_ ]\d{2}-\d{2}-\d{2}(?:-\d{3})?]"""
 
-        // {game} [{ts}].{channel}.state.auto
         val channelAutoMatch = Regex("""^(.+)$ts\.(.+?)\.state\.auto$""").find(fileName)
         if (channelAutoMatch != null) {
             return ParsedStateFileName(channelAutoMatch.groupValues[1], channelAutoMatch.groupValues[2], -1)
         }
-        // {game} [{ts}].state.auto  or  {game}.state.auto  or  {game}.state [{ts}].auto (legacy)
         val autoMatch = Regex("""^(.+?)(?:\.state)?(?:$ts)?\.state\.auto$|^(.+?)\.state$ts\.auto$""").find(fileName)
         if (autoMatch != null) {
             val rom = autoMatch.groupValues[1].ifEmpty { autoMatch.groupValues[2] }
             return ParsedStateFileName(rom, null, -1)
         }
-        // {game} [{ts}].{channel}.state{N}
         val channelNumberedMatch = Regex("""^(.+)$ts\.(.+?)\.state(\d+)$""").find(fileName)
         if (channelNumberedMatch != null) {
             return ParsedStateFileName(channelNumberedMatch.groupValues[1], channelNumberedMatch.groupValues[2], channelNumberedMatch.groupValues[3].toIntOrNull() ?: 0)
         }
-        // {game} [{ts}].state{N}  or  {game}.state{N}
         val numberedMatch = Regex("""^(.+?)(?:$ts)?\.state(\d+)$""").find(fileName)
         if (numberedMatch != null) {
             return ParsedStateFileName(numberedMatch.groupValues[1], null, numberedMatch.groupValues[2].toIntOrNull() ?: 0)
         }
-        // Legacy: {game} [{ts}].state (no slot number, treat as slot 0)
         val legacyMatch = Regex("""^(.+?)(?:$ts)?\.state$""").find(fileName)
         if (legacyMatch != null) {
             return ParsedStateFileName(legacyMatch.groupValues[1], null, 0)
         }
-        // Fallback
         return ParsedStateFileName(null, null, parseSlotFromFileName(fileName))
     }
 

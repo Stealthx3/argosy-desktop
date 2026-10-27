@@ -422,14 +422,8 @@ private fun GameDetailContent(
 
     val focusedItem = menuLayout.itemAtFocusIndex(uiState.menuFocusIndex, menuLayoutState)
 
-    // While a programmatic scroll triggered by menu focus is in flight, the
-    // reverse-sync below must not infer a "visible section" from intermediate
-    // scroll values -- a layout shift mid-animation (e.g. an achievements
-    // refresh emitting and changing achievementTopY) would otherwise bounce
-    // focus back to the previous section.
     var programmaticScrollInFlight by remember { mutableStateOf(false) }
 
-    // Scroll to section when menu focus changes
     LaunchedEffect(uiState.menuFocusIndex) {
         try {
             programmaticScrollInFlight = true
@@ -447,7 +441,6 @@ private fun GameDetailContent(
         }
     }
 
-    // Sync menu focus with scroll position (reverse direction)
     @OptIn(FlowPreview::class)
     LaunchedEffect(scrollState, menuLayoutState) {
         snapshotFlow { scrollState.value }
@@ -478,7 +471,6 @@ private fun GameDetailContent(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Background layer - extends behind footer
         Box(modifier = Modifier.fillMaxSize().blur(combinedBlur)) {
             val liveBackgroundPath = com.nendo.argosy.ui.common.rememberResolvedBackgroundPath(game.id, game.backgroundPath)
             val effectiveBackgroundPath = uiState.repairedBackgroundPath ?: liveBackgroundPath
@@ -522,12 +514,10 @@ private fun GameDetailContent(
             )
         }
 
-        // Main content: Collapsed Header + Left Menu (30%) + Right Content (70%)
         Column(modifier = Modifier.fillMaxSize().blur(combinedBlur)) {
             val isDark = LocalLauncherTheme.current.isDarkTheme
             val fadeColor = if (isDark) Color.Black else Color.White
 
-            // Full-width collapsed header (pushes content down)
             StickyCollapsedHeader(
                 game = game,
                 isVisible = isHeaderCollapsed
@@ -539,7 +529,6 @@ private fun GameDetailContent(
                 val isCompactMenu = displayAspectRatio <= 1.3f
 
                 Row(modifier = Modifier.fillMaxSize()) {
-                    // Left Menu (compact: icon-only, normal: 30%)
                     Box(
                         modifier = Modifier
                             .then(
@@ -602,7 +591,6 @@ private fun GameDetailContent(
                         }
                     }
 
-                    // Right Content (70%)
                     Column(modifier = Modifier.weight(1f)) {
 
                         Box(modifier = Modifier.weight(1f)) {
@@ -709,7 +697,6 @@ private fun GameDetailContent(
                             }
                             }
 
-                            // Gradient fade at bottom of content
                             Box(
                                 modifier = Modifier
                                     .align(Alignment.BottomCenter)

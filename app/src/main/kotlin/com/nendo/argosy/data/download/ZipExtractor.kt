@@ -20,21 +20,17 @@ data class ExtractedFolderRom(
 ) {
     val launchPath: String
         get() {
-            // 1. M3U for multi-disc games
             m3uFile?.absolutePath?.let { return it }
 
-            // 2. For disc-based games, prefer cue/gdi/chd over raw iso/bin
             val cueGdiFile = discFiles.find { it.extension.lowercase() in setOf("cue", "gdi") }
             if (cueGdiFile != null) return cueGdiFile.absolutePath
 
             val chdFile = discFiles.find { it.extension.lowercase() == "chd" }
             if (chdFile != null) return chdFile.absolutePath
 
-            // 3. Fall back to primary file or first disc
             if (primaryFile != null) return primaryFile.absolutePath
             if (discFiles.isNotEmpty()) return discFiles.first().absolutePath
 
-            // 4. Search allFiles for disc files (handles zips with files in subfolders)
             val allDiscFiles = allFiles.filter {
                 it.extension.lowercase() in DISC_EXTENSIONS && !it.name.startsWith("._")
             }
@@ -354,8 +350,6 @@ object ZipExtractor {
 
         return when {
             isSevenZFile(archiveFile) -> {
-                // 7z always needs extraction - standalone emulators don't support it
-                // Only exception would be arcade, but arcade ROMs use zip not 7z
                 if (!zipIsRomFormat) true else shouldExtractSevenZInternal(archiveFile)
             }
             isZipFile(archiveFile) -> when {
@@ -466,7 +460,6 @@ object ZipExtractor {
         val config = platformSlug?.let { getPlatformConfig(it) }
         val folderName = config?.updateFolder ?: "update"
 
-        // Check both singular and plural folder names for compatibility
         val candidates = listOf(folderName, "${folderName}s").distinct()
         for (name in candidates) {
             val folder = File(gameFolder, name)
@@ -532,7 +525,6 @@ object ZipExtractor {
 
         val updateExtensions = config?.updateExtensions
 
-        // extcontent/ files are matched by extension only (no filename patterns)
         listExtcontentFiles(gameFolder, updateExtensions)?.let { results.addAll(it) }
 
         gameFolder.listFiles()
@@ -556,7 +548,6 @@ object ZipExtractor {
 
         val dlcExtensions = config?.dlcExtensions
 
-        // extcontent/ files are matched by extension only (no filename patterns)
         listExtcontentFiles(gameFolder, dlcExtensions)?.let { results.addAll(it) }
 
         gameFolder.listFiles()
@@ -885,17 +876,12 @@ object ZipExtractor {
     }
 
     private fun filterToLaunchableDiscs(discFiles: List<File>): List<File> {
-        // For disc-based games, we need to identify which files are actually launchable
-        // vs which are just data files referenced by cue/gdi sheets
         val cueGdiFiles = discFiles.filter { it.extension.lowercase() in setOf("cue", "gdi") }
         val chdFiles = discFiles.filter { it.extension.lowercase() == "chd" }
 
         return when {
-            // CHD files are self-contained, each is a launchable disc
             chdFiles.isNotEmpty() -> chdFiles
-            // CUE/GDI files reference bin/iso/img, so they are the launchable files
             cueGdiFiles.isNotEmpty() -> cueGdiFiles
-            // Otherwise, use iso/bin/img files directly
             else -> discFiles.filter { it.extension.lowercase() != "mdf" }
         }
     }

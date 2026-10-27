@@ -316,9 +316,6 @@ class SettingsViewModel @Inject constructor(
                 }
             }
         }
-
-        // TODO: Remove after testing manage=true Android/data access
-        storageDelegate.testManagedStorageAccess(viewModelScope)
     }
 
     fun cyclePlatformContext(direction: Int) = routeCyclePlatformContext(this, direction)
@@ -330,7 +327,6 @@ class SettingsViewModel @Inject constructor(
     internal fun loadSettings() = routeLoadSettings(this)
 
     fun refreshEmulators() {
-        emulatorDelegate.refreshEmulators()
         loadSettings()
     }
 
@@ -1963,7 +1959,7 @@ class SettingsViewModel @Inject constructor(
     fun jumpToPrevSection(sections: List<com.nendo.argosy.ui.components.ListSection>): Boolean =
         routeJumpToPrevSection(this, sections)
 
-    fun requestPurgePlatform(platformId: Long) = storageDelegate.requestPurgePlatform(platformId)
+    fun requestPurgePlatform(platformId: Long) = storageDelegate.requestPurgePlatform(viewModelScope, platformId)
     fun confirmPurgePlatform() = storageDelegate.confirmPurgePlatform(viewModelScope)
     fun cancelPurgePlatform() = storageDelegate.cancelPurgePlatform()
     fun requestPurgeAll() = storageDelegate.requestPurgeAll(viewModelScope)

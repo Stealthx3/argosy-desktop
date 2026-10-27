@@ -381,15 +381,12 @@ class SaveDownloader @Inject constructor(
         try {
             val downloadPath = serverSave.downloadPath
             val caps = client.getCapabilities()
-            // Only RomM 4.9+ supports the optimistic=false fence; older servers use the raw asset URL.
             val useDeviceEndpoint = caps.supportsDeviceSyncMode && deviceId != null
             if (!useDeviceEndpoint && downloadPath == null) {
                 Logger.warn(TAG, "[SaveSync] DOWNLOAD gameId=$gameId | No download path in server save response")
                 return@withContext SaveSyncResult.Error("No download path available")
             }
 
-            // Skip if a previous attempt at this exact server-side timestamp produced
-            // a corrupt zip; resume only when the server copy changes (re-upload).
             val serverFingerprint = (downloadPath?.substringAfter("?timestamp=", "") ?: "")
                 .ifEmpty { serverSave.updatedAt ?: "" }
             if (serverFingerprint.isNotEmpty()) {
@@ -431,7 +428,6 @@ class SaveDownloader @Inject constructor(
             }
             val contentLength = response.headers()["Content-Length"]?.toLongOrNull() ?: -1
             if (!response.isSuccessful) {
-                // 404 content = orphan (metadata exists, file missing); drop row like the getSave 404 path.
                 if (response.code() == 404) {
                     Logger.debug(TAG, "[SaveSync] DOWNLOAD gameId=$gameId | Content missing (HTTP 404), dropping orphan tracking row | saveId=$saveId, syncEntityId=${syncEntity.id}")
                     saveSyncDao.deleteById(syncEntity.id)
@@ -539,12 +535,6 @@ class SaveDownloader @Inject constructor(
                             serverTimestamp = serverFingerprint,
                             error = result.error ?: "corrupt zip"
                         )
-                        // Auto-recovery: server zip is corrupt, push the (good) local
-                        // copy over it. Successful upload will produce a new server
-                        // timestamp, so the next sync clears the corrupt mark and
-                        // resumes normal flow. If the upload also fails, we fall
-                        // through with the original error and the skip-cache prevents
-                        // futile retries.
                         Logger.warn(TAG, "[SaveSync] DOWNLOAD gameId=$gameId | Server zip corrupt - auto-recovering by uploading local save | timestamp=$serverFingerprint")
                         val recoveryResult = try {
                             saveUploader.get().uploadSave(

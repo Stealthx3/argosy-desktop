@@ -1227,7 +1227,6 @@ class ImageCacheManager @Inject constructor(
             val g = Color.green(pixel)
             val b = Color.blue(pixel)
 
-            // Check if pixel is near-black (threshold of 30 for each channel)
             if (r < 30 && g < 30 && b < 30) {
                 pixels[i] = Color.TRANSPARENT
             }

@@ -405,10 +405,8 @@ class RetroAchievementsRepository @Inject constructor(
                 }
                 val unlocked = mutableSetOf<Long>()
                 if (hardcore) {
-                    // Hardcore mode: only count hardcore unlocks
                     body.hardcoreUnlocks?.mapTo(unlocked) { it.id }
                 } else {
-                    // Casual mode: count all unlocks (hardcore unlocks count too)
                     body.hardcoreUnlocks?.mapTo(unlocked) { it.id }
                     body.unlocks?.mapTo(unlocked) { it.id }
                 }

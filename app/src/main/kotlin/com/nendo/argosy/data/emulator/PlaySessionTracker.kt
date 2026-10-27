@@ -128,7 +128,6 @@ class PlaySessionTracker @Inject constructor(
     private val sessionServiceStarted = AtomicBoolean(false)
 
     private fun broadcastSessionChanged(gameId: Long?, channelName: String?, isHardcore: Boolean) {
-        // Write to SharedPreferences for companion process to read on startup
         if (gameId != null && gameId > 0) {
             val startMillis = _activeSession.value?.startTime?.toEpochMilli()
                 ?: System.currentTimeMillis()
@@ -428,8 +427,6 @@ class PlaySessionTracker @Inject constructor(
         endTime: Instant,
         totalMs: Long
     ): Pair<Long, Long> {
-        // Built-in libretro uses a synthetic package name; query the launcher's
-        // own package for UsageStats since the activity runs in this process.
         val statsPackage = if (emulatorPackage == EmulatorRegistry.BUILTIN_PACKAGE) {
             application.packageName
         } else {

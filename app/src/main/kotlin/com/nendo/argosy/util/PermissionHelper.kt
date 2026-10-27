@@ -197,9 +197,6 @@ class PermissionHelper @Inject constructor() {
         val events = usageStatsManager.queryEvents(fromMs, toMs)
         val event = UsageEvents.Event()
 
-        // Assume active at window start: the launcher just launched the emulator
-        // with the screen on, so both are true at fromMs. If the first event is a
-        // transition away, the interval [fromMs, event] is correctly captured.
         var foregroundMs = 0L
         var lastForegroundTime: Long? = fromMs
         var hasAppEvents = false
@@ -211,7 +208,6 @@ class PermissionHelper @Inject constructor() {
         while (events.hasNextEvent()) {
             events.getNextEvent(event)
 
-            // Screen interactive/non-interactive (API 29+)
             when (event.eventType) {
                 SCREEN_INTERACTIVE -> {
                     hasScreenEvents = true
@@ -228,7 +224,6 @@ class PermissionHelper @Inject constructor() {
                 }
             }
 
-            // App foreground/background
             if (event.packageName == packageName) {
                 when (event.eventType) {
                     UsageEvents.Event.MOVE_TO_FOREGROUND -> {
@@ -248,7 +243,6 @@ class PermissionHelper @Inject constructor() {
             }
         }
 
-        // Close open intervals at the end of the window
         if (lastForegroundTime != null) {
             foregroundMs += (toMs - lastForegroundTime).coerceAtLeast(0)
         }
@@ -256,11 +250,6 @@ class PermissionHelper @Inject constructor() {
             screenOnMs += (toMs - lastScreenOnTime).coerceAtLeast(0)
         }
 
-        // -1 signals "no data" so the caller can fall back to wall-clock time.
-        // With the fromMs initialization, no app events means emulator was in
-        // foreground the entire window (foregroundMs == totalMs). Return that
-        // directly -- it is the correct value, not a missing-data case.
-        // Only return -1 when we truly have no permission or no UsageStats access.
         val finalScreenOn = if (!hasScreenEvents) -1 else screenOnMs
 
         return SessionDurations(foregroundMs, finalScreenOn)

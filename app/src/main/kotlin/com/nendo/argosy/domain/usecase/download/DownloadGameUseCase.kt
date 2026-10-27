@@ -69,7 +69,6 @@ class DownloadGameUseCase @Inject constructor(
         val rommId = game.rommId
             ?: return DownloadResult.Error(DownloadGameFailureReason.GameNotSynced)
 
-        // Check if game is already downloaded (validates path and tries discovery)
         if (gameRepository.validateAndDiscoverGame(gameId)) {
             Log.d(TAG, "Game already downloaded: ${game.title}")
             return DownloadResult.AlreadyDownloaded

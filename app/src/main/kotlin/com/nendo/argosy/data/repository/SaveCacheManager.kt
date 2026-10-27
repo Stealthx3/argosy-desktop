@@ -205,7 +205,6 @@ class SaveCacheManager @Inject constructor(
 
             val saveSize = cachedFile.length()
 
-            // For named slots, replace existing instead of creating new entries
             if (slotName != null) {
                 val existing = saveCacheDao.getByGameAndSlot(gameId, slotName)
                 if (existing != null) {

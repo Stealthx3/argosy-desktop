@@ -461,10 +461,6 @@ class NetplaySessionManager(
                 if (state !is NetplaySessionState.Connected && state !is NetplaySessionState.Reconnecting) {
                     continue
                 }
-                // Don't trigger silence detection until we've received at least
-                // one FrameInput (remotePeerFrame >= 0 on the peer driver).
-                // During startup, the snapshot transfer can take several seconds
-                // and no FrameInput packets flow until both sides are ready.
                 val peerDriver = driver as? NetplayPeerDriver
                 if (peerDriver != null && peerDriver.remotePeerFrame < 0) continue
                 val silenceNanos = System.nanoTime() - driver.lastIncomingNanos

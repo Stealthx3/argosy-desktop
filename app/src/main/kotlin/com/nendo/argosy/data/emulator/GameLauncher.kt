@@ -366,8 +366,6 @@ class GameLauncher @Inject constructor(
             romFile = validateAndResolveLaunchFile(game, romFile)
         }
 
-        romFile = applyExtensionPreferenceIfNeeded(game, romFile)
-
         val intent = buildIntent(emulator, romFile, game, forResume, variantFileId, builtInDiscM3u)
             ?: return when (emulator.launchConfig) {
                 is LaunchConfig.RetroArch, is LaunchConfig.BuiltIn -> {
@@ -416,7 +414,6 @@ class GameLauncher @Inject constructor(
         val variantFile = File(variantPath)
         if (!variantFile.exists()) return LaunchResult.NoRomFile(variantPath)
 
-        // Multi-disc variant: launch via its M3U, which feeds into the existing disc flow.
         if (variant.isMultiDisc) {
             val m3u = variant.m3uPath?.let { File(it) }
             if (m3u != null && m3u.exists()) {
@@ -1045,7 +1042,6 @@ class GameLauncher @Inject constructor(
             is LaunchConfig.BuiltIn -> null
         } ?: return null
 
-        // commandFor* helpers that hardcode SHELL (legacy useFileUri/useShellLaunch) must not be overwritten.
         val base = if (rawBase.launchMethod == LaunchMethod.INTENT) {
             rawBase.copy(launchMethod = emulator.defaultLaunchMethod)
         } else {
@@ -1131,13 +1127,9 @@ class GameLauncher @Inject constructor(
         if (!path.startsWith("/storage/")) return false
         val canonical = StoragePathUtils.canonicalize(path)
         if (canonical.startsWith(primaryRootSlash)) {
-            // Primary external is readable to other apps EXCEPT cross-app /Android/data/<pkg>
-            // and /Android/obb/<pkg>, which scoped storage seals off on Android 11+.
             val rel = canonical.removePrefix(primaryRootSlash)
             return rel.startsWith("Android/data/") || rel.startsWith("Android/obb/")
         }
-        // Any other mount under /storage/ (SD card UUID, USB OTG, secondary users) is opaque
-        // to other apps via raw paths.
         return true
     }
 
@@ -1177,7 +1169,6 @@ class GameLauncher @Inject constructor(
             }
         }
 
-        // Non-file schemes (game IDs, custom schemes) are not reformattable.
         val baseDataIsFilePath = command.dataUri == null ||
             command.dataUri.scheme == null ||
             command.dataUri.scheme in listOf("file", "content") ||
@@ -1294,11 +1285,6 @@ class GameLauncher @Inject constructor(
         val coreFileName = "$dataDir/cores/${coreName}_libretro_android.so"
         Logger.debug(TAG, "RetroArch core: $coreFileName for platform: ${game.platformSlug}")
 
-        // Grant RetroArch a content URI for the ROM. On Android 11+ scoped
-        // storage, RetroArch reading /storage/<vol>/... raw can fail in the
-        // receiving UID even when both apps technically have storage access.
-        // Mirrors the URI-grant flow other emulators get via the dispatcher;
-        // commandForRetroArch was bespoke and had been skipping it.
         val romUri: Uri? = try {
             getFileUri(romFile)
         } catch (e: Exception) {
@@ -1493,8 +1479,6 @@ class GameLauncher @Inject constructor(
                 }
                 is ExtraValue.FileUriString -> {
                     val value = if (romFile.extension.equals("m3u", ignoreCase = true)) {
-                        // Playlist files (.m3u) often rely on relative sibling paths.
-                        // Passing content:// as a string can prevent emulators from resolving those entries.
                         romFile.absolutePath
                     } else {
                         getFileUri(romFile).also { fileUri = it }.toString()
@@ -1545,8 +1529,6 @@ class GameLauncher @Inject constructor(
             clipDataUri = documentUri ?: providerUri
         }
 
-        // Apply baked-in data binding (e.g. MelonDualDS requires Intent.setData
-        // with a FileProvider URI even when the ROM is also passed via extras).
         var defaultDataUri: Uri? = null
         when (config.defaultDataBinding) {
             RomBindingFormat.FILE_PROVIDER -> {
@@ -1979,7 +1961,6 @@ class GameLauncher @Inject constructor(
     private suspend fun validateAndResolveLaunchFile(game: GameEntity, romFile: File): File {
         if (romFile.extension.lowercase() != "m3u") return romFile
 
-        // For platforms that don't support m3u launching (e.g., PS2), use the first disc
         if (!M3uManager.supportsM3u(game.platformSlug)) {
             val firstDisc = M3uManager.parseFirstDisc(romFile)
             if (firstDisc != null) {
@@ -1993,7 +1974,6 @@ class GameLauncher @Inject constructor(
         val parentDir = romFile.parentFile ?: return romFile
         val siblingFiles = parentDir.listFiles() ?: return romFile
 
-        // Check if m3u is valid (references only launchable disc files)
         val m3uLines = try {
             romFile.readLines().filter { it.isNotBlank() && !it.startsWith("#") }
         } catch (e: Exception) {
@@ -2001,21 +1981,18 @@ class GameLauncher @Inject constructor(
             emptyList()
         }
 
-        // Find launchable disc files in the folder (excluding macOS resource forks)
         val discFiles = siblingFiles.filter {
             !it.name.startsWith("._") && it.extension.lowercase() in setOf("cue", "gdi", "chd", "iso", "bin", "img")
         }
         val cueGdiFiles = discFiles.filter { it.extension.lowercase() in setOf("cue", "gdi") }
         val chdFiles = discFiles.filter { it.extension.lowercase() == "chd" }
 
-        // Determine actual launchable files (prefer cue/gdi/chd over raw iso/bin)
         val launchableFiles = when {
             cueGdiFiles.isNotEmpty() -> cueGdiFiles
             chdFiles.isNotEmpty() -> chdFiles
             else -> discFiles.filter { it.extension.lowercase() in setOf("iso", "bin", "img") }
         }
 
-        // For single-disc games, m3u is unnecessary - use disc file directly
         if (launchableFiles.size == 1) {
             val discFile = launchableFiles.first()
             Logger.info(TAG, "Single disc game - using ${discFile.name} instead of m3u")
@@ -2023,7 +2000,6 @@ class GameLauncher @Inject constructor(
             return discFile
         }
 
-        // Validate m3u references correct files
         val launchableNames = launchableFiles.map { it.name.lowercase() }.toSet()
         val allReferencesValid = m3uLines.all { line ->
             val refFile = File(parentDir, line)
@@ -2031,7 +2007,6 @@ class GameLauncher @Inject constructor(
         }
 
         if (!allReferencesValid || m3uLines.size != launchableFiles.size) {
-            // M3U is broken - for multi-disc, prefer first cue/chd; for single, use the disc file
             val fallback = launchableFiles.minByOrNull { it.name }
             if (fallback != null) {
                 Logger.warn(TAG, "Invalid m3u detected - falling back to ${fallback.name}")
@@ -2044,12 +2019,6 @@ class GameLauncher @Inject constructor(
     }
 
     @Suppress("UNUSED_PARAMETER")
-    private suspend fun applyExtensionPreferenceIfNeeded(game: GameEntity, romFile: File): File {
-        // Extension switching was a workaround for old Azahar not supporting .3ds
-        // Modern Azahar supports all formats natively, so this is no longer needed
-        return romFile
-    }
-
     private fun getRomCacheDir(platformSlug: String, gameId: Long, cacheKey: String): File {
         return File(context.filesDir, "rom_cache/$platformSlug/$gameId/$cacheKey")
     }

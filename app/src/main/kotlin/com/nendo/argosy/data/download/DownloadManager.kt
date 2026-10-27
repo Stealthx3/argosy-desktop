@@ -1145,9 +1145,6 @@ class DownloadManager internal constructor(
 
                 val existingBytes = if (tempFile.exists()) tempFile.length() else 0L
 
-                // Temp file already has all the bytes (e.g., app was killed after download
-                // finished but before the rename). Promote it directly instead of requesting
-                // a Range that the server will reject with 416.
                 if (existingBytes > 0 && progress.totalBytes > 0) {
                     if (existingBytes == progress.totalBytes) {
                         Log.d(TAG, "Temp file matches expected size ($existingBytes bytes), promoting to target")
@@ -1819,10 +1816,6 @@ class DownloadManager internal constructor(
                 result
             }
             else -> {
-                // RomM occasionally flags a ROM as hasNestedSingleFile but streams
-                // the nested file's raw bytes without wrapping in a zip container.
-                // Detect that (via content magic) and rename the misleading .zip
-                // extension to the real ROM extension so emulators can open it.
                 val detected = ZipExtractor.detectRomFormatByMagic(targetFile)
                 if (detected != null && !targetFile.extension.equals(detected, ignoreCase = true)) {
                     val renamed = File(targetFile.parentFile, "${targetFile.nameWithoutExtension}.$detected")

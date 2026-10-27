@@ -212,7 +212,6 @@ fun SettingsScreen(
                     Intent.FLAG_GRANT_READ_URI_PERMISSION
                 )
             } catch (_: SecurityException) {
-                // Ignore if permission can't be persisted
             }
             viewModel.setCustomBackgroundPath(it.toString())
         }
@@ -947,8 +946,20 @@ fun SettingsScreen(
         ?: stringResource(R.string.settings_shell_modal_purge_platform_fallback)
     val purgeGameCount = purgePlatformConfig?.gameCount ?: 0
     val purgeAfterDisable = uiState.storage.purgeOfferedAfterDisable
+    val purgePlatformPending = uiState.storage.purgePlatformPendingUploads
     ArgosyConfirmModalHost(
-        visible = uiState.storage.showPurgePlatformConfirm != null,
+        visible = uiState.storage.showPurgePlatformConfirm != null && purgePlatformPending > 0,
+        title = stringResource(R.string.settings_shell_modal_sync_first_title),
+        message = stringResource(R.string.settings_shell_modal_sync_first_message, purgePlatformPending),
+        confirmLabel = stringResource(R.string.settings_shell_modal_sync_first_confirm),
+        onConfirm = {
+            viewModel.cancelPurgePlatform()
+            viewModel.requestSyncSaves()
+        },
+        onDismiss = { viewModel.cancelPurgePlatform() }
+    )
+    ArgosyConfirmModalHost(
+        visible = uiState.storage.showPurgePlatformConfirm != null && purgePlatformPending == 0,
         title = if (purgeAfterDisable) {
             stringResource(R.string.settings_shell_modal_purge_disabled_title, purgePlatformName)
         } else {
@@ -1636,10 +1647,8 @@ private fun getFilePathFromUri(context: Context, uri: Uri): String? {
     val rawPath = uri.path ?: return null
     val path = Uri.decode(rawPath)
 
-    // Tree URIs have format: /tree/primary:path/to/folder
-    // or /tree/primary:path/to/folder/document/primary:path/to/folder
     val treePath = path.substringAfter("/tree/", "")
-        .substringBefore("/document/") // Handle document URIs
+        .substringBefore("/document/")
     if (treePath.isEmpty()) return null
 
     return when {
@@ -1652,7 +1661,6 @@ private fun getFilePathFromUri(context: Context, uri: Uri): String? {
             }
         }
         treePath.contains(":") -> {
-            // External SD card: storage-id:path
             val parts = treePath.split(":", limit = 2)
             if (parts.size == 2) {
                 val storageId = parts[0]

@@ -187,9 +187,6 @@ class SteamAuthManager @Inject constructor(
             _authEvents.emit(SteamAuthEvent.LoginFailed(result.name))
             when {
                 result in AUTH_FATAL_RESULTS && pendingAuthResult != null -> {
-                    // QR auth got a fresh token but login was rejected (rate limited
-                    // from prior attempts). Keep the account -- the token is valid,
-                    // just cooling down.
                     Log.w(TAG, "QR auth login rejected ($result) during cooldown, keeping account")
                     pendingAuthResult = null
                     rateLimited = true
@@ -203,7 +200,6 @@ class SteamAuthManager @Inject constructor(
                         QrAuthState.Error(context.getString(R.string.sync_steam_qr_rate_limited))
                 }
                 result in AUTH_FATAL_RESULTS -> {
-                    // Auto-login with stored token failed -- token is dead.
                     Log.w(TAG, "Auth permanently failed ($result), clearing saved account")
                     sessionDead = true
                     steamAccountDao.deactivateAll()

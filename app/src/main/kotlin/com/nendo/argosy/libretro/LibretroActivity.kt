@@ -498,9 +498,6 @@ class LibretroActivity : ComponentActivity() {
         val savesDir: File
         val statesDir: File
         if (isGuestJoinedSession) {
-            // Guest sessions operate on a throwaway cache directory so no
-            // SRAM is loaded from the user's real saves and nothing written
-            // during the session leaks back into their persistent store.
             val (_, guestSaves, guestStates) = netplay.createScratchDir(cacheDir)
             savesDir = guestSaves
             statesDir = guestStates

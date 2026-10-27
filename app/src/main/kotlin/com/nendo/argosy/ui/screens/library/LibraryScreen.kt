@@ -1075,9 +1075,6 @@ private fun LibraryMasonryGrid(
     val initialIndex = remember { viewModel.gameIndexToGridIndex(uiState.focusedIndex) }
     val downloadIndicators = viewModel.downloadIndicators.collectAsState()
     val staggeredState = rememberLazyStaggeredGridState(initialFirstVisibleItemIndex = initialIndex)
-    // Local flag so the centering effect and the scroll listener read the same
-    // snapshot value with no recomposition lag (otherwise programmatic scrolls
-    // briefly look like user scrolls and wrongly flip the grid into touch mode).
     var isProgrammaticScroll by remember { mutableStateOf(false) }
 
     LaunchedEffect(uiState.currentPlatformIndex) {
@@ -1144,8 +1141,6 @@ private fun LibraryMasonryGrid(
             }
     }
 
-    // Feed the real on-screen cover positions to the view model so D-pad
-    // navigation can resolve directions spatially over the masonry layout.
     val currentGridItems by rememberUpdatedState(uiState.gridItems)
     LaunchedEffect(staggeredState) {
         snapshotFlow { staggeredState.layoutInfo.visibleItemsInfo }

@@ -103,7 +103,6 @@ class ShaderPreviewRenderer {
                     GLES20.glEnableVertexAttribArray(compiled.coordHandle)
                 }
 
-                // For multi-pass: pass 0 reads original, subsequent passes read previous output
                 val mainTexture = if (i > 0) fbos[i - 1].texture else inputTexture
                 GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
                 GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mainTexture)
@@ -126,7 +125,6 @@ class ShaderPreviewRenderer {
                     outH = fbos[i].height.toFloat()
                 }
 
-                // Input size: for pass 0 use original, for subsequent passes use previous output
                 val inW = if (i > 0) fbos[i - 1].width.toFloat() else texW
                 val inH = if (i > 0) fbos[i - 1].height.toFloat() else texH
                 setUniformVec2(compiled.textureSizeHandle, inW, inH)

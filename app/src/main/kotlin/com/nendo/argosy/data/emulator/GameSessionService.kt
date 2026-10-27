@@ -166,7 +166,6 @@ class GameSessionService : Service() {
                 startForegroundWithNotification(gameTitle, NotificationState.PLAYING)
                 awaitingForeground.set(false)
 
-                // Reset save state to clean when starting a new session
                 broadcastSaveStateChanged(isDirty = false)
 
                 if (watchPath != null) {
@@ -443,7 +442,6 @@ class GameSessionService : Service() {
         updateNotification(currentGameTitle, NotificationState.SAVE_DETECTED)
         if (currentEmulatorPackage != EmulatorRegistry.BUILTIN_PACKAGE) showOverlayBriefly()
 
-        // Notify secondary home that save is dirty (being cached)
         broadcastSaveStateChanged(isDirty = true)
 
         serviceScope.launch {

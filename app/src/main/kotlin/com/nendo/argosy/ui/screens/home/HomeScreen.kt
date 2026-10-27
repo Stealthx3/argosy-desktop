@@ -295,8 +295,6 @@ fun HomeScreen(
     }
 
     BackHandler(enabled = true) {
-        // Prevent back from popping Home screen off nav stack
-        // Home is the root destination - back should do nothing
     }
 
     val context = LocalContext.current

@@ -175,7 +175,6 @@ object Logger {
 
         val writer = fileWriter ?: return
 
-        // Sanitize sensitive data before writing to file
         val sanitizedMessage = LogSanitizer.sanitize(entry.message)
 
         val line = buildString {
@@ -193,7 +192,6 @@ object Logger {
         entry.throwable?.let { t ->
             val sw = StringWriter()
             t.printStackTrace(PrintWriter(sw))
-            // Sanitize stack traces too (may contain paths)
             writer.appendLine(LogSanitizer.sanitize(sw.toString()))
         }
 

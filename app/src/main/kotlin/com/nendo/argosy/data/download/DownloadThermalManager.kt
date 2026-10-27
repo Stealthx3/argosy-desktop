@@ -226,10 +226,6 @@ class DownloadThermalManager @Inject constructor(
     }
 
     private fun calculateThermalStatus(cpuTemp: Float, batteryTemp: Float): ThermalStatus {
-        // Throttling only engages during standby. When the screen is on the
-        // user is attending the device and can decide to stop downloads, and
-        // per-core junction sensors on modern SoCs routinely read hot under
-        // normal use -- throttling here would pause every download forever.
         if (!isScreenOff) {
             return ThermalStatus(ThermalState.NORMAL, cpuTemp, batteryTemp, 1.0f)
         }

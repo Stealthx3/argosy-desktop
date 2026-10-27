@@ -1023,7 +1023,6 @@ private fun CommentInput(
             try {
                 commentFocusRequester.requestFocus()
             } catch (_: IllegalStateException) {
-                // FocusRequester not yet attached to layout
             }
         }
     }

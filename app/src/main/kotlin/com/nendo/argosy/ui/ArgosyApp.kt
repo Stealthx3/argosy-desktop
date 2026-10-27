@@ -309,7 +309,6 @@ fun ArgosyApp(
         }
     }
 
-    // Drawer state - confirmStateChange handles swipe gestures synchronously
     val drawerState = rememberDrawerState(
         initialValue = DrawerValue.Closed
     )
@@ -377,9 +376,6 @@ fun ArgosyApp(
         try { rootFocusRequester.requestFocus() } catch (_: Exception) {}
     }
 
-    // When dual-screen topology changes (role swap, companion attach/detach, game moves
-    // between displays), drop any lingering modal/drawer state and clear the deferred
-    // view subscription so the newly-active screen's input handler gets a clean slot.
     if (dsm != null) {
         val swappedGameActive by dsm.swappedIsGameActive.collectAsState()
         LaunchedEffect(isRolesSwapped, companionActive, swappedGameActive) {
@@ -415,7 +411,6 @@ fun ArgosyApp(
         }
     }
 
-    // Create drawer input handler
     val drawerInputHandler = remember {
         viewModel.createDrawerInputHandler(
             onNavigate = { route ->
@@ -431,7 +426,6 @@ fun ArgosyApp(
         )
     }
 
-    // Synchronous drawer toggle - subscription must happen immediately, not via LaunchedEffect
     val openDrawer = remember(drawerInputHandler) {
         wizardGuard@{
             if (uiState.isFirstRun) return@wizardGuard
@@ -452,7 +446,6 @@ fun ArgosyApp(
         }
     }
 
-    // Quick settings input handler
     val openRommSignIn: () -> Unit = remember(viewModel, musicPlayerViewModel, inputDispatcher, navController) {
         {
             musicPlayerViewModel.closeBrowse()
@@ -801,8 +794,6 @@ fun ArgosyApp(
         }
     }
 
-
-    // Block input during route transitions and sync route to dispatcher
     LaunchedEffect(currentRoute) {
         if (currentRoute != null) {
             inputDispatcher.blockInputFor(Motion.transitionDebounceMs)
@@ -810,7 +801,6 @@ fun ArgosyApp(
         inputDispatcher.setCurrentRoute(currentRoute)
     }
 
-    // Gate Home button events - only emit when not on home screen
     LaunchedEffect(currentRoute) {
         val isHome = currentRoute?.startsWith(Screen.Home.route) == true
         viewModel.gamepadInputHandler.homeEventEnabled = !isHome
@@ -824,7 +814,6 @@ fun ArgosyApp(
         }
     }
 
-    // Sync ViewModel drawer state -> Compose drawer animation
     LaunchedEffect(isDrawerOpen) {
         if (isDrawerOpen && !drawerState.isOpen) {
             drawerState.open()
@@ -833,7 +822,6 @@ fun ArgosyApp(
         }
     }
 
-    // Notify companion when any upper overlay closes: stop forwarding + refocus lower screen
     val notifyOverlayClosed: () -> Unit = remember {
         {
             if (dsm != null && dsm.isOverlayFocused) {
@@ -860,7 +848,6 @@ fun ArgosyApp(
         }
     }
 
-    // When returning to Home from Apps/Settings in dual-screen mode, refocus lower
     LaunchedEffect(isDualScreenDevice, companionActive) {
         if (!isDualScreenDevice || !companionActive) return@LaunchedEffect
         var wasOnHome = true
@@ -905,7 +892,6 @@ fun ArgosyApp(
         }
     }
 
-    // Sync Compose drawer state -> ViewModel (for scrim tap close)
     LaunchedEffect(drawerState.isOpen) {
         if (!drawerState.isOpen && isDrawerOpen) {
             inputDispatcher.unsubscribeDrawer()
@@ -913,12 +899,10 @@ fun ArgosyApp(
         }
     }
 
-    // Block input during drawer transitions
     LaunchedEffect(isDrawerOpen) {
         inputDispatcher.blockInputFor(Motion.transitionDebounceMs)
     }
 
-    // Collect gamepad events (Menu toggles drawer, L3 toggles quick menu, R3 toggles quick settings)
     val inputLifecycle = androidx.lifecycle.compose.LocalLifecycleOwner.current.lifecycle
     LaunchedEffect(inputLifecycle) {
         viewModel.gamepadInputHandler.eventFlow().flowWithLifecycle(inputLifecycle).collect { input ->            val result = inputDispatcher.dispatch(input)
@@ -1057,9 +1041,7 @@ fun ArgosyApp(
     LaunchedEffect(inputLifecycle) {
         viewModel.gamepadInputHandler.homeEventFlow().flowWithLifecycle(inputLifecycle).collect {
             if (isEmulatorRunning) {
-                // No-op: onUserLeaveHint in LibretroActivity handles HOME quit
             } else {
-                // Navigate to home view (only if nav graph is ready)
                 if (navController.currentDestination != null) {
                     if (isDrawerOpen) closeDrawer()
                     if (isQuickSettingsOpen) closeQuickSettings()
@@ -1363,7 +1345,6 @@ fun ArgosyApp(
                     .padding(end = Dimens.spacingMd, bottom = Dimens.headerHeight)
             )
 
-            // Quick Menu Overlay (L3 triggered)
             QuickMenuOverlay(
                 viewModel = quickMenuViewModel,
                 onGameSelect = { gameId ->
@@ -1376,7 +1357,6 @@ fun ArgosyApp(
                 closeQuickMenu = closeQuickMenu
             )
 
-            // Quick Settings Panel (right-side drawer)
             val musicNeedsSignIn = musicPageVisible &&
                 musicPlayerUiState.browse?.notice ==
                 com.nendo.argosy.ui.components.musicplayer.MusicBrowseNotice.SIGN_IN_FOR_PLAYLISTS
@@ -1439,7 +1419,6 @@ fun ArgosyApp(
                 )
             }
 
-            // Background Sync Conflict Dialog
             backgroundConflictInfo?.let { info ->
                 BackgroundSyncConflictDialog(
                     conflictInfo = info,

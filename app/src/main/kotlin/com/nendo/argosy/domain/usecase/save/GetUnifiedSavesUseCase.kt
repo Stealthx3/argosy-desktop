@@ -139,13 +139,11 @@ class GetUnifiedSavesUseCase @Inject constructor(
             .mapNotNull { it.slot?.takeIf { s -> s.isNotBlank() } }
             .toSet()
 
-        // Find the most recent cache for each channel (only these should match server saves by name)
         val mostRecentByChannel = localCaches
             .filter { it.channelName != null }
             .groupBy { it.channelName }
             .mapValues { (_, caches) -> caches.maxByOrNull { it.cachedAt }?.id }
 
-        // Find the most recent non-channel cache (for "Latest" matching)
         val mostRecentNonChannel = localCaches
             .filter { it.channelName == null }
             .maxByOrNull { it.cachedAt }?.id
@@ -158,7 +156,6 @@ class GetUnifiedSavesUseCase @Inject constructor(
                 mostRecentNonChannel == cache.id
             }
 
-            // Direct match by rommSaveId takes priority over name-based matching
             val matchingServer = if (cache.rommSaveId != null) {
                 serverSaveById[cache.rommSaveId]
             } else if (isMostRecentForChannel) {
@@ -352,10 +349,6 @@ fun resolveActiveEntry(
     val candidates = entries.filterNot { it.isArchival || it.isRollback }.ifEmpty { entries }
     val namedChannel = SaveSyncApiClient.namedChannelOrNull(activeChannel)
     if (namedChannel != null) {
-        // A named channel is an exact coordinate: an empty channel means no active save, not
-        // "whatever is newest". Falling through would disagree with SaveStateManager, which
-        // restores strictly within the channel and finds nothing here -- that mismatch can launch
-        // in hardcore off another channel's save while no save is actually loaded.
         return candidates
             .filter { it.channelName != null && equalsNormalized(it.channelName, namedChannel) }
             .maxByOrNull { it.timestamp }

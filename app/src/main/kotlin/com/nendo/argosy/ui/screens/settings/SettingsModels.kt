@@ -1016,6 +1016,7 @@ data class StorageState(
     val platformConfigs: List<PlatformStorageConfig> = emptyList(),
     val showPurgePlatformConfirm: Long? = null,
     val purgeOfferedAfterDisable: Boolean = false,
+    val purgePlatformPendingUploads: Int = 0,
     val showMigratePlatformConfirm: PlatformMigrationInfo? = null,
     val platformSettingsModalId: Long? = null,
     val platformSettingsFocusIndex: Int = 0,

@@ -411,9 +411,6 @@ class SteamSettingsDelegate @Inject constructor(
             delay(QR_CONNECT_TIMEOUT_MS)
             if (pendingQrAuth) failQrConnect()
         }
-        // Optimistically move to CONNECTING so the UI shows a spinner
-        // immediately rather than flickering back to the connect button
-        // while the service starts up.
         _state.update {
             it.copy(
                 connectionState = SteamConnectionState.CONNECTING,
@@ -442,11 +439,6 @@ class SteamSettingsDelegate @Inject constructor(
     }
 
     fun startQrAuth() {
-        // If connectToSteam was called, pendingQrAuth is already set and
-        // observeServiceState will trigger startQrAuth once the client is
-        // CONNECTED.  Calling steamAuthManager.startQrAuth() before the
-        // client exists produces QrAuthState.Error which flashes the error
-        // screen during a normal connect flow.
         if (pendingQrAuth) return
         steamAuthManager.startQrAuth()
     }
@@ -663,10 +655,6 @@ class SteamSettingsDelegate @Inject constructor(
                     return@collect
                 }
                 _state.update {
-                    // Suppress connection state changes that would flash the login screen:
-                    // 1. During QR auth flow (old client teardown)
-                    // 2. When we have a saved account and service is still connecting
-                    // 3. During sync-initiated reconnect (hold LOGGED_IN until complete)
                     val suppressState = pendingQrAuth || pendingSync ||
                         (serviceState.connectionState == SteamConnectionState.DISCONNECTED &&
                             it.connectionState == SteamConnectionState.LOGGED_IN)

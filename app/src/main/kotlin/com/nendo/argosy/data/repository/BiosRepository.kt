@@ -744,7 +744,6 @@ class BiosRepository @Inject constructor(
         val oldPath = prefs.customBiosPath
         val internalDir = getInternalBiosDir()
 
-        // Determine source directory (old custom path or internal)
         val oldBiosDir = if (oldPath != null) resolveBiosDir(oldPath) else null
         val sourceDir = oldBiosDir ?: internalDir
 
@@ -756,7 +755,6 @@ class BiosRepository @Inject constructor(
             }
 
             try {
-                // Copy from source (old custom or internal) to new custom path
                 if (sourceDir.exists()) {
                     sourceDir.walkTopDown().filter { it.isFile }.forEach { file ->
                         val relativePath = file.relativeTo(sourceDir)
@@ -769,7 +767,6 @@ class BiosRepository @Inject constructor(
                     Logger.info(TAG, "Copied BIOS files from ${sourceDir.absolutePath} to ${newDir.absolutePath}")
                 }
 
-                // Update localPath in firmware database
                 val allFirmware = firmwareDao.getDownloaded()
                 allFirmware.forEach { firmware ->
                     val oldLocalPath = firmware.localPath ?: return@forEach
@@ -777,7 +774,6 @@ class BiosRepository @Inject constructor(
                     val relativePath = try {
                         oldFile.relativeTo(sourceDir)
                     } catch (e: IllegalArgumentException) {
-                        // File not under source dir, skip
                         return@forEach
                     }
                     val newLocalPath = File(newDir, relativePath.path).absolutePath
@@ -789,7 +785,6 @@ class BiosRepository @Inject constructor(
                 return@withContext false
             }
         } else {
-            // Moving back to internal - update database paths
             try {
                 if (sourceDir.exists() && sourceDir != internalDir) {
                     sourceDir.walkTopDown().filter { it.isFile }.forEach { file ->
@@ -820,7 +815,6 @@ class BiosRepository @Inject constructor(
             }
         }
 
-        // Delete old custom directory if different from new
         if (oldBiosDir != null && oldBiosDir.absolutePath != (if (newPath != null) resolveBiosDir(newPath).absolutePath else null)) {
             try {
                 if (oldBiosDir.exists()) {
@@ -896,7 +890,6 @@ class BiosRepository @Inject constructor(
                 }
             }
 
-            // Create all Eden expected directories
             val edenDirs = listOf(
                 "amiibo", "cache", "config", "crash_dumps", "dump",
                 "keys", "load", "log", "play_time", "screenshots",
@@ -973,15 +966,6 @@ class BiosRepository @Inject constructor(
 
         profileDir.mkdirs()
 
-        // profiles.dat format (0x650 bytes total):
-        // [0x00-0x0F] 16 bytes header padding
-        // [0x10-0xD7] User 0 (0xC8 bytes per user, 8 users max)
-        //   [0x10-0x1F] UUID (16 bytes)
-        //   [0x20-0x2F] UUID2 (16 bytes, same as UUID)
-        //   [0x30-0x37] timestamp (8 bytes, little-endian)
-        //   [0x38-0x57] username (32 bytes, null-padded UTF-8)
-        //   [0x58-0xD7] extra_data (128 bytes)
-
         val uuid = UUID.randomUUID()
         val uuidBytes = ByteBuffer.allocate(16).order(ByteOrder.LITTLE_ENDIAN)
             .putLong(uuid.leastSignificantBits)
@@ -994,21 +978,20 @@ class BiosRepository @Inject constructor(
             .array()
 
         val username = "Argosy".toByteArray(Charsets.UTF_8)
-        val usernameBytes = ByteArray(32)
-        System.arraycopy(username, 0, usernameBytes, 0, minOf(username.size, 31))
+        val usernameBytes = ByteArray(EdenProfileLayout.USERNAME_BYTES)
+        System.arraycopy(username, 0, usernameBytes, 0, minOf(username.size, EdenProfileLayout.USERNAME_BYTES - 1))
 
-        val profileData = ByteArray(0x650)
-        System.arraycopy(uuidBytes, 0, profileData, 0x10, 16)
-        System.arraycopy(uuidBytes, 0, profileData, 0x20, 16)
-        System.arraycopy(timestampBytes, 0, profileData, 0x30, 8)
-        System.arraycopy(usernameBytes, 0, profileData, 0x38, 32)
+        val profileData = ByteArray(EdenProfileLayout.FILE_BYTES)
+        System.arraycopy(uuidBytes, 0, profileData, EdenProfileLayout.USER0_UUID, EdenProfileLayout.UUID_BYTES)
+        System.arraycopy(uuidBytes, 0, profileData, EdenProfileLayout.USER0_UUID_COPY, EdenProfileLayout.UUID_BYTES)
+        System.arraycopy(timestampBytes, 0, profileData, EdenProfileLayout.USER0_TIMESTAMP_LE, EdenProfileLayout.TIMESTAMP_BYTES)
+        System.arraycopy(usernameBytes, 0, profileData, EdenProfileLayout.USER0_USERNAME_UTF8, EdenProfileLayout.USERNAME_BYTES)
 
         profileFile.writeBytes(profileData)
 
         val folderName = String.format("%016X%016X", uuid.mostSignificantBits, uuid.leastSignificantBits)
         Logger.info(TAG, "Created default Eden profile | uuid=$folderName, path=${profileFile.absolutePath}")
 
-        // Create user save directory structure so save sync works immediately
         val userSaveDir = File(edenBasePath, "nand/user/save/0000000000000000/$folderName")
         userSaveDir.mkdirs()
         Logger.info(TAG, "Created Eden user save directory | path=${userSaveDir.absolutePath}")
@@ -1036,4 +1019,15 @@ class BiosRepository @Inject constructor(
         }
         return md.digest().joinToString("") { "%02x".format(it) }
     }
+}
+
+private object EdenProfileLayout {
+    const val FILE_BYTES = 0x650
+    const val USER0_UUID = 0x10
+    const val USER0_UUID_COPY = 0x20
+    const val USER0_TIMESTAMP_LE = 0x30
+    const val USER0_USERNAME_UTF8 = 0x38
+    const val UUID_BYTES = 16
+    const val TIMESTAMP_BYTES = 8
+    const val USERNAME_BYTES = 32
 }

@@ -587,7 +587,6 @@ class SavePathResolver @Inject constructor(
         val romNameNoExt = File(romPath).nameWithoutExtension
         val resolvedPaths = SavePathRegistry.resolvePathWithPackage(config, emulatorPackage, context.filesDir.absolutePath, fal.externalStorageRoots())
 
-        // DuckStation PerGameFileTitle mode: {romFilenameNoExt}_1.mcd
         for (basePath in resolvedPaths) {
             if (!fal.exists(basePath) || !fal.isDirectory(basePath)) continue
             val mcdPath = "$basePath/${romNameNoExt}_1.mcd"
