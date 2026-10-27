@@ -134,7 +134,6 @@ class GameLauncherTest {
             emulatorConfigDao = emulatorConfigDao,
             emulatorLaunchArgsDao = emulatorLaunchArgsDao,
             variantResolver = variantResolver,
-            installedAppResolver = installedAppResolver,
             platformLibretroSettingsDao = platformLibretroSettingsDao,
             emulatorDetector = emulatorDetector,
             builtinCoreResolver = BuiltinCoreResolver(
@@ -171,7 +170,14 @@ class GameLauncherTest {
             dreamcastVmuMigrator = mockk(relaxed = true),
             launchProgressTracker = launchProgressTracker,
             steamInstallReports = steamInstallReports,
-            appsRepository = appsRepository
+            appsRepository = appsRepository,
+            emulatorResolver = EmulatorResolver(
+                emulatorDetector = emulatorDetector,
+                emulatorConfigDao = emulatorConfigDao,
+                userPreferencesRepository = userPreferencesRepository,
+                libretroCoreMgr = libretroCoreMgr,
+                installedAppResolver = installedAppResolver
+            )
         )
     }
 

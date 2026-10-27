@@ -138,8 +138,9 @@ folder resolution); "tidying" them breaks resolution.
   unscoped glob picks up worktrees and build output. Core three:
   PlatformDefinitions, EmulatorRegistry, LibretroCoreRegistry - PlatformDefinitions
   does NOT match the glob, so finding 14 is not finding everything.
-- Two resolvers that MUST agree: EmulatorResolver.getEmulatorPackageForGame
-  and GameLauncher.resolveEmulator.
+- One emulator resolver: EmulatorResolver.resolveEmulatorForGame. GameLauncher
+  launches with its def and save sync reads its package; never add a second
+  precedence chain beside it.
 - Sync engines: SyncCoordinator (negotiate/reconcile), SaveSyncOrchestrator
   (discovery/preamble), SaveSyncRepository facade + services.
 - Save id -> on-disk path, per platform: docs/save-id-to-path.md. Read it

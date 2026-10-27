@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -123,13 +124,15 @@ class JellyfinLibrarySyncService @Inject constructor(
 
         val libraries = views.mapIndexedNotNull { order, view -> view.toLibraryEntity(owner, order) }
         persistLibraries(owner, libraries)
-        _syncProgress.value = _syncProgress.value.copy(librariesTotal = libraries.size)
+        _syncProgress.update { it.copy(librariesTotal = libraries.size) }
 
         for ((index, library) in libraries.withIndex()) {
-            _syncProgress.value = _syncProgress.value.copy(
-                currentLibrary = library.name,
-                librariesDone = index
-            )
+            _syncProgress.update {
+                it.copy(
+                    currentLibrary = library.name,
+                    librariesDone = index
+                )
+            }
             when (val outcome = syncOneLibrary(owner, library)) {
                 is JellyfinResult.Success -> {
                     itemsAdded += outcome.data.itemsAdded
@@ -207,10 +210,12 @@ class JellyfinLibrarySyncService @Inject constructor(
             }
 
             startIndex += page.items.size
-            _syncProgress.value = _syncProgress.value.copy(
-                itemsTotal = page.totalRecordCount ?: startIndex,
-                itemsDone = startIndex
-            )
+            _syncProgress.update {
+                it.copy(
+                    itemsTotal = page.totalRecordCount ?: startIndex,
+                    itemsDone = startIndex
+                )
+            }
             if (reachedLastPage(page, startIndex)) break
         }
 

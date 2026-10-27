@@ -31,6 +31,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.io.Closeable
@@ -242,10 +243,12 @@ class SteamService : Service() {
 
         subscriptions += cm.subscribe(ConnectedCallback::class.java) { _ ->
             Log.d(TAG, "Connected to Steam")
-            _state.value = _state.value.copy(
-                connectionState = SteamConnectionState.CONNECTED,
-                error = null
-            )
+            _state.update {
+                it.copy(
+                    connectionState = SteamConnectionState.CONNECTED,
+                    error = null
+                )
+            }
             steamAuthManager.onConnected(steamClient!!, steamUser!!)
         }
 
@@ -256,10 +259,12 @@ class SteamService : Service() {
                 return@subscribe
             }
             val willReconnect = !callback.isUserInitiated && isRunning
-            _state.value = _state.value.copy(
-                connectionState = SteamConnectionState.DISCONNECTED,
-                error = if (!callback.isUserInitiated && !willReconnect) "Connection lost" else null
-            )
+            _state.update {
+                it.copy(
+                    connectionState = SteamConnectionState.DISCONNECTED,
+                    error = if (!callback.isUserInitiated && !willReconnect) "Connection lost" else null
+                )
+            }
             steamAuthManager.onDisconnected()
 
             if (willReconnect) {
@@ -277,7 +282,7 @@ class SteamService : Service() {
                     if (reconnectAttempt >= MAX_RECONNECT_ATTEMPTS) {
                         Log.e(TAG, "Max reconnect attempts ($MAX_RECONNECT_ATTEMPTS) reached, giving up")
                         isRunning = false
-                        _state.value = _state.value.copy(error = "Reconnect failed after $MAX_RECONNECT_ATTEMPTS attempts")
+                        _state.update { it.copy(error = "Reconnect failed after $MAX_RECONNECT_ATTEMPTS attempts") }
                         return@launch
                     }
 
@@ -297,29 +302,35 @@ class SteamService : Service() {
             if (callback.result == EResult.OK) {
                 Log.d(TAG, "Logged on as ${callback.clientSteamID}")
                 reconnectAttempt = 0
-                _state.value = _state.value.copy(
-                    connectionState = SteamConnectionState.LOGGED_IN,
-                    steamId = callback.clientSteamID?.convertToUInt64(),
-                    error = null
-                )
+                _state.update {
+                    it.copy(
+                        connectionState = SteamConnectionState.LOGGED_IN,
+                        steamId = callback.clientSteamID?.convertToUInt64(),
+                        error = null
+                    )
+                }
                 steamAuthManager.onLoggedOn(callback)
             } else {
                 Log.e(TAG, "Login failed: ${callback.result}")
-                _state.value = _state.value.copy(
-                    connectionState = SteamConnectionState.LOGGED_OUT,
-                    error = "Login failed: ${callback.result}"
-                )
+                _state.update {
+                    it.copy(
+                        connectionState = SteamConnectionState.LOGGED_OUT,
+                        error = "Login failed: ${callback.result}"
+                    )
+                }
                 steamAuthManager.onLoginFailed(callback.result)
             }
         }
 
         subscriptions += cm.subscribe(LoggedOffCallback::class.java) { callback ->
             Log.d(TAG, "Logged off: ${callback.result}")
-            _state.value = _state.value.copy(
-                connectionState = SteamConnectionState.LOGGED_OUT,
-                username = null,
-                steamId = null
-            )
+            _state.update {
+                it.copy(
+                    connectionState = SteamConnectionState.LOGGED_OUT,
+                    username = null,
+                    steamId = null
+                )
+            }
             if (callback.result == `in`.dragonbra.javasteam.enums.EResult.LogonSessionReplaced) {
                 Log.d(TAG, "Session replaced externally, tokens preserved -- will reconnect with unique loginID")
             }
@@ -333,7 +344,7 @@ class SteamService : Service() {
     private fun connectForAuth() {
         steamAuthManager.connectingForAuth = true
         suppressDisconnectError = true
-        _state.value = _state.value.copy(connectionState = SteamConnectionState.CONNECTING, error = null)
+        _state.update { it.copy(connectionState = SteamConnectionState.CONNECTING, error = null) }
         try { steamClient?.disconnect() } catch (_: Throwable) {}
         callbackJob?.cancel()
         initializeSteamClient()
@@ -347,10 +358,12 @@ class SteamService : Service() {
                 startCallbackLoop()
             } catch (e: Throwable) {
                 Log.e(TAG, "Failed to connect for auth", e)
-                _state.value = _state.value.copy(
-                    connectionState = SteamConnectionState.DISCONNECTED,
-                    error = e.message
-                )
+                _state.update {
+                    it.copy(
+                        connectionState = SteamConnectionState.DISCONNECTED,
+                        error = e.message
+                    )
+                }
             }
         }
     }
@@ -369,12 +382,12 @@ class SteamService : Service() {
             callbackJob?.cancel()
             initializeSteamClient()
             suppressDisconnectError = false
-            _state.value = _state.value.copy(connectionState = SteamConnectionState.DISCONNECTED)
+            _state.update { it.copy(connectionState = SteamConnectionState.DISCONNECTED) }
         }
 
         isRunning = true
         connectStartedAt = System.currentTimeMillis()
-        _state.value = _state.value.copy(connectionState = SteamConnectionState.CONNECTING)
+        _state.update { it.copy(connectionState = SteamConnectionState.CONNECTING) }
 
         scope.launch {
             try {
@@ -391,10 +404,12 @@ class SteamService : Service() {
                     startCallbackLoop()
                 } catch (e2: Throwable) {
                     Log.e(TAG, "Retry connect also failed", e2)
-                    _state.value = _state.value.copy(
-                        connectionState = SteamConnectionState.DISCONNECTED,
-                        error = e2.message
-                    )
+                    _state.update {
+                        it.copy(
+                            connectionState = SteamConnectionState.DISCONNECTED,
+                            error = e2.message
+                        )
+                    }
                 }
             }
         }

@@ -413,11 +413,11 @@ class DownloadsViewModel @Inject constructor(
     }
 
     fun showFailedActionDialog() {
-        _uiState.value = _uiState.value.copy(showFailedActionDialog = true)
+        _uiState.update { it.copy(showFailedActionDialog = true) }
     }
 
     fun dismissFailedActionDialog() {
-        _uiState.value = _uiState.value.copy(showFailedActionDialog = false)
+        _uiState.update { it.copy(showFailedActionDialog = false) }
     }
 
     fun createInputHandler(

@@ -110,7 +110,6 @@ class GameLauncher @Inject constructor(
     private val emulatorConfigDao: EmulatorConfigDao,
     private val emulatorLaunchArgsDao: EmulatorLaunchArgsDao,
     private val variantResolver: VariantResolver,
-    private val installedAppResolver: com.nendo.argosy.data.platform.InstalledAppResolver,
     private val platformLibretroSettingsDao: com.nendo.argosy.data.local.dao.PlatformLibretroSettingsDao,
     private val emulatorDetector: EmulatorDetector,
     private val builtinCoreResolver: BuiltinCoreResolver,
@@ -137,7 +136,8 @@ class GameLauncher @Inject constructor(
     private val volumeHealth: StorageVolumeHealth,
     private val launchProgressTracker: LaunchProgressTracker,
     private val steamInstallReports: SteamInstallReports,
-    private val appsRepository: com.nendo.argosy.data.repository.AppsRepository
+    private val appsRepository: com.nendo.argosy.data.repository.AppsRepository,
+    private val emulatorResolver: EmulatorResolver
 ) {
     private val shellAmAvailable: Boolean by lazy {
         try {
@@ -943,67 +943,8 @@ class GameLauncher @Inject constructor(
         }
     }
 
-    private suspend fun resolveEmulator(game: GameEntity): EmulatorDef? {
-        if (emulatorDetector.installedEmulators.value.isEmpty()) {
-            emulatorDetector.detectEmulators()
-        }
-
-        val builtinEnabled = userPreferencesRepository.userPreferences.first().builtinLibretroEnabled
-
-        var installedPackages = emulatorDetector.installedEmulators.value
-            .map { it.def.packageName }
-            .toSet()
-
-        val gameOverride = emulatorConfigDao.getByGameId(game.id)
-        val platformDefault = emulatorConfigDao.getDefaultForPlatform(game.platformId)
-
-        val configuredPackage = gameOverride?.packageName ?: platformDefault?.packageName
-        if (configuredPackage != null && configuredPackage !in installedPackages) {
-            Logger.debug(TAG, "Configured emulator $configuredPackage not in cache, re-detecting...")
-            emulatorDetector.detectEmulators()
-            installedPackages = emulatorDetector.installedEmulators.value
-                .map { it.def.packageName }
-                .toSet()
-        }
-
-        val isBuiltinPackage: (String?) -> Boolean = { pkg ->
-            pkg == EmulatorRegistry.BUILTIN_PACKAGE
-        }
-
-        if (gameOverride?.packageName != null && gameOverride.packageName in installedPackages) {
-            val skipBuiltin = isBuiltinPackage(gameOverride.packageName) &&
-                (!builtinEnabled || !libretroCoreMgr.isPlatformSupported(game.platformSlug))
-            if (!skipBuiltin) {
-                return emulatorDetector.getByPackage(gameOverride.packageName)
-            }
-        }
-
-        if (platformDefault?.packageName != null && platformDefault.packageName in installedPackages) {
-            val skipBuiltin = isBuiltinPackage(platformDefault.packageName) &&
-                (!builtinEnabled || !libretroCoreMgr.isPlatformSupported(game.platformSlug))
-            if (!skipBuiltin) {
-                return emulatorDetector.getByPackage(platformDefault.packageName)
-            }
-        }
-
-        val adHocPackage = gameOverride?.packageName?.takeIf {
-            !EmulatorRegistry.isKnownPackage(it) && installedAppResolver.isAppInstalled(it)
-        } ?: platformDefault?.packageName?.takeIf {
-            !EmulatorRegistry.isKnownPackage(it) && installedAppResolver.isAppInstalled(it)
-        }
-        if (adHocPackage != null) {
-            val displayName = (if (adHocPackage == gameOverride?.packageName) gameOverride.displayName else platformDefault?.displayName)
-                ?: adHocPackage
-            Logger.debug(TAG, "Resolved ad-hoc emulator binding: $adHocPackage for ${game.platformSlug}")
-            return EmulatorRegistry.synthesizeAdHocEmulatorDef(
-                packageName = adHocPackage,
-                displayName = displayName,
-                platformSlug = game.platformSlug
-            )
-        }
-
-        return emulatorDetector.getPreferredEmulator(game.platformSlug, builtinEnabled)?.def
-    }
+    private suspend fun resolveEmulator(game: GameEntity): EmulatorDef? =
+        emulatorResolver.resolveEmulatorForGame(game.id, game.platformId, game.platformSlug)
 
     private suspend fun buildIntent(emulator: EmulatorDef, romFile: File, game: GameEntity, forResume: Boolean, variantFileId: Long? = null, discM3uPath: String? = null): Intent? {
         val configType = emulator.launchConfig::class.simpleName

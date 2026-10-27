@@ -402,7 +402,7 @@ class DownloadManager internal constructor(
 
     private suspend fun updateAvailableStorage() {
         val available = getGlobalStorageBytes()
-        _state.value = _state.value.copy(availableStorageBytes = available)
+        _state.update { it.copy(availableStorageBytes = available) }
     }
 
     private suspend fun isInstantDownload(expectedSizeBytes: Long): Boolean {
@@ -418,38 +418,42 @@ class DownloadManager internal constructor(
 
         if (plan is StoragePlan.Insufficient) {
             downloadQueueDao.updateState(progress.id, DownloadState.WAITING_FOR_STORAGE.name)
-            _state.value = _state.value.copy(
-                activeDownloads = _state.value.activeDownloads.filter { it.id != progress.id },
-                queue = _state.value.queue.map {
-                    if (it.id == progress.id) {
-                        it.copy(
-                            state = DownloadState.WAITING_FOR_STORAGE,
-                            requiredStorageBytes = plan.requiredBytes
+            _state.update { current ->
+                current.copy(
+                    activeDownloads = current.activeDownloads.filter { it.id != progress.id },
+                    queue = current.queue.map {
+                        if (it.id == progress.id) {
+                            it.copy(
+                                state = DownloadState.WAITING_FOR_STORAGE,
+                                requiredStorageBytes = plan.requiredBytes
+                            )
+                        } else {
+                            it
+                        }
+                    } + if (current.queue.none { it.id == progress.id }) {
+                        listOf(
+                            progress.copy(
+                                state = DownloadState.WAITING_FOR_STORAGE,
+                                requiredStorageBytes = plan.requiredBytes
+                            )
                         )
-                    } else {
-                        it
-                    }
-                } + if (_state.value.queue.none { it.id == progress.id }) {
-                    listOf(
-                        progress.copy(
-                            state = DownloadState.WAITING_FOR_STORAGE,
-                            requiredStorageBytes = plan.requiredBytes
-                        )
-                    )
-                } else emptyList(),
-                availableStorageBytes = availableStorage
-            )
+                    } else emptyList(),
+                    availableStorageBytes = availableStorage
+                )
+            }
             return
         }
 
         soundManager.play(SoundType.DOWNLOAD_START)
 
-        _state.value = _state.value.copy(
-            activeDownloads = _state.value.activeDownloads +
-                progress.copy(state = DownloadState.DOWNLOADING, isAwaitingServer = true),
-            queue = _state.value.queue.filter { it.id != progress.id },
-            availableStorageBytes = availableStorage
-        )
+        _state.update { current ->
+            current.copy(
+                activeDownloads = current.activeDownloads +
+                    progress.copy(state = DownloadState.DOWNLOADING, isAwaitingServer = true),
+                queue = current.queue.filter { it.id != progress.id },
+                availableStorageBytes = availableStorage
+            )
+        }
 
         downloadQueueDao.updateState(progress.id, DownloadState.DOWNLOADING.name)
 
@@ -498,18 +502,23 @@ class DownloadManager internal constructor(
         when (result) {
             is DownloadResult.Cancelled -> return
             is DownloadResult.WaitingForStorage -> {
-                _state.value = _state.value.copy(
-                    activeDownloads = _state.value.activeDownloads.filter { it.id != progress.id },
-                    queue = _state.value.queue.filter { it.id != progress.id } + finalProgress,
-                    availableStorageBytes = getAvailableStorageBytes(progress.gameId, progress.platformSlug)
-                )
+                val availableStorage = getAvailableStorageBytes(progress.gameId, progress.platformSlug)
+                _state.update { current ->
+                    current.copy(
+                        activeDownloads = current.activeDownloads.filter { it.id != progress.id },
+                        queue = current.queue.filter { it.id != progress.id } + finalProgress,
+                        availableStorageBytes = availableStorage
+                    )
+                }
                 notifySlotFreed()
             }
             else -> {
-                _state.value = _state.value.copy(
-                    activeDownloads = _state.value.activeDownloads.filter { it.id != progress.id },
-                    completed = _state.value.completed + finalProgress
-                )
+                _state.update { current ->
+                    current.copy(
+                        activeDownloads = current.activeDownloads.filter { it.id != progress.id },
+                        completed = current.completed + finalProgress
+                    )
+                }
                 notifySlotFreed()
                 if (result is DownloadResult.Success) {
                     broadcastDownloadCompleted(progress.gameId)
@@ -1038,30 +1047,34 @@ class DownloadManager internal constructor(
             if (plan is StoragePlan.Insufficient) {
                 Log.d(TAG, "processQueue: ${next.gameTitle} needs ${plan.requiredBytes}, has ${plan.availableBytes}")
                 downloadQueueDao.updateState(next.id, DownloadState.WAITING_FOR_STORAGE.name)
-                _state.value = _state.value.copy(
-                    queue = _state.value.queue.map {
-                        if (it.id == next.id) {
-                            it.copy(
-                                state = DownloadState.WAITING_FOR_STORAGE,
-                                requiredStorageBytes = plan.requiredBytes
-                            )
-                        } else {
-                            it
-                        }
-                    },
-                    availableStorageBytes = availableStorage
-                )
+                _state.update { current ->
+                    current.copy(
+                        queue = current.queue.map {
+                            if (it.id == next.id) {
+                                it.copy(
+                                    state = DownloadState.WAITING_FOR_STORAGE,
+                                    requiredStorageBytes = plan.requiredBytes
+                                )
+                            } else {
+                                it
+                            }
+                        },
+                        availableStorageBytes = availableStorage
+                    )
+                }
                 continue
             }
 
             soundManager.play(SoundType.DOWNLOAD_START)
 
-            _state.value = _state.value.copy(
-                activeDownloads = _state.value.activeDownloads +
-                    next.copy(state = DownloadState.DOWNLOADING, isAwaitingServer = true),
-                queue = _state.value.queue.filter { it.id != next.id },
-                availableStorageBytes = availableStorage
-            )
+            _state.update { current ->
+                current.copy(
+                    activeDownloads = current.activeDownloads +
+                        next.copy(state = DownloadState.DOWNLOADING, isAwaitingServer = true),
+                    queue = current.queue.filter { it.id != next.id },
+                    availableStorageBytes = availableStorage
+                )
+            }
 
             downloadQueueDao.updateState(next.id, DownloadState.DOWNLOADING.name)
 
@@ -1885,11 +1898,13 @@ class DownloadManager internal constructor(
     }
 
     private fun updateProgress(progress: DownloadProgress) {
-        _state.value = _state.value.copy(
-            activeDownloads = _state.value.activeDownloads.map {
-                if (it.id == progress.id) progress else it
-            }
-        )
+        _state.update { current ->
+            current.copy(
+                activeDownloads = current.activeDownloads.map {
+                    if (it.id == progress.id) progress else it
+                }
+            )
+        }
     }
 
     fun pauseDownload(rommId: Long) {
@@ -1903,20 +1918,28 @@ class DownloadManager internal constructor(
                 downloadQueueDao.updateProgress(active.id, active.bytesDownloaded)
             }
 
-            _state.value = _state.value.copy(
-                activeDownloads = _state.value.activeDownloads.filter { it.id != active.id },
-                queue = listOf(active.copy(state = DownloadState.PAUSED)) + _state.value.queue
-            )
+            _state.update { current ->
+                current.copy(
+                    activeDownloads = current.activeDownloads.filter { it.id != active.id },
+                    queue = listOf(active.copy(state = DownloadState.PAUSED)) + current.queue
+                )
+            }
             notifySlotFreed()
         } else {
-            _state.value = _state.value.copy(
-                queue = _state.value.queue.map {
-                    if (it.rommId == rommId && it.state == DownloadState.QUEUED) {
-                        scope.launch { downloadQueueDao.updateState(it.id, DownloadState.PAUSED.name) }
-                        it.copy(state = DownloadState.PAUSED)
-                    } else it
-                }
-            )
+            val pausedIds = _state.value.queue
+                .filter { it.rommId == rommId && it.state == DownloadState.QUEUED }
+                .map { it.id }
+                .toSet()
+            pausedIds.forEach { id ->
+                scope.launch { downloadQueueDao.updateState(id, DownloadState.PAUSED.name) }
+            }
+            _state.update { current ->
+                current.copy(
+                    queue = current.queue.map {
+                        if (it.id in pausedIds) it.copy(state = DownloadState.PAUSED) else it
+                    }
+                )
+            }
         }
     }
 
@@ -1929,10 +1952,12 @@ class DownloadManager internal constructor(
                 downloadQueueDao.updateState(paused.id, DownloadState.QUEUED.name)
             }
 
-            _state.value = _state.value.copy(
-                queue = listOf(paused.copy(state = DownloadState.QUEUED)) +
-                        _state.value.queue.filter { it.gameId != gameId }
-            )
+            _state.update { current ->
+                current.copy(
+                    queue = listOf(paused.copy(state = DownloadState.QUEUED)) +
+                            current.queue.filter { it.gameId != gameId }
+                )
+            }
 
             scope.launch { processQueue() }
         }
@@ -2007,9 +2032,11 @@ class DownloadManager internal constructor(
                 }
                 discardStagingFor(active.id)
             }
-            _state.value = _state.value.copy(
-                activeDownloads = _state.value.activeDownloads.filter { it.id != active.id }
-            )
+            _state.update { current ->
+                current.copy(
+                    activeDownloads = current.activeDownloads.filter { it.id != active.id }
+                )
+            }
             notifySlotFreed()
         } else {
             val queued = _state.value.queue.find { it.rommId == rommId }
@@ -2023,9 +2050,11 @@ class DownloadManager internal constructor(
                     }
                     discardStagingFor(queued.id)
                 }
-                _state.value = _state.value.copy(
-                    queue = _state.value.queue.filter { it.rommId != rommId }
-                )
+                _state.update { current ->
+                    current.copy(
+                        queue = current.queue.filter { it.rommId != rommId }
+                    )
+                }
             }
         }
     }
@@ -2034,23 +2063,25 @@ class DownloadManager internal constructor(
         scope.launch {
             downloadQueueDao.clearCompleted()
         }
-        _state.value = _state.value.copy(completed = emptyList())
+        _state.update { it.copy(completed = emptyList()) }
     }
 
     fun clearFinished() {
         scope.launch {
             downloadQueueDao.clearFinished()
         }
-        _state.value = _state.value.copy(completed = emptyList())
+        _state.update { it.copy(completed = emptyList()) }
     }
 
     fun removeFromCompleted(downloadId: Long) {
         scope.launch {
             downloadQueueDao.deleteById(downloadId)
         }
-        _state.value = _state.value.copy(
-            completed = _state.value.completed.filter { it.id != downloadId }
-        )
+        _state.update { current ->
+            current.copy(
+                completed = current.completed.filter { it.id != downloadId }
+            )
+        }
     }
 
     fun retryDownload(downloadId: Long) {
@@ -2059,9 +2090,11 @@ class DownloadManager internal constructor(
         scope.launch {
             downloadQueueDao.deleteById(downloadId)
 
-            _state.value = _state.value.copy(
-                completed = _state.value.completed.filter { it.id != downloadId }
-            )
+            _state.update { current ->
+                current.copy(
+                    completed = current.completed.filter { it.id != downloadId }
+                )
+            }
 
             requeueFailed(item)
         }

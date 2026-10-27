@@ -641,25 +641,29 @@ class RomMLibrarySyncService @Inject constructor(
                 emptySet()
             }
 
-            _syncProgress.value = _syncProgress.value.copy(
-                platformsTotal = passPlatforms.size,
-                platforms = passPlatforms.map { platform ->
-                    PlatformSyncRow(
-                        platformId = storagePlatformId(platform),
-                        name = platform.name,
-                        slug = platform.slug
-                    )
-                }
-            )
+            _syncProgress.update {
+                it.copy(
+                    platformsTotal = passPlatforms.size,
+                    platforms = passPlatforms.map { platform ->
+                        PlatformSyncRow(
+                            platformId = storagePlatformId(platform),
+                            name = platform.name,
+                            slug = platform.slug
+                        )
+                    }
+                )
+            }
 
             for ((index, platform) in passPlatforms.withIndex()) {
                 onProgress?.invoke(index + 1, passPlatforms.size, platform.name)
 
-                _syncProgress.value = _syncProgress.value.copy(
-                    currentPlatform = platform.name,
-                    currentPlatformSlug = platform.slug,
-                    platformsDone = index
-                )
+                _syncProgress.update {
+                    it.copy(
+                        currentPlatform = platform.name,
+                        currentPlatformSlug = platform.slug,
+                        platformsDone = index
+                    )
+                }
 
                 val storageId = storagePlatformId(platform)
                 if (storageId in completedPlatformIds) {

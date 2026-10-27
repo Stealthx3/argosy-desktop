@@ -138,7 +138,7 @@ class UserProfileViewModel @Inject constructor(
     }
 
     fun loadProfile() {
-        _uiState.value = _uiState.value.copy(isLoading = true)
+        _uiState.update { it.copy(isLoading = true) }
         socialRepository.requestUserProfile(userId)
     }
 
@@ -147,7 +147,7 @@ class UserProfileViewModel @Inject constructor(
         val maxIndex = (state.focusCount - 1).coerceAtLeast(0)
         val newIndex = (state.focusIndex + delta).coerceIn(0, maxIndex)
         if (newIndex != state.focusIndex) {
-            _uiState.value = state.copy(focusIndex = newIndex)
+            _uiState.update { it.copy(focusIndex = newIndex) }
             return true
         }
         return false
@@ -157,9 +157,11 @@ class UserProfileViewModel @Inject constructor(
         val profile = _uiState.value.profile ?: return
         if (profile.relationship != "friend") return
         socialRepository.toggleFavoriteFriend(userId)
-        _uiState.value = _uiState.value.copy(
-            profile = profile.copy(isFavorite = !profile.isFavorite)
-        )
+        _uiState.update {
+            it.copy(
+                profile = it.profile?.copy(isFavorite = !profile.isFavorite)
+            )
+        }
     }
 
     fun sendFriendRequest() {

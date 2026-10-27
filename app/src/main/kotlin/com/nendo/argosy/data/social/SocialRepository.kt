@@ -55,6 +55,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.time.Instant
@@ -352,10 +353,12 @@ class SocialRepository @Inject constructor(
                     }
                     is ArgosSocialService.IncomingMessage.FavoriteFriendUpdated -> {
                         Log.d(TAG, "Favorite updated: ${message.friendId} -> ${message.isFavorite}")
-                        _friends.value = _friends.value.map { friend ->
-                            if (friend.id == message.friendId) friend.copy(isFavorite = message.isFavorite)
-                            else friend
-                        }.sortedWith(friendComparator)
+                        _friends.update { friends ->
+                            friends.map { friend ->
+                                if (friend.id == message.friendId) friend.copy(isFavorite = message.isFavorite)
+                                else friend
+                            }.sortedWith(friendComparator)
+                        }
                     }
                     is ArgosSocialService.IncomingMessage.QuayPassAvatarUpdated -> {
                         message.ownerDoodle?.let { preferencesRepository.setSocialAvatarFromServer(it) }
@@ -418,9 +421,8 @@ class SocialRepository @Inject constructor(
                         Log.d(TAG, "FeedData received: ${message.events.size} new events, loadingMore=$_isLoadingMoreFeed, prevCount=$prevCount")
                         _isLoadingFeed.value = false
                         if (_isLoadingMoreFeed) {
-                            val combined = _feedEvents.value + message.events
+                            val combined = _feedEvents.updateAndGet { it + message.events }
                             Log.d(TAG, "FeedData appending: $prevCount + ${message.events.size} = ${combined.size} total")
-                            _feedEvents.value = combined
                             _isLoadingMoreFeed = false
                         } else {
                             Log.d(TAG, "FeedData replacing: was $prevCount, now ${message.events.size}")
@@ -432,7 +434,7 @@ class SocialRepository @Inject constructor(
                     is ArgosSocialService.IncomingMessage.FeedEvent -> {
                         val prevCount = _feedEvents.value.size
                         Log.d(TAG, "FeedEvent received: id=${message.event.id}, type=${message.event.type}, prepending to $prevCount events")
-                        _feedEvents.value = listOf(message.event) + _feedEvents.value
+                        _feedEvents.update { listOf(message.event) + it }
                         Log.d(TAG, "FeedEvent added: total now ${_feedEvents.value.size}")
                     }
                     is ArgosSocialService.IncomingMessage.FeedEventUpdated -> {
@@ -451,12 +453,13 @@ class SocialRepository @Inject constructor(
                     }
                     is ArgosSocialService.IncomingMessage.EventCommentsData -> {
                         Log.d(TAG, "EventCommentsData: eventId=${message.eventId}, count=${message.comments.size}")
-                        _eventComments.value = _eventComments.value + (message.eventId to message.comments)
+                        _eventComments.update { it + (message.eventId to message.comments) }
                     }
                     is ArgosSocialService.IncomingMessage.FeedCommentReceived -> {
                         Log.d(TAG, "FeedCommentReceived: eventId=${message.eventId}, commentId=${message.comment.id}")
-                        val current = _eventComments.value[message.eventId] ?: emptyList()
-                        _eventComments.value = _eventComments.value + (message.eventId to (current + message.comment))
+                        _eventComments.update {
+                            it + (message.eventId to ((it[message.eventId] ?: emptyList()) + message.comment))
+                        }
                     }
                     is ArgosSocialService.IncomingMessage.RequestGameData -> {
                         Log.d(TAG, "Server requesting game data: igdbId=${message.igdbId}, steamAppId=${message.steamAppId}, title=${message.gameTitle}")
@@ -479,7 +482,7 @@ class SocialRepository @Inject constructor(
                     is ArgosSocialService.IncomingMessage.NotificationReceived -> {
                         _usersCache.putAll(message.users)
                         val resolved = resolveNotificationActors(message.notification)
-                        _notifications.value = trimNotifications(listOf(resolved) + _notifications.value)
+                        _notifications.update { trimNotifications(listOf(resolved) + it) }
                     }
                     is ArgosSocialService.IncomingMessage.NotificationsData -> {
                         _usersCache.putAll(message.users)
@@ -489,7 +492,7 @@ class SocialRepository @Inject constructor(
                         }
                         val resolved = message.notifications.map { resolveNotificationActors(it) }
                         if (_isLoadingMoreNotifications) {
-                            _notifications.value = trimNotifications(_notifications.value + resolved)
+                            _notifications.update { trimNotifications(it + resolved) }
                             _isLoadingMoreNotifications = false
                         } else {
                             _notifications.value = trimNotifications(resolved)
@@ -498,7 +501,7 @@ class SocialRepository @Inject constructor(
                     }
                     is ArgosSocialService.IncomingMessage.CommunityFeedData -> {
                         if (_isLoadingMoreCommunityFeed) {
-                            _communityFeed.value = _communityFeed.value + message.events
+                            _communityFeed.update { it + message.events }
                         } else {
                             _communityFeed.value = message.events
                         }
@@ -512,14 +515,16 @@ class SocialRepository @Inject constructor(
                         Log.d(TAG, "CommunityFollows: ${message.follows.size}")
                     }
                     is ArgosSocialService.IncomingMessage.CommunityFollowUpdated -> {
-                        val existing = _communityFollows.value.toMutableList()
-                        val idx = existing.indexOfFirst { it.igdbGameId == message.follow.igdbGameId }
-                        if (idx >= 0) {
-                            existing[idx] = message.follow
-                        } else {
-                            existing.add(message.follow)
+                        _communityFollows.update { follows ->
+                            val existing = follows.toMutableList()
+                            val idx = existing.indexOfFirst { it.igdbGameId == message.follow.igdbGameId }
+                            if (idx >= 0) {
+                                existing[idx] = message.follow
+                            } else {
+                                existing.add(message.follow)
+                            }
+                            existing
                         }
-                        _communityFollows.value = existing
                         Log.d(TAG, "CommunityFollowUpdated: igdbGameId=${message.follow.igdbGameId}")
                     }
                     is ArgosSocialService.IncomingMessage.UserSettingsData -> {
@@ -790,10 +795,10 @@ class SocialRepository @Inject constructor(
         if (igdbGameId != null && igdbGameId != 0) {
             val isHidden = igdbGameId in _hiddenGameIds.value
             if (isHidden) {
-                _hiddenGameIds.value = _hiddenGameIds.value - igdbGameId
+                _hiddenGameIds.update { it - igdbGameId }
                 socialService.sendUnhideGame(igdbGameId, steamAppId)
             } else {
-                _hiddenGameIds.value = _hiddenGameIds.value + igdbGameId
+                _hiddenGameIds.update { it + igdbGameId }
                 socialService.sendHideGame(igdbGameId, steamAppId)
             }
             pendingToggleGameId = igdbGameId
@@ -1133,7 +1138,7 @@ class SocialRepository @Inject constructor(
         Log.d(TAG, "hideEvent: eventId=$eventId, connected=${socialService.isConnected()}")
         if (socialService.isConnected()) {
             val prevCount = _feedEvents.value.size
-            _feedEvents.value = _feedEvents.value.filter { it.id != eventId }
+            _feedEvents.update { events -> events.filter { it.id != eventId } }
             Log.d(TAG, "hideEvent: removed locally, count $prevCount -> ${_feedEvents.value.size}")
             socialService.hideEvent(eventId)
         }
@@ -1166,10 +1171,12 @@ class SocialRepository @Inject constructor(
     fun markNotificationRead(notificationId: String) {
         if (socialService.isConnected()) {
             socialService.markNotificationRead(notificationId = notificationId)
-            _notifications.value = _notifications.value.map {
-                if (it.id == notificationId && it.isUnread) {
-                    it.copy(viewedAt = java.time.Instant.now().toString())
-                } else it
+            _notifications.update { notifications ->
+                notifications.map {
+                    if (it.id == notificationId && it.isUnread) {
+                        it.copy(viewedAt = java.time.Instant.now().toString())
+                    } else it
+                }
             }
         }
     }
@@ -1178,8 +1185,10 @@ class SocialRepository @Inject constructor(
         if (socialService.isConnected()) {
             socialService.markAllNotificationsRead()
             val now = java.time.Instant.now().toString()
-            _notifications.value = _notifications.value.map {
-                it.copy(viewedAt = now)
+            _notifications.update { notifications ->
+                notifications.map {
+                    it.copy(viewedAt = now)
+                }
             }
             _unreadCount.value = 0
         }
@@ -1259,7 +1268,7 @@ class SocialRepository @Inject constructor(
     fun unfollowCommunity(igdbGameId: Int) {
         if (socialService.isConnected()) {
             socialService.unfollowCommunity(igdbGameId)
-            _communityFollows.value = _communityFollows.value.filter { it.igdbGameId != igdbGameId }
+            _communityFollows.update { follows -> follows.filter { it.igdbGameId != igdbGameId } }
         }
     }
 
@@ -1279,7 +1288,7 @@ class SocialRepository @Inject constructor(
         if (socialService.isConnected()) {
             socialService.updateUserSettings(communityAutoShare)
             if (communityAutoShare != null) {
-                _userSettings.value = _userSettings.value.copy(communityAutoShare = communityAutoShare)
+                _userSettings.update { it.copy(communityAutoShare = communityAutoShare) }
             }
         }
     }
