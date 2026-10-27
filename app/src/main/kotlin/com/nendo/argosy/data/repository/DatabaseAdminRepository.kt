@@ -3,6 +3,7 @@ package com.nendo.argosy.data.repository
 import android.content.Context
 import android.util.Log
 import androidx.room.withTransaction
+import com.nendo.argosy.core.media.SfxCacheCleaner
 import com.nendo.argosy.data.cache.ImageCacheManager
 import com.nendo.argosy.data.download.DownloadManager
 import com.nendo.argosy.data.download.MediaDownloadManager
@@ -14,7 +15,6 @@ import com.nendo.argosy.data.preferences.SessionStateStore
 import com.nendo.argosy.data.social.SocialRepository
 import com.nendo.argosy.data.storage.StorageAttributionRepository
 import com.nendo.argosy.data.storage.StorageCategory
-import com.nendo.argosy.ui.input.SoundFeedbackManager
 import com.nendo.argosy.util.AppPaths
 import com.nendo.argosy.util.FileNames
 import dagger.Lazy
@@ -83,7 +83,7 @@ class DatabaseAdminRepository @Inject constructor(
     private val emulatorDownloadManager: Lazy<EmulatorDownloadManager>,
     private val mediaDownloadManager: Lazy<MediaDownloadManager>,
     private val socialRepository: Lazy<SocialRepository>,
-    private val soundFeedbackManager: Lazy<SoundFeedbackManager>,
+    private val sfxCacheCleaner: Lazy<SfxCacheCleaner>,
     private val hardResetRecorder: HardResetRecorder,
     private val gameRepository: Lazy<GameRepository>
 ) {
@@ -127,7 +127,7 @@ class DatabaseAdminRepository @Inject constructor(
         )
         purgeDatabase(GameSource.entries, includeLocalCollections = true, clearImages = true)
         downloadManager.get().cleanAbandonedStaging()
-        soundFeedbackManager.get().clearSfxCache()
+        sfxCacheCleaner.get().clearSfxCache()
         if (!emulatorDownloadManager.get().clearApkCache()) {
             Log.w(TAG, "hardReset: emulator APK cache skipped, download became active mid-reset")
         }

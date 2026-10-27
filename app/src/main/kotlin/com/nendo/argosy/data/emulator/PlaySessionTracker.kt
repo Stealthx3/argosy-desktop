@@ -595,7 +595,13 @@ class PlaySessionTracker @Inject constructor(
                     isHardcore = isHardcore,
                     channelName = channelName
                 )
-                _activeSession.update { current -> if (current?.startTime == session.startTime) updated else current }
+                _activeSession.update { current ->
+                    if (current?.startTime == session.startTime) {
+                        current.copy(isHardcore = isHardcore, channelName = channelName)
+                    } else {
+                        current
+                    }
+                }
                 Logger.debug(TAG, "[SaveSync] SESSION gameId=$gameId | Hardcore claim updated | hardcore=$isHardcore, channel=$channelName")
 
                 preferencesRepository.persistActiveSession(

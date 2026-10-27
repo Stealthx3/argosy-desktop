@@ -190,6 +190,7 @@
     <string name="notif_review_saved">Отзыв опубликован</string>
     <string name="notif_review_deleted">Отзыв удалён</string>
     <string name="notif_review_error_offline">Нет подключения к Argosy Social</string>
+    <string name="notif_social_error_offline">Нет подключения к Argosy Social</string>
     <string name="notif_review_error_too_long">Отзыв слишком длинный</string>
     <string name="notif_review_error_invalid">Сервер не смог прочитать отзыв</string>
     <string name="notif_review_error_server">Сервер не смог сохранить отзыв</string>

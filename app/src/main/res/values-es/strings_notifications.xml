@@ -184,6 +184,7 @@
     <string name="notif_review_saved">Reseña publicada</string>
     <string name="notif_review_deleted">Reseña eliminada</string>
     <string name="notif_review_error_offline">Sin conexión con Argosy Social</string>
+    <string name="notif_social_error_offline">Sin conexión con Argosy Social</string>
     <string name="notif_review_error_too_long">La reseña es demasiado larga</string>
     <string name="notif_review_error_invalid">El servidor no pudo leer la reseña</string>
     <string name="notif_review_error_server">El servidor no pudo guardar la reseña</string>

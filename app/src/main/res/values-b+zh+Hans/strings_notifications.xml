@@ -172,6 +172,7 @@
     <string name="notif_review_saved">评价已发布</string>
     <string name="notif_review_deleted">评价已删除</string>
     <string name="notif_review_error_offline">未连接到 Argosy Social</string>
+    <string name="notif_social_error_offline">未连接到 Argosy Social</string>
     <string name="notif_review_error_too_long">评价内容过长</string>
     <string name="notif_review_error_invalid">服务器无法读取该评价</string>
     <string name="notif_review_error_server">服务器无法保存该评价</string>

@@ -396,6 +396,9 @@
     <string name="notif_review_deleted">Review deleted</string>
     <!-- Error when a review write was attempted without a social connection. -->
     <string name="notif_review_error_offline">Not connected to Argosy Social</string>
+    <!-- Error when a like, comment, post, follow, friend or notification action was attempted
+         without a social connection, so it was not sent. -->
+    <string name="notif_social_error_offline">Not connected to Argosy Social</string>
     <!-- Error when the server refused the review text for exceeding its length limit. -->
     <string name="notif_review_error_too_long">The review is too long</string>
     <!-- Error when the server could not read the review it was sent. -->

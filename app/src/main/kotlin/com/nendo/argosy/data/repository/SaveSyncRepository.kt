@@ -1,6 +1,7 @@
 package com.nendo.argosy.data.repository
 
 import com.nendo.argosy.data.local.dao.SaveCacheDao
+import com.nendo.argosy.data.local.dao.SaveCountByDevice
 import com.nendo.argosy.data.local.dao.SaveSyncDao
 import com.nendo.argosy.data.local.entity.SaveSyncEntity
 import com.nendo.argosy.data.remote.romm.AccountApi
@@ -155,6 +156,12 @@ class SaveSyncRepository @Inject constructor(
 
     fun observeSaveCountsByPlatform(): Flow<Map<Long, Int>> =
         entityManager.observeSaveCountsByPlatform()
+
+    fun observeSaveRows(ownerUserId: Long?): Flow<List<SaveSyncEntity>> =
+        saveSyncDao.observeAll(ownerUserId)
+
+    fun observeSaveCountsByDevice(ownerUserId: Long?): Flow<List<SaveCountByDevice>> =
+        saveSyncDao.observeSaveCountsByDevice(ownerUserId)
 
     suspend fun clearDirtyFlags(gameId: Long) = entityManager.clearDirtyFlags(gameId)
 

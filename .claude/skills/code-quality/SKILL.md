@@ -512,7 +512,6 @@ in an import search. Before saying "this is not on the list", grep for `Dao` in
 the file, not just the import block.
 - `ui/screens/settings/SettingsViewModel.kt` (`SaveCacheDao`)
 - `ui/screens/settings/delegates/BiosSettingsDelegate.kt` (`FirmwareDao`)
-- `ui/screens/savesync/SaveSyncViewModel.kt` (`GameDao`, `PendingConflictDao`, `SaveSyncDao`)
 - `ui/screens/gamedetail/GameDetailViewModel.kt` (`EmulatorConfigDao`, `GameDiscDao`, `GameFileDao`)
 - `ui/screens/gamedetail/delegates/AchievementDelegate.kt` (`AchievementDao`)
 - `ui/screens/gamedetail/delegates/PerGameSettingsDelegate.kt` (`EmulatorConfigDao`)

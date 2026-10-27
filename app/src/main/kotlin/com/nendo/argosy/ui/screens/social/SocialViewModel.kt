@@ -670,8 +670,9 @@ class SocialViewModel @Inject constructor(
         val event = _uiState.value.focusedEvent
         Log.d(TAG, "reportCurrentEvent: event=${event?.id}, reason=${reason.value}")
         event?.let {
-            socialRepository.reportEvent(it.id, reason.value)
-            socialRepository.hideEvent(it.id)
+            if (socialRepository.reportEvent(it.id, reason.value)) {
+                socialRepository.hideEvent(it.id)
+            }
         }
     }
 

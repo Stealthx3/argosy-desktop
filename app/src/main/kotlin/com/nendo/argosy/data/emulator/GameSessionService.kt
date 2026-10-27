@@ -74,6 +74,8 @@ class GameSessionService : Service() {
     private val serviceScope = SafeCoroutineScope(Dispatchers.IO, "GameSessionService")
     private val handler = Handler(Looper.getMainLooper())
     private val fileObservers = mutableListOf<FileObserver>()
+    @Volatile
+    private var watchGeneration = 0
     private val sessionStateStore by lazy { SessionStateStore(this) }
 
     private var wakeLock: PowerManager.WakeLock? = null
@@ -334,17 +336,25 @@ class GameSessionService : Service() {
     }
 
     private fun startFileObserver(watchDir: File) {
-        val dirsToWatch = mutableListOf(watchDir)
-        watchDir.walkTopDown().maxDepth(3).filter { it.isDirectory }.forEach { dir ->
-            if (dir != watchDir) {
-                if (shouldIgnoreDirectory(dir)) {
-                    Logger.debug(TAG, "Skipping ignored directory: ${dir.name}")
-                } else {
-                    dirsToWatch.add(dir)
+        val generation = watchGeneration
+        serviceScope.launch {
+            val dirsToWatch = mutableListOf(watchDir)
+            watchDir.walkTopDown().maxDepth(3).filter { it.isDirectory }.forEach { dir ->
+                if (dir != watchDir) {
+                    if (shouldIgnoreDirectory(dir)) {
+                        Logger.debug(TAG, "Skipping ignored directory: ${dir.name}")
+                    } else {
+                        dirsToWatch.add(dir)
+                    }
                 }
             }
+            handler.post {
+                if (generation == watchGeneration) installObservers(dirsToWatch)
+            }
         }
+    }
 
+    private fun installObservers(dirsToWatch: List<File>) {
         val elapsedSinceStart = System.currentTimeMillis() - sessionStartTime
         Logger.debug(TAG, "Starting file watcher on ${dirsToWatch.size} directories (session elapsed: ${elapsedSinceStart}ms)")
 
@@ -397,6 +407,7 @@ class GameSessionService : Service() {
     }
 
     private fun stopWatching() {
+        watchGeneration++
         isWaitingForDirectory = false
         fileObservers.forEach { it.stopWatching() }
         fileObservers.clear()

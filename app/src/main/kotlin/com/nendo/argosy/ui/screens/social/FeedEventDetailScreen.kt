@@ -201,7 +201,7 @@ class FeedEventDetailViewModel @Inject constructor(
         val text = state.commentText.trim()
         if (text.isEmpty()) return
 
-        socialRepository.commentEvent(event.id, text)
+        if (!socialRepository.commentEvent(event.id, text)) return
         _uiState.update { it.copy(commentText = "", isCommentInputFocused = false) }
     }
 

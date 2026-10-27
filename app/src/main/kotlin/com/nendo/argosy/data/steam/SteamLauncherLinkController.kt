@@ -9,8 +9,8 @@ import com.nendo.argosy.data.launcher.SteamLaunchers
 import com.nendo.argosy.data.local.dao.GameArtDao
 import com.nendo.argosy.data.local.dao.GameDao
 import com.nendo.argosy.data.local.dao.resolved
-import com.nendo.argosy.ui.components.SteamLauncherLinkPrompt
-import com.nendo.argosy.ui.components.SteamMarkOption
+import com.nendo.argosy.data.model.SteamLauncherLinkPrompt
+import com.nendo.argosy.data.model.SteamMarkOption
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

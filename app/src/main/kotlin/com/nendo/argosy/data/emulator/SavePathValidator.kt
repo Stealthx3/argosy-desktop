@@ -37,7 +37,12 @@ class SavePathValidator @Inject constructor(
         data object NoConfig : Result()
     }
 
-    suspend fun validateAccess(emulatorId: String, emulatorPackage: String? = null): Result {
+    suspend fun validateAccess(emulatorId: String, emulatorPackage: String? = null): Result =
+        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+            validateAccessOnIo(emulatorId, emulatorPackage)
+        }
+
+    private suspend fun validateAccessOnIo(emulatorId: String, emulatorPackage: String?): Result {
         val config = SavePathRegistry.getConfigIncludingUnsupported(emulatorId)
         if (config == null) {
             Logger.debug(TAG, "[SaveSync] VALIDATE | No config for emulator | emulator=$emulatorId")

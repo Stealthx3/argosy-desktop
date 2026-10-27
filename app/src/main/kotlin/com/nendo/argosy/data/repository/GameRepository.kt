@@ -888,6 +888,8 @@ class GameRepository @Inject constructor(
 
     suspend fun getByIds(ids: List<Long>): List<GameEntity> = gameDao.getByIds(ids)
 
+    suspend fun getByIdsBatched(ids: List<Long>): List<GameEntity> = gameDao.getByIdsChunked(ids)
+
     private suspend fun hydrateByIds(ids: List<Long>): List<GameEntity> {
         if (ids.isEmpty()) return emptyList()
         val byId = gameDao.getByIdsChunked(ids).associateBy { it.id }

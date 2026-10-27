@@ -13,6 +13,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.nendo.argosy.ui.ArgosyViewModel
+import com.nendo.argosy.ui.common.settingsSection
 import com.nendo.argosy.ui.screens.apps.AppsScreen
 import com.nendo.argosy.ui.screens.collections.CollectionDetailScreen
 import com.nendo.argosy.ui.screens.collections.CollectionsScreen
@@ -96,7 +97,7 @@ fun NavGraph(
                 onNavigateToDefault = navigateToDefault,
                 onDrawerToggle = onDrawerToggle,
                 onChangelogAction = { action ->
-                    val section = action.section.name
+                    val section = action.settingsSection.name
                     navController.navigate(Screen.Settings.createRoute(section, action.actionKey))
                 },
                 onNavigateToSettings = { section ->

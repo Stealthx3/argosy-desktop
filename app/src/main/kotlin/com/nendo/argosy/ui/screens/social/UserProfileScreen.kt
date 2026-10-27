@@ -31,6 +31,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nendo.argosy.data.repository.GameRepository
+import com.nendo.argosy.data.social.SocialConnectionState
 import com.nendo.argosy.data.social.SocialRepository
 import com.nendo.argosy.data.social.UserProfileData
 import androidx.compose.foundation.layout.Spacer
@@ -120,6 +121,13 @@ class UserProfileViewModel @Inject constructor(
             }
         }
         viewModelScope.launch {
+            socialRepository.connectionState.collect { state ->
+                if (state !is SocialConnectionState.Connected) {
+                    _uiState.update { it.copy(isLoading = false) }
+                }
+            }
+        }
+        viewModelScope.launch {
             socialRepository.userProfile.collect { profile ->
                 if (profile != null && profile.user.id == userId) {
                     val igdbIds = profile.mostPlayed.map { it.igdbId }
@@ -139,7 +147,9 @@ class UserProfileViewModel @Inject constructor(
 
     fun loadProfile() {
         _uiState.update { it.copy(isLoading = true) }
-        socialRepository.requestUserProfile(userId)
+        if (!socialRepository.requestUserProfile(userId)) {
+            _uiState.update { it.copy(isLoading = false) }
+        }
     }
 
     fun moveFocus(delta: Int): Boolean {
@@ -156,7 +166,7 @@ class UserProfileViewModel @Inject constructor(
     fun toggleFavorite() {
         val profile = _uiState.value.profile ?: return
         if (profile.relationship != "friend") return
-        socialRepository.toggleFavoriteFriend(userId)
+        if (!socialRepository.toggleFavoriteFriend(userId)) return
         _uiState.update {
             it.copy(
                 profile = it.profile?.copy(isFavorite = !profile.isFavorite)

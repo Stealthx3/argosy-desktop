@@ -16,7 +16,7 @@ import com.nendo.argosy.data.preferences.SyncPreferencesRepository
 import com.nendo.argosy.data.preferences.UserPreferencesRepository
 import com.nendo.argosy.data.remote.romm.ConnectionState
 import com.nendo.argosy.data.remote.romm.RomMRepository
-import com.nendo.argosy.ui.input.SoundFeedbackManager
+import com.nendo.argosy.core.input.AppEventFeedback
 import com.nendo.argosy.core.input.SoundType
 import com.nendo.argosy.data.remote.romm.RomMResult
 import com.nendo.argosy.data.download.nsz.NszDecompressor
@@ -166,7 +166,7 @@ class DownloadManager internal constructor(
     private val platformDao: PlatformDao,
     private val romMRepository: RomMRepository,
     private val preferencesRepository: UserPreferencesRepository,
-    private val soundManager: SoundFeedbackManager,
+    private val soundManager: AppEventFeedback,
     private val m3uManager: M3uManager,
     private val thermalManager: dagger.Lazy<DownloadThermalManager>,
     private val mediaDownloadManager: dagger.Lazy<MediaDownloadManager>,
@@ -189,7 +189,7 @@ class DownloadManager internal constructor(
         platformDao: PlatformDao,
         romMRepository: RomMRepository,
         preferencesRepository: UserPreferencesRepository,
-        soundManager: SoundFeedbackManager,
+        soundManager: AppEventFeedback,
         m3uManager: M3uManager,
         thermalManager: dagger.Lazy<DownloadThermalManager>,
         mediaDownloadManager: dagger.Lazy<MediaDownloadManager>,

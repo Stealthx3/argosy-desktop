@@ -17,20 +17,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.res.stringResource
 import com.nendo.argosy.R
+import com.nendo.argosy.data.model.SteamLauncherLinkPrompt
+import com.nendo.argosy.data.model.SteamMarkOption
 import com.nendo.argosy.ui.theme.Dimens
 import com.nendo.argosy.ui.theme.LocalArgosyTheme
 import com.nendo.argosy.ui.util.clickableNoFocus
-
-data class SteamLauncherLinkPrompt(
-    val gameId: Long,
-    val title: String,
-    val coverPath: String? = null
-)
-
-data class SteamMarkOption(
-    val launcherPackage: String,
-    val displayName: String
-)
 
 @Composable
 fun SteamLauncherLinkModal(
