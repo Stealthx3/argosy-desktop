@@ -239,6 +239,7 @@ class DisplayPreferencesRepository @Inject constructor(
         val APPS_DISPLAY_TARGET = stringPreferencesKey("apps_display_target")
         val DUAL_SCREEN_INPUT_FOCUS = stringPreferencesKey("dual_screen_input_focus")
         val SCREEN_LAYOUTS = stringPreferencesKey("screen_layouts")
+        val SCREEN_LAYOUTS_UNREADABLE = stringPreferencesKey("screen_layouts_unreadable")
         val INSTALLED_ONLY_HOME = booleanPreferencesKey("installed_only_home")
     }
 
@@ -834,8 +835,17 @@ class DisplayPreferencesRepository @Inject constructor(
     }
 
     suspend fun setScreenLayouts(layouts: ScreenLayouts) {
-        dataStore.edit { it[Keys.SCREEN_LAYOUTS] = layouts.toJson() }
+        dataStore.edit { prefs ->
+            val stored = prefs[Keys.SCREEN_LAYOUTS]
+            if (stored != null && !isJsonObject(stored) && prefs[Keys.SCREEN_LAYOUTS_UNREADABLE] == null) {
+                prefs[Keys.SCREEN_LAYOUTS_UNREADABLE] = stored
+            }
+            prefs[Keys.SCREEN_LAYOUTS] = layouts.toJson()
+        }
     }
+
+    private fun isJsonObject(raw: String): Boolean =
+        runCatching { org.json.JSONObject(raw) }.isSuccess
 
     suspend fun setInstalledOnlyHome(enabled: Boolean) {
         dataStore.edit { it[Keys.INSTALLED_ONLY_HOME] = enabled }

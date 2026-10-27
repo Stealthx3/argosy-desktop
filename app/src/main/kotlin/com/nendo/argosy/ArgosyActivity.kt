@@ -225,6 +225,7 @@ class ArgosyActivity : ComponentActivity() {
 
     private var hasResumedBefore = false
     private var yieldedFocusToGame = false
+    private var attachedToDsmHolder = false
     private val pointerGuard = ControllerPointerGuard(
         windowName = "launcher",
         scope = lifecycleScope,
@@ -342,6 +343,8 @@ class ArgosyActivity : ComponentActivity() {
             )
             DualScreenManagerHolder.instance = dualScreenManager
         }
+        DualScreenManagerHolder.attach()
+        attachedToDsmHolder = true
 
         dualScreenManager.onRoleSwapped = { swapped ->
             if (swapped && !dualScreenManager.isMovingGame) refocusSelf()
@@ -493,9 +496,12 @@ class ArgosyActivity : ComponentActivity() {
         super.onDestroy()
         if (::screenCaptureManager.isInitialized) screenCaptureManager.stopCapture()
         activityScope.cancel()
-        if (isFinishing && ::dualScreenManager.isInitialized) {
+        val othersAttached = attachedToDsmHolder && DualScreenManagerHolder.detachAndCountRemaining() > 0
+        if (isFinishing && ::dualScreenManager.isInitialized && !othersAttached) {
             dualScreenManager.unregisterReceivers()
-            DualScreenManagerHolder.instance = null
+            if (DualScreenManagerHolder.instance === dualScreenManager) {
+                DualScreenManagerHolder.instance = null
+            }
         }
     }
 
