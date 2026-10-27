@@ -6,12 +6,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
- * Holds the settings backup to the classification documented on [SettingsBackupKeys].
- *
- * The excluded names live here rather than beside the allowlist so the production file can keep
- * describing exclusion by reason instead of by list. This is the audit: every DataStore key the
- * app declares is either exported or recorded below under the group that keeps it out, and a key
- * added later belongs to neither until somebody decides which.
+ * Every declared DataStore key is either in [SettingsBackupKeys.EXPORTED] or recorded below under
+ * the group that keeps it out of a backup.
  */
 class SettingsBackupKeysTest {
 
@@ -102,11 +98,13 @@ class SettingsBackupKeysTest {
         "file_logging_enabled", "file_log_level", "save_debug_logging_enabled"
     )
 
+    private val installPermissions = setOf("allow_remote_installs")
+
     private val excluded: Set<String> =
         credentialsAndIdentity + presenceSharingAndServiceAccounts + syncWatermarksAndResume +
             oneShotAndVersionMarkers + liveSessionState + saveAndStateSafetyGates +
             filesystemLocations + hardwareAndUnit + perDeviceScreenChoices + localRowIdsAndSets +
-            derivedAndGenerated + diagnostics
+            derivedAndGenerated + diagnostics + installPermissions
 
     private val credentialShapes = listOf(
         "token", "credential", "password", "api_key", "username", "user_name", "user_id", "device_id",

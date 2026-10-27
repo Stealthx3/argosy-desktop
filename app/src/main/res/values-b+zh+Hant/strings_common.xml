@@ -190,6 +190,12 @@
     <!-- Shared modals and controls (ui/components, ui/primitives) -->
 
     <string name="ui_confirm_modal_cancel">取消</string>
+    <string name="ui_pushed_apk_title">安裝%1$s？</string>
+    <string name="ui_pushed_apk_message">%1$s 將此應用程式傳送到了本裝置。\n\n套件：%2$s\n簽署：%3$s</string>
+    <string name="ui_pushed_apk_unknown_server">你的 RomM 伺服器</string>
+    <string name="ui_pushed_apk_unknown_signer">未知</string>
+    <string name="ui_pushed_apk_install">安裝</string>
+    <string name="ui_pushed_apk_not_now">暫不</string>
 
     <string name="ui_modal_search_placeholder">搜尋...</string>
 

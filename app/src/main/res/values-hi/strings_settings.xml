@@ -177,6 +177,7 @@
     <string name="settings_installers_error_download">डाउनलोड विफल</string>
     <string name="settings_installers_error_rate_limited">GitHub अनुरोध सीमित कर रहा है। बाद में फिर कोशिश करें</string>
     <string name="settings_installers_error_not_found">इस रिपॉज़िटरी तक नहीं पहुँचा जा सका</string>
+    <string name="settings_installers_error_wrong_package">डाउनलोड की गई ऐप अपेक्षित ऐप नहीं है</string>
     <string name="settings_installers_ime_enable_title">सिस्टम सेटिंग में चालू करें</string>
     <string name="settings_installers_ime_enable_subtitle">Android कीबोर्ड को सिस्टम सेटिंग से ही चालू करने देता है</string>
     <string name="settings_installers_ime_select_title">सक्रिय कीबोर्ड चुनें</string>

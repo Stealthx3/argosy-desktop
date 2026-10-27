@@ -169,6 +169,7 @@ fun ArgosyApp(
     val backgroundConflictButtonIndex by viewModel.saveConflicts.backgroundConflictButtonIndex.collectAsState()
     val backgroundConflictSnapshot by viewModel.saveConflicts.backgroundConflictSnapshot.collectAsState()
     val coreCrashPrompt by viewModel.coreCrashController.prompt.collectAsState()
+    val pushedApkPrompt by viewModel.apkInstallManager.pushedPrompt.collectAsState()
     val coreCrashFocusIndex by viewModel.coreCrashController.focusIndex.collectAsState()
     val coreCrashDownloading by viewModel.coreCrashController.downloading.collectAsState()
     val netplayInvitePrompt by viewModel.netplayInvitePrompt.collectAsState()
@@ -1473,6 +1474,22 @@ fun ArgosyApp(
                     onDismiss = { viewModel.coreCrashController.dismiss() }
                 )
             }
+
+            val pushedApk = pushedApkPrompt
+            com.nendo.argosy.ui.primitives.ArgosyConfirmModalHost(
+                visible = pushedApk != null,
+                title = stringResource(R.string.ui_pushed_apk_title, pushedApk?.title.orEmpty()),
+                message = stringResource(
+                    R.string.ui_pushed_apk_message,
+                    pushedApk?.serverHost ?: stringResource(R.string.ui_pushed_apk_unknown_server),
+                    pushedApk?.packageName.orEmpty(),
+                    pushedApk?.signerSha256 ?: stringResource(R.string.ui_pushed_apk_unknown_signer)
+                ),
+                confirmLabel = stringResource(R.string.ui_pushed_apk_install),
+                cancelLabel = stringResource(R.string.ui_pushed_apk_not_now),
+                onConfirm = { viewModel.apkInstallManager.confirmPushedInstall() },
+                onDismiss = { viewModel.apkInstallManager.dismissPushedInstall() }
+            )
 
             netplayInvitePrompt?.let { invite ->
                 NetplayInviteModal(

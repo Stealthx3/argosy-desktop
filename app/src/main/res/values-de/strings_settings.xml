@@ -187,6 +187,7 @@
     <string name="settings_installers_error_download">Download fehlgeschlagen</string>
     <string name="settings_installers_error_rate_limited">GitHub begrenzt die Anfragen. Später erneut versuchen</string>
     <string name="settings_installers_error_not_found">Dieses Repository ist nicht erreichbar</string>
+    <string name="settings_installers_error_wrong_package">Der Download ist eine andere App als erwartet</string>
     <string name="settings_installers_ime_enable_title">In den Systemeinstellungen aktivieren</string>
     <string name="settings_installers_ime_enable_subtitle">Android verlangt, dass die Tastatur in den Systemeinstellungen aktiviert wird</string>
     <string name="settings_installers_ime_select_title">Aktive Tastatur wählen</string>

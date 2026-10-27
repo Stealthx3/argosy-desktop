@@ -195,6 +195,12 @@
     <string name="ui_state_slot_row_tag_local">[Локально]</string>
 
     <string name="ui_confirm_modal_cancel">Отмена</string>
+    <string name="ui_pushed_apk_title">Установить %1$s?</string>
+    <string name="ui_pushed_apk_message">%1$s отправил это приложение на устройство.\n\nПакет: %2$s\nПодпись: %3$s</string>
+    <string name="ui_pushed_apk_unknown_server">Ваш сервер RomM</string>
+    <string name="ui_pushed_apk_unknown_signer">неизвестна</string>
+    <string name="ui_pushed_apk_install">Установить</string>
+    <string name="ui_pushed_apk_not_now">Не сейчас</string>
 
     <string name="ui_modal_search_placeholder">Поиск...</string>
 

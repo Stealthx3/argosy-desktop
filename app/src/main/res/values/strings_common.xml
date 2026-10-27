@@ -424,6 +424,12 @@
 
     <!-- Declining button of the shared confirm modal. Verb. -->
     <string name="ui_confirm_modal_cancel">Cancel</string>
+    <string name="ui_pushed_apk_title">Install %1$s?</string>
+    <string name="ui_pushed_apk_message">%1$s sent this app to this device.\n\nPackage: %2$s\nSigner: %3$s</string>
+    <string name="ui_pushed_apk_unknown_server">Your RomM server</string>
+    <string name="ui_pushed_apk_unknown_signer">unknown</string>
+    <string name="ui_pushed_apk_install">Install</string>
+    <string name="ui_pushed_apk_not_now">Not now</string>
 
     <!-- Placeholder in a modal's search field when nothing has been typed. -->
     <string name="ui_modal_search_placeholder">Search...</string>

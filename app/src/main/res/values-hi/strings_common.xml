@@ -193,6 +193,12 @@
     <!-- Shared modals and controls (ui/components, ui/primitives) -->
 
     <string name="ui_confirm_modal_cancel">रद्द करें</string>
+    <string name="ui_pushed_apk_title">%1$s इंस्टॉल करें?</string>
+    <string name="ui_pushed_apk_message">%1$s ने यह ऐप इस डिवाइस पर भेजा है।\n\nपैकेज: %2$s\nहस्ताक्षर: %3$s</string>
+    <string name="ui_pushed_apk_unknown_server">आपका RomM सर्वर</string>
+    <string name="ui_pushed_apk_unknown_signer">अज्ञात</string>
+    <string name="ui_pushed_apk_install">इंस्टॉल करें</string>
+    <string name="ui_pushed_apk_not_now">अभी नहीं</string>
 
     <string name="ui_modal_search_placeholder">खोजें...</string>
 

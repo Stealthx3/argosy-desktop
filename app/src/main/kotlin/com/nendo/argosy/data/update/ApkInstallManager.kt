@@ -12,7 +12,9 @@ import com.nendo.argosy.data.local.dao.GameArtDao
 import com.nendo.argosy.data.local.dao.GameDao
 import com.nendo.argosy.data.local.dao.resolved
 import com.nendo.argosy.data.model.GameSource
+import com.nendo.argosy.data.model.PushedApkPrompt
 import com.nendo.argosy.data.platform.LocalPlatformIds
+import com.nendo.argosy.data.remote.romm.RomMConnectionManager
 import com.nendo.argosy.data.repository.AppsRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import com.nendo.argosy.util.SafeCoroutineScope
@@ -27,6 +29,8 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 private const val TAG = "ApkInstallManager"
+private const val PUSHED_PREFS = "apk_install_pushed"
+private const val PUSHED_IDS = "game_ids"
 
 sealed class ApkInstallState {
     data object Idle : ApkInstallState()
@@ -43,7 +47,8 @@ class ApkInstallManager @Inject constructor(
     private val gameArtDao: GameArtDao,
     private val appInstaller: AppInstaller,
     private val imageCacheManager: ImageCacheManager,
-    private val appsRepository: AppsRepository
+    private val appsRepository: AppsRepository,
+    private val connectionManager: RomMConnectionManager
 ) {
     private val scope = SafeCoroutineScope(Dispatchers.Main, "ApkInstallManager")
 
@@ -111,8 +116,67 @@ class ApkInstallManager @Inject constructor(
             gameDao.update(game.copy(titleId = expectedPackageName))
         }
 
+        if (consumePushed(event.gameId)) {
+            _pushedPrompt.value = PushedApkPrompt(
+                gameId = event.gameId,
+                apkPath = event.localPath,
+                title = game.title,
+                packageName = expectedPackageName,
+                signerSha256 = apkSignerSha256(apkFile),
+                serverHost = runCatching { java.net.URI(connectionManager.getBaseUrl()).host }.getOrNull()
+            )
+            return
+        }
+
         _state.value = ApkInstallState.WaitingForInstall(event.gameId, event.localPath)
         appInstaller.installApk(context, apkFile)
+    }
+
+    private val _pushedPrompt = MutableStateFlow<PushedApkPrompt?>(null)
+    val pushedPrompt: StateFlow<PushedApkPrompt?> = _pushedPrompt.asStateFlow()
+
+    private val pushedPrefs by lazy { context.getSharedPreferences(PUSHED_PREFS, Context.MODE_PRIVATE) }
+
+    fun markPushed(gameId: Long) {
+        val ids = pushedPrefs.getStringSet(PUSHED_IDS, emptySet()).orEmpty() + gameId.toString()
+        pushedPrefs.edit().putStringSet(PUSHED_IDS, ids).apply()
+    }
+
+    private fun consumePushed(gameId: Long): Boolean {
+        val ids = pushedPrefs.getStringSet(PUSHED_IDS, emptySet()).orEmpty()
+        if (gameId.toString() !in ids) return false
+        pushedPrefs.edit().putStringSet(PUSHED_IDS, ids - gameId.toString()).apply()
+        return true
+    }
+
+    fun confirmPushedInstall() {
+        val prompt = _pushedPrompt.value ?: return
+        _pushedPrompt.value = null
+        val apk = File(prompt.apkPath)
+        if (!apk.exists()) return
+        _state.value = ApkInstallState.WaitingForInstall(prompt.gameId, prompt.apkPath)
+        appInstaller.installApk(context, apk)
+    }
+
+    fun dismissPushedInstall() {
+        _pushedPrompt.value = null
+    }
+
+    private fun apkSignerSha256(apkFile: File): String? = try {
+        val flags = PackageManager.GET_SIGNING_CERTIFICATES
+        val info = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            context.packageManager.getPackageArchiveInfo(apkFile.absolutePath, PackageManager.PackageInfoFlags.of(flags.toLong()))
+        } else {
+            @Suppress("DEPRECATION")
+            context.packageManager.getPackageArchiveInfo(apkFile.absolutePath, flags)
+        }
+        info?.signingInfo?.apkContentsSigners?.firstOrNull()?.toByteArray()?.let { cert ->
+            java.security.MessageDigest.getInstance("SHA-256").digest(cert)
+                .joinToString(":") { "%02X".format(it) }
+        }
+    } catch (e: Exception) {
+        Log.w(TAG, "Could not read the APK signer: ${e.message}")
+        null
     }
 
     private fun getApkPackageName(apkFile: File): String? {

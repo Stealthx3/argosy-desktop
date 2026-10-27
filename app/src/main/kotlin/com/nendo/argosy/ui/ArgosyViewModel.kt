@@ -191,7 +191,8 @@ class ArgosyViewModel @Inject constructor(
     val saveConflicts: com.nendo.argosy.ui.conflict.SaveConflictPrompts,
     private val deepLinkLaunchCoordinator: com.nendo.argosy.ui.deeplink.DeepLinkLaunchCoordinator,
     private val gameStartRouter: com.nendo.argosy.ui.screens.common.GameStartRouter,
-    private val connectedControllerTracker: com.nendo.argosy.core.input.ConnectedControllerTracker
+    private val connectedControllerTracker: com.nendo.argosy.core.input.ConnectedControllerTracker,
+    val apkInstallManager: com.nendo.argosy.data.update.ApkInstallManager
 ) : ViewModel() {
 
     suspend fun resolveDeepLinkLaunch(

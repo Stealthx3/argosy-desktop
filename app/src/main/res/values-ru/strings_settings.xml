@@ -180,6 +180,7 @@
     <string name="settings_installers_error_download">Не удалось загрузить</string>
     <string name="settings_installers_error_rate_limited">GitHub ограничивает запросы. Повторите позже</string>
     <string name="settings_installers_error_not_found">Не удалось открыть этот репозиторий</string>
+    <string name="settings_installers_error_wrong_package">Загружено другое приложение, а не ожидаемое</string>
     <string name="settings_installers_ime_enable_title">Включить в настройках системы</string>
     <string name="settings_installers_ime_enable_subtitle">Android разрешает включить клавиатуру только в настройках системы</string>
     <string name="settings_installers_ime_select_title">Выбрать активную клавиатуру</string>

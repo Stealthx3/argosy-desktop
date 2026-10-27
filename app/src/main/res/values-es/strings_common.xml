@@ -194,6 +194,12 @@
     <!-- Shared modals and controls (ui/components, ui/primitives) -->
 
     <string name="ui_confirm_modal_cancel">Cancelar</string>
+    <string name="ui_pushed_apk_title">¿Instalar %1$s?</string>
+    <string name="ui_pushed_apk_message">%1$s envió esta app a este dispositivo.\n\nPaquete: %2$s\nFirma: %3$s</string>
+    <string name="ui_pushed_apk_unknown_server">Tu servidor RomM</string>
+    <string name="ui_pushed_apk_unknown_signer">desconocida</string>
+    <string name="ui_pushed_apk_install">Instalar</string>
+    <string name="ui_pushed_apk_not_now">Ahora no</string>
 
     <string name="ui_modal_search_placeholder">Buscar...</string>
 

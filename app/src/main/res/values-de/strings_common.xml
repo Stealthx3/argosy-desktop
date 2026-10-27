@@ -193,6 +193,12 @@
     <!-- Shared modals and controls (ui/components, ui/primitives) -->
 
     <string name="ui_confirm_modal_cancel">Abbrechen</string>
+    <string name="ui_pushed_apk_title">%1$s installieren?</string>
+    <string name="ui_pushed_apk_message">%1$s hat diese App an dieses Gerät gesendet.\n\nPaket: %2$s\nSignatur: %3$s</string>
+    <string name="ui_pushed_apk_unknown_server">Dein RomM-Server</string>
+    <string name="ui_pushed_apk_unknown_signer">unbekannt</string>
+    <string name="ui_pushed_apk_install">Installieren</string>
+    <string name="ui_pushed_apk_not_now">Nicht jetzt</string>
 
     <string name="ui_modal_search_placeholder">Suchen...</string>
 

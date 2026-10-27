@@ -189,6 +189,7 @@
     <string name="settings_installers_error_download">Error en la descarga</string>
     <string name="settings_installers_error_rate_limited">GitHub está limitando las solicitudes. Inténtalo más tarde</string>
     <string name="settings_installers_error_not_found">No se pudo acceder a ese repositorio</string>
+    <string name="settings_installers_error_wrong_package">La descarga es una aplicación distinta de la esperada</string>
     <string name="settings_installers_ime_enable_title">Activar en los ajustes del sistema</string>
     <string name="settings_installers_ime_enable_subtitle">Android exige activar el teclado desde los ajustes del sistema</string>
     <string name="settings_installers_ime_select_title">Elegir teclado activo</string>

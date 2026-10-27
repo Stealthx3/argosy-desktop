@@ -109,6 +109,8 @@
     <string name="settings_installers_error_rate_limited">GitHub is limiting requests. Try again later</string>
     <!-- Error line: the repository does not exist or is private. -->
     <string name="settings_installers_error_not_found">That repository could not be reached</string>
+    <!-- Error line: the downloaded APK installs a different app than the one this entry manages. -->
+    <string name="settings_installers_error_wrong_package">The download is a different app than expected</string>
     <!-- Row title under an installed keyboard. Verb phrase: open the system screen that turns a
          keyboard on. -->
     <string name="settings_installers_ime_enable_title">Enable In System Settings</string>
