@@ -2,6 +2,7 @@ package com.nendo.argosy.desktop
 
 import kotlin.system.exitProcess
 import com.nendo.argosy.platform.AppShutdown
+import com.nendo.argosy.ui.input.DesktopGamepadDispatcher
 import com.nendo.argosy.platform.mpv.MpvProbe
 import kotlinx.coroutines.flow.drop
 import java.awt.image.BufferedImage
@@ -65,6 +66,7 @@ fun main(args: Array<String>) {
     val keyDispatcher = app.component.keyDispatcher()
     val gamepadDispatcher = app.component.gamepadDispatcher()
     gamepadDispatcher.start()
+    Runtime.getRuntime().addShutdownHook(Thread({ shutDown(gamepadDispatcher) }, "argosy-shutdown"))
     app.component.hostSessionWatcher().start()
     app.component.backgroundJobs().start()
     val fontFamilyResolver = robotoFontFamilyResolver()
@@ -145,10 +147,19 @@ fun main(args: Array<String>) {
             }
         }
     }
-    gamepadDispatcher.releaseAll()
     keyDispatcher.releaseAll()
     exitProcess(0)
 }
+
+private fun shutDown(gamepadDispatcher: DesktopGamepadDispatcher) {
+    Thread({
+        Thread.sleep(SHUTDOWN_GRACE_MS)
+        Runtime.getRuntime().halt(0)
+    }, "argosy-shutdown-watchdog").apply { isDaemon = true }.start()
+    gamepadDispatcher.stop()
+}
+
+private const val SHUTDOWN_GRACE_MS = 3_000L
 
 /**
  * Android TV's density rule: the screen is 540dp tall at any resolution (720p is 1.33, 1080p is 2.0,

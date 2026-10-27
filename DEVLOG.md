@@ -1331,3 +1331,23 @@ Mapped ids: retroarch, dolphin, cemu, azahar, ryujinx (Ryubing), eden, melonds, 
 **Action:** the desktop `ImageCacheManager` was a full stub (empty art model, no caching), so Home and the Library showed placeholder tiles even though sync already records each game's art URLs in `game_art` (shared `ArtSourceRecorder`). The desktop actual now builds the same art model as Android (`gameArt` from `gameArtDao.observeRowCount()` → `getAll().toResolvedArtByGame()`, `artFor`, `loadArt`, `observeArt`), and its background-cache calls (`queueBackgroundCache*`, `queueCoverCache`, `queueArtIfStale`) prefetch the HTTP URLs through Coil's singleton loader. `installDesktopImageLoader` gains a 512 MB Coil disk cache under `DesktopDirectories.cache/image_cache`, so covers fetched during sync stay on disk and later screens load them offline. Divergence from Android: Android writes covers to its own files and stores `cachedPath`; desktop leaves `cachedPath` empty and relies on Coil's disk cache keyed by URL (same display, no extra file bookkeeping).
 **Verification:** gate `:shared:desktopTest` 131 + `:app:testDebugUnitTest` 4,426, 0 failures; smell check clean. Testbed games have no covers, so the walk `build/desktop-check/fresh-p5s3/` inserted COVER rows pointing at a local PNG server: `home-before` shows text tiles, `home-after` shows the covers on the Home rows, `library-all` shows them in the Library grid. Not checked against real RomM/IGDB covers (the owner's library has them; for the owner to check on the alpha).
 **Step 3 closed.** Alpha republished (`--step-close 5.3`).
+
+### 2026-10-26 — Step 4: Steam Game Mode (launch crash, clean exit); step closed
+
+**Finding:** the desktop never shipped Sigil's JNI library, so the first title-id lookup (`TitleIdDownloadObserver` → `TitleIdExtractor` → `Sigil.<clinit>`) threw `UnsatisfiedLinkError` on the main thread. That happens when a game launches on a platform that uses title ids (the 2026-10-24 log shows it on a GameCube launch through Dolphin), and the uncaught error ended the app. This plausibly explains "no games launch" in Game Mode, but it is a desktop-wide bug, not specific to gamescope.
+**Action:**
+- `libsigil-jni` is built from the vendored `sigil/` with its own CMake (`-DSIGIL_BUILD_JNI_HOST=ON`), following the Phase 1 plan:
+  - Dev runs: a `:desktopApp:sigilJni` task builds it on the host, and the `run` task adds its folder through a JVM argument provider (Compose resets `jvmArgs` in its own `doFirst`, so plain `jvmArgs` were lost).
+  - Flatpak: a `sigil-jni` module compiles it inside the 25.08 SDK, so it links against the runtime's glibc, not the host's 2.43. `build-alpha.sh` stages the JDK's JNI headers, and FindJNI's library paths are set to dummies because they are never linked. The module installs into the app directory, and the packaged launcher gets `-Djava.library.path=$APPDIR`.
+- Shutdown: `DesktopGamepadDispatcher.stop()` closes every gamepad and quits SDL on its own thread. A JVM shutdown hook in `Main.kt` calls it on every way out: Close Argosy, the window close button, and SIGTERM (Steam's overlay "Exit game", logout). The hook also starts a 3 s watchdog that halts the JVM if any shutdown work hangs, so the process cannot linger. An SDL3-mode Argosy holds a Deck's controller through HIDAPI, and on SIGTERM that hold was never released.
+
+**Verification:**
+- Gate `:shared:desktopTest` 131 + `:app:testDebugUnitTest` 4,426, 0 failures; smell check clean.
+- `Class.forName("com.nendo.sigil.Sigil")` initialises against the built library (jshell).
+- The dev run's JVM reports `java.library.path` = the sigil build folder.
+- Local alpha: `libsigil-jni.so` is in `/app/lib/argosy-desktop/lib/app`, `ldd` inside the sandbox resolves only the runtime's libc, and the launcher cfg carries `-Djava.library.path=$APPDIR`.
+- SIGTERM to a running dev instance: exit in 417 ms.
+
+**Not verified here:** real Steam Game Mode. A nested-gamescope SIGTERM test was blocked by the session's permission classifier (its process match was too broad). A GameCube launch walk did not reach the game. Live Game Mode checks (launch, overlay exit) move to the owner and step 6 (SteamOS testing), with `argosy-run.log` requested from the owner.
+
+**Step 4 closed.** Alpha republished (`--step-close 5.4`).

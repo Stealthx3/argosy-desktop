@@ -15,6 +15,10 @@ mkdir -p "$out"
 if [ "${1:-}" != "--no-gradle" ]; then
   JAVA_HOME="$HOME/.jdks/jdk-21.0.12.1+1" ./gradlew --no-daemon --console=plain :desktopApp:createDistributable
 fi
+# JNI headers for the sigil-jni module (the runtime SDK has no JDK); the library itself is built
+# inside the SDK so it links against the runtime's glibc, not the host's.
+rm -rf desktopApp/build/jni-include
+cp -r "$HOME/.jdks/jdk-21.0.12.1+1/include" desktopApp/build/jni-include
 if command -v flatpak-builder >/dev/null 2>&1; then
   builder=(flatpak-builder)
 else

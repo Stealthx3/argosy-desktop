@@ -106,6 +106,15 @@ class DesktopGamepadDispatcher @Inject constructor(
         stopRepeat()
     }
 
+    /**
+     * Closes every gamepad and quits SDL on its own thread, so a held HIDAPI device (a Steam Deck's
+     * controller in SDL3 mode) goes back to the system before the process ends.
+     */
+    fun stop() {
+        stopRepeat()
+        source?.stopAndJoin(STOP_TIMEOUT_MS)
+    }
+
     internal fun handle(event: SdlPadEvent) {
         val deviceId = SdlGamepadMapping.deviceId(event.instanceId)
         if (event is SdlPadEvent.Button || event is SdlPadEvent.Axis) _padActivity.value = System.currentTimeMillis()

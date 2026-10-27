@@ -2,7 +2,7 @@
 
 Rewritten (not appended) at the end of every work unit, so a fresh session can start from it alone. History and reasoning live in `DEVLOG.md`. Earlier phases: `phase-0.md` … `phase-4.md` (closed summaries).
 
-**Updated:** 2026-10-24 (step 3 closed, alpha 5.3). Steps 1–3 done; step 4 next.
+**Updated:** 2026-10-26 (step 4 closed, alpha 5.4). Steps 1–4 done; step 5 next.
 
 ## Scope and exit criterion
 
@@ -16,21 +16,27 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 - Flathub lint: exceptions or alternatives for emulator folder grants and `flatpak-spawn` access, screenshots, the app id vs repository name; offline from-source build (Gradle dependencies as Flatpak sources).
 - YouTube trailers on desktop (deferred; needs yt-dlp and a JavaScript runtime).
 
-## Known issue (for step 4)
+## Owner checks pending (alpha 5.4)
 
-- Desktop throws an uncaught `UnsatisfiedLinkError: no sigil-jni` from `TitleIdDownloadObserver` → `TitleIdExtractor` → `Sigil.<clinit>` (no libsigil-jni on desktop): catch it or skip title-id extraction on desktop, or ship the native library.
-- Walk gotchas: Quick Settings menus wrap (Close Argosy is `R3 DOWN*8`); `desktop-drive.sh` ends with `pkill -f` on the main class name, so never put that name in the same Bash command.
+- Real RomM covers on Home and Library (step 3 was verified with injected rows).
+- Steam Game Mode: launch a GameCube/Switch/PS game and a GBA game; exit Argosy from the Steam overlay. If anything fails, send `argosy-run.log` (Flatpak: under `~/.var/app/io.github.stealthx3.ArgosyDesktop`). Results feed step 6 (SteamOS testing).
 
-## Step 3 (thumbnails): done
+## Step 4 (Steam Game Mode): done
 
-- Desktop `ImageCacheManager` now has Android's art model and prefetches art URLs through Coil; `DesktopImageLoader` has a 512 MB disk cache (`DesktopDirectories.cache/image_cache`). Verified with injected `game_art` rows (testbed has no covers); real RomM covers are for the owner test.
-- Walk gotchas: `PAD:RIGHT_SHOULDER` switches Home → Library; A on "All Games" opens the grid.
+- `libsigil-jni`: `:desktopApp:sigilJni` (host, dev runs, via a JVM argument provider on `run`) and the Flatpak `sigil-jni` module (built in the SDK; `build-alpha.sh` stages JDK headers into `desktopApp/build/jni-include`). The Flathub offline build will need the openjdk SDK extension in place of those staged headers.
+- Shutdown hook (`Main.kt` `shutDown`): `DesktopGamepadDispatcher.stop()` plus a 3 s halt watchdog. SIGTERM exits in about 0.4 s.
 
-## Step 4 (Steam Game Mode): next action
+## Next action (step 5: side-by-side checks against Android)
 
-- First fix the Sigil `UnsatisfiedLinkError` (catch or skip title-id extraction on desktop). Then review launch under gamescope and shutdown (SIGTERM hook, non-daemon threads, SDL quit), try nested `gamescope` if installed (do not install without asking), and ask the owner for `~/.var/app/io.github.stealthx3.ArgosyDesktop/.../argosy-run.log` from a Game Mode session.
+- Read the Phase 5 plan's step 5 in `DEVLOG.md` and start it.
 
-## Pre-beta fixes (owner, 2026-10-24): steps 1–3 done, step 4 next
+## Gotchas
+
+- Walks: Quick Settings menus wrap (Close Argosy is `R3 DOWN*8`). `PAD:RIGHT_SHOULDER` from Home went to Favs on 2026-10-26, not the Library: check with a shot before relying on it. `desktop-drive.sh` ends with `pkill -f` on the main class name, so never put that name in the same Bash command.
+- Dev data downloads go to the real `~/Games/Argosy` (a walk's A on Home downloaded `gba/Argosy Advance Demo (Homebrew).gba` there on 2026-10-26).
+- Process probes: match the app instance by its unique `--key-pipe=<path>` and skip the `org.gradle` wrapper JVM; never signal by `pgrep -x java` (blocked, and could hit other Java programs).
+
+## Pre-beta fixes (owner, 2026-10-24): steps 1–4 done
 
 1. Wizard: the desktop Permissions step (`EmulatorFolderAccessStep` in `FirstRunScreen.kt`, title/intro reuse `firstrun_permissions_*` keys) gets its own title "Emulators Argosy should manage" and a matching intro (new keys, eight locales); Android keeps its Permissions step.
 2. Quick Settings: desktop-only "Close Argosy" item (`QuickSettingsItem`, gate on `PlatformFeatures.desktopWindow`) → confirm modal (`ArgosyConfirmModal` pattern) → graceful exit: a shell hook observed by `Main.kt` that stops the gamepad dispatcher, background jobs and players, then `exitApplication()`.

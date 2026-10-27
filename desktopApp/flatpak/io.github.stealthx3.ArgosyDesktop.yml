@@ -104,6 +104,23 @@ modules:
         url: https://github.com/mpv-player/mpv.git
         tag: v0.41.0
         commit: 41f6a645068483470267271e1d09966ca3b9f413
+  # Sigil's JNI library (title ids and save layouts), built with sigil's own CMake against the
+  # runtime; FindJNI needs only the headers, the JVM and AWT library paths are never linked.
+  - name: sigil-jni
+    buildsystem: simple
+    build-commands:
+      - cmake -S sigil -B build -DSIGIL_BUILD_JNI_HOST=ON -DCMAKE_BUILD_TYPE=Release
+          -DJAVA_INCLUDE_PATH=$PWD/jni-include -DJAVA_INCLUDE_PATH2=$PWD/jni-include/linux
+          -DJAVA_AWT_INCLUDE_PATH=$PWD/jni-include -DJAVA_AWT_LIBRARY=unused -DJAVA_JVM_LIBRARY=unused
+      - cmake --build build --target sigil_jni_host -j $FLATPAK_BUILDER_N_JOBS
+      - install -Dm755 build/bindings/libsigil-jni.so -t /app/lib/argosy-desktop/lib/app
+    sources:
+      - type: dir
+        path: ../../sigil
+        dest: sigil
+      - type: dir
+        path: ../build/jni-include
+        dest: jni-include
   - name: argosy-desktop
     buildsystem: simple
     build-commands:
