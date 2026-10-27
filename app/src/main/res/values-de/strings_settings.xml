@@ -1141,10 +1141,6 @@
     <string name="settings_caches_frames_busy">Wird geleert…</string>
     <string name="settings_caches_frames_subtitle">Heruntergeladene Rahmen - werden bei Bedarf erneut heruntergeladen</string>
 
-    <string name="settings_caches_steam_clear_title">Download-Daten leeren</string>
-    <string name="settings_caches_steam_clear_busy">Wird geleert…</string>
-    <string name="settings_caches_steam_clear_blocked">Zuerst Steam-Downloads abbrechen</string>
-    <string name="settings_caches_steam_clear_subtitle">Entfernt vorbereitete Downloads und die Warteschlange - installierte Spiele bleiben</string>
 
     <string name="settings_caches_info_artwork_title">Artwork-Cache</string>
     <string name="settings_caches_info_artwork_subtitle">Poster, Backdrops und andere Onlinegrafik - werden bei Bedarf erneut heruntergeladen</string>
@@ -1163,9 +1159,6 @@
     </plurals>
     <string name="settings_caches_info_steam_total_title">Steam &amp; PC gesamt</string>
     <string name="settings_caches_info_steam_total_subtitle">Enthält installierte Store-Spiele</string>
-    <string name="settings_caches_info_steam_staging_title">Download-Zwischenspeicher</string>
-    <string name="settings_caches_info_steam_staging_subtitle">Teilweise Downloads, die auf Bereitstellung warten</string>
-    <string name="settings_caches_info_steam_staging_computing">Wird berechnet…</string>
 
     <!-- ===== Steam section ===== -->
 
@@ -1181,10 +1174,6 @@
     <string name="settings_steam_gn_storage_warning_title">Externer Speicher</string>
     <string name="settings_steam_gn_storage_warning_value">Öffnen Sie GameNative und aktivieren Sie \'Write to external storage\' in den Einstellungen</string>
 
-    <string name="settings_steam_install_path_title">Installationspfad</string>
-    <string name="settings_steam_install_path_title_custom">Installationspfad (benutzerdefiniert)</string>
-    <string name="settings_steam_install_path_change">Ändern</string>
-    <string name="settings_steam_install_triage_title">Installierte Spiele</string>
     <string name="settings_steam_account_title">Steam-Konto</string>
     <string name="settings_steam_account_connected">Verbunden</string>
 
@@ -2358,7 +2347,6 @@
     <string name="settings_accounts_delegate_blocker_external_game">%1$s war vor %2$ds im Vordergrund. Beenden Sie es vollständig und versuchen Sie es erneut.</string>
     <string name="settings_accounts_delegate_blocker_active_downloads">Spiel-Downloads laufen noch. Lassen Sie sie abschließen oder brechen Sie sie ab.</string>
     <string name="settings_accounts_delegate_blocker_emulator_download">Ein Emulator-Download läuft noch. Lassen Sie ihn abschließen oder brechen Sie ihn ab.</string>
-    <string name="settings_accounts_delegate_blocker_steam_download">Ein Steam-Download läuft noch. Lassen Sie ihn abschließen oder brechen Sie ihn ab.</string>
     <string name="settings_accounts_delegate_blocker_media_download">Ein Film oder eine Folge wird noch heruntergeladen. Lassen Sie es abschließen oder brechen Sie es ab.</string>
     <string name="settings_accounts_delegate_blocker_library_sync">Ein Bibliotheks-Sync läuft. Lassen Sie ihn abschließen und versuchen Sie es erneut.</string>
     <string name="settings_accounts_delegate_blocker_netplay_session">Eine Netplay-Sitzung ist geöffnet. Verlassen Sie sie und versuchen Sie es erneut.</string>
@@ -2368,7 +2356,6 @@
     <!-- ===== Steam settings delegate (Settings > delegates > SteamSettingsDelegate) ===== -->
 
     <string name="settings_steam_delegate_invalid_app_id">Bitte geben Sie eine gültige Steam-App-ID ein</string>
-    <string name="settings_steam_delegate_volume_other_label">Andere</string>
 
     <!-- ===== Jellyfin settings delegate (Settings > delegates > JellyfinSettingsDelegate) ===== -->
 

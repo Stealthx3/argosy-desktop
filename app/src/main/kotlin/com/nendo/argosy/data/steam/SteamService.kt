@@ -3,10 +3,6 @@ package com.nendo.argosy.data.steam
 import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.net.ConnectivityManager
-import android.net.Network
-import android.net.NetworkCapabilities
-import android.net.NetworkRequest
 import android.os.Binder
 import android.os.IBinder
 import android.util.Log
@@ -72,9 +68,6 @@ class SteamService : Service() {
     @Inject
     lateinit var steamLibraryManager: SteamLibraryManager
 
-    @Inject
-    lateinit var steamContentManager: SteamContentManager
-
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private var callbackJob: Job? = null
 
@@ -89,8 +82,6 @@ class SteamService : Service() {
     private val subscriptions = mutableListOf<Closeable>()
     private var isRunning = false
     private var reconnectAttempt = 0
-    private var networkPaused = false
-    private var networkCallback: ConnectivityManager.NetworkCallback? = null
 
     inner class LocalBinder : Binder() {
         fun getService(): SteamService = this@SteamService
@@ -104,7 +95,6 @@ class SteamService : Service() {
         super.onCreate()
         Log.d(TAG, "SteamService created")
         com.nendo.argosy.data.sync.SyncNotificationChannel.create(this)
-        registerNetworkCallback()
         initializeSteamClient()
     }
 
@@ -128,26 +118,6 @@ class SteamService : Service() {
                 Log.d(TAG, "Force connecting to Steam (on-demand)")
                 connect()
             }
-        } else if (intent?.getBooleanExtra(EXTRA_AUTO_CONNECT, false) == true) {
-            scope.launch {
-                kotlinx.coroutines.delay(100)
-                val account = steamAuthManager.getActiveAccount()
-                if (account == null) {
-                    Log.d(TAG, "No saved account, skipping connect")
-                    stopSelf()
-                    return@launch
-                }
-                val hasPendingWork = steamContentManager.hasPendingDownloads()
-                if (hasPendingWork) {
-                    Log.d(TAG, "Pending downloads found in DB, auto-connecting for ${account.username}")
-                    promoteToForeground(R.string.steam_service_syncing_library)
-                    observeStateForNotification()
-                    connect()
-                } else {
-                    Log.d(TAG, "No pending work, stopping service")
-                    stopSelf()
-                }
-            }
         } else {
             stopSelf()
         }
@@ -168,16 +138,7 @@ class SteamService : Service() {
                     SteamConnectionState.CONNECTED,
                     SteamConnectionState.LOGGING_IN ->
                         updateForegroundNotification(R.string.steam_service_signing_in)
-                    SteamConnectionState.LOGGED_IN -> {
-                        val hasWork = runCatching { steamContentManager.hasPendingDownloads() }.getOrDefault(false)
-                        if (hasWork) {
-                            updateForegroundNotification(R.string.steam_service_syncing_library)
-                        } else {
-                            Log.d(TAG, "Logged in with no pending work, dropping foreground notification")
-                            lastNotificationStatus = null
-                            stopForeground(STOP_FOREGROUND_REMOVE)
-                        }
-                    }
+                    SteamConnectionState.LOGGED_IN,
                     SteamConnectionState.DISCONNECTED,
                     SteamConnectionState.LOGGED_OUT -> {
                         lastNotificationStatus = null
@@ -197,7 +158,6 @@ class SteamService : Service() {
     }
 
     companion object {
-        const val EXTRA_AUTO_CONNECT = "auto_connect"
         const val EXTRA_FORCE_CONNECT = "force_connect"
         const val EXTRA_CONNECT_FOR_AUTH = "connect_for_auth"
         private const val MAX_RECONNECT_ATTEMPTS = 5
@@ -245,9 +205,7 @@ class SteamService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         Log.d(TAG, "SteamService destroyed")
-        unregisterNetworkCallback()
         steamLibraryManager.cleanup()
-        steamContentManager.cleanup()
         disconnect()
         scope.cancel()
     }
@@ -275,7 +233,6 @@ class SteamService : Service() {
 
         val cm = callbackManager!!
         steamLibraryManager.initialize(steamApps!!, cm)
-        steamContentManager.initialize(client, steamApps!!, cm)
 
         registerCallbacks()
     }
@@ -304,7 +261,6 @@ class SteamService : Service() {
                 error = if (!callback.isUserInitiated && !willReconnect) "Connection lost" else null
             )
             steamAuthManager.onDisconnected()
-            steamContentManager.onDisconnected()
 
             if (willReconnect) {
                 scope.launch {
@@ -347,12 +303,6 @@ class SteamService : Service() {
                     error = null
                 )
                 steamAuthManager.onLoggedOn(callback)
-                steamContentManager.initialize(steamClient!!, steamApps!!, cm)
-                steamContentManager.notifyConnected()
-                scope.launch {
-                    steamContentManager.discoverLocalSteamGames()
-                    steamContentManager.restorePausedDownloads()
-                }
             } else {
                 Log.e(TAG, "Login failed: ${callback.result}")
                 _state.value = _state.value.copy(
@@ -480,65 +430,9 @@ class SteamService : Service() {
         }
     }
 
-    private fun registerNetworkCallback() {
-        val cm = getSystemService(ConnectivityManager::class.java) ?: return
-        val request = NetworkRequest.Builder()
-            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-            .build()
-
-        val callback = object : ConnectivityManager.NetworkCallback() {
-            private var lostTime = 0L
-
-            override fun onLost(network: Network) {
-                lostTime = System.currentTimeMillis()
-                Log.d(TAG, "Network lost event")
-                // Debounce: only pause after sustained loss (checked in onAvailable timeout)
-                scope.launch {
-                    kotlinx.coroutines.delay(5000)
-                    // If still no network after 5s and download is active, pause
-                    val dlState = steamContentManager.downloadState.value
-                    if (!networkPaused && lostTime > 0 &&
-                        (dlState is SteamDownloadState.Downloading || dlState is SteamDownloadState.Preparing)) {
-                        Log.d(TAG, "Network lost for 5s, pausing active download")
-                        networkPaused = true
-                        steamContentManager.pauseDownload()
-                    }
-                }
-            }
-
-            override fun onAvailable(network: Network) {
-                lostTime = 0 // Cancel pending pause
-                if (!networkPaused) return
-                Log.d(TAG, "Network restored, resuming download")
-                networkPaused = false
-                val dlState = steamContentManager.downloadState.value
-                if (dlState is SteamDownloadState.Paused) {
-                    scope.launch {
-                        val game = steamContentManager.activeDownload.value ?: return@launch
-                        steamContentManager.queueDownloadOptimistic(game.appId, game.gameName, game.coverPath)
-                    }
-                }
-            }
-        }
-
-        networkCallback = callback
-        cm.registerNetworkCallback(request, callback)
-    }
-
-    private fun unregisterNetworkCallback() {
-        networkCallback?.let { cb ->
-            try {
-                getSystemService(ConnectivityManager::class.java)?.unregisterNetworkCallback(cb)
-            } catch (_: Exception) {}
-        }
-        networkCallback = null
-    }
-
-
     fun getSteamClient(): SteamClient? = steamClient
     fun getSteamUser(): SteamUser? = steamUser
     fun getSteamApps(): SteamApps? = steamApps
     fun getCallbackManager(): CallbackManager? = callbackManager
-    fun getContentManager(): SteamContentManager = steamContentManager
     fun getLibraryManager(): SteamLibraryManager = steamLibraryManager
 }

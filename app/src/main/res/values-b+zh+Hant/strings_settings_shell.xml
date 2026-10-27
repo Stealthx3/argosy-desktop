@@ -371,8 +371,6 @@
     <string name="settings_shell_caches_shaders_catalog_message">這會刪除已下載的目錄著色器，自訂著色器會保留，目錄著色器會在需要時重新下載。</string>
     <string name="settings_shell_caches_frames_title">要清除邊框疊層嗎？</string>
     <string name="settings_shell_caches_frames_message">這會刪除已下載的邊框疊層，選取時會重新下載。</string>
-    <string name="settings_shell_caches_steam_downloads_title">要清除Steam下載資料嗎？</string>
-    <string name="settings_shell_caches_steam_downloads_message">這會刪除暫存的Steam下載內容並清空下載佇列，不會影響已安裝的遊戲，但未完成的下載會從頭開始。</string>
 
     <!-- ===== ManagePinsScreen ===== -->
 

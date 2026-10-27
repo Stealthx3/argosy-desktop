@@ -12,7 +12,6 @@ import com.nendo.argosy.data.local.entity.GameEntity
 import com.nendo.argosy.data.model.GameSource
 import com.nendo.argosy.data.preferences.SessionStateStore
 import com.nendo.argosy.data.social.SocialRepository
-import com.nendo.argosy.data.steam.SteamContentManager
 import com.nendo.argosy.data.storage.StorageAttributionRepository
 import com.nendo.argosy.data.storage.StorageCategory
 import com.nendo.argosy.ui.input.SoundFeedbackManager
@@ -39,7 +38,6 @@ sealed interface HardResetBlocker {
     data class PendingUploads(val accounts: List<PendingUploadAccount>) : HardResetBlocker
     data object ActiveDownloads : HardResetBlocker
     data object EmulatorDownload : HardResetBlocker
-    data object SteamDownload : HardResetBlocker
     data object MediaDownload : HardResetBlocker
 }
 
@@ -82,7 +80,6 @@ class DatabaseAdminRepository @Inject constructor(
     private val attributionRepository: StorageAttributionRepository,
     private val downloadManager: Lazy<DownloadManager>,
     private val emulatorDownloadManager: Lazy<EmulatorDownloadManager>,
-    private val steamContentManager: Lazy<SteamContentManager>,
     private val mediaDownloadManager: Lazy<MediaDownloadManager>,
     private val socialRepository: Lazy<SocialRepository>,
     private val soundFeedbackManager: Lazy<SoundFeedbackManager>,
@@ -132,9 +129,6 @@ class DatabaseAdminRepository @Inject constructor(
         if (!emulatorDownloadManager.get().clearApkCache()) {
             Log.w(TAG, "hardReset: emulator APK cache skipped, download became active mid-reset")
         }
-        if (!steamContentManager.get().clearDownloadData()) {
-            Log.w(TAG, "hardReset: steam download data skipped, download became active mid-reset")
-        }
         socialRepository.get().clearPresenceCovers()
         attributionRepository.refresh(force = true, deep = true)
         null
@@ -148,7 +142,6 @@ class DatabaseAdminRepository @Inject constructor(
             return HardResetBlocker.ActiveDownloads
         }
         if (emulatorDownloadManager.get().hasActiveDownload()) return HardResetBlocker.EmulatorDownload
-        if (steamContentManager.get().hasBlockingDownloadState()) return HardResetBlocker.SteamDownload
         if (mediaDownloadManager.get().hasBlockingDownloadState()) return HardResetBlocker.MediaDownload
         return null
     }

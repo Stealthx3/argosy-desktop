@@ -56,8 +56,6 @@ import com.nendo.argosy.data.local.dao.QuayPassDailyStatsDao
 import com.nendo.argosy.data.local.dao.QuayPassEncounterDao
 import com.nendo.argosy.data.local.dao.QuayPassPendingReportDao
 import com.nendo.argosy.data.local.dao.SteamAccountDao
-import com.nendo.argosy.data.local.dao.SteamDownloadQueueDao
-import com.nendo.argosy.data.local.dao.SteamDownloadTrackingDao
 import com.nendo.argosy.data.local.dao.SteamLicenseDao
 import dagger.Module
 import dagger.Provides
@@ -309,14 +307,6 @@ object DatabaseModule {
     @Provides
     fun provideCachedLicenseDao(database: ALauncherDatabase): CachedLicenseDao =
         database.cachedLicenseDao()
-
-    @Provides
-    fun provideSteamDownloadQueueDao(database: ALauncherDatabase): SteamDownloadQueueDao =
-        database.steamDownloadQueueDao()
-
-    @Provides
-    fun provideSteamDownloadTrackingDao(database: ALauncherDatabase): SteamDownloadTrackingDao =
-        database.steamDownloadTrackingDao()
 
     @Provides
     fun provideBgmPlaylistDao(database: ALauncherDatabase): BgmPlaylistDao =

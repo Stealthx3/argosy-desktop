@@ -1112,6 +1112,7 @@ private fun GameDetailModals(
         SteamLauncherPickerModal(
             availableLaunchers = pickerState.availableSteamLaunchers,
             currentLauncherName = game.steamLauncherName,
+            currentLauncherPackage = game.steamLauncherPackage,
             isAutomatic = !game.steamLauncherSetManually,
             focusIndex = pickerState.steamLauncherPickerFocusIndex,
             onSelectLauncher = viewModel.pickerModalDelegate::selectSteamLauncher,

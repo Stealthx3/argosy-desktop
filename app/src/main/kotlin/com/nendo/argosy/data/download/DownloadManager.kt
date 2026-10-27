@@ -169,7 +169,6 @@ class DownloadManager internal constructor(
     private val soundManager: SoundFeedbackManager,
     private val m3uManager: M3uManager,
     private val thermalManager: dagger.Lazy<DownloadThermalManager>,
-    private val steamContentManager: dagger.Lazy<com.nendo.argosy.data.steam.SteamContentManager>,
     private val mediaDownloadManager: dagger.Lazy<MediaDownloadManager>,
     private val musicDirectoryManager: MusicDirectoryManager,
     private val attributionRepository: StorageAttributionRepository,
@@ -193,7 +192,6 @@ class DownloadManager internal constructor(
         soundManager: SoundFeedbackManager,
         m3uManager: M3uManager,
         thermalManager: dagger.Lazy<DownloadThermalManager>,
-        steamContentManager: dagger.Lazy<com.nendo.argosy.data.steam.SteamContentManager>,
         mediaDownloadManager: dagger.Lazy<MediaDownloadManager>,
         musicDirectoryManager: MusicDirectoryManager,
         attributionRepository: StorageAttributionRepository,
@@ -206,7 +204,7 @@ class DownloadManager internal constructor(
         platformFolderResolver: PlatformFolderResolver
     ) : this(
         gameDao, gameDiscDao, gameFileDao, downloadQueueDao, platformDao, romMRepository,
-        preferencesRepository, soundManager, m3uManager, thermalManager, steamContentManager,
+        preferencesRepository, soundManager, m3uManager, thermalManager,
         mediaDownloadManager, musicDirectoryManager, attributionRepository, syncPreferencesRepository,
         homeTileRepository, homeTilePromptQueue, customGridShapeStore, extContentOrganizer,
         romStagingManager, platformFolderResolver,
@@ -221,13 +219,11 @@ class DownloadManager internal constructor(
     /**
      * How many downloads are running right now, across every queue.
      *
-     * Rom, Steam and media downloads share one concurrency budget and one connection, so this is the
-     * only number any of them may compare against it. Counting a queue's own kind alone is what let
-     * a Steam install and a film start against a budget of one and then compete for the same pipe.
+     * Rom and media downloads share one concurrency budget and one connection, so this is the
+     * only number either of them may compare against it.
      */
     fun totalActiveDownloads(): Int =
         _state.value.activeDownloads.size +
-            (if (steamContentManager.get().hasActiveSteamDownload()) 1 else 0) +
             (if (mediaDownloadManager.get().hasActiveMediaDownload()) 1 else 0)
 
     /**
@@ -241,15 +237,9 @@ class DownloadManager internal constructor(
         scope.launch { processQueue() }
     }
 
-    /**
-     * Tells every queue that a slot this one was holding is free. All three are told because none of
-     * them knows what the others are waiting on, and a release that only wakes its own queue leaves
-     * the others sitting on work the budget now allows.
-     */
     private fun notifySlotFreed() {
         scope.launch {
             processQueue()
-            steamContentManager.get().onDownloadSlotFreed()
             mediaDownloadManager.get().onDownloadSlotFreed()
         }
     }

@@ -59,8 +59,6 @@ import com.nendo.argosy.data.local.dao.StateOwnershipDao
 import com.nendo.argosy.data.local.dao.StateTombstoneDao
 import com.nendo.argosy.data.local.dao.CachedLicenseDao
 import com.nendo.argosy.data.local.dao.SteamAccountDao
-import com.nendo.argosy.data.local.dao.SteamDownloadQueueDao
-import com.nendo.argosy.data.local.dao.SteamDownloadTrackingDao
 import com.nendo.argosy.data.local.dao.SteamLicenseDao
 import com.nendo.argosy.data.local.entity.AchievementEntity
 import com.nendo.argosy.data.local.entity.AppCategoryEntity
@@ -118,9 +116,6 @@ import com.nendo.argosy.data.local.entity.StateCacheEntity
 import com.nendo.argosy.data.local.entity.StateOwnershipEntity
 import com.nendo.argosy.data.local.entity.StateTombstoneEntity
 import com.nendo.argosy.data.local.entity.SteamAccountEntity
-import com.nendo.argosy.data.local.entity.SteamCompletedDepotEntity
-import com.nendo.argosy.data.local.entity.SteamCompletedFileEntity
-import com.nendo.argosy.data.local.entity.SteamDownloadQueueEntity
 import com.nendo.argosy.data.local.entity.SteamLicenseEntity
 
 @Database(
@@ -167,10 +162,7 @@ import com.nendo.argosy.data.local.entity.SteamLicenseEntity
         GameControllerMappingEntity::class,
         SteamAccountEntity::class,
         SteamLicenseEntity::class,
-        SteamDownloadQueueEntity::class,
         CachedLicenseEntity::class,
-        SteamCompletedFileEntity::class,
-        SteamCompletedDepotEntity::class,
         EmulatorLaunchArgsEntity::class,
         PendingConflictEntity::class,
         com.nendo.argosy.data.local.entity.TouchLayoutOverrideEntity::class,
@@ -201,7 +193,7 @@ import com.nendo.argosy.data.local.entity.SteamLicenseEntity
         com.nendo.argosy.data.local.entity.RAPatchCacheEntity::class,
         com.nendo.argosy.data.local.entity.PlayRecordDeletionEntity::class
     ],
-    version = 216,
+    version = 217,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -249,8 +241,6 @@ abstract class ALauncherDatabase : RoomDatabase() {
     abstract fun steamAccountDao(): SteamAccountDao
     abstract fun steamLicenseDao(): SteamLicenseDao
     abstract fun cachedLicenseDao(): CachedLicenseDao
-    abstract fun steamDownloadQueueDao(): SteamDownloadQueueDao
-    abstract fun steamDownloadTrackingDao(): SteamDownloadTrackingDao
     abstract fun pendingConflictDao(): PendingConflictDao
     abstract fun touchLayoutOverrideDao(): com.nendo.argosy.data.local.dao.TouchLayoutOverrideDao
     abstract fun speedrunDao(): com.nendo.argosy.data.local.dao.SpeedrunDao

@@ -16,6 +16,7 @@ import com.nendo.argosy.ui.screens.gamedetail.components.OptionItem
 fun SteamLauncherPickerModal(
     availableLaunchers: List<SteamLauncher>,
     currentLauncherName: String?,
+    currentLauncherPackage: String?,
     isAutomatic: Boolean,
     focusIndex: Int,
     onSelectLauncher: (SteamLauncher?) -> Unit,
@@ -43,11 +44,11 @@ fun SteamLauncherPickerModal(
                     onClick = { onSelectLauncher(null) }
                 )
             }
-            itemsIndexed(availableLaunchers) { index, launcher ->
+            itemsIndexed(availableLaunchers, key = { _, launcher -> launcher.packageName }) { index, launcher ->
                 OptionItem(
                     label = launcher.displayName,
                     isFocused = focusIndex == index + 1,
-                    isSelected = !isAutomatic && launcher.displayName == currentLauncherName,
+                    isSelected = !isAutomatic && launcher.packageName == currentLauncherPackage,
                     onClick = { onSelectLauncher(launcher) }
                 )
             }

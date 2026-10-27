@@ -383,8 +383,6 @@
     <string name="settings_shell_caches_shaders_catalog_message">Это удалит скачанные шейдеры из каталога. Собственные шейдеры сохранятся, а шейдеры каталога будут скачаны заново по запросу.</string>
     <string name="settings_shell_caches_frames_title">Очистить оверлеи рамок?</string>
     <string name="settings_shell_caches_frames_message">Это удалит скачанные оверлеи рамок. Они будут скачаны заново по запросу при выборе.</string>
-    <string name="settings_shell_caches_steam_downloads_title">Очистить данные загрузок Steam?</string>
-    <string name="settings_shell_caches_steam_downloads_message">Это удалит подготовленные загрузки Steam и очистит очередь загрузок. На установленные игры это не влияет, но частичные загрузки начнутся заново.</string>
 
     <!-- ===== ManagePinsScreen ===== -->
 

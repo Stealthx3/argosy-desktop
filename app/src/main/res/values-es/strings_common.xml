@@ -222,7 +222,6 @@
     <string name="ui_changelog_action_relogin_romm">Volver a iniciar sesión en RomM</string>
     <string name="ui_changelog_action_resync_library">Resincronizar biblioteca</string>
     <string name="ui_changelog_action_clear_cache">Vaciar caché</string>
-    <string name="ui_changelog_action_set_steam_path">Configurar ruta de instalación de Steam</string>
 
     <string name="ui_background_conflict_title">Conflicto de sincronización de partidas guardadas</string>
     <string name="ui_background_conflict_default_slot">Partida guardada predeterminada</string>
@@ -319,7 +318,6 @@
     <string name="ui_add_to_collection_create">Crear nueva colección</string>
     <string name="ui_add_to_collection_member">En la colección</string>
 
-    <string name="ui_steam_location_download">Descargar mediante Argosy</string>
     <string name="ui_steam_location_mark_installed">Marcar como instalado</string>
     <string name="ui_steam_location_managed_by">Administrado por %1$s</string>
 

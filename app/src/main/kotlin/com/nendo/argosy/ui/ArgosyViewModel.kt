@@ -181,9 +181,8 @@ class ArgosyViewModel @Inject constructor(
     private val radioController: com.nendo.argosy.hardware.RadioController,
     private val platformSyncQueue: com.nendo.argosy.data.sync.PlatformSyncQueue,
     private val socialRepository: SocialRepository,
-    private val steamContentManager: com.nendo.argosy.data.steam.SteamContentManager,
     private val mediaDownloadManager: com.nendo.argosy.data.download.MediaDownloadManager,
-    val steamDownloadPromptController: com.nendo.argosy.data.steam.SteamDownloadPromptController,
+    val steamLauncherLinkController: com.nendo.argosy.data.steam.SteamLauncherLinkController,
     val coreCrashController: com.nendo.argosy.libretro.CoreCrashController,
     private val netplayPreflightChecker: NetplayPreflightChecker,
     private val netplayJoinService: com.nendo.argosy.data.netplay.NetplayJoinService,
@@ -361,8 +360,6 @@ class ArgosyViewModel @Inject constructor(
             ) { emulators, cores -> emulators + cores },
             _navFocusIndex,
             socialRepository.connectionState,
-            steamContentManager.activeDownload,
-            steamContentManager.downloadQueue,
             ownedConflictCount(),
             preferencesRepository.userPreferences,
             mediaDownloadManager.activeDownload,
@@ -374,19 +371,13 @@ class ArgosyViewModel @Inject constructor(
         val pendingUpdateCount = values[2] as Int
         val navIndex = values[3] as Int
         val socialConnection = values[4] as SocialConnectionState
-        val steamActiveDownload = values[5] as com.nendo.argosy.data.steam.SteamDownloadProgress?
+        val saveSyncAttentionCount = values[5] as Int
+        val userPrefs = values[6] as com.nendo.argosy.data.preferences.UserPreferences
+        val mediaActiveDownload = values[7] as com.nendo.argosy.data.download.MediaDownloadProgress?
         @Suppress("UNCHECKED_CAST")
-        val steamQueue = values[6] as List<com.nendo.argosy.data.steam.QueuedSteamDownload>
-        val saveSyncAttentionCount = values[7] as Int
-        val userPrefs = values[8] as com.nendo.argosy.data.preferences.UserPreferences
-        val mediaActiveDownload = values[9] as com.nendo.argosy.data.download.MediaDownloadProgress?
-        @Suppress("UNCHECKED_CAST")
-        val mediaQueue = values[10] as List<com.nendo.argosy.data.download.QueuedMediaDownload>
+        val mediaQueue = values[8] as List<com.nendo.argosy.data.download.QueuedMediaDownload>
 
-        val steamActive = steamActiveDownload != null
-        val steamQueued = steamQueue.size
         val downloadCount = downloads.activeDownloads.size + downloads.queue.size +
-            (if (steamActive) 1 else 0) + steamQueued +
             (if (mediaActiveDownload != null) 1 else 0) + mediaQueue.size
         DrawerState(
             rommConnected = connection is ConnectionState.Connected,

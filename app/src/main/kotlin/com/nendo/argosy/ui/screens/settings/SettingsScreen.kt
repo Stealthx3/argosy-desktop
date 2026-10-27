@@ -2140,7 +2140,6 @@ private fun cachesClearConfirmTitle(target: CachesClearTarget?): String = when (
     CachesClearTarget.MISC_DOWNLOADS -> stringResource(R.string.settings_shell_caches_misc_downloads_title)
     CachesClearTarget.SHADERS_CATALOG -> stringResource(R.string.settings_shell_caches_shaders_catalog_title)
     CachesClearTarget.FRAMES -> stringResource(R.string.settings_shell_caches_frames_title)
-    CachesClearTarget.STEAM_DOWNLOADS -> stringResource(R.string.settings_shell_caches_steam_downloads_title)
     null -> ""
 }
 
@@ -2154,7 +2153,6 @@ private fun cachesClearConfirmMessage(target: CachesClearTarget?): String = when
     CachesClearTarget.EMULATOR_APKS -> stringResource(R.string.settings_shell_caches_emulator_apks_message)
     CachesClearTarget.SHADERS_CATALOG -> stringResource(R.string.settings_shell_caches_shaders_catalog_message)
     CachesClearTarget.FRAMES -> stringResource(R.string.settings_shell_caches_frames_message)
-    CachesClearTarget.STEAM_DOWNLOADS -> stringResource(R.string.settings_shell_caches_steam_downloads_message)
     null -> ""
 }
 

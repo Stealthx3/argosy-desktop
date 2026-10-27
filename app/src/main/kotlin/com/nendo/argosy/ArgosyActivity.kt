@@ -166,12 +166,10 @@ class ArgosyActivity : ComponentActivity() {
     @Inject lateinit var emulatorConfigDao: com.nendo.argosy.data.local.dao.EmulatorConfigDao
     @Inject lateinit var builtinCoreResolver: com.nendo.argosy.data.emulator.BuiltinCoreResolver
     @Inject lateinit var saveHandlerRegistry: com.nendo.argosy.data.sync.platform.PlatformSaveHandlerRegistry
-    @Inject lateinit var steamDownloadQueueDao: com.nendo.argosy.data.local.dao.SteamDownloadQueueDao
     @Inject lateinit var steamRepository: com.nendo.argosy.data.repository.SteamRepository
     @Inject lateinit var playSessionTracker: com.nendo.argosy.data.emulator.PlaySessionTracker
     @Inject lateinit var repairImageCacheUseCase: com.nendo.argosy.domain.usecase.cache.RepairImageCacheUseCase
     @Inject lateinit var downloadFileStatusRepository: com.nendo.argosy.data.repository.DownloadFileStatusRepository
-    @Inject lateinit var steamContentManager: com.nendo.argosy.data.steam.SteamContentManager
     @Inject lateinit var presenceManager: com.nendo.argosy.data.social.PresenceManager
     @Inject lateinit var discordPresenceManager: com.nendo.argosy.data.social.discord.DiscordPresenceManager
     @Inject lateinit var gradientExtractionDelegate: com.nendo.argosy.ui.screens.common.GradientExtractionDelegate
@@ -312,11 +310,9 @@ class ArgosyActivity : ComponentActivity() {
                 configureEmulatorUseCase = configureEmulatorUseCase,
                 builtinCoreResolver = builtinCoreResolver,
                 saveHandlerRegistry = saveHandlerRegistry,
-                steamDownloadQueueDao = steamDownloadQueueDao,
                 steamRepository = steamRepository,
                 playSessionTracker = playSessionTracker,
                 permissionHelper = permissionHelper,
-                steamContentManager = steamContentManager,
                 repairImageCacheUseCase = repairImageCacheUseCase,
                 downloadFileStatusRepository = downloadFileStatusRepository,
                 gradientExtractionDelegate = gradientExtractionDelegate,

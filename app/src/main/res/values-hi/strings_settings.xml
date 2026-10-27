@@ -1131,10 +1131,6 @@
     <string name="settings_caches_frames_busy">साफ़ हो रहा है...</string>
     <string name="settings_caches_frames_subtitle">डाउनलोड किए गए बेज़ेल - मांगे जाने पर फिर से डाउनलोड होते हैं</string>
 
-    <string name="settings_caches_steam_clear_title">डाउनलोड डेटा साफ़ करें</string>
-    <string name="settings_caches_steam_clear_busy">साफ़ हो रहा है...</string>
-    <string name="settings_caches_steam_clear_blocked">पहले Steam डाउनलोड रद्द करें</string>
-    <string name="settings_caches_steam_clear_subtitle">स्टेज किए गए डाउनलोड और क्यू हटाता है - इंस्टॉल किए गए गेम बने रहते हैं</string>
 
     <string name="settings_caches_info_artwork_title">आर्टवर्क कैश</string>
     <string name="settings_caches_info_artwork_subtitle">पोस्टर, बैकड्रॉप और अन्य ऑनलाइन आर्टवर्क - मांगे जाने पर फिर से डाउनलोड होते हैं</string>
@@ -1153,9 +1149,6 @@
     </plurals>
     <string name="settings_caches_info_steam_total_title">Steam और PC कुल</string>
     <string name="settings_caches_info_steam_total_subtitle">इंस्टॉल किए गए स्टोर गेम शामिल हैं</string>
-    <string name="settings_caches_info_steam_staging_title">डाउनलोड स्टेजिंग</string>
-    <string name="settings_caches_info_steam_staging_subtitle">डिप्लॉय की प्रतीक्षा में आधे-अधूरे डाउनलोड</string>
-    <string name="settings_caches_info_steam_staging_computing">गणना हो रही है...</string>
 
     <!-- ===== Steam section ===== -->
 
@@ -1171,10 +1164,6 @@
     <string name="settings_steam_gn_storage_warning_title">एक्सटर्नल स्टोरेज</string>
     <string name="settings_steam_gn_storage_warning_value">GameNative खोलें और उसकी सेटिंग्स में \'Write to external storage\' चालू करें</string>
 
-    <string name="settings_steam_install_path_title">इंस्टॉल पाथ</string>
-    <string name="settings_steam_install_path_title_custom">इंस्टॉल पाथ (कस्टम)</string>
-    <string name="settings_steam_install_path_change">बदलें</string>
-    <string name="settings_steam_install_triage_title">इंस्टॉल किए गए गेम</string>
     <string name="settings_steam_account_title">Steam अकाउंट</string>
     <string name="settings_steam_account_connected">कनेक्टेड</string>
 
@@ -2348,7 +2337,6 @@
     <string name="settings_accounts_delegate_blocker_external_game">%1$s %2$d सेकंड पहले स्क्रीन पर था। इसे पूरी तरह बंद करें, फिर फिर से कोशिश करें।</string>
     <string name="settings_accounts_delegate_blocker_active_downloads">गेम डाउनलोड अभी भी चल रहे हैं। इन्हें पूरा होने दें या रद्द करें।</string>
     <string name="settings_accounts_delegate_blocker_emulator_download">एक एमुलेटर डाउनलोड अभी भी चल रहा है। इसे पूरा होने दें या रद्द करें।</string>
-    <string name="settings_accounts_delegate_blocker_steam_download">एक Steam डाउनलोड अभी भी चल रहा है। इसे पूरा होने दें या रद्द करें।</string>
     <string name="settings_accounts_delegate_blocker_media_download">एक फ़िल्म या एपिसोड अभी भी डाउनलोड हो रहा है। इसे पूरा होने दें या रद्द करें।</string>
     <string name="settings_accounts_delegate_blocker_library_sync">एक लाइब्रेरी सिंक चल रही है। इसे पूरा होने दें, फिर फिर से कोशिश करें।</string>
     <string name="settings_accounts_delegate_blocker_netplay_session">एक नेटप्ले सेशन खुला है। इसे छोड़ें, फिर फिर से कोशिश करें।</string>
@@ -2358,7 +2346,6 @@
     <!-- ===== Steam settings delegate (Settings > delegates > SteamSettingsDelegate) ===== -->
 
     <string name="settings_steam_delegate_invalid_app_id">कृपया एक मान्य Steam App ID डालें</string>
-    <string name="settings_steam_delegate_volume_other_label">अन्य</string>
 
     <!-- ===== Jellyfin settings delegate (Settings > delegates > JellyfinSettingsDelegate) ===== -->
 

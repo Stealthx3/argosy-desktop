@@ -1181,10 +1181,6 @@
     <string name="settings_caches_frames_busy">Vaciando...</string>
     <string name="settings_caches_frames_subtitle">Marcos descargados - se vuelven a descargar bajo demanda</string>
 
-    <string name="settings_caches_steam_clear_title">Vaciar datos de descarga</string>
-    <string name="settings_caches_steam_clear_busy">Vaciando...</string>
-    <string name="settings_caches_steam_clear_blocked">Cancela primero las descargas de Steam</string>
-    <string name="settings_caches_steam_clear_subtitle">Elimina las descargas preparadas y la cola - los juegos instalados permanecen</string>
 
     <string name="settings_caches_info_artwork_title">Caché de ilustraciones</string>
     <string name="settings_caches_info_artwork_subtitle">Pósters, fondos y otras imágenes en línea - se vuelven a descargar bajo demanda</string>
@@ -1204,9 +1200,6 @@
     </plurals>
     <string name="settings_caches_info_steam_total_title">Total de Steam y PC</string>
     <string name="settings_caches_info_steam_total_subtitle">Incluye los juegos instalados de la tienda</string>
-    <string name="settings_caches_info_steam_staging_title">Preparación de descargas</string>
-    <string name="settings_caches_info_steam_staging_subtitle">Descargas parciales a la espera de implementarse</string>
-    <string name="settings_caches_info_steam_staging_computing">Calculando...</string>
 
     <!-- ===== Steam section ===== -->
 
@@ -1222,10 +1215,6 @@
     <string name="settings_steam_gn_storage_warning_title">Almacenamiento externo</string>
     <string name="settings_steam_gn_storage_warning_value">Abre GameNative y activa \'Escribir en almacenamiento externo\' en Ajustes</string>
 
-    <string name="settings_steam_install_path_title">Ruta de instalación</string>
-    <string name="settings_steam_install_path_title_custom">Ruta de instalación (personalizada)</string>
-    <string name="settings_steam_install_path_change">Cambiar</string>
-    <string name="settings_steam_install_triage_title">Juegos instalados</string>
     <string name="settings_steam_account_title">Cuenta de Steam</string>
     <string name="settings_steam_account_connected">Conectada</string>
 
@@ -2417,7 +2406,6 @@
     <string name="settings_accounts_delegate_blocker_external_game">%1$s estuvo en pantalla hace %2$d s. Ciérralo por completo e inténtalo de nuevo.</string>
     <string name="settings_accounts_delegate_blocker_active_downloads">Todavía hay descargas de juegos en curso. Espera a que terminen o cancélalas.</string>
     <string name="settings_accounts_delegate_blocker_emulator_download">Todavía hay una descarga de emulador en curso. Espera a que termine o cancélala.</string>
-    <string name="settings_accounts_delegate_blocker_steam_download">Todavía hay una descarga de Steam en curso. Espera a que termine o cancélala.</string>
     <string name="settings_accounts_delegate_blocker_media_download">Todavía se está descargando una película o episodio. Espera a que termine o cancélala.</string>
     <string name="settings_accounts_delegate_blocker_library_sync">Hay una sincronización de biblioteca en curso. Espera a que termine e inténtalo de nuevo.</string>
     <string name="settings_accounts_delegate_blocker_netplay_session">Hay una sesión de netplay abierta. Sal de ella e inténtalo de nuevo.</string>
@@ -2427,7 +2415,6 @@
     <!-- ===== Steam settings delegate (Settings > delegates > SteamSettingsDelegate) ===== -->
 
     <string name="settings_steam_delegate_invalid_app_id">Introduce un App ID de Steam válido</string>
-    <string name="settings_steam_delegate_volume_other_label">Otro</string>
 
     <!-- ===== Jellyfin settings delegate (Settings > delegates > JellyfinSettingsDelegate) ===== -->
 

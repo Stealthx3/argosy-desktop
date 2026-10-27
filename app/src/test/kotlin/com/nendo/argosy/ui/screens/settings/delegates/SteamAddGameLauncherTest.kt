@@ -27,16 +27,12 @@ class SteamAddGameLauncherTest {
         steamRepository = steamRepository,
         steamAuthManager = mockk(relaxed = true),
         steamLibraryManager = mockk(relaxed = true),
-        steamContentManager = mockk(relaxed = true),
         androidDataAccessor = mockk(relaxed = true),
         notificationManager = mockk(relaxed = true),
         emulatorDownloadManager = mockk(relaxed = true),
         emulatorUpdateRepository = mockk(relaxed = true),
         steamIgdbResolver = mockk(relaxed = true),
-        preferencesRepository = mockk(relaxed = true),
         steamPathResolver = mockk(relaxed = true),
-        gameRepository = mockk(relaxed = true),
-        platformRepository = mockk(relaxed = true),
         storagePrefs = mockk(relaxed = true),
         gameNativeStoreSync = mockk(relaxed = true)
     )

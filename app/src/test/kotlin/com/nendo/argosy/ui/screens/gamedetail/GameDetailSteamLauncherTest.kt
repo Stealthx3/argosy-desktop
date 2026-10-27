@@ -48,6 +48,7 @@ class GameDetailSteamLauncherTest {
         assertTrue(candidates.isEmpty())
         assertTrue(refreshed.steamLauncherSetManually)
         assertEquals(GameNativeLauncher.displayName, refreshed.steamLauncherName)
+        assertEquals(GameNativeLauncher.packageName, refreshed.steamLauncherPackage)
         assertFalse(refreshed.canPlay)
     }
 
@@ -89,6 +90,7 @@ class GameDetailSteamLauncherTest {
 
         assertEquals(before.copy(
             steamLauncherName = GameNativeLauncher.displayName,
+            steamLauncherPackage = GameNativeLauncher.packageName,
             managingLauncherDisplayName = GameNativeLauncher.displayName
         ), refreshed)
     }

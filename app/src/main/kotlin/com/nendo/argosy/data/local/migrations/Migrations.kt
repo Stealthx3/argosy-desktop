@@ -4259,6 +4259,14 @@ object Migration_215_216 : Migration(215, 216) {
     }
 }
 
+object Migration_216_217 : Migration(216, 217) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("DROP TABLE IF EXISTS `steam_download_queue`")
+        db.execSQL("DROP TABLE IF EXISTS `steam_completed_files`")
+        db.execSQL("DROP TABLE IF EXISTS `steam_completed_depots`")
+    }
+}
+
 object Migration_203_204 : Migration(203, 204) {
     override fun migrate(db: SupportSQLiteDatabase) {
         db.execSQL(

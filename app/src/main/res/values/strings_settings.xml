@@ -2162,15 +2162,6 @@
     <!-- Second line of that row otherwise. "Bezel" is the border art around the game picture. -->
     <string name="settings_caches_frames_subtitle">Downloaded bezels - re-download on demand</string>
 
-    <!-- Row that empties Steam's partly-fetched downloads. Verb phrase. -->
-    <string name="settings_caches_steam_clear_title">Clear Download Data</string>
-    <!-- Second line of that row while it is running. -->
-    <string name="settings_caches_steam_clear_busy">Clearing...</string>
-    <!-- Second line of that row while a Steam download is still going. -->
-    <string name="settings_caches_steam_clear_blocked">Cancel Steam downloads first</string>
-    <!-- Second line of that row otherwise. -->
-    <string name="settings_caches_steam_clear_subtitle">Removes staged downloads and the queue - installed games stay</string>
-
     <!-- Read-only row naming the stored posters and background pictures. Noun phrase. -->
     <string name="settings_caches_info_artwork_title">Artwork Cache</string>
     <!-- Second line of that row. -->
@@ -2204,12 +2195,6 @@
     <string name="settings_caches_info_steam_total_title">Steam &amp; PC Total</string>
     <!-- Second line of that row. -->
     <string name="settings_caches_info_steam_total_subtitle">Includes installed store games</string>
-    <!-- Read-only row naming the working folder for Steam downloads. Noun phrase. -->
-    <string name="settings_caches_info_steam_staging_title">Download Staging</string>
-    <!-- Second line of that row. "Deploy" here means moving the finished files into place. -->
-    <string name="settings_caches_info_steam_staging_subtitle">Partial downloads awaiting deploy</string>
-    <!-- Shown in place of the size while it is still being worked out. -->
-    <string name="settings_caches_info_steam_staging_computing">Computing...</string>
 
     <!-- ===== Steam section =====
          "Steam" is a game service and "GameNative" the separate app that runs its games on
@@ -2243,14 +2228,6 @@
          they are unless that app is translated too. -->
     <string name="settings_steam_gn_storage_warning_value">Open GameNative and enable \'Write to external storage\' in Settings</string>
 
-    <!-- Row naming the folder Steam games install into. Noun phrase. -->
-    <string name="settings_steam_install_path_title">Install Path</string>
-    <!-- The same row once the user has picked their own folder. -->
-    <string name="settings_steam_install_path_title_custom">Install Path (custom)</string>
-    <!-- Button on that row. Verb. -->
-    <string name="settings_steam_install_path_change">Change</string>
-    <!-- Read-only row listing where the installed games sit. Adjective plus noun. -->
-    <string name="settings_steam_install_triage_title">Installed Games</string>
     <!-- Read-only row naming the signed-in account. Noun phrase. -->
     <string name="settings_steam_account_title">Steam Account</string>
     <!-- Value of that row when signed in but the account name is unknown. Adjective. -->
@@ -4543,9 +4520,6 @@
     <string name="settings_accounts_delegate_blocker_active_downloads">Game downloads are still running. Let them finish or cancel them.</string>
     <!-- Switch-blocked reason: an emulator download is in progress. -->
     <string name="settings_accounts_delegate_blocker_emulator_download">An emulator download is still running. Let it finish or cancel it.</string>
-    <!-- Switch-blocked reason: a Steam game download is in progress. "Steam" is the third-party
-         service name, never translated. -->
-    <string name="settings_accounts_delegate_blocker_steam_download">A Steam download is still running. Let it finish or cancel it.</string>
     <!-- Switch-blocked reason: a media download is in progress. -->
     <string name="settings_accounts_delegate_blocker_media_download">A movie or episode is still downloading. Let it finish or cancel it.</string>
     <!-- Switch-blocked reason: a library sync is in progress. -->
@@ -4564,9 +4538,6 @@
     <!-- Inline error shown under the App ID field when the typed value is not a valid Steam
          App ID. -->
     <string name="settings_steam_delegate_invalid_app_id">Please enter a valid Steam App ID</string>
-    <!-- Fallback bucket label for installed Steam games whose storage volume could not be
-         matched to a known volume. -->
-    <string name="settings_steam_delegate_volume_other_label">Other</string>
 
     <!-- ===== Jellyfin settings delegate (Settings > delegates > JellyfinSettingsDelegate) =====
          "Jellyfin" is the media server software's name, never translated. -->

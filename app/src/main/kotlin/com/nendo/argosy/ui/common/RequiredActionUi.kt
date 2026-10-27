@@ -17,5 +17,4 @@ val RequiredAction.labelRes: Int
         RequiredAction.ReloginRomM -> R.string.ui_changelog_action_relogin_romm
         RequiredAction.ResyncLibrary -> R.string.ui_changelog_action_resync_library
         RequiredAction.ClearCache -> R.string.ui_changelog_action_clear_cache
-        RequiredAction.SetSteamInstallPath -> R.string.ui_changelog_action_set_steam_path
     }

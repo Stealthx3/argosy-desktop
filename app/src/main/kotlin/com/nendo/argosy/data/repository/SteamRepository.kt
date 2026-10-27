@@ -11,11 +11,11 @@ import com.nendo.argosy.data.local.dao.PlatformDao
 import com.nendo.argosy.data.local.entity.GameEntity
 import com.nendo.argosy.data.local.entity.PlatformEntity
 import com.nendo.argosy.data.model.ArtSlot
+import com.nendo.argosy.data.model.FileOrigin
 import com.nendo.argosy.data.model.GameSource
 import com.nendo.argosy.data.platform.LocalPlatformIds
 import com.nendo.argosy.data.remote.steam.SteamAppData
 import com.nendo.argosy.data.remote.steam.SteamStoreApi
-import com.nendo.argosy.util.AppPaths
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -43,7 +43,6 @@ class SteamRepository @Inject constructor(
     private val gameDao: GameDao,
     private val platformDao: PlatformDao,
     private val imageCacheManager: ImageCacheManager,
-    private val steamDownloadQueueDao: com.nendo.argosy.data.local.dao.SteamDownloadQueueDao,
     private val syncPreferencesRepository: com.nendo.argosy.data.preferences.SyncPreferencesRepository,
     private val gameArtDao: GameArtDao,
     private val gameScreenshotDao: GameScreenshotDao
@@ -200,9 +199,8 @@ class SteamRepository @Inject constructor(
         try {
             val game = gameDao.getBySteamAppId(steamAppId)
             if (game != null) {
-                deleteInstalledFiles(game.localPath, steamAppId)
+                deleteInstalledFiles(game)
                 gameDao.clearLocalPath(game.id)
-                steamDownloadQueueDao.deleteByAppId(steamAppId)
             }
             SteamResult.Success(Unit)
         } catch (e: Exception) {
@@ -219,9 +217,8 @@ class SteamRepository @Inject constructor(
         try {
             val game = gameDao.getBySteamAppId(steamAppId)
             if (game != null) {
-                deleteInstalledFiles(game.localPath, steamAppId)
+                deleteInstalledFiles(game)
                 gameDao.delete(game.id)
-                steamDownloadQueueDao.deleteByAppId(steamAppId)
                 deleteCachedImage(steamAppId)
                 updatePlatformGameCount()
             }
@@ -232,19 +229,16 @@ class SteamRepository @Inject constructor(
         }
     }
 
-    private fun deleteInstalledFiles(localPath: String?, steamAppId: Long) {
-        if (localPath != null) {
-            val dir = File(localPath)
-            if (dir.exists()) {
-                val deleted = dir.deleteRecursively()
-                Log.d(TAG, "Deleted game files at $localPath: $deleted")
-            }
+    private fun deleteInstalledFiles(game: GameEntity) {
+        val localPath = game.localPath ?: return
+        if (game.fileOrigin != FileOrigin.STEAM_DOWNLOAD) {
+            Log.d(TAG, "Unlinking ${game.fileOrigin} install at $localPath without deleting files")
+            return
         }
-
-        val stagingDir = AppPaths.steamStagingDir(context.filesDir, steamAppId)
-        if (stagingDir.exists()) {
-            stagingDir.deleteRecursively()
-            Log.d(TAG, "Deleted staging dir for $steamAppId")
+        val dir = File(localPath)
+        if (dir.exists()) {
+            val deleted = dir.deleteRecursively()
+            Log.d(TAG, "Deleted game files at $localPath: $deleted")
         }
     }
 
@@ -262,11 +256,6 @@ class SteamRepository @Inject constructor(
             SteamResult.Error(e.message ?: "Unknown error")
         }
     }
-
-    fun observeDownloadByAppId(
-        steamAppId: Long
-    ): kotlinx.coroutines.flow.Flow<com.nendo.argosy.data.local.entity.SteamDownloadQueueEntity?> =
-        steamDownloadQueueDao.observeByAppId(steamAppId)
 
     suspend fun refreshAllMetadata(): SteamResult<Int> = withContext(Dispatchers.IO) {
         try {

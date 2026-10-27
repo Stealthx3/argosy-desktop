@@ -175,19 +175,9 @@ data class MediaRemovalResult(
 )
 
 /**
- * Fetches movies and episodes for offline playback.
- *
- * A separate resolver rather than a branch inside [DownloadManager]: that queue is keyed on a game id
- * end to end, so media gets its own queue and its own progress, and the downloads screen merges the
- * two the way it already merges Steam. Media inherits the same bandwidth contention Steam has today -
- * one shared slot budget, no global bandwidth scheduler.
- *
- * The two qualities are two different fetches, not one fetch with a parameter. The original is a
- * static file the server already has, so it carries a real size, honours a Range header and resumes
- * from a half-written file. A transcode is produced on demand: the server has to start ffmpeg before
- * any byte exists, there is no length to resume against, and abandoning one leaks that process until
- * the server times it out, which is why the play session is recorded on the queue row and explicitly
- * stopped.
+ * Fetches movies and episodes for offline playback, on a queue of its own that shares the rom
+ * downloads' slot budget. An original-quality fetch resumes from a partial file; a transcode cannot
+ * resume, and its server play session is recorded on the queue row and stopped when abandoned.
  */
 @Singleton
 @Suppress("TooManyFunctions")

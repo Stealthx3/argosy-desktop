@@ -379,8 +379,6 @@
     <string name="settings_shell_caches_shaders_catalog_message">Esto eliminará los shaders del catálogo descargados. Los shaders personalizados se conservan, y los shaders del catálogo se vuelven a descargar bajo demanda.</string>
     <string name="settings_shell_caches_frames_title">¿Vaciar marcos descargados?</string>
     <string name="settings_shell_caches_frames_message">Esto eliminará los marcos descargados. Se volverán a descargar bajo demanda al seleccionarlos.</string>
-    <string name="settings_shell_caches_steam_downloads_title">¿Vaciar datos de descarga de Steam?</string>
-    <string name="settings_shell_caches_steam_downloads_message">Esto eliminará las descargas de Steam preparadas y vaciará la cola de descargas. Los juegos instalados no se ven afectados, pero las descargas parciales reiniciarán desde cero.</string>
 
     <!-- ===== ManagePinsScreen ===== -->
 

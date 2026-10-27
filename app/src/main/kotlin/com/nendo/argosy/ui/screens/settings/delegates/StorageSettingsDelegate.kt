@@ -1010,8 +1010,6 @@ class StorageSettingsDelegate @Inject constructor(
             NotificationText.Res(R.string.notif_storage_hardreset_blocked_active_downloads)
         HardResetBlocker.EmulatorDownload ->
             NotificationText.Res(R.string.notif_storage_hardreset_blocked_emulator_download)
-        HardResetBlocker.SteamDownload ->
-            NotificationText.Res(R.string.notif_storage_hardreset_blocked_steam_download)
         HardResetBlocker.MediaDownload ->
             NotificationText.Res(R.string.notif_storage_hardreset_blocked_media_download)
     }

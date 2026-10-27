@@ -125,6 +125,7 @@ internal fun GameDetailUi.withSteamLauncher(
     val displayPackage = if (game.hasSteamLauncherPin) storedPackage else candidates.singleOrNull()
     return copy(
         steamLauncherName = displayPackage?.let { SteamLaunchers.getByPackage(it)?.displayName },
+        steamLauncherPackage = displayPackage,
         steamLauncherSetManually = game.hasSteamLauncherPin,
         isExternallyManaged = game.isExternallyManaged,
         managingLauncherDisplayName = storedPackage?.let(SteamLaunchers::displayNameForPackage),

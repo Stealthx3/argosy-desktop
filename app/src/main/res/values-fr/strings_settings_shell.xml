@@ -379,8 +379,6 @@
     <string name="settings_shell_caches_shaders_catalog_message">Cela supprimera les shaders du catalogue téléchargés. Les shaders personnalisés sont conservés, et les shaders du catalogue seront retéléchargés à la demande.</string>
     <string name="settings_shell_caches_frames_title">Vider les cadres téléchargés ?</string>
     <string name="settings_shell_caches_frames_message">Cela supprimera les cadres téléchargés. Ils seront retéléchargés à la demande lors de leur sélection.</string>
-    <string name="settings_shell_caches_steam_downloads_title">Vider les données de téléchargement Steam ?</string>
-    <string name="settings_shell_caches_steam_downloads_message">Cela supprimera les téléchargements Steam en préparation et videra la file d\'attente. Les jeux installés ne sont pas affectés, mais les téléchargements partiels repartiront de zéro.</string>
 
     <!-- ===== ManagePinsScreen ===== -->
 

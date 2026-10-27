@@ -130,7 +130,6 @@ class SteamMetadataLauncherRecoveryTest {
             gameDao = gameDao,
             platformDao = mockk(relaxed = true),
             imageCacheManager = mockk(relaxed = true),
-            steamDownloadQueueDao = mockk(relaxed = true),
             syncPreferencesRepository = mockk(relaxed = true),
             gameArtDao = mockk(relaxed = true),
             gameScreenshotDao = mockk(relaxed = true)
@@ -192,10 +191,8 @@ class SteamMetadataLauncherRecoveryTest {
         steamLicenseDao = mockk(relaxed = true),
         cachedLicenseDao = mockk(relaxed = true),
         imageCacheManager = mockk(relaxed = true),
-        drmHazardManager = mockk(relaxed = true),
         steamRepository = mockk(relaxed = true),
         steamIgdbResolver = mockk(relaxed = true),
-        steamContentManager = mockk(relaxed = true),
         preferencesRepository = mockk(relaxed = true),
         syncPreferencesRepository = mockk(relaxed = true),
         steamLibraryRepair = mockk(relaxed = true),

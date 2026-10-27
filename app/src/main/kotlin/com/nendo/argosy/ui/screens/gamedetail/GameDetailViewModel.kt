@@ -1,6 +1,5 @@
 package com.nendo.argosy.ui.screens.gamedetail
 
-import com.nendo.argosy.data.steam.SteamDownloadState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nendo.argosy.data.cache.ImageCacheManager
@@ -132,8 +131,7 @@ class GameDetailViewModel @Inject constructor(
     private val perGameSettingsDelegate: PerGameSettingsDelegate,
     val speedrunSplitsDelegate: com.nendo.argosy.ui.screens.gamedetail.delegates.SpeedrunSplitsDelegate,
     private val socialRepository: com.nendo.argosy.data.social.SocialRepository,
-    private val steamContentManager: com.nendo.argosy.data.steam.SteamContentManager,
-    private val steamDownloadPromptController: com.nendo.argosy.data.steam.SteamDownloadPromptController,
+    private val steamLauncherLinkController: com.nendo.argosy.data.steam.SteamLauncherLinkController,
     private val variantScanner: com.nendo.argosy.data.scanner.VariantScanner,
     private val variantResolver: com.nendo.argosy.data.emulator.VariantResolver,
     private val downloadManager: com.nendo.argosy.data.download.DownloadManager,
@@ -621,8 +619,8 @@ class GameDetailViewModel @Inject constructor(
             val fileExists = gameRepository.validateAndDiscoverGame(gameId)
 
             val steamPathExists = isSteamGame && downloadFileStatusRepository.pathExists(game.localPath)
-            val steamDownloadComplete = isSteamGame && downloadFileStatusRepository.isDownloadComplete(game.localPath)
-            val steamDownloadInProgress = isSteamGame && downloadFileStatusRepository.isDownloadInProgress(game.localPath)
+            val steamInstalled = isSteamGame &&
+                downloadFileStatusRepository.isSteamInstalled(game.isExternallyManaged, game.localPath)
 
             val canPlay = when {
                 game.source == GameSource.ANDROID_APP -> true
@@ -635,16 +633,10 @@ class GameDetailViewModel @Inject constructor(
                 else -> fileExists && emulatorDetector.hasAnyEmulator(game.platformSlug)
             }
 
-            val activeSteamDl = if (isSteamGame) steamContentManager.activeDownload.value else null
-            val isSteamDownloading = activeSteamDl != null && activeSteamDl.appId == game.steamAppId
-
             val downloadStatus = when {
                 game.source == GameSource.ANDROID_APP -> GameDownloadStatus.DOWNLOADED
                 isAndroidApp && fileExists && game.packageName == null -> GameDownloadStatus.NEEDS_INSTALL
-                isSteamGame && game.isExternallyManaged -> GameDownloadStatus.DOWNLOADED
-                isSteamGame && game.localPath != null && steamDownloadComplete -> GameDownloadStatus.DOWNLOADED
-                isSteamGame && game.localPath != null && steamDownloadInProgress -> GameDownloadStatus.DOWNLOADING
-                isSteamDownloading -> GameDownloadStatus.DOWNLOADING
+                isSteamGame -> if (steamInstalled) GameDownloadStatus.DOWNLOADED else GameDownloadStatus.NOT_DOWNLOADED
                 fileExists -> GameDownloadStatus.DOWNLOADED
                 game.isMultiDisc -> {
                     val downloadedCount = gameDiscDao.getDownloadedDiscCount(gameId)
@@ -1106,8 +1098,8 @@ class GameDetailViewModel @Inject constructor(
     fun toggleFilePickerRow(row: com.nendo.argosy.data.model.FilePickerRow) =
         pickerModalDelegate.toggleFilePickerRow(row)
 
-    fun downloadSteamGame() {
-        steamDownloadPromptController.requestSteamDownload(currentGameId)
+    fun linkSteamLauncher() {
+        steamLauncherLinkController.requestLink(currentGameId)
     }
 
     fun dismissExtractionPrompt() = downloadDelegate.dismissExtractionPrompt()
@@ -1174,7 +1166,7 @@ class GameDetailViewModel @Inject constructor(
             GameDownloadStatus.NOT_DOWNLOADED, GameDownloadStatus.FAILED -> {
                 val game = state.game
                 if (game != null && game.isSteamGame) {
-                    downloadSteamGame()
+                    linkSteamLauncher()
                 } else {
                     promptOrDownload()
                 }
@@ -1446,7 +1438,7 @@ class GameDetailViewModel @Inject constructor(
                         downloadDelegate.uninstallAndroidApp(viewModelScope, pkg)
                     }
                     gameUi?.isExternallyManaged == true -> {
-                        steamDownloadPromptController.unlinkLauncher(currentGameId)
+                        steamLauncherLinkController.unlinkLauncher(currentGameId)
                         viewModelScope.launch { loadGame(currentGameId) }
                     }
                     else -> {

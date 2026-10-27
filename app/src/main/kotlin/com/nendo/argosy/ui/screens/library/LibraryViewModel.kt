@@ -484,8 +484,7 @@ class LibraryViewModel @Inject constructor(
     private val gradientExtractionDelegate: GradientExtractionDelegate,
     downloadIndicatorSource: com.nendo.argosy.ui.screens.common.DownloadIndicatorSource,
     private val emulatorDetector: EmulatorDetector,
-    private val steamContentManager: com.nendo.argosy.data.steam.SteamContentManager,
-    private val steamDownloadPromptController: com.nendo.argosy.data.steam.SteamDownloadPromptController,
+    private val steamLauncherLinkController: com.nendo.argosy.data.steam.SteamLauncherLinkController,
     private val downloadFileStatusRepository: com.nendo.argosy.data.repository.DownloadFileStatusRepository,
     private val siblingChoice: com.nendo.argosy.ui.screens.common.SiblingChoiceDelegate,
     private val socialRepository: SocialRepository,
@@ -1997,7 +1996,7 @@ class LibraryViewModel @Inject constructor(
                 when {
                     game.needsInstall -> installApk(game.id)
                     game.isDownloaded -> launchGame(game.id)
-                    game.source == com.nendo.argosy.data.model.GameSource.STEAM -> downloadSteamGame(game.id)
+                    game.source == com.nendo.argosy.data.model.GameSource.STEAM -> linkSteamLauncher(game.id)
                     else -> downloadGame(game.id)
                 }
                 toggleQuickMenu()
@@ -2201,8 +2200,8 @@ class LibraryViewModel @Inject constructor(
         }
     }
 
-    fun downloadSteamGame(gameId: Long) {
-        steamDownloadPromptController.requestSteamDownload(gameId)
+    fun linkSteamLauncher(gameId: Long) {
+        steamLauncherLinkController.requestLink(gameId)
     }
 
     fun installApk(gameId: Long) {

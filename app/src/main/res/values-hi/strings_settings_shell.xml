@@ -368,8 +368,6 @@
     <string name="settings_shell_caches_shaders_catalog_message">इससे डाउनलोड किए गए कैटलॉग शेडर हट जाएँगे। कस्टम शेडर बने रहेंगे, और कैटलॉग शेडर मांगे जाने पर फिर से डाउनलोड होंगे।</string>
     <string name="settings_shell_caches_frames_title">फ़्रेम ओवरले साफ़ करें?</string>
     <string name="settings_shell_caches_frames_message">इससे डाउनलोड किए गए फ़्रेम ओवरले हट जाएँगे। चुने जाने पर वे मांगे जाने पर फिर से डाउनलोड होंगे।</string>
-    <string name="settings_shell_caches_steam_downloads_title">Steam डाउनलोड डेटा साफ़ करें?</string>
-    <string name="settings_shell_caches_steam_downloads_message">इससे स्टेज किए गए Steam डाउनलोड हट जाएँगे और डाउनलोड क्यू साफ़ हो जाएगी। इंस्टॉल किए गए गेम प्रभावित नहीं होंगे, लेकिन आधे-अधूरे डाउनलोड शुरू से चालू होंगे।</string>
 
     <!-- ===== ManagePinsScreen ===== -->
 

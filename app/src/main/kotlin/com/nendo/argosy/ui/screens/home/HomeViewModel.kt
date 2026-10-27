@@ -122,8 +122,7 @@ class HomeViewModel @Inject constructor(
     val mediaDelegate: HomeMediaDelegate,
     val tilePickerDelegate: HomeTilePickerDelegate,
     private val dockDelegate: HomeDockDelegate,
-    private val steamContentManager: com.nendo.argosy.data.steam.SteamContentManager,
-    private val steamDownloadPromptController: com.nendo.argosy.data.steam.SteamDownloadPromptController,
+    private val steamLauncherLinkController: com.nendo.argosy.data.steam.SteamLauncherLinkController,
     private val appsRepository: com.nendo.argosy.data.repository.AppsRepository,
     private val homeTileRepository: com.nendo.argosy.data.repository.HomeTileRepository,
     private val customGridShapeStore: CustomGridShapeStore,
@@ -2013,7 +2012,7 @@ class HomeViewModel @Inject constructor(
             HomeGameActivation.INSTALL -> installApk(game.id)
             HomeGameActivation.LAUNCH -> launchGame(game.id)
             HomeGameActivation.RESUME_DOWNLOAD -> resumeDownload(game.id)
-            HomeGameActivation.STEAM_DOWNLOAD -> queueSteamDownload(game.id)
+            HomeGameActivation.STEAM_LINK_LAUNCHER -> linkSteamLauncher(game.id)
             HomeGameActivation.DOWNLOAD_EXACT -> downloadDelegate.queueDownload(viewModelScope, game.id)
             HomeGameActivation.DOWNLOAD_WITH_CHOICE -> queueDownload(game.id)
         }
@@ -2112,8 +2111,8 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    override fun queueSteamDownload(gameId: Long) {
-        steamDownloadPromptController.requestSteamDownload(gameId)
+    override fun linkSteamLauncher(gameId: Long) {
+        steamLauncherLinkController.requestLink(gameId)
     }
 
     override fun installApk(gameId: Long) {

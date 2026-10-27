@@ -1041,10 +1041,6 @@
     <string name="settings_caches_frames_busy">清除中&#8230;</string>
     <string name="settings_caches_frames_subtitle">已下載的邊框，需要時會重新下載</string>
 
-    <string name="settings_caches_steam_clear_title">清除下載資料</string>
-    <string name="settings_caches_steam_clear_busy">清除中&#8230;</string>
-    <string name="settings_caches_steam_clear_blocked">請先取消Steam下載</string>
-    <string name="settings_caches_steam_clear_subtitle">移除暫存下載內容與佇列，已安裝的遊戲會保留</string>
 
     <string name="settings_caches_info_artwork_title">美術圖片快取</string>
     <string name="settings_caches_info_artwork_subtitle">海報、背景圖與其他線上美術圖片，需要時會重新下載</string>
@@ -1062,9 +1058,6 @@
     </plurals>
     <string name="settings_caches_info_steam_total_title">Steam與PC總計</string>
     <string name="settings_caches_info_steam_total_subtitle">包含已安裝的商店遊戲</string>
-    <string name="settings_caches_info_steam_staging_title">下載暫存</string>
-    <string name="settings_caches_info_steam_staging_subtitle">等待部署的未完成下載</string>
-    <string name="settings_caches_info_steam_staging_computing">計算中&#8230;</string>
 
     <string name="settings_steam_section_account">帳號</string>
     <string name="settings_steam_section_library">收藏庫</string>
@@ -1078,10 +1071,6 @@
     <string name="settings_steam_gn_storage_warning_title">外部儲存空間</string>
     <string name="settings_steam_gn_storage_warning_value">開啟GameNative，並在設定中啟用「寫入外部儲存空間」</string>
 
-    <string name="settings_steam_install_path_title">安裝路徑</string>
-    <string name="settings_steam_install_path_title_custom">安裝路徑（自訂）</string>
-    <string name="settings_steam_install_path_change">變更</string>
-    <string name="settings_steam_install_triage_title">已安裝的遊戲</string>
     <string name="settings_steam_account_title">Steam帳號</string>
     <string name="settings_steam_account_connected">已連線</string>
 
@@ -2160,7 +2149,6 @@
     <string name="settings_accounts_delegate_blocker_external_game">%1$s在%2$d秒前仍在畫面上，請完全結束後再試一次。</string>
     <string name="settings_accounts_delegate_blocker_active_downloads">遊戲下載仍在進行中，請等待完成或取消下載。</string>
     <string name="settings_accounts_delegate_blocker_emulator_download">模擬器下載仍在進行中，請等待完成或取消下載。</string>
-    <string name="settings_accounts_delegate_blocker_steam_download">Steam下載仍在進行中，請等待完成或取消下載。</string>
     <string name="settings_accounts_delegate_blocker_media_download">電影或影集仍在下載中，請等待完成或取消下載。</string>
     <string name="settings_accounts_delegate_blocker_library_sync">收藏庫同步仍在進行中，請等待完成後再試一次。</string>
     <string name="settings_accounts_delegate_blocker_netplay_session">Netplay工作階段仍開啟中，請離開後再試一次。</string>
@@ -2168,7 +2156,6 @@
     <string name="settings_accounts_delegate_blocker_unknown_account">該帳號已不在此裝置上。</string>
 
     <string name="settings_steam_delegate_invalid_app_id">請輸入有效的Steam App ID</string>
-    <string name="settings_steam_delegate_volume_other_label">其他</string>
 
     <string name="settings_jellyfin_delegate_config_error_empty">請輸入伺服器位址</string>
     <string name="settings_jellyfin_delegate_config_error_scheme">位址必須以http://或https://開頭</string>

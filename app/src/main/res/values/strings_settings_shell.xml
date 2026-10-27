@@ -504,8 +504,6 @@
     <string name="settings_shell_caches_shaders_catalog_message">This will delete downloaded catalog shaders. Custom shaders are kept, and catalog shaders re-download on demand.</string>
     <string name="settings_shell_caches_frames_title">Clear Frame Overlays?</string>
     <string name="settings_shell_caches_frames_message">This will delete downloaded frame overlays. They re-download on demand when selected.</string>
-    <string name="settings_shell_caches_steam_downloads_title">Clear Steam Download Data?</string>
-    <string name="settings_shell_caches_steam_downloads_message">This will delete staged Steam downloads and clear the download queue. Installed games are not affected, but partial downloads restart from zero.</string>
 
     <!-- ===== ManagePinsScreen ===== -->
 

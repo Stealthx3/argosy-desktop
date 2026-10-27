@@ -375,8 +375,6 @@
     <string name="settings_shell_caches_shaders_catalog_message">Dadurch werden heruntergeladene Katalog-Shader gelöscht. Eigene Shader bleiben erhalten, und Katalog-Shader werden bei Bedarf erneut heruntergeladen.</string>
     <string name="settings_shell_caches_frames_title">Rahmen-Overlays leeren?</string>
     <string name="settings_shell_caches_frames_message">Dadurch werden heruntergeladene Rahmen-Overlays gelöscht. Sie werden bei Auswahl bei Bedarf erneut heruntergeladen.</string>
-    <string name="settings_shell_caches_steam_downloads_title">Steam-Download-Daten leeren?</string>
-    <string name="settings_shell_caches_steam_downloads_message">Dadurch werden vorbereitete Steam-Downloads gelöscht und die Download-Warteschlange geleert. Installierte Spiele sind davon nicht betroffen, aber unvollständige Downloads beginnen wieder bei null.</string>
 
     <!-- ===== ManagePinsScreen ===== -->
 

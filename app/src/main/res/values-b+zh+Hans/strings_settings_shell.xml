@@ -364,8 +364,6 @@
     <string name="settings_shell_caches_shaders_catalog_message">这将删除已下载的目录着色器。自定义着色器会保留，目录着色器会按需重新下载。</string>
     <string name="settings_shell_caches_frames_title">清除边框素材？</string>
     <string name="settings_shell_caches_frames_message">这将删除已下载的边框素材。选择时会按需重新下载。</string>
-    <string name="settings_shell_caches_steam_downloads_title">清除Steam下载数据？</string>
-    <string name="settings_shell_caches_steam_downloads_message">这将删除已暂存的Steam下载内容并清空下载队列。已安装的游戏不受影响，但未完成的下载会从头重新开始。</string>
 
     <!-- ===== ManagePinsScreen ===== -->
 

@@ -17,5 +17,4 @@ sealed class RequiredAction(
     data object ReloginRomM : RequiredAction("Re-login to RomM", SettingsSection.ROMM, "rommConfig")
     data object ResyncLibrary : RequiredAction("Resync Library", SettingsSection.ROMM, "syncLibrary")
     data object ClearCache : RequiredAction("Clear Cache", SettingsSection.STORAGE)
-    data object SetSteamInstallPath : RequiredAction("Set Steam Install Path", SettingsSection.STEAM_SETTINGS)
 }

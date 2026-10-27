@@ -5,10 +5,8 @@ import android.content.pm.PackageManager
 import com.nendo.argosy.data.launcher.DroidDeckLauncher
 import com.nendo.argosy.data.launcher.GameNativeLauncher
 import com.nendo.argosy.data.steam.SteamAuthManager
-import com.nendo.argosy.data.steam.SteamContentManager
 import com.nendo.argosy.ui.screens.settings.SteamSettingsState
 import io.mockk.coEvery
-import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
@@ -27,7 +25,6 @@ class SteamLauncherAvailabilityTest {
     private val context: Context = mockk(relaxed = true) {
         every { packageManager } returns this@SteamLauncherAvailabilityTest.packageManager
     }
-    private val contentManager: SteamContentManager = mockk(relaxed = true)
     private val authManager: SteamAuthManager = mockk(relaxed = true) {
         coEvery { getActiveAccount() } returns null
     }
@@ -35,26 +32,15 @@ class SteamLauncherAvailabilityTest {
         steamRepository = mockk(relaxed = true),
         steamAuthManager = authManager,
         steamLibraryManager = mockk(relaxed = true),
-        steamContentManager = contentManager,
         androidDataAccessor = mockk(relaxed = true),
         notificationManager = mockk(relaxed = true),
         emulatorDownloadManager = mockk(relaxed = true),
         emulatorUpdateRepository = mockk(relaxed = true),
         steamIgdbResolver = mockk(relaxed = true),
-        preferencesRepository = mockk(relaxed = true),
         steamPathResolver = mockk(relaxed = true),
-        gameRepository = mockk(relaxed = true),
-        platformRepository = mockk(relaxed = true),
         storagePrefs = mockk(relaxed = true),
         gameNativeStoreSync = mockk(relaxed = true)
     )
-
-    @Test
-    fun `availability refresh does not discover local Steam games`() = runTest {
-        delegate.refreshLauncherAvailability(context)
-
-        coVerify(exactly = 0) { contentManager.discoverLocalSteamGames() }
-    }
 
     @Test
     fun `package changes refresh availability and preserve unrelated settings`() = runTest {

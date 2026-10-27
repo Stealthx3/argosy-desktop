@@ -651,7 +651,7 @@ fun LibraryScreen(
                         when {
                             game.needsInstall -> viewModel.installApk(game.id)
                             game.isDownloaded -> viewModel.launchGame(game.id)
-                            game.source == com.nendo.argosy.data.model.GameSource.STEAM -> viewModel.downloadSteamGame(game.id)
+                            game.source == com.nendo.argosy.data.model.GameSource.STEAM -> viewModel.linkSteamLauncher(game.id)
                             else -> viewModel.downloadGame(game.id)
                         }
                     },

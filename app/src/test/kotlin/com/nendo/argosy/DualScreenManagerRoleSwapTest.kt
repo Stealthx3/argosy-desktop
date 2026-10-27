@@ -802,6 +802,7 @@ class DualScreenManagerRoleSwapTest {
                 every { getRoleDisplayIds(false) } returns (PRIMARY_DISPLAY to PRESENTATION_DISPLAY)
                 every { getRoleDisplayIds(true) } returns (PRESENTATION_DISPLAY to PRIMARY_DISPLAY)
                 every { appScreenDisplayId(any()) } returns null
+                every { usableDisplayId(any()) } answers { firstArg() }
             },
             gameWindowMover = mover
         )
@@ -930,11 +931,9 @@ class DualScreenManagerRoleSwapTest {
         configureEmulatorUseCase = mockk(relaxed = true),
         builtinCoreResolver = mockk(relaxed = true),
         saveHandlerRegistry = mockk(relaxed = true),
-        steamDownloadQueueDao = mockk(relaxed = true),
         steamRepository = mockk(relaxed = true),
         playSessionTracker = playSessionTracker,
         permissionHelper = permissionHelper,
-        steamContentManager = mockk(relaxed = true),
         repairImageCacheUseCase = mockk(relaxed = true),
         downloadFileStatusRepository = mockk(relaxed = true),
         gradientExtractionDelegate = mockk(relaxed = true),

@@ -476,8 +476,6 @@
     <string name="ui_changelog_action_resync_library">Resync Library</string>
     <!-- One of those things. Verb phrase: empty Argosy's cached files. -->
     <string name="ui_changelog_action_clear_cache">Clear Cache</string>
-    <!-- One of those things. Verb phrase: tell Argosy where Steam games are installed. -->
-    <string name="ui_changelog_action_set_steam_path">Set Steam Install Path</string>
 
     <!-- Heading of the prompt shown when a save changed on both this device and the server while
          Argosy was syncing in the background. -->
@@ -629,11 +627,8 @@
     <!-- Icon description on the tick beside a collection the game is already in. -->
     <string name="ui_add_to_collection_member">In collection</string>
 
-    <!-- Row of the prompt asking where a Steam game should come from. Verb phrase: Argosy
-         fetches it. -->
-    <string name="ui_steam_location_download">Download via Argosy</string>
-    <!-- Row of that prompt for a launcher that already has the game. Verb phrase: records the
-         game as present without fetching anything. -->
+    <!-- Row of the prompt that links a Steam game to the launcher app that has it installed.
+         Verb phrase: records the game as present without fetching anything. -->
     <string name="ui_steam_location_mark_installed">Mark as Installed</string>
     <!-- Second line under that row. %1$s is the other launcher's name. -->
     <string name="ui_steam_location_managed_by">Managed by %1$s</string>

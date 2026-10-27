@@ -1039,9 +1039,6 @@ data class StorageState(
 
 enum class StorageGamesSortMode { PLATFORM, SIZE }
 
-internal const val CACHES_ENTRY_TOP = 0
-internal const val CACHES_ENTRY_STEAM = 1
-
 data class StorageAttributionState(
     val snapshot: com.nendo.argosy.data.storage.StorageSnapshot? = null,
     val volumes: List<com.nendo.argosy.data.storage.StorageVolumeInfo> = emptyList(),
@@ -1077,15 +1074,12 @@ enum class CachesClearTarget {
     EMULATOR_APKS,
     MISC_DOWNLOADS,
     SHADERS_CATALOG,
-    FRAMES,
-    STEAM_DOWNLOADS
+    FRAMES
 }
 
 data class StorageCachesState(
     val pendingClear: CachesClearTarget? = null,
-    val busyClears: Set<CachesClearTarget> = emptySet(),
-    val steamDownloadBusy: Boolean = false,
-    val steamStagingBytes: Long? = null
+    val busyClears: Set<CachesClearTarget> = emptySet()
 )
 
 enum class PlayTimeGamesSortMode { HOURS, SESSIONS, RECENT }
@@ -1479,16 +1473,6 @@ data class SteamSettingsState(
     val showGameNativeFoldersModal: Boolean = false,
     val gameNativeFoldersFocusIndex: Int = 0,
     val gameNativeFoldersActionIndex: Int = 0,
-
-    // Install volume
-    val steamInstallVolume: String? = null,
-    val availableVolumes: List<com.nendo.argosy.data.steam.SteamInstallVolume> = emptyList(),
-    val installedGamesByVolume: Map<String, Int> = emptyMap(),
-
-    // Steam install path (resolved from Steam platform's customRomPath, or default <romsRoot>/steam)
-    val steamInstallPath: String? = null,
-    // True when the Steam platform row has a non-null customRomPath (user-overridden)
-    val steamInstallPathIsCustom: Boolean = false,
 
     // Steam connection
     val connectionState: com.nendo.argosy.data.steam.SteamConnectionState =

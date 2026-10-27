@@ -103,7 +103,12 @@ data class GameDetailUi(
     val canManageSaves: Boolean = false,
     val canManageStates: Boolean = false,
     val isSteamGame: Boolean = false,
+    /**
+     * Display label of the resolved Steam launcher, never compared.
+     * Launcher identity is [steamLauncherPackage].
+     */
     val steamLauncherName: String? = null,
+    val steamLauncherPackage: String? = null,
     val steamLauncherSetManually: Boolean = false,
     val isExternallyManaged: Boolean = false,
     val managingLauncherDisplayName: String? = null,

@@ -650,30 +650,30 @@ fun ArgosyApp(
         )
     }
 
-    val steamDownloadPromptInputHandler = remember(viewModel) {
+    val steamLauncherLinkInputHandler = remember(viewModel) {
         object : CapturingInputHandler {
             override fun onLeft(): InputResult {
-                viewModel.steamDownloadPromptController.moveFocus(-1)
+                viewModel.steamLauncherLinkController.moveFocus(-1)
                 return InputResult.HANDLED
             }
             override fun onRight(): InputResult {
-                viewModel.steamDownloadPromptController.moveFocus(1)
+                viewModel.steamLauncherLinkController.moveFocus(1)
                 return InputResult.HANDLED
             }
             override fun onUp(): InputResult {
-                viewModel.steamDownloadPromptController.moveFocus(-1)
+                viewModel.steamLauncherLinkController.moveFocus(-1)
                 return InputResult.HANDLED
             }
             override fun onDown(): InputResult {
-                viewModel.steamDownloadPromptController.moveFocus(1)
+                viewModel.steamLauncherLinkController.moveFocus(1)
                 return InputResult.HANDLED
             }
             override fun onConfirm(): InputResult {
-                viewModel.steamDownloadPromptController.confirmFocused()
+                viewModel.steamLauncherLinkController.confirmFocused()
                 return InputResult.handled(SoundType.CLOSE_MODAL)
             }
             override fun onBack(): InputResult {
-                viewModel.steamDownloadPromptController.dismiss()
+                viewModel.steamLauncherLinkController.dismiss()
                 return InputResult.handled(SoundType.CLOSE_MODAL)
             }
         }
@@ -727,7 +727,7 @@ fun ArgosyApp(
         )
     }
 
-    val steamDownloadPrompt by viewModel.steamDownloadPromptController.prompt.collectAsState()
+    val steamLauncherLinkPrompt by viewModel.steamLauncherLinkController.prompt.collectAsState()
 
     val coreCrashInputHandler = remember(viewModel) {
         object : InputHandler {
@@ -761,7 +761,7 @@ fun ArgosyApp(
         }
     }
 
-    LaunchedEffect(coreCrashPrompt, saveConflictInfo, backgroundConflictInfo, netplayInvitePrompt, netplayJoinModalActive, netplayJoinNeedsInput, steamDownloadPrompt, resumeCount) {
+    LaunchedEffect(coreCrashPrompt, saveConflictInfo, backgroundConflictInfo, netplayInvitePrompt, netplayJoinModalActive, netplayJoinNeedsInput, steamLauncherLinkPrompt, resumeCount) {
         inputDispatcher.setCriticalHandler(
             when {
                 coreCrashPrompt != null -> coreCrashInputHandler
@@ -771,12 +771,12 @@ fun ArgosyApp(
             }
         )
         when {
-            steamDownloadPrompt != null -> inputDispatcher.subscribeDrawer(steamDownloadPromptInputHandler)
+            steamLauncherLinkPrompt != null -> inputDispatcher.subscribeDrawer(steamLauncherLinkInputHandler)
             netplayJoinNeedsInput || netplayJoinModalActive -> inputDispatcher.subscribeDrawer(netplayJoinInputHandler)
             netplayInvitePrompt != null -> inputDispatcher.subscribeDrawer(netplayInviteInputHandler)
             else -> {
                 val released = listOf(
-                    steamDownloadPromptInputHandler,
+                    steamLauncherLinkInputHandler,
                     netplayJoinInputHandler,
                     netplayInviteInputHandler
                 ).any { inputDispatcher.releaseDrawer(it) }
@@ -1150,7 +1150,7 @@ fun ArgosyApp(
                 coreCrashPrompt != null ||
                 netplayInvitePrompt != null ||
                 netplayJoinModalActive ||
-                steamDownloadPrompt != null
+                steamLauncherLinkPrompt != null
             val navBarAllowed = onRingDestination &&
                 !hasCapturingOverlay &&
                 !homeAppBarOwnsBottom &&
@@ -1488,16 +1488,15 @@ fun ArgosyApp(
                 onDismiss = { viewModel.cancelNetplayJoin() }
             )
 
-            val steamDownloadFocusIndex by viewModel.steamDownloadPromptController.focusIndex.collectAsState()
-            val steamMarkOptions by viewModel.steamDownloadPromptController.markOptions.collectAsState()
-            steamDownloadPrompt?.let { prompt ->
-                com.nendo.argosy.ui.components.SteamDownloadLocationModal(
+            val steamLauncherLinkFocusIndex by viewModel.steamLauncherLinkController.focusIndex.collectAsState()
+            val steamMarkOptions by viewModel.steamLauncherLinkController.markOptions.collectAsState()
+            steamLauncherLinkPrompt?.let { prompt ->
+                com.nendo.argosy.ui.components.SteamLauncherLinkModal(
                     prompt = prompt,
-                    focusIndex = steamDownloadFocusIndex,
+                    focusIndex = steamLauncherLinkFocusIndex,
                     markOptions = steamMarkOptions,
-                    onDownloadToSd = { viewModel.steamDownloadPromptController.confirmDownloadToSd() },
-                    onMarkAsInstalled = { pkg -> viewModel.steamDownloadPromptController.confirmMarkInstalled(pkg) },
-                    onDismiss = { viewModel.steamDownloadPromptController.dismiss() }
+                    onMarkAsInstalled = { pkg -> viewModel.steamLauncherLinkController.confirmMarkInstalled(pkg) },
+                    onDismiss = { viewModel.steamLauncherLinkController.dismiss() }
                 )
             }
 

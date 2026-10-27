@@ -1094,10 +1094,6 @@
     <string name="settings_caches_frames_busy">正在清除...</string>
     <string name="settings_caches_frames_subtitle">已下载的边框 - 按需重新下载</string>
 
-    <string name="settings_caches_steam_clear_title">清除下载数据</string>
-    <string name="settings_caches_steam_clear_busy">正在清除...</string>
-    <string name="settings_caches_steam_clear_blocked">请先取消Steam下载</string>
-    <string name="settings_caches_steam_clear_subtitle">移除暂存的下载内容与队列 - 已安装的游戏保留</string>
 
     <string name="settings_caches_info_artwork_title">美术资源缓存</string>
     <string name="settings_caches_info_artwork_subtitle">海报、背景图及其他在线美术资源 - 按需重新下载</string>
@@ -1116,9 +1112,6 @@
     </plurals>
     <string name="settings_caches_info_steam_total_title">Steam与PC总计</string>
     <string name="settings_caches_info_steam_total_subtitle">包含已安装的商店游戏</string>
-    <string name="settings_caches_info_steam_staging_title">下载暂存</string>
-    <string name="settings_caches_info_steam_staging_subtitle">等待部署的未完成下载</string>
-    <string name="settings_caches_info_steam_staging_computing">正在计算...</string>
 
     <!-- ===== Steam section ===== -->
 
@@ -1134,10 +1127,6 @@
     <string name="settings_steam_gn_storage_warning_title">外部存储</string>
     <string name="settings_steam_gn_storage_warning_value">打开GameNative，在设置中启用"Write to external storage"</string>
 
-    <string name="settings_steam_install_path_title">安装路径</string>
-    <string name="settings_steam_install_path_title_custom">安装路径 (自定义)</string>
-    <string name="settings_steam_install_path_change">更改</string>
-    <string name="settings_steam_install_triage_title">已安装的游戏</string>
     <string name="settings_steam_account_title">Steam账户</string>
     <string name="settings_steam_account_connected">已连接</string>
 
@@ -2292,7 +2281,6 @@
     <string name="settings_accounts_delegate_blocker_external_game">%1$s在%2$d秒前仍在前台运行。请完全退出后再试。</string>
     <string name="settings_accounts_delegate_blocker_active_downloads">游戏下载仍在进行。请等待完成或取消下载。</string>
     <string name="settings_accounts_delegate_blocker_emulator_download">模拟器下载仍在进行。请等待完成或取消下载。</string>
-    <string name="settings_accounts_delegate_blocker_steam_download">Steam下载仍在进行。请等待完成或取消下载。</string>
     <string name="settings_accounts_delegate_blocker_media_download">有影片或剧集仍在下载。请等待完成或取消下载。</string>
     <string name="settings_accounts_delegate_blocker_library_sync">库同步正在进行。请等待其完成后再试。</string>
     <string name="settings_accounts_delegate_blocker_netplay_session">联机对战会话处于打开状态。请退出后再试。</string>
@@ -2302,7 +2290,6 @@
     <!-- ===== Steam settings delegate ===== -->
 
     <string name="settings_steam_delegate_invalid_app_id">请输入有效的Steam App ID</string>
-    <string name="settings_steam_delegate_volume_other_label">其他</string>
 
     <!-- ===== Jellyfin settings delegate ===== -->
 

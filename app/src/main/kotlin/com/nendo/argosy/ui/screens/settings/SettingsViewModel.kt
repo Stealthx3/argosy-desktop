@@ -1096,11 +1096,6 @@ class SettingsViewModel @Inject constructor(
     fun dismissAddSteamGameDialog() = steamDelegate.dismissAddSteamGameDialog()
     fun setAddGameAppId(appId: String) = steamDelegate.setAddGameAppId(appId)
     fun confirmAddSteamGame() = steamDelegate.confirmAddSteamGame(context, viewModelScope)
-    fun cycleSteamInstallVolume(direction: Int = 1) = steamDelegate.cycleSteamInstallVolume(viewModelScope, direction)
-    fun openSteamInstallPathPicker() =
-        storageDelegate.openPlatformFolderPicker(viewModelScope, com.nendo.argosy.data.platform.LocalPlatformIds.STEAM)
-    fun resetSteamInstallPath() =
-        storageDelegate.resetPlatformToGlobal(viewModelScope, com.nendo.argosy.data.platform.LocalPlatformIds.STEAM)
 
     fun installSteamLauncher(emulatorId: String) = steamDelegate.installSteamLauncher(emulatorId, viewModelScope)
     fun refreshSteamMetadata() {}
@@ -1236,8 +1231,7 @@ class SettingsViewModel @Inject constructor(
     fun navigateToThemeBackdrop() = routeNavigateToThemeBackdrop(this)
     fun navigateToStorageGames() = routeNavigateToStorageGames(this)
     fun navigateToStorageMedia() = routeNavigateToStorageMedia(this)
-    fun navigateToStorageCaches() = routeNavigateToStorageCaches(this, CACHES_ENTRY_TOP)
-    fun navigateToStorageCachesForSteam() = routeNavigateToStorageCaches(this, CACHES_ENTRY_STEAM)
+    fun navigateToStorageCaches() = routeNavigateToStorageCaches(this)
     fun navigateToPlayTimePlatforms() = routePushSection(this, SettingsSection.PLAY_TIME_PLATFORMS)
     fun navigateToPlayTimeDevices() = routePushSection(this, SettingsSection.PLAY_TIME_DEVICES)
     fun navigateToPlayTimeGames() = routePushSection(this, SettingsSection.PLAY_TIME_GAMES)

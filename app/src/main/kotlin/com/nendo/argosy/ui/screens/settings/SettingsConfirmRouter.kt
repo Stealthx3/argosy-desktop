@@ -509,7 +509,6 @@ private fun routeSteamConfirm(vm: SettingsViewModel, state: SettingsUiState): In
     when (val item = steamItemAtFocusIndex(state.focusedIndex, state.steam)) {
         SteamItem.PreLogin -> routeSteamPreLoginConfirm(vm, state)
         SteamItem.GnInstall -> {}
-        SteamItem.InstallPath -> vm.openSteamInstallPathPicker()
         SteamItem.SyncLibrary -> vm.syncSteamLibrary()
         SteamItem.AddManual -> vm.showAddSteamGameDialog()
         SteamItem.GameNativeLibrary -> {
@@ -562,7 +561,7 @@ private fun routeStorageConfirm(vm: SettingsViewModel, state: SettingsUiState): 
         StorageItem.MediaTile -> vm.navigateToStorageMedia()
         StorageItem.MusicTile -> vm.navigateToThemeMusic()
         StorageItem.CachesTile -> vm.navigateToStorageCaches()
-        StorageItem.SteamTile -> vm.navigateToStorageCachesForSteam()
+        StorageItem.SteamTile -> vm.navigateToSection(SettingsSection.STEAM_SETTINGS)
         StorageItem.GlobalRomPath -> vm.openFolderPicker()
         StorageItem.ImageCache -> if (!state.syncSettings.isImageCacheMigrating) vm.openImageCachePicker()
         StorageItem.MusicLocation -> vm.openMusicLocationPicker()
@@ -716,7 +715,6 @@ private fun routeStorageCachesConfirm(vm: SettingsViewModel, state: SettingsUiSt
         StorageCachesItem.MiscDownloadsClear -> vm.requestCachesClear(CachesClearTarget.MISC_DOWNLOADS)
         StorageCachesItem.ShadersCatalogClear -> vm.requestCachesClear(CachesClearTarget.SHADERS_CATALOG)
         StorageCachesItem.FramesClear -> vm.requestCachesClear(CachesClearTarget.FRAMES)
-        StorageCachesItem.SteamClear -> vm.requestCachesClear(CachesClearTarget.STEAM_DOWNLOADS)
         else -> {}
     }
     return InputResult.HANDLED

@@ -74,4 +74,29 @@ class SteamPackageChangesTest {
 
         coVerify(exactly = 1) { sync.refreshSteamInstallations() }
     }
+
+    @Test
+    fun `foreground refresh runs at most once an hour`() = runTest {
+        coEvery { sync.refreshSteamInstallations() } returns Unit
+        val app = app()
+        val hourMs = 60 * 60 * 1000L
+
+        app.refreshSteamInstallationsIfStale(now = 0L)
+        app.refreshSteamInstallationsIfStale(now = hourMs - 1)
+        coVerify(exactly = 1) { sync.refreshSteamInstallations() }
+
+        app.refreshSteamInstallationsIfStale(now = hourMs)
+        coVerify(exactly = 2) { sync.refreshSteamInstallations() }
+    }
+
+    @Test
+    fun `failed foreground refresh is logged and still starts the interval`() = runTest {
+        coEvery { sync.refreshSteamInstallations() } throws IOException("Preferences unavailable")
+        val app = app()
+
+        app.refreshSteamInstallationsIfStale(now = 0L)
+        app.refreshSteamInstallationsIfStale(now = 1L)
+
+        coVerify(exactly = 1) { sync.refreshSteamInstallations() }
+    }
 }

@@ -44,7 +44,6 @@ class DatabaseAdminRepositoryDeleteFilesTest {
             attributionRepository = mockk(relaxed = true),
             downloadManager = mockk(relaxed = true),
             emulatorDownloadManager = mockk(relaxed = true),
-            steamContentManager = mockk(relaxed = true),
             mediaDownloadManager = mockk(relaxed = true),
             socialRepository = mockk(relaxed = true),
             soundFeedbackManager = mockk(relaxed = true),

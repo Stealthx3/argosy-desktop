@@ -29,6 +29,7 @@ class SteamLauncherPickerTest {
                 SteamLauncherPickerModal(
                     availableLaunchers = listOf(DroidDeckLauncher),
                     currentLauncherName = "DroidDeck",
+                    currentLauncherPackage = DroidDeckLauncher.packageName,
                     isAutomatic = true,
                     focusIndex = 0,
                     onSelectLauncher = { selection = it },
@@ -51,6 +52,7 @@ class SteamLauncherPickerTest {
                 SteamLauncherPickerModal(
                     availableLaunchers = listOf(DroidDeckLauncher),
                     currentLauncherName = "DroidDeck",
+                    currentLauncherPackage = DroidDeckLauncher.packageName,
                     isAutomatic = false,
                     focusIndex = 1,
                     onSelectLauncher = {},

@@ -86,7 +86,6 @@ class DownloadManagerPlatformFolderTest {
             soundManager = mockk(relaxed = true),
             m3uManager = mockk(relaxed = true),
             thermalManager = dagger.Lazy { mockk(relaxed = true) },
-            steamContentManager = dagger.Lazy { mockk(relaxed = true) },
             mediaDownloadManager = dagger.Lazy { mockk(relaxed = true) },
             musicDirectoryManager = mockk(relaxed = true),
             attributionRepository = mockk(relaxed = true),

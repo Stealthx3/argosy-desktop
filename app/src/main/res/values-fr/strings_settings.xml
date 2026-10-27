@@ -1171,10 +1171,6 @@
     <string name="settings_caches_frames_busy">Effacement...</string>
     <string name="settings_caches_frames_subtitle">Cadres téléchargés - retéléchargés à la demande</string>
 
-    <string name="settings_caches_steam_clear_title">Effacer les données de téléchargement</string>
-    <string name="settings_caches_steam_clear_busy">Effacement...</string>
-    <string name="settings_caches_steam_clear_blocked">Annulez d\'abord les téléchargements Steam</string>
-    <string name="settings_caches_steam_clear_subtitle">Supprime les téléchargements préparés et la file d\'attente - les jeux installés restent</string>
 
     <string name="settings_caches_info_artwork_title">Cache des visuels</string>
     <string name="settings_caches_info_artwork_subtitle">Affiches, arrière-plans et autres visuels en ligne - retéléchargés à la demande</string>
@@ -1194,9 +1190,6 @@
     </plurals>
     <string name="settings_caches_info_steam_total_title">Total Steam &amp; PC</string>
     <string name="settings_caches_info_steam_total_subtitle">Inclut les jeux installés de la boutique</string>
-    <string name="settings_caches_info_steam_staging_title">Zone de préparation des téléchargements</string>
-    <string name="settings_caches_info_steam_staging_subtitle">Téléchargements partiels en attente de déploiement</string>
-    <string name="settings_caches_info_steam_staging_computing">Calcul en cours...</string>
 
     <!-- ===== Section Steam ===== -->
 
@@ -1212,10 +1205,6 @@
     <string name="settings_steam_gn_storage_warning_title">Stockage externe</string>
     <string name="settings_steam_gn_storage_warning_value">Ouvrez GameNative et activez \'Écrire sur le stockage externe\' dans les paramètres</string>
 
-    <string name="settings_steam_install_path_title">Chemin d\'installation</string>
-    <string name="settings_steam_install_path_title_custom">Chemin d\'installation (personnalisé)</string>
-    <string name="settings_steam_install_path_change">Modifier</string>
-    <string name="settings_steam_install_triage_title">Jeux installés</string>
     <string name="settings_steam_account_title">Compte Steam</string>
     <string name="settings_steam_account_connected">Connecté</string>
 
@@ -2406,7 +2395,6 @@
     <string name="settings_accounts_delegate_blocker_external_game">%1$s était à l\'écran il y a %2$ds. Quittez-le complètement, puis réessayez.</string>
     <string name="settings_accounts_delegate_blocker_active_downloads">Des téléchargements de jeux sont encore en cours. Laissez-les se terminer ou annulez-les.</string>
     <string name="settings_accounts_delegate_blocker_emulator_download">Un téléchargement d\'émulateur est encore en cours. Laissez-le se terminer ou annulez-le.</string>
-    <string name="settings_accounts_delegate_blocker_steam_download">Un téléchargement Steam est encore en cours. Laissez-le se terminer ou annulez-le.</string>
     <string name="settings_accounts_delegate_blocker_media_download">Un film ou un épisode est encore en cours de téléchargement. Laissez-le se terminer ou annulez-le.</string>
     <string name="settings_accounts_delegate_blocker_library_sync">Une synchro de bibliothèque est en cours. Laissez-la se terminer, puis réessayez.</string>
     <string name="settings_accounts_delegate_blocker_netplay_session">Une session netplay est ouverte. Quittez-la, puis réessayez.</string>
@@ -2416,7 +2404,6 @@
     <!-- ===== Delegue des parametres Steam ===== -->
 
     <string name="settings_steam_delegate_invalid_app_id">Veuillez entrer un App ID Steam valide</string>
-    <string name="settings_steam_delegate_volume_other_label">Autre</string>
 
     <!-- ===== Delegue des parametres Jellyfin ===== -->
 

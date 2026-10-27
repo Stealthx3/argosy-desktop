@@ -1208,10 +1208,6 @@
     <string name="settings_caches_frames_busy">Очистка...</string>
     <string name="settings_caches_frames_subtitle">Скачанные рамки - скачиваются заново по запросу</string>
 
-    <string name="settings_caches_steam_clear_title">Очистить данные загрузок</string>
-    <string name="settings_caches_steam_clear_busy">Очистка...</string>
-    <string name="settings_caches_steam_clear_blocked">Сначала отмените загрузки Steam</string>
-    <string name="settings_caches_steam_clear_subtitle">Удаляет подготовленные загрузки и очередь - установленные игры остаются</string>
 
     <string name="settings_caches_info_artwork_title">Кэш обложек</string>
     <string name="settings_caches_info_artwork_subtitle">Постеры, фоны и другие онлайн-изображения - скачиваются заново по запросу</string>
@@ -1232,9 +1228,6 @@
     </plurals>
     <string name="settings_caches_info_steam_total_title">Всего Steam и ПК</string>
     <string name="settings_caches_info_steam_total_subtitle">Включает установленные игры из магазинов</string>
-    <string name="settings_caches_info_steam_staging_title">Временные файлы загрузок</string>
-    <string name="settings_caches_info_steam_staging_subtitle">Частичные загрузки, ожидающие установки</string>
-    <string name="settings_caches_info_steam_staging_computing">Вычисление...</string>
 
     <!-- ===== Steam section ===== -->
 
@@ -1250,10 +1243,6 @@
     <string name="settings_steam_gn_storage_warning_title">Внешнее хранилище</string>
     <string name="settings_steam_gn_storage_warning_value">Откройте GameNative и включите «Write to external storage» в настройках</string>
 
-    <string name="settings_steam_install_path_title">Путь установки</string>
-    <string name="settings_steam_install_path_title_custom">Путь установки (свой)</string>
-    <string name="settings_steam_install_path_change">Изменить</string>
-    <string name="settings_steam_install_triage_title">Установленные игры</string>
     <string name="settings_steam_account_title">Аккаунт Steam</string>
     <string name="settings_steam_account_connected">Подключено</string>
 
@@ -2462,7 +2451,6 @@
     <string name="settings_accounts_delegate_blocker_external_game">%1$s было на экране %2$ds назад. Полностью закройте его и повторите попытку.</string>
     <string name="settings_accounts_delegate_blocker_active_downloads">Загрузки игр ещё выполняются. Дождитесь их завершения или отмените их.</string>
     <string name="settings_accounts_delegate_blocker_emulator_download">Загрузка эмулятора ещё выполняется. Дождитесь завершения или отмените её.</string>
-    <string name="settings_accounts_delegate_blocker_steam_download">Загрузка Steam ещё выполняется. Дождитесь завершения или отмените её.</string>
     <string name="settings_accounts_delegate_blocker_media_download">Фильм или эпизод ещё скачивается. Дождитесь завершения или отмените загрузку.</string>
     <string name="settings_accounts_delegate_blocker_library_sync">Выполняется синхронизация библиотеки. Дождитесь завершения и повторите попытку.</string>
     <string name="settings_accounts_delegate_blocker_netplay_session">Открыта сессия Netplay. Выйдите из неё и повторите попытку.</string>
@@ -2472,7 +2460,6 @@
     <!-- ===== Steam settings delegate ===== -->
 
     <string name="settings_steam_delegate_invalid_app_id">Введите корректный Steam App ID</string>
-    <string name="settings_steam_delegate_volume_other_label">Другое</string>
 
     <!-- ===== Jellyfin settings delegate ===== -->
 

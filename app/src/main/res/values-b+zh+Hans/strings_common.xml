@@ -212,7 +212,6 @@
     <string name="ui_changelog_action_relogin_romm">重新登录RomM</string>
     <string name="ui_changelog_action_resync_library">重新同步游戏库</string>
     <string name="ui_changelog_action_clear_cache">清除缓存</string>
-    <string name="ui_changelog_action_set_steam_path">设置Steam安装路径</string>
 
     <string name="ui_background_conflict_title">存档同步冲突</string>
     <string name="ui_background_conflict_default_slot">默认存档</string>
@@ -293,7 +292,6 @@
     <string name="ui_add_to_collection_create">创建新合集</string>
     <string name="ui_add_to_collection_member">已在合集中</string>
 
-    <string name="ui_steam_location_download">通过Argosy下载</string>
     <string name="ui_steam_location_mark_installed">标记为已安装</string>
     <string name="ui_steam_location_managed_by">由%1$s管理</string>
 
