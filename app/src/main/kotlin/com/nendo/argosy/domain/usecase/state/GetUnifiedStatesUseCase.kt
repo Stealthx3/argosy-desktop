@@ -7,6 +7,7 @@ import com.nendo.argosy.data.emulator.StatePathRegistry
 import com.nendo.argosy.data.emulator.VersionValidationResult
 import com.nendo.argosy.data.local.dao.GameDao
 import com.nendo.argosy.data.local.entity.StateCacheEntity
+import com.nendo.argosy.data.repository.SaveSyncApiClient
 import com.nendo.argosy.data.repository.SaveSyncRepository
 import com.nendo.argosy.data.remote.romm.RomMState
 import com.nendo.argosy.data.repository.StateCacheManager
@@ -213,7 +214,7 @@ class GetUnifiedStatesUseCase @Inject constructor(
             localCacheId = null,
             serverStateId = state.id,
             slotNumber = slot,
-            timestamp = stateCacheManager.parseServerStateTimestamp(state.updatedAt) ?: Instant.EPOCH,
+            timestamp = SaveSyncApiClient.parseTimestampOrNull(state.updatedAt) ?: Instant.EPOCH,
             size = state.fileSizeBytes,
             channelName = channelName ?: parsed.channelName,
             coreId = null,

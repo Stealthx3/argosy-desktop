@@ -15,36 +15,46 @@ import javax.inject.Inject
 
 private const val TAG = "VerifyRAGameIdUseCase"
 
+data class HashVerification(val raId: Long?, val matchedHash: String?)
+
 class VerifyRAGameIdUseCase @Inject constructor(
     private val gameDao: GameDao,
     private val raRepository: RetroAchievementsRepository
 ) {
     suspend operator fun invoke(gameId: Long, forceRehash: Boolean = false): Long? =
-        withContext(Dispatchers.IO) { verify(gameId, forceRehash) }
+        withContext(Dispatchers.IO) { verify(gameId, forceRehash).raId }
 
-    private suspend fun verify(gameId: Long, forceRehash: Boolean): Long? {
-        val game = gameDao.getById(gameId) ?: return null
+    /**
+     * Rehashes the ROM and resolves it against RetroAchievements. [HashVerification.matchedHash]
+     * is set only when RetroAchievements resolved that exact hash to [HashVerification.raId]; every
+     * fallback to the RomM id leaves it null.
+     */
+    suspend fun verifyHash(gameId: Long): HashVerification =
+        withContext(Dispatchers.IO) { verify(gameId, forceRehash = true) }
+
+    private suspend fun verify(gameId: Long, forceRehash: Boolean): HashVerification {
+        val game = gameDao.getById(gameId) ?: return HashVerification(null, null)
 
         if (game.raIdVerified && !forceRehash) {
-            return game.effectiveRaId
+            return HashVerification(game.effectiveRaId, null)
         }
 
         val localPath = game.localPath
         if (localPath == null) {
             gameDao.updateVerifiedRaId(gameId, game.raId)
-            return game.raId
+            return HashVerification(game.raId, null)
         }
 
         val consoleId = RAConsoleIds.getConsoleId(game.platformSlug)
         if (consoleId == null) {
             gameDao.updateVerifiedRaId(gameId, game.raId)
-            return game.raId
+            return HashVerification(game.raId, null)
         }
 
         val hashPath = resolveHashPath(localPath, game.platformSlug)
         if (hashPath == null) {
             gameDao.updateVerifiedRaId(gameId, game.raId)
-            return game.raId
+            return HashVerification(game.raId, null)
         }
 
         val hash = if (!forceRehash && game.romHash != null) {
@@ -60,14 +70,14 @@ class VerifyRAGameIdUseCase @Inject constructor(
         if (hash == null) {
             Logger.warn(TAG, "Failed to compute hash for game $gameId ($localPath)")
             gameDao.updateVerifiedRaId(gameId, game.raId)
-            return game.raId
+            return HashVerification(game.raId, null)
         }
 
         val resolvedId = try {
             raRepository.resolveGameId(hash)
         } catch (e: Exception) {
             Logger.warn(TAG, "Network error resolving game ID for hash $hash: ${e.message}")
-            return game.effectiveRaId ?: game.raId
+            return HashVerification(game.effectiveRaId ?: game.raId, null)
         }
 
         if (resolvedId != null) {
@@ -75,11 +85,11 @@ class VerifyRAGameIdUseCase @Inject constructor(
             if (resolvedId != game.raId) {
                 Logger.info(TAG, "Verified RA ID differs from RomM: verified=$resolvedId, romm=${game.raId} (game $gameId)")
             }
-            return resolvedId
+            return HashVerification(resolvedId, hash)
         }
 
         Logger.warn(TAG, "RA hash lookup returned no match for game $gameId (hash=$hash); not persisting verified=null, falling back to romm raId=${game.raId}")
-        return game.raId
+        return HashVerification(game.raId, null)
     }
 
     /**

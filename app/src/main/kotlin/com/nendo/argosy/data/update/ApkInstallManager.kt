@@ -162,7 +162,10 @@ class ApkInstallManager @Inject constructor(
         _pushedPrompt.value = null
     }
 
-    private fun apkSignerSha256(apkFile: File): String? = try {
+    private suspend fun apkSignerSha256(apkFile: File): String? =
+        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { readApkSignerSha256(apkFile) }
+
+    private fun readApkSignerSha256(apkFile: File): String? = try {
         val flags = PackageManager.GET_SIGNING_CERTIFICATES
         val info = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             context.packageManager.getPackageArchiveInfo(apkFile.absolutePath, PackageManager.PackageInfoFlags.of(flags.toLong()))
@@ -179,7 +182,10 @@ class ApkInstallManager @Inject constructor(
         null
     }
 
-    private fun getApkPackageName(apkFile: File): String? {
+    private suspend fun getApkPackageName(apkFile: File): String? =
+        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { readApkPackageName(apkFile) }
+
+    private fun readApkPackageName(apkFile: File): String? {
         return try {
             val packageInfo: PackageInfo? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 context.packageManager.getPackageArchiveInfo(

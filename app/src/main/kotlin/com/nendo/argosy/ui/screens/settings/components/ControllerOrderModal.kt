@@ -2,20 +2,16 @@ package com.nendo.argosy.ui.screens.settings.components
 
 import android.view.KeyEvent
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
@@ -24,16 +20,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import com.nendo.argosy.R
-import com.nendo.argosy.core.input.controllerIdOf
 import com.nendo.argosy.core.input.isPhysicalGamepad
 import com.nendo.argosy.ui.components.InputButton
 import com.nendo.argosy.ui.components.Modal
-import com.nendo.argosy.ui.components.animateScrollToItemCentered
 import com.nendo.argosy.ui.input.LocalGamepadInputHandler
 import com.nendo.argosy.ui.primitives.FocusIndicators
-import com.nendo.argosy.ui.primitives.SegmentedControl
 import com.nendo.argosy.ui.primitives.argosyFocusIndicators
-import com.nendo.argosy.ui.primitives.segmentedInlineWidth
 import com.nendo.argosy.ui.theme.Dimens
 import com.nendo.argosy.ui.util.clickableNoFocus
 
@@ -48,10 +40,8 @@ fun ControllerOrderModal(
 
     DisposableEffect(gamepadInputHandler, controller) {
         val listener: (KeyEvent) -> Boolean = { event ->
-            if (event.action == KeyEvent.ACTION_DOWN) {
-                val pressingPad = event.device
-                    ?.takeIf { it.isPhysicalGamepad() }
-                    ?.let(::controllerIdOf)
+            if (event.action == KeyEvent.ACTION_DOWN && event.repeatCount == 0) {
+                val pressingPad = event.device?.takeIf { it.isPhysicalGamepad() }
                 val gamepadEvent = gamepadInputHandler?.mapKeyToEvent(event.keyCode)
                 if (controller.onPadPress(gamepadEvent, pressingPad)) currentOnDismiss.value()
             }
@@ -61,23 +51,11 @@ fun ControllerOrderModal(
         onDispose { gamepadInputHandler?.setRawKeyEventListener(null) }
     }
 
-    val seatLabels = SEAT_OPTIONS.map { port ->
-        if (port == null) {
-            stringResource(R.string.settings_controller_order_seat_none)
-        } else {
-            stringResource(R.string.settings_controller_order_slot_label, port + 1)
-        }
-    }
     val defaultName = stringResource(R.string.settings_controller_order_default_name)
-    val listState = rememberLazyListState()
-
-    LaunchedEffect(state.focusedIndex, state.rows.size) {
-        if (state.rows.isNotEmpty()) listState.animateScrollToItemCentered(state.focusedIndex)
-    }
 
     Modal(
         title = stringResource(R.string.settings_controller_order_title),
-        subtitle = stringResource(R.string.settings_controller_order_subtitle),
+        subtitle = stringResource(R.string.settings_controller_order_claim_subtitle),
         baseWidth = Dimens.modalWidthLg,
         onDismiss = onDismiss,
         footerHints = listOf(
@@ -88,70 +66,61 @@ fun ControllerOrderModal(
             if (button == InputButton.Y) controller.clearAll()
         }
     ) {
-        if (state.rows.isEmpty()) {
-            Text(
-                text = stringResource(R.string.settings_controller_order_empty),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        } else {
-            LazyColumn(
-                state = listState,
-                modifier = Modifier.weight(1f, fill = false),
-                verticalArrangement = Arrangement.spacedBy(Dimens.spacingXs)
-            ) {
-                itemsIndexed(state.rows, key = { _, row -> row.controllerId }) { index, row ->
-                    ControllerSeatRow(
-                        name = row.name ?: defaultName,
-                        seatLabels = seatLabels,
-                        selectedIndex = SEAT_OPTIONS.indexOf(row.port),
-                        isFocused = index == state.focusedIndex,
-                        onFocus = { controller.focusRow(index) },
-                        onSelectSeat = { option -> controller.setSeat(index, SEAT_OPTIONS[option]) }
-                    )
-                }
+        Column(verticalArrangement = Arrangement.spacedBy(Dimens.spacingXs)) {
+            state.seats.forEachIndexed { port, holder ->
+                SeatRow(
+                    seatLabel = stringResource(R.string.settings_controller_order_slot_label, port + 1),
+                    occupant = holder?.let { it.name ?: defaultName },
+                    isWaiting = port == state.nextOpenSeat,
+                    onRelease = { controller.releaseSeat(port) }
+                )
             }
         }
     }
 }
 
 @Composable
-private fun ControllerSeatRow(
-    name: String,
-    seatLabels: List<String>,
-    selectedIndex: Int,
-    isFocused: Boolean,
-    onFocus: () -> Unit,
-    onSelectSeat: (Int) -> Unit
+private fun SeatRow(
+    seatLabel: String,
+    occupant: String?,
+    isWaiting: Boolean,
+    onRelease: () -> Unit
 ) {
+    val emptyText = if (isWaiting) {
+        stringResource(R.string.settings_controller_order_seat_waiting)
+    } else {
+        stringResource(R.string.settings_controller_order_seat_open)
+    }
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(min = Dimens.menuRowHeightLg)
             .argosyFocusIndicators(
-                focused = isFocused,
+                focused = isWaiting,
                 indicators = FocusIndicators.ListRow,
                 shape = RoundedCornerShape(Dimens.radiusMd)
             )
-            .clickableNoFocus(onClick = onFocus)
+            .clickableNoFocus(enabled = occupant != null, onClick = onRelease)
             .padding(horizontal = Dimens.spacingMd, vertical = Dimens.spacingXs),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(Dimens.spacingMd)
     ) {
         Text(
-            text = name,
+            text = seatLabel,
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.primary
+        )
+        Text(
+            text = occupant ?: emptyText,
             style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurface,
+            color = if (occupant != null) {
+                MaterialTheme.colorScheme.onSurface
+            } else {
+                MaterialTheme.colorScheme.onSurfaceVariant
+            },
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f)
-        )
-        SegmentedControl(
-            options = seatLabels,
-            selectedIndex = selectedIndex,
-            onSelect = onSelectSeat,
-            focused = isFocused,
-            modifier = Modifier.width(segmentedInlineWidth(seatLabels))
         )
     }
 }

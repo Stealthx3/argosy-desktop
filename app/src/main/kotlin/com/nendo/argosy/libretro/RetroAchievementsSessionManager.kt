@@ -113,8 +113,8 @@ class RetroAchievementsSessionManager(
             gameIgdbId = game.igdbId
             gameTitle = game.title
 
-            val verifiedId = verifyRAGameIdUseCase(gameId, forceRehash = true)
-            gameRaId = verifiedId ?: game.effectiveRaId ?: game.raId
+            val verification = verifyRAGameIdUseCase.verifyHash(gameId)
+            gameRaId = verification.raId ?: game.effectiveRaId ?: game.raId
             Log.d(TAG, "Game loaded: title=${game.title}, resolvedRaId=$gameRaId, raId=${game.raId}, verifiedRaId=${game.verifiedRaId}")
 
             if (gameRaId == null) {
@@ -125,7 +125,7 @@ class RetroAchievementsSessionManager(
 
             val raId = gameRaId!!
             Log.d(TAG, "Starting RA session for raId=$raId, hardcore=$requestedHardcore")
-            val verifiedHash = if (verifiedId == raId) gameDao.getById(gameId)?.romHash else null
+            val verifiedHash = verification.matchedHash?.takeIf { verification.raId == raId }
             val sessionResult = raRepository.startSession(raId, requestedHardcore && !hardcoreAbandoned, verifiedHash)
             if (sessionResult.success) {
                 raSessionActive = true
@@ -136,7 +136,8 @@ class RetroAchievementsSessionManager(
             val livePatch = (raRepository.fetchPatchData(raId) as? RAPatchFetchResult.Fetched)?.patchData
             val patchData = livePatch ?: raRepository.getCachedPatchData(raId)
             val armedFromCache = livePatch == null && patchData != null
-            val claimsHardcore = requestedHardcore && sessionResult.success && !armedFromCache && !hardcoreAbandoned
+            val claimsHardcore = requestedHardcore && verifiedHash != null && sessionResult.success &&
+                !armedFromCache && !hardcoreAbandoned
             val fellBackFromHardcore = requestedHardcore && !claimsHardcore
             if (claimsHardcore) {
                 _sessionMode.value = RASessionMode.HARDCORE

@@ -602,6 +602,10 @@ class PlaySessionTracker @Inject constructor(
                         current
                     }
                 }
+                if (_activeSession.value?.startTime != session.startTime) {
+                    Logger.debug(TAG, "[SaveSync] SESSION gameId=$gameId | Session ended before the hardcore claim landed")
+                    return@withLock
+                }
                 Logger.debug(TAG, "[SaveSync] SESSION gameId=$gameId | Hardcore claim updated | hardcore=$isHardcore, channel=$channelName")
 
                 preferencesRepository.persistActiveSession(

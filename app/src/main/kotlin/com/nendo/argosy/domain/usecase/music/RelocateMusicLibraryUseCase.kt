@@ -33,7 +33,7 @@ class RelocateMusicLibraryUseCase @Inject constructor(
             val oldPrefix = source.absolutePath.trimEnd('/')
             val newPrefix = target.absolutePath.trimEnd('/')
             repoint(oldPrefix, newPrefix)
-            result.failed.forEach { stayed -> repoint(newPrefix + stayed.removePrefix(oldPrefix), stayed) }
+            result.failed.forEach { stayed -> repointFile(newPrefix + stayed.removePrefix(oldPrefix), stayed) }
         }
         val isDefault = target.absolutePath == musicDirectoryManager.defaultMusicDir().absolutePath
         storagePreferences.setMusicStoragePath(if (isDefault) null else target.absolutePath)
@@ -44,5 +44,11 @@ class RelocateMusicLibraryUseCase @Inject constructor(
         bgmPlaylistRepository.rewritePathPrefix(oldPrefix, newPrefix)
         gameFileDao.rewriteLocalPathPrefix(oldPrefix, newPrefix)
         controlsPreferencesRepository.rewriteSoundConfigPathPrefix(oldPrefix, newPrefix)
+    }
+
+    private suspend fun repointFile(oldPath: String, newPath: String) {
+        bgmPlaylistRepository.rewritePathPrefix(oldPath, newPath)
+        gameFileDao.updateLocalPathByOldPath(oldPath, newPath)
+        controlsPreferencesRepository.rewriteSoundConfigPathPrefix(oldPath, newPath)
     }
 }

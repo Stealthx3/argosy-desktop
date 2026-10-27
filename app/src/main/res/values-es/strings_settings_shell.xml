@@ -214,6 +214,7 @@
 
     <string name="settings_shell_modal_sync_first_title">Sincronizar guardados primero</string>
     <string name="settings_shell_modal_sync_first_message">Sincroniza los guardados primero: %1$d pendientes. Restablecer la biblioteca ahora descartaría permanentemente los guardados que no se han subido.</string>
+    <string name="settings_shell_modal_purge_sync_first_message">Sincroniza los guardados primero: %1$d pendientes. Quitar esta plataforma ahora descartaría permanentemente los guardados que no se han subido. La confirmación para quitarla vuelve a aparecer cuando termine la sincronización.</string>
     <string name="settings_shell_modal_sync_first_confirm">Sincronizar ahora</string>
 
     <string name="settings_shell_modal_reset_library_title">¿Restablecer biblioteca?</string>

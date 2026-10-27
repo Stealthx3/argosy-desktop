@@ -188,7 +188,7 @@ class ControlsPreferencesRepository @Inject constructor(
             if (current.isEmpty()) return@edit
             val updated = current.mapValues { (_, config) ->
                 val path = config.customFilePath
-                if (path != null && path.startsWith("$old/")) {
+                if (path != null && (path == old || path.startsWith("$old/"))) {
                     config.copy(customFilePath = new + path.removePrefix(old))
                 } else {
                     config

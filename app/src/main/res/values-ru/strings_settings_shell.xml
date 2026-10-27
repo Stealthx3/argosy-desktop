@@ -216,6 +216,7 @@
 
     <string name="settings_shell_modal_sync_first_title">Сначала синхронизируйте сохранения</string>
     <string name="settings_shell_modal_sync_first_message">Сначала синхронизируйте сохранения - %1$d в ожидании. Сброс библиотеки сейчас безвозвратно удалит невыгруженные сохранения.</string>
+    <string name="settings_shell_modal_purge_sync_first_message">Сначала синхронизируйте сохранения - %1$d в ожидании. Удаление этой платформы сейчас безвозвратно удалит невыгруженные сохранения. Запрос на удаление появится снова после завершения синхронизации.</string>
     <string name="settings_shell_modal_sync_first_confirm">Синхронизировать</string>
 
     <string name="settings_shell_modal_reset_library_title">Сбросить библиотеку?</string>

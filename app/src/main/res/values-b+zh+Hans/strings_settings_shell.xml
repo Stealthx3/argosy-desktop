@@ -203,6 +203,7 @@
 
     <string name="settings_shell_modal_sync_first_title">请先同步存档</string>
     <string name="settings_shell_modal_sync_first_message">请先同步存档，还有%1$d个待处理。现在重置库会永久丢弃尚未上传的存档。</string>
+    <string name="settings_shell_modal_purge_sync_first_message">请先同步存档，还有%1$d个待处理。现在移除此平台会永久丢弃尚未上传的存档。同步完成后会再次询问是否移除。</string>
     <string name="settings_shell_modal_sync_first_confirm">立即同步</string>
 
     <string name="settings_shell_modal_reset_library_title">重置库？</string>

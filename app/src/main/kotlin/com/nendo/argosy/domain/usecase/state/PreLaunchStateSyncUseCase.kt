@@ -156,7 +156,7 @@ class PreLaunchStateSyncUseCase @Inject constructor(
             val slotNumber = parsed.slotNumber
             val linked = localByRommId[serverState.id]
             val localState = linked ?: localBySlot[slotNumber to stateChannelKey(parsed.channelName)]
-            val serverUpdatedAt = stateCacheManager.parseTimestamp(serverState.updatedAt)
+            val serverUpdatedAt = com.nendo.argosy.data.repository.SaveSyncApiClient.parseTimestampOrNull(serverState.updatedAt)
 
             val shouldDownload = when {
                 localState == null -> {

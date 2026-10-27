@@ -214,6 +214,7 @@
 
     <string name="settings_shell_modal_sync_first_title">Synchroniser les sauvegardes d\'abord</string>
     <string name="settings_shell_modal_sync_first_message">Synchronisez les sauvegardes d\'abord : %1$d en attente. Réinitialiser la bibliothèque maintenant supprimerait définitivement les sauvegardes non envoyées.</string>
+    <string name="settings_shell_modal_purge_sync_first_message">Synchronisez les sauvegardes d\'abord : %1$d en attente. Retirer cette plateforme maintenant supprimerait définitivement les sauvegardes non envoyées. La demande de retrait réapparaît une fois la synchronisation terminée.</string>
     <string name="settings_shell_modal_sync_first_confirm">Synchroniser</string>
 
     <string name="settings_shell_modal_reset_library_title">Réinitialiser la bibliothèque ?</string>

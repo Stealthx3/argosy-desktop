@@ -295,6 +295,7 @@ class SettingsViewModel @Inject constructor(
         routeObserveModalResetSignal(this)
         routeObserveConnectionState(this)
         observeSocialConnectionState()
+        reofferPurgeAfterSync()
         observeAvatarPreferences()
         routeObservePlatformLibretroSettings(this)
         routeObservePlatforms(this)
@@ -1768,7 +1769,35 @@ class SettingsViewModel @Inject constructor(
 
     fun requestSyncSaves() = syncDelegate.requestSyncSaves()
     fun confirmSyncSaves() = syncDelegate.confirmSyncSaves(viewModelScope)
-    fun cancelSyncSaves() = syncDelegate.cancelSyncSaves()
+    fun cancelSyncSaves() {
+        purgeAfterSync = null
+        syncDelegate.cancelSyncSaves()
+    }
+
+    private var purgeAfterSync: Long? = null
+
+    fun syncBeforePurge() {
+        purgeAfterSync = uiState.value.storage.showPurgePlatformConfirm
+        storageDelegate.cancelPurgePlatform()
+        syncDelegate.requestSyncSaves()
+    }
+
+    private fun reofferPurgeAfterSync() {
+        viewModelScope.launch {
+            var sawSync = false
+            uiState.map { it.syncSettings.isSyncing }.distinctUntilChanged().collect { syncing ->
+                if (syncing) {
+                    sawSync = true
+                } else if (sawSync) {
+                    sawSync = false
+                    purgeAfterSync?.let { platformId ->
+                        purgeAfterSync = null
+                        requestPurgePlatform(platformId)
+                    }
+                }
+            }
+        }
+    }
     fun moveSyncConfirmFocus(delta: Int) = syncDelegate.moveSyncConfirmFocus(delta)
 
     fun openImageCachePicker() = syncDelegate.openImageCachePicker(viewModelScope)

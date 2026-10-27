@@ -210,6 +210,7 @@
 
     <string name="settings_shell_modal_sync_first_title">請先同步存檔</string>
     <string name="settings_shell_modal_sync_first_message">請先同步存檔，目前還有%1$d個待處理。現在重設收藏庫會永久捨棄尚未上傳的存檔。</string>
+    <string name="settings_shell_modal_purge_sync_first_message">請先同步存檔，目前還有%1$d個待處理。現在移除此平台會永久捨棄尚未上傳的存檔。同步完成後會再次詢問是否移除。</string>
     <string name="settings_shell_modal_sync_first_confirm">立即同步</string>
 
     <string name="settings_shell_modal_reset_library_title">要重設收藏庫嗎？</string>

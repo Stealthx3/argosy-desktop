@@ -2264,7 +2264,9 @@
     <!-- ===== Controller order modal (Settings > components > ControllerOrderModal) ===== -->
 
     <string name="settings_controller_order_title">Orden de mandos</string>
-    <string name="settings_controller_order_subtitle">Pulsa un botón en un mando para encontrarlo.</string>
+    <string name="settings_controller_order_claim_subtitle">Pulsa un botón en cada mando en orden de jugador. Vuelve a pulsar para dejar el puesto.</string>
+    <string name="settings_controller_order_seat_waiting">Pulsa un botón</string>
+    <string name="settings_controller_order_seat_open">Libre</string>
     <string name="settings_controller_order_hint_clear_all">Borrar todo</string>
     <string name="settings_controller_order_default_name">Mando</string>
     <string name="settings_controller_order_slot_label">J%1$d</string>

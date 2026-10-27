@@ -950,12 +950,9 @@ fun SettingsScreen(
     ArgosyConfirmModalHost(
         visible = uiState.storage.showPurgePlatformConfirm != null && purgePlatformPending > 0,
         title = stringResource(R.string.settings_shell_modal_sync_first_title),
-        message = stringResource(R.string.settings_shell_modal_sync_first_message, purgePlatformPending),
+        message = stringResource(R.string.settings_shell_modal_purge_sync_first_message, purgePlatformPending),
         confirmLabel = stringResource(R.string.settings_shell_modal_sync_first_confirm),
-        onConfirm = {
-            viewModel.cancelPurgePlatform()
-            viewModel.requestSyncSaves()
-        },
+        onConfirm = { viewModel.syncBeforePurge() },
         onDismiss = { viewModel.cancelPurgePlatform() }
     )
     ArgosyConfirmModalHost(

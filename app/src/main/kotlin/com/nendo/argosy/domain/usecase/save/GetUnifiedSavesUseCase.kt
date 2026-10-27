@@ -13,8 +13,6 @@ import com.nendo.argosy.domain.model.UnifiedSaveEntry
 import com.nendo.argosy.util.Logger
 import java.io.File
 import java.time.Instant
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 private const val LATEST_SLOT_KEY = "__latest__"
@@ -315,17 +313,8 @@ class GetUnifiedSavesUseCase @Inject constructor(
         return latest + sortedDated + sortedChannels
     }
 
-    private fun parseServerTimestamp(timestamp: String): Instant? {
-        return try {
-            ZonedDateTime.parse(timestamp, DateTimeFormatter.ISO_DATE_TIME).toInstant()
-        } catch (_: Exception) {
-            try {
-                Instant.parse(timestamp)
-            } catch (_: Exception) {
-                null
-            }
-        }
-    }
+    private fun parseServerTimestamp(timestamp: String): Instant? =
+        com.nendo.argosy.data.repository.SaveSyncApiClient.parseTimestampOrNull(timestamp)
 
 }
 

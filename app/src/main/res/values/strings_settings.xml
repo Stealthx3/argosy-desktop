@@ -4246,9 +4246,12 @@
 
     <!-- Modal title. Noun phrase: assigning controllers to player ports. -->
     <string name="settings_controller_order_title">Controller Order</string>
-    <!-- Modal subtitle. Each connected controller has a row; pressing a button on a controller
-         moves the highlight to that controller's row. -->
-    <string name="settings_controller_order_subtitle">Press a button on any controller to find it.</string>
+    <!-- Modal subtitle. Seats fill in the order controllers press a button. -->
+    <string name="settings_controller_order_claim_subtitle">Press a button on each controller in player order. Press again to give up a seat.</string>
+    <!-- Seat row text for the next open seat, the one the next button press takes. -->
+    <string name="settings_controller_order_seat_waiting">Press a button</string>
+    <!-- Seat row text for an open seat after the next one. -->
+    <string name="settings_controller_order_seat_open">Open</string>
     <!-- Footer hint. Removes every controller's player seat. -->
     <string name="settings_controller_order_hint_clear_all">Clear all</string>
     <!-- Fallback name for a controller that reports no name of its own. -->

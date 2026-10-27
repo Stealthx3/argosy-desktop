@@ -2087,7 +2087,7 @@ class LibretroActivity : ComponentActivity() {
         val current = stored?.let { def.resolveStored(it) } ?: def.defaultValue
         val currentIndex = rotation.indexOf(current).coerceAtLeast(0)
         val newValue = rotation[(currentIndex + direction).mod(rotation.size)]
-        if (hardcoreMode && !LibretroDroid.isCoreSettingAllowed(optionKey, newValue)) {
+        if (hardcoreBlocks(optionKey, newValue)) {
             inGameMessage = getString(R.string.ingame_libretro_core_option_blocked_hardcore)
             return
         }
@@ -2130,6 +2130,11 @@ class LibretroActivity : ComponentActivity() {
         val def = CoreOptionManifestRegistry.getManifest(coreId)
             ?.options?.firstOrNull { it.key == optionKey } ?: return
         val perGame = perGameSettingsEnabled && gameId != -1L
+        val target = if (perGame) coreOptionOverrides[optionKey] ?: def.defaultValue else def.defaultValue
+        if (hardcoreBlocks(optionKey, target)) {
+            inGameMessage = getString(R.string.ingame_libretro_core_option_blocked_hardcore)
+            return
+        }
         if (perGame) {
             gameCoreOptionOverrides = gameCoreOptionOverrides - optionKey
             val fallback = coreOptionOverrides[optionKey] ?: def.defaultValue
@@ -2148,19 +2153,21 @@ class LibretroActivity : ComponentActivity() {
 
     private fun applyPerGameSettingsToggle(enabled: Boolean) {
         if (gameId == -1L) return
-        perGameSettingsEnabled = enabled
         val coreId = resolvedCoreId
         val manifest = coreId?.let { CoreOptionManifestRegistry.getManifest(it) }
-        if (manifest != null && ::retroView.isInitialized) {
-            val held = splitHeldCoreOptions()
-            manifest.options.forEach { def ->
-                val gameOverride = if (enabled) gameCoreOptionOverrides[def.key] else null
-                val stored = gameOverride ?: coreOptionOverrides[def.key]
-                val effective = held[def.key]
-                    ?: stored?.let { def.resolveStored(it) }
-                    ?: def.defaultValue
-                retroView.updateVariables(Variable(def.key, effective))
-            }
+        val held = splitHeldCoreOptions()
+        val effective = manifest?.options?.map { def ->
+            val gameOverride = if (enabled) gameCoreOptionOverrides[def.key] else null
+            val stored = gameOverride ?: coreOptionOverrides[def.key]
+            Variable(def.key, held[def.key] ?: stored?.let { def.resolveStored(it) } ?: def.defaultValue)
+        }.orEmpty()
+        if (effective.any { hardcoreBlocks(it.key, it.value) }) {
+            inGameMessage = getString(R.string.ingame_libretro_core_option_blocked_hardcore)
+            return
+        }
+        perGameSettingsEnabled = enabled
+        if (::retroView.isInitialized) {
+            effective.forEach { retroView.updateVariables(it) }
         }
         lifecycleScope.launch(Dispatchers.IO) {
             gameDao.setPerGameSettingsEnabled(gameId, enabled)
@@ -3467,6 +3474,10 @@ class LibretroActivity : ComponentActivity() {
 
         dualScreenOutput = output
         output.coreOptions.forEach { (key, value) ->
+            if (hardcoreBlocks(key, value)) {
+                achievementBridge.sessionManager?.abandonHardcore("$key=$value")
+                inGameMessage = getString(R.string.ingame_libretro_hardcore_off_core_setting, key, value)
+            }
             retroView.updateVariables(Variable(key, value))
         }
         retroView.setScreenSplit(output.primary, output.primaryAspect)
@@ -3905,6 +3916,9 @@ class LibretroActivity : ComponentActivity() {
         val canonical = com.nendo.argosy.data.platform.PlatformDefinitions.getCanonicalSlug(platformSlug)
         return if (canonical in PLATFORMS_WITH_DIGITAL_RIGHT_STICK) DIGITAL_RIGHT_STICK_DEADZONE else 0f
     }
+
+    private fun hardcoreBlocks(key: String?, value: String?): Boolean =
+        hardcoreMode && key != null && value != null && !LibretroDroid.isCoreSettingAllowed(key, value)
 
     private fun enforceHardcoreCoreSettings() {
         if (!hardcoreMode) return

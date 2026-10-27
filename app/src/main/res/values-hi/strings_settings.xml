@@ -2198,7 +2198,9 @@
     <!-- ===== Controller order modal (Settings > components > ControllerOrderModal) ===== -->
 
     <string name="settings_controller_order_title">कंट्रोलर क्रम</string>
-    <string name="settings_controller_order_subtitle">कंट्रोलर खोजने के लिए उस पर कोई बटन दबाएँ।</string>
+    <string name="settings_controller_order_claim_subtitle">खिलाड़ी क्रम में हर कंट्रोलर पर एक बटन दबाएँ। सीट छोड़ने के लिए फिर से दबाएँ।</string>
+    <string name="settings_controller_order_seat_waiting">कोई बटन दबाएँ</string>
+    <string name="settings_controller_order_seat_open">खाली</string>
     <string name="settings_controller_order_hint_clear_all">सभी हटाएँ</string>
     <string name="settings_controller_order_default_name">कंट्रोलर</string>
     <string name="settings_controller_order_slot_label">P%1$d</string>

@@ -2146,7 +2146,9 @@
     <!-- ===== Controller order modal ===== -->
 
     <string name="settings_controller_order_title">手柄顺序</string>
-    <string name="settings_controller_order_subtitle">按下手柄上的按钮即可找到它。</string>
+    <string name="settings_controller_order_claim_subtitle">按玩家顺序在每个手柄上按一个按钮。再按一次即可让出位置。</string>
+    <string name="settings_controller_order_seat_waiting">请按一个按钮</string>
+    <string name="settings_controller_order_seat_open">空位</string>
     <string name="settings_controller_order_hint_clear_all">全部清除</string>
     <string name="settings_controller_order_default_name">手柄</string>
     <string name="settings_controller_order_slot_label">P%1$d</string>

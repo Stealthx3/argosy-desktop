@@ -2307,7 +2307,9 @@
     <!-- ===== Controller order modal (Settings > components > ControllerOrderModal) ===== -->
 
     <string name="settings_controller_order_title">Порядок контроллеров</string>
-    <string name="settings_controller_order_subtitle">Нажмите кнопку на контроллере, чтобы найти его.</string>
+    <string name="settings_controller_order_claim_subtitle">Нажмите кнопку на каждом контроллере в порядке игроков. Нажмите ещё раз, чтобы освободить место.</string>
+    <string name="settings_controller_order_seat_waiting">Нажмите кнопку</string>
+    <string name="settings_controller_order_seat_open">Свободно</string>
     <string name="settings_controller_order_hint_clear_all">Очистить все</string>
     <string name="settings_controller_order_default_name">Контроллер</string>
     <string name="settings_controller_order_slot_label">P%1$d</string>

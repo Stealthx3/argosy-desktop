@@ -281,6 +281,7 @@
 
     <string name="settings_shell_modal_sync_first_title">Sync Saves First</string>
     <string name="settings_shell_modal_sync_first_message">Sync saves first - %1$d pending. Resetting the library now would permanently discard saves that have not been uploaded.</string>
+    <string name="settings_shell_modal_purge_sync_first_message">Sync saves first - %1$d pending. Removing this platform now would permanently discard saves that have not been uploaded. The removal prompt returns once the sync finishes.</string>
     <string name="settings_shell_modal_sync_first_confirm">Sync Now</string>
 
     <string name="settings_shell_modal_reset_library_title">Reset Library?</string>

@@ -205,6 +205,7 @@
 
     <string name="settings_shell_modal_sync_first_title">पहले सेव सिंक करें</string>
     <string name="settings_shell_modal_sync_first_message">पहले सेव सिंक करें - %1$d लंबित हैं। अभी लाइब्रेरी रीसेट करने से वे सेव हमेशा के लिए मिट जाएँगे जो अपलोड नहीं हुए हैं।</string>
+    <string name="settings_shell_modal_purge_sync_first_message">पहले सेव सिंक करें - %1$d लंबित हैं। अभी यह प्लेटफ़ॉर्म हटाने से वे सेव हमेशा के लिए मिट जाएँगे जो अपलोड नहीं हुए हैं। सिंक पूरा होने के बाद हटाने का संकेत फिर से दिखेगा।</string>
     <string name="settings_shell_modal_sync_first_confirm">अभी सिंक करें</string>
 
     <string name="settings_shell_modal_reset_library_title">लाइब्रेरी रीसेट करें?</string>

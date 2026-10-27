@@ -2254,7 +2254,9 @@
     <!-- ===== Fenetre d'ordre des manettes ===== -->
 
     <string name="settings_controller_order_title">Ordre des manettes</string>
-    <string name="settings_controller_order_subtitle">Appuyez sur un bouton d\'une manette pour la trouver.</string>
+    <string name="settings_controller_order_claim_subtitle">Appuyez sur un bouton de chaque manette dans l\'ordre des joueurs. Appuyez à nouveau pour libérer la place.</string>
+    <string name="settings_controller_order_seat_waiting">Appuyez sur un bouton</string>
+    <string name="settings_controller_order_seat_open">Libre</string>
     <string name="settings_controller_order_hint_clear_all">Tout effacer</string>
     <string name="settings_controller_order_default_name">Manette</string>
     <string name="settings_controller_order_slot_label">J%1$d</string>

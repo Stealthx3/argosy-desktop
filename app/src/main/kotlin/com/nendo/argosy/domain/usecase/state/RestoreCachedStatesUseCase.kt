@@ -134,6 +134,7 @@ class RestoreCachedStatesUseCase @Inject constructor(
                 slotNumber != null
             } ?: emptyList()
 
+            val keptInPlace = mutableSetOf<String>()
             for (existingFile in existingStates) {
                 val existingPath = existingFile.absolutePath
                 val claim = stateOwnershipTracker.claim(existingPath, emulatorId)
@@ -151,11 +152,13 @@ class RestoreCachedStatesUseCase @Inject constructor(
                     ) != null
                     if (!archived) {
                         Log.w(TAG, "Leaving ${existingFile.name} in place: belongs to user ${claim.ownerUserId} and could not be archived")
+                        keptInPlace += existingFile.name
                         continue
                     }
                 }
                 if (!stateCacheManager.displaceLiveState(existingFile)) {
                     Log.w(TAG, "Leaving ${existingFile.name} in place: could not move it aside")
+                    keptInPlace += existingFile.name
                     continue
                 }
                 stateOwnershipTracker.clear(existingPath, emulatorId)
@@ -169,6 +172,10 @@ class RestoreCachedStatesUseCase @Inject constructor(
                     continue
                 }
 
+                if (cacheFile.name in keptInPlace) {
+                    Log.w(TAG, "Skipping restore of ${cacheFile.name}: a live state there was kept in place")
+                    continue
+                }
                 val targetFile = File(targetDir, cacheFile.name)
                 cacheFile.copyTo(targetFile, overwrite = true)
                 stateCacheManager.restoreScreenshot(state, targetFile)

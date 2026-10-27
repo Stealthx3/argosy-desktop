@@ -1096,7 +1096,7 @@ class StateCacheManager @Inject constructor(
                     return@withContext StateCloudResult.Error("Empty response from server")
                 }
 
-                val serverTimestamp = parseTimestamp(serverState.updatedAt)
+                val serverTimestamp = SaveSyncApiClient.parseTimestampOrNull(serverState.updatedAt)
                 stateCacheDao.updateSyncState(
                     id = state.id,
                     rommSaveId = serverState.id,
@@ -1212,7 +1212,7 @@ class StateCacheManager @Inject constructor(
                 note = existing?.note,
                 rommSaveId = rommStateId,
                 syncStatus = StateCacheEntity.STATUS_SYNCED,
-                serverUpdatedAt = parseTimestamp(serverState.updatedAt) ?: now,
+                serverUpdatedAt = SaveSyncApiClient.parseTimestampOrNull(serverState.updatedAt) ?: now,
                 lastUploadedHash = contentHash,
                 ownerUserId = existing?.ownerUserId ?: ownerUserId
             )
@@ -1392,7 +1392,7 @@ class StateCacheManager @Inject constructor(
                             stateCacheDao.getByRommSaveId(it, syncPreferencesRepository.getRommUserId())
                         }
                         if (oldCache != null && serverState != null) {
-                            val serverTimestamp = parseTimestamp(serverState.updatedAt)
+                            val serverTimestamp = SaveSyncApiClient.parseTimestampOrNull(serverState.updatedAt)
                             stateCacheDao.updateSyncState(
                                 id = oldCache.id,
                                 rommSaveId = serverState.id,
@@ -1458,8 +1458,6 @@ class StateCacheManager @Inject constructor(
         return md.digest().joinToString("") { "%02x".format(it) }
     }
 
-    fun parseServerStateTimestamp(timestamp: String): Instant? = parseTimestamp(timestamp)
-
     /**
      * The capture time a state's name carries: `[yyyy-MM-dd_HH-mm-ss]` from Argosy, or RomM's
      * `[yyyy-MM-dd HH-mm-ss-SSS]` (web player) and `[yyyy-MM-dd_HH-mm-ss-SSS]` (server tag).
@@ -1477,20 +1475,7 @@ class StateCacheManager @Inject constructor(
     }
 
     fun serverStateWrittenAt(state: RomMState): Instant? =
-        parseStateFileTimestamp(state.fileName) ?: parseTimestamp(state.updatedAt)
-
-    fun parseTimestamp(timestamp: String): Instant? {
-        return try {
-            ZonedDateTime.parse(timestamp, DateTimeFormatter.ISO_DATE_TIME).toInstant()
-        } catch (e: Exception) {
-            try {
-                Instant.parse(timestamp)
-            } catch (e2: Exception) {
-                Log.w(TAG, "Failed to parse timestamp: $timestamp")
-                null
-            }
-        }
-    }
+        parseStateFileTimestamp(state.fileName) ?: SaveSyncApiClient.parseTimestampOrNull(state.updatedAt)
 
     fun buildUploadFileName(state: StateCacheEntity, romBaseName: String): String {
         val stateExt = when (state.slotNumber) {
