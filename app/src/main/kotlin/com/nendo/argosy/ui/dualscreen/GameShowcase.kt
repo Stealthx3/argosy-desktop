@@ -681,14 +681,17 @@ private fun ShowcaseCover(
 ) {
     if (art == PresentationArt.TITLE) return
     val artUrl = detail.artUrl
-    val boxArtStyle = LocalBoxArtStyle.current
     val repairArt = com.nendo.argosy.ui.common.rememberArtRepair()
     val repair: (ArtSlot) -> Unit = { slot -> detail.gameId?.let { repairArt(it, slot) } }
     var failedRoutes by remember(detail.spineUrl, detail.box3dUrl, artUrl) {
         mutableStateOf(emptySet<BoxArtRoute>())
     }
     val routes = boxArtRoutes(art == PresentationArt.BOX_3D, detail.spineUrl, detail.box3dUrl, artUrl)
-    when (routes.firstWorking(failedRoutes)) {
+    val onImageFailed: (BoxArtRoute, ArtSlot) -> Unit = { route, slot ->
+        failedRoutes = failedRoutes + route
+        repair(slot)
+    }
+    when (val route = routes.firstWorking(failedRoutes)) {
         BoxArtRoute.SPINE_RENDER -> Box3dCover(
             frontPath = artUrl.orEmpty(),
             spinePath = detail.spineUrl.orEmpty(),
@@ -696,32 +699,48 @@ private fun ShowcaseCover(
             isInteractive = interactive,
             modifier = Modifier.heightIn(max = height).widthIn(max = width),
             onUnavailable = {
-                failedRoutes = failedRoutes + BoxArtRoute.SPINE_RENDER
                 repair(ArtSlot.BOX_SPINE)
                 repair(ArtSlot.COVER)
+            },
+            fallback = {
+                ShowcaseFlatCover(
+                    route = routes.firstWorking(failedRoutes + BoxArtRoute.SPINE_RENDER),
+                    detail = detail,
+                    height = height,
+                    width = width,
+                    onImageFailed = onImageFailed
+                )
             }
         )
+        else -> ShowcaseFlatCover(route, detail, height, width, onImageFailed)
+    }
+}
+
+@Composable
+private fun ShowcaseFlatCover(
+    route: BoxArtRoute,
+    detail: CompanionDetail,
+    height: Dp,
+    width: Dp,
+    onImageFailed: (BoxArtRoute, ArtSlot) -> Unit
+) {
+    val boxArtStyle = LocalBoxArtStyle.current
+    when (route) {
         BoxArtRoute.BOX_3D_IMAGE -> ShowcaseImage(
             model = rememberFileImageModel(detail.box3dUrl),
             width = width,
             height = height,
-            onError = {
-                failedRoutes = failedRoutes + BoxArtRoute.BOX_3D_IMAGE
-                repair(ArtSlot.BOX_3D)
-            }
+            onError = { onImageFailed(BoxArtRoute.BOX_3D_IMAGE, ArtSlot.BOX_3D) }
         )
         BoxArtRoute.FLAT_COVER -> ShowcaseImage(
-            model = rememberFileImageModel(artUrl),
+            model = rememberFileImageModel(detail.artUrl),
             width = width,
             height = height,
             aspectRatio = boxArtStyle.aspectRatio.takeUnless { boxArtStyle.nativeAspectRatio },
             modifier = Modifier.clip(RoundedCornerShape(Dimens.radiusLg)),
-            onError = {
-                failedRoutes = failedRoutes + BoxArtRoute.FLAT_COVER
-                repair(ArtSlot.COVER)
-            }
+            onError = { onImageFailed(BoxArtRoute.FLAT_COVER, ArtSlot.COVER) }
         )
-        BoxArtRoute.TEXT -> ShowcaseTitleCover(detail.title, Modifier.size(width, height))
+        BoxArtRoute.SPINE_RENDER, BoxArtRoute.TEXT -> ShowcaseTitleCover(detail.title, Modifier.size(width, height))
     }
 }
 

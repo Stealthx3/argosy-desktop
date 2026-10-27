@@ -313,7 +313,7 @@ class DualScreenManager(
         val keys = attached.map { it.key }
         val setKey = com.nendo.argosy.domain.model.ScreenLayouts.setKeyOf(keys)
         val stored = preferencesRepository.userPreferences.first().screenLayouts
-        val known = stored.layoutFor(setKey)
+        val known = stored.layoutFor(setKey)?.takeIf { stored -> attached.any { it.key == stored.primaryKey } }
         val layout = known ?: com.nendo.argosy.domain.model.ScreenLayout.defaultFor(
             attached.map {
                 com.nendo.argosy.domain.model.ScreenSpec(

@@ -31,6 +31,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -105,6 +106,7 @@ class SteamService : Service() {
         if (intent?.getBooleanExtra(EXTRA_CONNECT_FOR_AUTH, false) == true) {
             promoteToForeground(R.string.steam_service_signing_in)
             observeStateForNotification()
+            stopAfterNextSync(startId)
             scope.launch {
                 Log.d(TAG, "Connecting for QR auth, stopping reconnect loop")
                 isRunning = false
@@ -115,6 +117,7 @@ class SteamService : Service() {
         } else if (intent?.getBooleanExtra(EXTRA_FORCE_CONNECT, false) == true) {
             promoteToForeground(R.string.steam_service_connecting)
             observeStateForNotification()
+            stopAfterNextSync(startId)
             scope.launch {
                 Log.d(TAG, "Force connecting to Steam (on-demand)")
                 connect()
@@ -123,7 +126,19 @@ class SteamService : Service() {
             stopSelf()
         }
 
-        return START_STICKY
+        return START_NOT_STICKY
+    }
+
+    private var stopAfterSyncJob: Job? = null
+
+    private fun stopAfterNextSync(startId: Int) {
+        val settledBefore = steamLibraryManager.settledSyncRuns.value
+        stopAfterSyncJob?.cancel()
+        stopAfterSyncJob = scope.launch {
+            steamLibraryManager.settledSyncRuns.first { it > settledBefore }
+            Log.d(TAG, "Library sync settled, stopping service start $startId")
+            stopSelf(startId)
+        }
     }
 
     private var notificationObserverJob: Job? = null

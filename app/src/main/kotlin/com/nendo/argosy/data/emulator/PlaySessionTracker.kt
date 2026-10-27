@@ -862,7 +862,7 @@ class PlaySessionTracker @Inject constructor(
 
     private fun surfaceConflict(outcome: SessionSaveOutcome.Synced) {
         val conflict = outcome.sync as? SyncSaveOnSessionEndUseCase.Result.Conflict ?: return
-        Logger.debug(TAG, "[SaveSync] SESSION gameId=${conflict.gameId} | Sync result: CONFLICT | conflictId=${outcome.conflictId}, local=${conflict.upload.localTimestamp}, server=${conflict.upload.serverTimestamp}")
+        Logger.warn(TAG, "[SaveSync] SESSION gameId=${conflict.gameId} | Sync result: CONFLICT | conflictId=${outcome.conflictId}, local=${conflict.upload.localTimestamp}, server=${conflict.upload.serverTimestamp}")
         _pendingSessionConflict.value = SaveConflictEvent(
             gameId = conflict.gameId,
             emulatorId = conflict.emulatorId,
@@ -907,13 +907,13 @@ class PlaySessionTracker @Inject constructor(
                 )
             }
             is SyncSaveOnSessionEndUseCase.Result.Queued -> {
-                Logger.debug(TAG, "[SaveSync] SESSION gameId=${session.gameId} | Sync result: QUEUED")
+                Logger.info(TAG, "[SaveSync] SESSION gameId=${session.gameId} | Sync result: QUEUED")
             }
             is SyncSaveOnSessionEndUseCase.Result.NoSaveFound -> {
-                Logger.debug(TAG, "[SaveSync] SESSION gameId=${session.gameId} | Sync result: NO_SAVE_FOUND")
+                Logger.info(TAG, "[SaveSync] SESSION gameId=${session.gameId} | Sync result: NO_SAVE_FOUND")
             }
             is SyncSaveOnSessionEndUseCase.Result.NotConfigured -> {
-                Logger.debug(TAG, "[SaveSync] SESSION gameId=${session.gameId} | Sync result: NOT_CONFIGURED")
+                Logger.info(TAG, "[SaveSync] SESSION gameId=${session.gameId} | Sync result: NOT_CONFIGURED")
             }
             is SyncSaveOnSessionEndUseCase.Result.Error -> {
                 Logger.error(TAG, "[SaveSync] SESSION gameId=${session.gameId} | Sync result: ERROR | ${result.message}")

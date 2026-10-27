@@ -103,6 +103,7 @@ class RomMLibrarySyncService @Inject constructor(
 ) {
     private val api: RomMApi? get() = connectionManager.getApi()
     private val syncMutex = Mutex()
+    private var romFailuresThisPass = 0
     private var boxArtCacheEnabledForSync = true
     private var screenshotCacheEnabledForSync = false
     private var decodedImageCacheDirty = false
@@ -167,6 +168,7 @@ class RomMLibrarySyncService @Inject constructor(
         val scope = resolveSyncScope(currentApi)
         val syncStartedAt = Instant.now()
         val queryFrom = since.minus(CHANGES_OVERLAP)
+        romFailuresThisPass = 0
 
         _syncProgress.value = SyncProgress(isSyncing = true)
         try {
@@ -227,7 +229,11 @@ class RomMLibrarySyncService @Inject constructor(
             androidGameScanner.get().relinkInstalledRommAndroidApps()
             playSessionDao.relinkOrphans(scope.ownerUserId)
             userPreferencesRepository.setLastRommSyncTime(syncStartedAt)
-            userPreferencesRepository.setRommChangesWatermark(syncStartedAt)
+            if (romFailuresThisPass == 0) {
+                userPreferencesRepository.setRommChangesWatermark(syncStartedAt)
+            } else {
+                Logger.warn(TAG, "Changes pass kept its watermark: $romFailuresThisPass ROMs failed and will be fetched again")
+            }
             syncVirtualCollectionsUseCase.get()()
             recomputeSiblingGroups(completesFullPass = false)
             writeGameCounts(enabledRemoteIds.values.map { storagePlatformId(it) }, scope.ownerUserId)
@@ -567,6 +573,7 @@ class RomMLibrarySyncService @Inject constructor(
         onProgress: ((current: Int, total: Int, platformName: String) -> Unit)?
     ): SyncResult {
         val currentApi = api ?: return SyncResult(0, 0, 0, 0, listOf("Not connected"))
+        romFailuresThisPass = 0
         val errors = mutableListOf<String>()
         var platformsSynced = 0
         var gamesAdded = 0
@@ -708,7 +715,9 @@ class RomMLibrarySyncService @Inject constructor(
 
             val passFinishedAt = Instant.now()
             userPreferencesRepository.setLastRommSyncTime(passFinishedAt)
-            if (!skipsPlatforms) userPreferencesRepository.setRommChangesWatermark(passFinishedAt)
+            if (!skipsPlatforms && romFailuresThisPass == 0) {
+                userPreferencesRepository.setRommChangesWatermark(passFinishedAt)
+            }
             if (errors.isEmpty()) {
                 userPreferencesRepository.setLastRommFullSyncTime(
                     resumeGeneration.takeIf { resuming } ?: syncStartedAt
@@ -1422,6 +1431,7 @@ class RomMLibrarySyncService @Inject constructor(
             trackSiblingMultiDisc(rom, batch)
         } catch (e: Exception) {
             batch.decidedRomIds.remove(rom.id)
+            romFailuresThisPass++
             Logger.warn(TAG, "syncRomInBatch: failed to sync ROM ${rom.id} (${rom.name}): ${e.message}")
         }
     }

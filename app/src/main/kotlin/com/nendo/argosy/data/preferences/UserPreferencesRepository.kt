@@ -175,7 +175,6 @@ class UserPreferencesRepository @Inject constructor(
             fileLoggingPath = app.fileLoggingPath,
             fileLogLevel = app.fileLogLevel,
             saveDebugLoggingEnabled = sync.saveDebugLoggingEnabled,
-            saveWatcherEnabled = sync.saveWatcherEnabled,
             boxArtShape = display.boxArtShape,
             boxArtCornerRadius = display.boxArtCornerRadius,
             boxArtBorderThickness = display.boxArtBorderThickness,
@@ -478,8 +477,6 @@ class UserPreferencesRepository @Inject constructor(
     suspend fun setSaveCacheLimit(limit: Int) = syncPrefs.setSaveCacheLimit(limit)
     suspend fun setSaveDebugLoggingEnabled(enabled: Boolean) = syncPrefs.setSaveDebugLoggingEnabled(enabled)
     suspend fun setImageCachePath(path: String?) = syncPrefs.setImageCachePath(path)
-    fun saveWatcherEnabled(): Flow<Boolean> = syncPrefs.saveWatcherEnabled()
-    suspend fun setSaveWatcherEnabled(enabled: Boolean) = syncPrefs.setSaveWatcherEnabled(enabled)
 
     // --- Social delegates ---
 
@@ -938,7 +935,6 @@ data class UserPreferences(
     val fileLoggingPath: String? = null,
     val fileLogLevel: LogLevel = LogLevel.INFO,
     val saveDebugLoggingEnabled: Boolean = false,
-    val saveWatcherEnabled: Boolean = false,
     val boxArtShape: BoxArtShape = BoxArtShape.STANDARD,
     val boxArtCornerRadius: BoxArtCornerRadius = BoxArtCornerRadius.MEDIUM,
     val boxArtBorderThickness: BoxArtBorderThickness = BoxArtBorderThickness.MEDIUM,

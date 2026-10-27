@@ -56,7 +56,7 @@ class SettingsBackupKeysTest {
     )
 
     private val saveAndStateSafetyGates = setOf(
-        "save_sync_enabled", "save_watcher_enabled", "state_cache_enabled", "secure_saves",
+        "save_sync_enabled", "state_cache_enabled", "secure_saves",
         "weekly_integrity_check_enabled", "sync_filter_delete_orphans"
     )
 

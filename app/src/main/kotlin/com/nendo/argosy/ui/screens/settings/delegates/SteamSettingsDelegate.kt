@@ -533,8 +533,8 @@ class SteamSettingsDelegate @Inject constructor(
 
     fun disconnectSteam(context: Context, scope: CoroutineScope) {
         scope.launch {
-            serviceRef?.disconnect()
             steamAuthManager.logout()
+            serviceRef?.disconnect()
             unbindService(context)
             context.stopService(Intent(context, SteamService::class.java))
             _state.update {

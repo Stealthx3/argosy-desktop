@@ -150,6 +150,25 @@ class RomMLibrarySyncChangesTest {
     }
 
     @Test
+    fun `a rom that fails to store holds the watermark so the next pass fetches it again`() = runTest {
+        coEvery { api.getRoms(any()) } returns Response.success(RomMRomPage(items = listOf(rom()), total = 1))
+        coEvery { gameDao.getByRommId(any()) } throws IllegalStateException("disk full")
+
+        service.syncLibraryChanges(since)
+
+        coVerify(exactly = 0) { preferencesRepository.setRommChangesWatermark(any()) }
+    }
+
+    @Test
+    fun `a clean changes pass advances the watermark`() = runTest {
+        coEvery { api.getRoms(any()) } returns Response.success(RomMRomPage(items = listOf(rom()), total = 1))
+
+        service.syncLibraryChanges(since)
+
+        coVerify(exactly = 1) { preferencesRepository.setRommChangesWatermark(any()) }
+    }
+
+    @Test
     fun `the changes pass syncs what came back and never marks rows dirty`() = runTest {
         coEvery { api.getRoms(any()) } returns Response.success(RomMRomPage(items = listOf(rom()), total = 1))
 

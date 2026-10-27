@@ -4267,6 +4267,18 @@ object Migration_216_217 : Migration(216, 217) {
     }
 }
 
+object Migration_217_218 : Migration(217, 218) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE `media_user_data` ADD COLUMN `pendingPosition` INTEGER NOT NULL DEFAULT 0")
+        db.execSQL("ALTER TABLE `media_user_data` ADD COLUMN `pendingPlayed` INTEGER NOT NULL DEFAULT 0")
+        db.execSQL("ALTER TABLE `media_user_data` ADD COLUMN `pendingFavorite` INTEGER NOT NULL DEFAULT 0")
+        db.execSQL(
+            "UPDATE `media_user_data` SET `pendingPosition` = 1, `pendingPlayed` = 1, " +
+                "`pendingFavorite` = 1 WHERE `needsSync` = 1"
+        )
+    }
+}
+
 object Migration_203_204 : Migration(203, 204) {
     override fun migrate(db: SupportSQLiteDatabase) {
         db.execSQL(
