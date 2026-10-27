@@ -1396,3 +1396,9 @@ Mapped ids: retroarch, dolphin, cemu, azahar, ryujinx (Ryubing), eden, melonds, 
 - The `PlatformFeatures` KDoc was cut to two lines (smell rule).
 
 **Verification:** gate 131 (asserts `selfUpdate` and `systemApp` false) + 4,426, 0 failures; translations complete (6,372 keys); smell check clean. Desktop walk `build/desktop-check/p5s5c/about-desktop-small.png`.
+
+### 2026-10-26 — Step 5, unit 4: Collections create; automated pass complete
+
+**Action:** `side-by-side.sh <out> <fresh> collections` opens Collections and the New Collection dialog (`build/desktop-check/p5s5d/`). The standalone Search screen (`Screen.Search`) has no navigation entry in either app; search is reached inside collection and category browsers, so it is not a separate row.
+**Result:** the dialog, fields, buttons, focus order and footer match. One platform difference: Android raises the system on-screen keyboard for the name field, and the desktop has none of its own. A physical keyboard types directly, and in Steam Game Mode text entry depends on Steam's on-screen keyboard (Steam + X). This is added to the owner's Game Mode checks. No code change.
+**Automated pass complete:** every main screen, game details, all Settings sections, Quick Settings and New Collection have been compared. Fixed along the way: the dual-screen row and subtitle (unit 1), and About's APK updater and system-app tools (unit 3). Step 5 now waits for the owner's checklist (`docs/desktop/side-by-side-checklist.md`) and the Brightness decision.

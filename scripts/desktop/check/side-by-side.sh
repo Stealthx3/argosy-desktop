@@ -2,8 +2,8 @@
 # Desktop vs Android screens for the Phase 5 side-by-side check. Walks the same screens on the check
 # AVD (emulator-5556, testbed-signed) and on desktop fresh-walk data (never the owner's data), only
 # moving and opening screens (A only on rows that open a section), then tiles each pair into <out>/pairs-*.png.
-# usage: side-by-side.sh <out-dir> <fresh-walk-name> [settings2]; settings2 opens the Settings sections
-# after Displays by name (the two apps order them differently).
+# usage: side-by-side.sh <out-dir> <fresh-walk-name> [settings2|collections]; settings2 opens the Settings
+# sections after Displays by name (the two apps order them differently); collections opens New Collection.
 set -u
 out=$1; fresh=$2; plan=${3:-main}
 cd /mnt/FileDrive/Personal/Projects/Git/argosy-desktop
@@ -48,7 +48,11 @@ route() {
   done
   echo "${steps[@]}"
 }
-if [ "$plan" = settings2 ]; then
+if [ "$plan" = collections ]; then
+  steps=(R1 wait:3 R1 wait:3 shot:collections A wait:3 shot:new-collection DOWN wait:1 shot:new-collection-down)
+  android "${steps[@]}"
+  desktop "${steps[@]}"
+elif [ "$plan" = settings2 ]; then
   names=(saves retroachievements bios drivers platforms storage playtime romm permissions installers about)
   a_idx=(6 7 8 9 10 11 12 13 17 18 20); d_idx=(5 6 7 8 9 10 11 12 13 14 15)
   a=(); d=()

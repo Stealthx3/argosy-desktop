@@ -2,7 +2,7 @@
 
 Rewritten (not appended) at the end of every work unit, so a fresh session can start from it alone. History and reasoning live in `DEVLOG.md`. Earlier phases: `phase-0.md` … `phase-4.md` (closed summaries).
 
-**Updated:** 2026-10-26 (step 5 unit 3 committed). Steps 1–4 done; step 5 in progress.
+**Updated:** 2026-10-26 (step 5 unit 4 committed; waiting for the owner). Steps 1–4 done; step 5 in progress.
 
 ## Scope and exit criterion
 
@@ -19,7 +19,7 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 ## Owner checks pending (alpha 5.4)
 
 - Real RomM covers on Home and Library (step 3 was verified with injected rows).
-- Steam Game Mode: launch a GameCube/Switch/PS game and a GBA game; exit Argosy from the Steam overlay. If anything fails, send `argosy-run.log` (Flatpak: under `~/.var/app/io.github.stealthx3.ArgosyDesktop`). Results feed step 6 (SteamOS testing).
+- Steam Game Mode: launch a GameCube/Switch/PS game and a GBA game; exit Argosy from the Steam overlay; type a collection name with Steam's on-screen keyboard (Steam + X). If anything fails, send `argosy-run.log` (Flatpak: under `~/.var/app/io.github.stealthx3.ArgosyDesktop`). Results feed step 6 (SteamOS testing).
 
 ## Step 4 (Steam Game Mode): done
 
@@ -32,7 +32,8 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 - Owner question: Quick Settings Brightness is hidden on desktop (`screenBrightnessAvailable`). Should it be an approved divergence, or should desktop get backlight control?
 - Unit 2: the pass now covers game details and the Theme, Interface, Navigation, Audio and Displays sections (`build/desktop-check/p5s5b/`); no new real differences.
 - Unit 3: `settings2` plan covers the remaining sections (`build/desktop-check/p5s5c/`). Fixed: About's APK updater and System App section are off on desktop (`selfUpdate`, `systemApp`); the Check row says Flatpak updates the app.
-- **Next action:** Search and Collections create in the pass. After that, step 5 waits for the owner's checklist results. For a fair Home comparison, give the fresh desktop data a played game. Then, from the owner's checklist results, fix every difference outside the divergences. Close step 5 when the checklist comes back clean, and republish (`--step-close 5.5`).
+- Unit 4: Collections create matches (`build/desktop-check/p5s5d/`). Search has no nav entry of its own. Automated pass complete.
+- **Next action:** wait for the owner. Needed: the checklist results, the Brightness decision, and the Game Mode checks. Fix every reported difference, then close step 5 (`--step-close 5.5`). For a fair Home comparison, give the fresh desktop data a played game. Then, from the owner's checklist results, fix every difference outside the divergences. Close step 5 when the checklist comes back clean, and republish (`--step-close 5.5`).
 
 ## Gotchas
 
