@@ -228,6 +228,7 @@ class GameLaunchDelegate @Inject constructor(
         onLaunchFailed: () -> Unit = {}
     ) {
         if (isSyncing) {
+            notificationManager.showError(NotificationText.Res(R.string.notif_gamelaunch_busy_syncing))
             onLaunchFailed()
             return
         }
@@ -240,6 +241,7 @@ class GameLaunchDelegate @Inject constructor(
             }
             val ticket = launchProgressTracker.begin(gameId, game.title) ?: run {
                 android.util.Log.d("GameLaunchDelegate", "launchGame: another launch is in progress")
+                notificationManager.showError(NotificationText.Res(R.string.notif_gamelaunch_busy_launching))
                 onLaunchFailed()
                 return@launch
             }

@@ -377,8 +377,11 @@ grep -n "SyncType.ACHIEVEMENT" app/src/main/kotlin/com/nendo/argosy/data/sync/Sy
   `isHardcore` gate on every mutator.
 - **RA session carries the flag, not the heartbeat**:
   `RetroAchievementsSessionManager` starts the session with `requestedHardcore`
-  (`raRepository.startSession(raId, requestedHardcore)`, sent as
-  `hardcore = 0/1`); awards send `forHardcoreMode`; the periodic
+  and the verified ROM hash (`raRepository.startSession(raId, hardcore, verifiedHash)`).
+  The request mirrors rcheevos `rc_api_init_start_session_request`: `h` and `m`
+  go together only when the hash is known (the hash is passed only when the
+  session's game id came from hash verification), and `l` carries the rcheevos
+  version (`RAApi.RCHEEVOS_VERSION`). Awards send `forHardcoreMode`; the periodic
   `sendHeartbeat` carries no mode. Unlocks are stored split
   (`markUnlockedHardcore` vs `markUnlocked`) and social/LED surfaces receive
   `isHardcore`.
