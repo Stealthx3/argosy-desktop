@@ -1366,3 +1366,13 @@ Mapped ids: retroarch, dolphin, cemu, azahar, ryujinx (Ryubing), eden, melonds, 
   - Quick Settings has no Brightness row on desktop. It is hidden by `screenBrightnessAvailable` (the desktop cannot set the panel brightness). This is not in the approved divergence list, so it is left for the owner to approve or ask for (backlight control through logind on laptops and the Deck).
 
 **Verification:** gate `:shared:desktopTest` 131 (now also asserts `dualScreen` false) + `:app:testDebugUnitTest` 4,426, 0 failures; translation check complete in all locales; smell check clean. Desktop walk `build/desktop-check/fresh-p5s3/settings-main.png` and `displays.png`: the subtitle reads "Screen dimmer", and Displays shows only Screen Safety. Android: same values as before (`dualScreen` true).
+
+### 2026-10-26 — Step 5, unit 2: second automated pass (details, five Settings sections)
+
+**Action:** `side-by-side.sh` also opens game details from Home (X) and the Theme, Interface, Navigation, Audio and Displays sections (A on the section row, then B). Run: `build/desktop-check/p5s5b/`.
+**Result:** no new real differences. Each difference found is an approved divergence or a data difference:
+- Details: Android's footer "New Game" needs a built-in-emulator game (`canShowPlayOptions`). Its save row, play time and completion come from the AVD's history.
+- Interface: desktop swaps "Hide System Navigation/Status Bar" for Display Profile, Safe Area and Start Full Screen (`desktopWindow` gates).
+- Navigation: desktop adds Input Mode and Button Mapping. Vibration Strength sits below the fold on both.
+- Displays: desktop has no section rail, since only Screen Safety remains after unit 1.
+- Theme and Audio: same rows and order.
