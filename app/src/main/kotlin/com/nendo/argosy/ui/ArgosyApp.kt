@@ -380,7 +380,8 @@ fun ArgosyApp(
         val swappedGameActive by dsm.swappedIsGameActive.collectAsState()
         LaunchedEffect(isRolesSwapped, companionActive, swappedGameActive) {
             inputDispatcher.resetToMainView()
-            inputDispatcher.clearPendingViewSubscription()
+            val liveRoute = navController.currentBackStackEntry?.destination?.route
+            inputDispatcher.clearPendingViewSubscription(keepRoute = liveRoute)
             if (dsm.isOverlayFocused) {
                 dsm.isOverlayFocused = false
                 dsm.controlCompanion?.onOverlayClosed()
