@@ -24,6 +24,8 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileInputStream
@@ -109,6 +111,7 @@ class BiosRepository @Inject constructor(
     private val attributionRepository: StorageAttributionRepository
 ) {
     private var api: RomMApi? = null
+    private val firmwareRowsLock = Mutex()
 
     fun setApi(api: RomMApi?) {
         this.api = api
@@ -190,14 +193,28 @@ class BiosRepository @Inject constructor(
         platformSlug: String,
         firmware: List<RomMFirmware>
     ) = withContext(Dispatchers.IO) {
-        if (firmware.isEmpty()) {
-            Logger.debug(TAG, "No firmware for platform $platformSlug")
-            return@withContext
+        firmwareRowsLock.withLock { reconcilePlatformFirmware(platformId, platformSlug, firmware) }
+    }
+
+    private suspend fun reconcilePlatformFirmware(
+        platformId: Long,
+        platformSlug: String,
+        firmware: List<RomMFirmware>
+    ) {
+        val (missing, available) = firmware.partition { it.missingFromFs }
+        val heldWhileMissing = missing.filter { firmwareDao.getByRommId(it.id)?.localPath != null }.map { it.id }
+        if (missing.isNotEmpty()) {
+            Logger.info(TAG, "Skipping ${missing.size} firmware files missing from the server for $platformSlug, keeping ${heldWhileMissing.size} already downloaded")
+        }
+        if (available.isEmpty() && heldWhileMissing.isEmpty()) {
+            Logger.info(TAG, "No firmware available for $platformSlug, clearing its entries")
+            firmwareDao.deleteByPlatform(platformId)
+            return
         }
 
-        Logger.info(TAG, "Syncing ${firmware.size} firmware files for $platformSlug")
+        Logger.info(TAG, "Syncing ${available.size} firmware files for $platformSlug")
 
-        val entities = firmware.map { fw ->
+        val entities = available.map { fw ->
             val existing = firmwareDao.getByRommId(fw.id)
             FirmwareEntity(
                 id = existing?.id ?: 0,
@@ -215,8 +232,8 @@ class BiosRepository @Inject constructor(
             )
         }
 
-        firmwareDao.upsertAll(entities)
-        firmwareDao.deleteRemovedFirmware(platformId, firmware.map { it.id })
+        if (entities.isNotEmpty()) firmwareDao.upsertAll(entities)
+        firmwareDao.deleteRemovedFirmware(platformId, available.map { it.id } + heldWhileMissing)
     }
 
     suspend fun downloadFirmware(
@@ -343,14 +360,21 @@ class BiosRepository @Inject constructor(
                 }
             }
 
-            targetFile.delete()
-            if (!partFile.renameTo(targetFile)) {
-                partFile.delete()
-                Logger.error(TAG, "Could not move ${firmware.fileName} into place")
-                return@withContext BiosDownloadResult.Error("Could not save the downloaded file")
+            firmwareRowsLock.withLock {
+                val current = firmwareDao.getByRommId(firmware.rommId)
+                if (current == null) {
+                    partFile.delete()
+                    Logger.info(TAG, "Dropped ${firmware.fileName}: the server stopped offering it during the download")
+                    return@withContext BiosDownloadResult.Error("No longer offered by the server")
+                }
+                targetFile.delete()
+                if (!partFile.renameTo(targetFile)) {
+                    partFile.delete()
+                    Logger.error(TAG, "Could not move ${firmware.fileName} into place")
+                    return@withContext BiosDownloadResult.Error("Could not save the downloaded file")
+                }
+                firmwareDao.updateLocalPath(current.id, targetFile.absolutePath, Instant.now())
             }
-
-            firmwareDao.updateLocalPath(firmware.id, targetFile.absolutePath, Instant.now())
             Logger.info(TAG, "Downloaded firmware: ${firmware.fileName}")
 
             attributionRepository.markDirty(StorageCategory.BIOS)
