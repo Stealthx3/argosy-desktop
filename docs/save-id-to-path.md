@@ -387,7 +387,9 @@ hakuX signs saves with a default HD key every install shares, unless the user
 imported their own console's EEPROM, so a save carries between hakuX installs as
 is. The 0.3.x disk image (`x1box/hdd.img`, qcow2) is no longer read.
 `xbox_hdd.qcow2` is retired firmware (`BiosPathRegistry.isRetiredFirmware`):
-firmware sync gives it no row and deletes any copy in Argosy's BIOS folders.
+firmware sync gives it no row, and `BiosRepository.purgeRetiredFirmware` deletes
+any copy or partial download in Argosy's BIOS folders at every startup. The
+server's copy is left alone.
 
 ### Dreamcast (`DreamcastSaveHandler`)
 

@@ -79,6 +79,9 @@ class ArgosyApp : Application(), Configuration.Provider, ImageLoaderFactory {
     lateinit var platformDao: PlatformDao
 
     @Inject
+    lateinit var biosRepository: com.nendo.argosy.data.repository.BiosRepository
+
+    @Inject
     lateinit var appPreferencesRepository:
         com.nendo.argosy.data.preferences.AppPreferencesRepository
 
@@ -237,6 +240,7 @@ class ArgosyApp : Application(), Configuration.Provider, ImageLoaderFactory {
         appScope.launch { activeSaveRepository.resetAllActiveSaveApplied() }
         appScope.launch { libraryDefaultPlatformMigration.run() }
         appScope.launch { deleteRetiredSteamDownloadDirs() }
+        appScope.launch { biosRepository.purgeRetiredFirmware() }
         syncPlatformSortOrders()
     }
 

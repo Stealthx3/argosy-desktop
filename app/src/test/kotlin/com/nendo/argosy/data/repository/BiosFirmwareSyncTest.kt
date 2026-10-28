@@ -62,6 +62,11 @@ class BiosFirmwareSyncTest {
             val keep = secondArg<List<Long>>()
             rows.removeAll { it.platformId == platformId && it.rommId !in keep }
         }
+        coEvery { dao.getAll() } answers { rows.toList() }
+        coEvery { dao.deleteByIds(any()) } answers {
+            val ids = firstArg<List<Long>>()
+            rows.removeAll { it.id in ids }
+        }
         coEvery { dao.deleteByPlatform(any()) } answers {
             val platformId = firstArg<Long>()
             rows.removeAll { it.platformId == platformId }
@@ -211,16 +216,26 @@ class BiosFirmwareSyncTest {
     }
 
     @Test
-    fun `retired firmware the server still lists gets no row and its local copies are deleted`() = runBlocking {
+    fun `retired firmware the server still lists gets no row`() = runBlocking {
+        repository.syncPlatformFirmware(3, "3ds", listOf(remote(30, "xbox_hdd.qcow2"), remote(11, "aes_keys.txt")))
+
+        assertEquals(listOf(11L), rows.map { it.rommId })
+    }
+
+    @Test
+    fun `the startup purge deletes retired firmware rows and files without asking the server`() = runBlocking {
         val disk = biosFile("xbox_hdd.qcow2").apply { parentFile.mkdirs(); writeBytes(ByteArray(16)) }
         val part = biosFile("xbox_hdd.qcow2.part").apply { writeBytes(ByteArray(8)) }
+        val kept = biosFile("aes_keys.txt").apply { writeBytes(ByteArray(4)) }
         rows += row(30, 3, "xbox_hdd.qcow2", localPath = disk.absolutePath)
+        rows += row(11, 3, "aes_keys.txt", localPath = kept.absolutePath)
 
-        repository.syncPlatformFirmware(3, "3ds", listOf(remote(30, "xbox_hdd.qcow2"), remote(11, "aes_keys.txt")))
+        repository.purgeRetiredFirmware()
 
         assertEquals(listOf(11L), rows.map { it.rommId })
         assertFalse(disk.exists())
         assertFalse(part.exists())
+        assertTrue(kept.exists())
     }
 
     @Test
