@@ -537,7 +537,8 @@ fun SwitchPreference(
     onLabelClick: (() -> Unit)? = null,
     isCustom: Boolean = false,
     showResetButton: Boolean = false,
-    onReset: (() -> Unit)? = null
+    onReset: (() -> Unit)? = null,
+    subtitleColor: Color? = null
 ) {
     Row(
         modifier = preferenceModifier(isFocused),
@@ -584,7 +585,7 @@ fun SwitchPreference(
                     Text(
                         text = subtitle,
                         style = MaterialTheme.typography.bodySmall,
-                        color = preferenceSecondaryColor(isFocused)
+                        color = subtitleColor ?: preferenceSecondaryColor(isFocused)
                     )
                 }
             }

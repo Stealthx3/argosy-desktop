@@ -585,6 +585,22 @@ class DisplaySettingsDelegate @Inject constructor(
         }
     }
 
+    fun setQuickPanelInEmulators(scope: CoroutineScope, enabled: Boolean, serviceEnabled: Boolean) {
+        scope.launch {
+            preferencesRepository.setQuickPanelInEmulators(enabled)
+            _state.update {
+                it.copy(
+                    quickPanelInEmulators = enabled,
+                    showAccessibilityPrompt = enabled && !serviceEnabled
+                )
+            }
+        }
+    }
+
+    fun dismissAccessibilityPrompt() {
+        _state.update { it.copy(showAccessibilityPrompt = false) }
+    }
+
     fun setLockScreenArt(scope: CoroutineScope, enabled: Boolean) {
         scope.launch {
             preferencesRepository.setLockScreenArt(enabled)

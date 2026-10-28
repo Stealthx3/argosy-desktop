@@ -193,6 +193,11 @@
     <string name="settings_shell_modal_import_settings_message">Choisissez un fichier de sauvegarde et les réglages qu\'il contient remplaceront les vôtres. Tout ce que le fichier omet reste inchangé, et les comptes, serveurs, états de synchro et emplacements de fichiers ne sont jamais repris.</string>
     <string name="settings_shell_modal_import_settings_confirm">Choisir un fichier</string>
 
+    <string name="settings_shell_modal_accessibility_title">Activer l\'accessibilité</string>
+    <string name="settings_shell_modal_accessibility_message">Argosy utilise son service d\'accessibilité pour détecter le bouton Retour pendant qu\'un autre émulateur est ouvert. Android vous avertira qu\'il peut observer ce que vous saisissez ; Argosy ne surveille que le bouton Retour pendant une partie.</string>
+    <string name="settings_shell_modal_accessibility_confirm">Ouvrir les paramètres</string>
+    <string name="settings_shell_modal_accessibility_not_now">Plus tard</string>
+
     <string name="settings_shell_modal_migrate_downloads_title">Migrer les téléchargements ?</string>
     <string name="settings_shell_modal_migrate_downloads_message">Déplacer %1$d jeux (%2$s) vers le nouvel emplacement ?</string>
     <string name="settings_shell_modal_migrate_downloads_confirm">Migrer</string>

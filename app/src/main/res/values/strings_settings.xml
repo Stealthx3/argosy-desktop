@@ -318,6 +318,14 @@
     <string name="settings_interface_hide_system_status_bar_title">Hide System Status Bar</string>
     <!-- Second line of that row. Says what is hidden and how to bring it back for a moment. -->
     <string name="settings_interface_hide_system_status_bar_subtitle">Hide Android\'s status bar and notification icons. Swipe down from the top to show it</string>
+    <!-- Toggle row title. "Quick Panel" is Argosy's side panel of game settings; "Other Emulators"
+         means standalone emulator apps, as opposed to the emulators built into Argosy. -->
+    <string name="settings_interface_quick_panel_in_emulators_title">Quick Panel in Other Emulators</string>
+    <!-- Second line of that row. "Back" is the controller or system Back button. -->
+    <string name="settings_interface_quick_panel_in_emulators_subtitle">Hold Back in an emulator Argosy launched to open the quick panel. Needs Argosy\'s accessibility service</string>
+    <!-- Replaces that second line when the row is on but Android's accessibility service for Argosy
+         is switched off. Shown as a warning. -->
+    <string name="settings_interface_quick_panel_in_emulators_service_off">Accessibility service is off. Turn it on in Permissions</string>
     <!-- Setting title. Noun phrase: the picture Argosy puts behind the device's lock screen. -->
     <string name="settings_interface_lock_screen_art_title">Lock Screen Art</string>
     <!-- Setting subtitle. Explains what the switch does and warns that it takes over the lock
@@ -1261,6 +1269,10 @@
     <string name="settings_permissions_display_overlay_title">Display Over Other Apps</string>
     <!-- Body of that card. -->
     <string name="settings_permissions_display_overlay_description">Shows save detection notifications while playing games in external emulators.</string>
+    <!-- Card title. Names Android's accessibility service setting for Argosy. -->
+    <string name="settings_permissions_accessibility_title">Accessibility Service</string>
+    <!-- Body of that card. "Silent" means taken without a sound or visible capture prompt. -->
+    <string name="settings_permissions_accessibility_description">Lets the quick panel open over other emulators, and silent save screenshots</string>
     <!-- Card title. Noun phrase naming Argosy's animated wallpaper, which Android asks the user to apply once. -->
     <string name="settings_permissions_live_wallpaper_title">Animated Lock Screen</string>
     <!-- Body of that card. -->

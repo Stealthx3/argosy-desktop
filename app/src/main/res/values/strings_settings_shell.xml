@@ -258,6 +258,16 @@
     <string name="settings_shell_modal_import_settings_message">Pick a backup file and the settings it names replace yours. Anything the file leaves out is untouched, and accounts, servers, sync state and file locations are never carried.</string>
     <string name="settings_shell_modal_import_settings_confirm">Choose File</string>
 
+    <!-- Title of the prompt shown after turning on the quick panel in other emulators while
+         Argosy's accessibility service is off. -->
+    <string name="settings_shell_modal_accessibility_title">Turn On Accessibility</string>
+    <!-- Body of that prompt. "Back button" is the controller or system Back button. -->
+    <string name="settings_shell_modal_accessibility_message">Argosy uses its accessibility service to see the Back button while another emulator is open. Android will warn that it can observe what you type; Argosy only watches the Back button during a game.</string>
+    <!-- Button that opens Android's accessibility settings page. -->
+    <string name="settings_shell_modal_accessibility_confirm">Open Settings</string>
+    <!-- Button that closes the prompt without opening settings; the setting stays on. -->
+    <string name="settings_shell_modal_accessibility_not_now">Not Now</string>
+
     <string name="settings_shell_modal_migrate_downloads_title">Migrate Downloads?</string>
     <!-- %1$d is the number of games, %2$s the formatted total size, e.g. "1.2 GB". -->
     <string name="settings_shell_modal_migrate_downloads_message">Move %1$d games (%2$s) to the new location?</string>

@@ -111,6 +111,9 @@
     <string name="settings_interface_hide_system_nav_bar_subtitle">Android के बैक, होम और हाल के ऐप्स बटन या जेस्चर बार छिपाता है। दिखाने के लिए किनारे से स्वाइप करें</string>
     <string name="settings_interface_hide_system_status_bar_title">सिस्टम स्टेटस बार छिपाएँ</string>
     <string name="settings_interface_hide_system_status_bar_subtitle">Android का स्टेटस बार और सूचना आइकन छिपाता है। दिखाने के लिए ऊपर से नीचे स्वाइप करें</string>
+    <string name="settings_interface_quick_panel_in_emulators_title">अन्य एमुलेटर में क्विक पैनल</string>
+    <string name="settings_interface_quick_panel_in_emulators_subtitle">क्विक पैनल खोलने के लिए Argosy से खोले गए एमुलेटर में वापस को दबाए रखें। Argosy की एक्सेसिबिलिटी सेवा ज़रूरी है</string>
+    <string name="settings_interface_quick_panel_in_emulators_service_off">एक्सेसिबिलिटी सेवा बंद है। इसे अनुमतियों में चालू करें</string>
     <string name="settings_interface_lock_screen_art_title">लॉक स्क्रीन चित्र</string>
     <string name="settings_interface_lock_screen_art_subtitle">जब Argosy आपका होम ऐप हो, लॉक स्क्रीन पर आपकी लाइब्रेरी या चालू छोड़ा गया गेम दिखता है। यह आपके लॉक स्क्रीन वॉलपेपर की जगह हमेशा के लिए ले लेता है।</string>
     <string name="settings_interface_home_app_title">होम ऐप के रूप में उपलब्ध</string>
@@ -633,6 +636,8 @@
     <string name="settings_permissions_screen_capture_description">गेम खेलते समय स्क्रीन के रंग पढ़ने के लिए एम्बिएंट LED लाइटिंग सक्षम करता है।</string>
     <string name="settings_permissions_display_overlay_title">अन्य ऐप्स के ऊपर दिखाएँ</string>
     <string name="settings_permissions_display_overlay_description">बाहरी एमुलेटर में गेम खेलते समय सेव पहचान नोटिफ़िकेशन दिखाता है।</string>
+    <string name="settings_permissions_accessibility_title">एक्सेसिबिलिटी सेवा</string>
+    <string name="settings_permissions_accessibility_description">क्विक पैनल को अन्य एमुलेटर के ऊपर खोलने देता है, और बिना आवाज़ के सेव स्क्रीनशॉट लेता है</string>
     <string name="settings_permissions_live_wallpaper_title">एनिमेटेड लॉक स्क्रीन</string>
     <string name="settings_permissions_live_wallpaper_description">Argosy को एनिमेटेड लॉक स्क्रीन लागू करने की अनुमति दें।</string>
     <string name="settings_lock_screen_wallpaper_label">Argosy लाइब्रेरी</string>

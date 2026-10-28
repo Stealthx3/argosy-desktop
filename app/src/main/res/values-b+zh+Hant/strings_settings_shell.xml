@@ -189,6 +189,11 @@
     <string name="settings_shell_modal_import_settings_message">選擇備份檔案後，檔案中列出的設定會取代您目前的設定。檔案未包含的項目則不受影響，帳號、伺服器、同步狀態與檔案位置永遠不會被匯入。</string>
     <string name="settings_shell_modal_import_settings_confirm">選擇檔案</string>
 
+    <string name="settings_shell_modal_accessibility_title">開啟無障礙</string>
+    <string name="settings_shell_modal_accessibility_message">當其他模擬器開啟時，Argosy 透過其無障礙服務辨識返回按鈕。Android 會警告它可以查看您輸入的內容；Argosy 只在遊戲期間留意返回按鈕。</string>
+    <string name="settings_shell_modal_accessibility_confirm">開啟設定</string>
+    <string name="settings_shell_modal_accessibility_not_now">暫不</string>
+
     <string name="settings_shell_modal_migrate_downloads_title">要遷移下載內容嗎？</string>
     <string name="settings_shell_modal_migrate_downloads_message">要將%1$d款遊戲（%2$s）移動到新位置嗎？</string>
     <string name="settings_shell_modal_migrate_downloads_confirm">遷移</string>

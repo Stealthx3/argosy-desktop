@@ -277,6 +277,8 @@ data class DisplayState(
     val compactFooter: Boolean = false,
     val hideSystemNavigationBar: Boolean = true,
     val hideSystemStatusBar: Boolean = true,
+    val quickPanelInEmulators: Boolean = false,
+    val showAccessibilityPrompt: Boolean = false,
     val lockScreenArt: Boolean = true,
     val homeAppAvailable: Boolean = true,
     val isDefaultHome: Boolean = false,
@@ -1601,6 +1603,7 @@ data class PermissionsState(
     val hasScreenCapture: Boolean = false,
     val isScreenCaptureRelevant: Boolean = false,
     val hasDisplayOverlay: Boolean = false,
+    val hasAccessibilityService: Boolean = false,
     val hasLiveWallpaper: Boolean = false,
     val isLiveWallpaperRelevant: Boolean = false
 ) {

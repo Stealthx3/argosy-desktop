@@ -731,6 +731,7 @@ private fun routeInterfaceConfirm(vm: SettingsViewModel, state: SettingsUiState)
         InterfaceItem.HideSystemNavigationBar ->
             vm.setHideSystemNavigationBar(!state.display.hideSystemNavigationBar)
         InterfaceItem.HideSystemStatusBar -> vm.setHideSystemStatusBar(!state.display.hideSystemStatusBar)
+        InterfaceItem.QuickPanelInEmulators -> vm.setQuickPanelInEmulators(!state.display.quickPanelInEmulators)
         InterfaceItem.LockScreenArt -> vm.setLockScreenArt(!state.display.lockScreenArt)
         InterfaceItem.HomeApp -> vm.setHomeAppAvailable(!state.display.homeAppAvailable)
         InterfaceItem.StatusClock -> vm.setShowStatusClock(!state.display.showStatusClock)

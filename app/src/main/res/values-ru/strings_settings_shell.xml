@@ -195,6 +195,11 @@
     <string name="settings_shell_modal_import_settings_message">Выберите файл резервной копии - указанные в нём настройки заменят ваши. Всё, что в файле не указано, останется без изменений; аккаунты, серверы, статус синхронизации и расположения файлов никогда не переносятся.</string>
     <string name="settings_shell_modal_import_settings_confirm">Выбрать файл</string>
 
+    <string name="settings_shell_modal_accessibility_title">Включить специальные возможности</string>
+    <string name="settings_shell_modal_accessibility_message">Argosy использует свою службу специальных возможностей, чтобы видеть кнопку Назад, пока открыт другой эмулятор. Android предупредит, что служба может отслеживать вводимый текст; Argosy следит только за кнопкой Назад во время игры.</string>
+    <string name="settings_shell_modal_accessibility_confirm">Открыть настройки</string>
+    <string name="settings_shell_modal_accessibility_not_now">Не сейчас</string>
+
     <string name="settings_shell_modal_migrate_downloads_title">Перенести загрузки?</string>
     <string name="settings_shell_modal_migrate_downloads_message">Переместить %1$d игр (%2$s) в новое расположение?</string>
     <string name="settings_shell_modal_migrate_downloads_confirm">Перенести</string>

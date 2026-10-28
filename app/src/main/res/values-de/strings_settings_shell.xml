@@ -191,6 +191,11 @@
     <string name="settings_shell_modal_import_settings_message">Wählen Sie eine Sicherungsdatei aus; die darin genannten Einstellungen ersetzen Ihre eigenen. Alles, was die Datei auslässt, bleibt unverändert, und Konten, Server, Sync-Status und Speicherorte werden nie übernommen.</string>
     <string name="settings_shell_modal_import_settings_confirm">Datei wählen</string>
 
+    <string name="settings_shell_modal_accessibility_title">Bedienungshilfe einschalten</string>
+    <string name="settings_shell_modal_accessibility_message">Argosy nutzt seinen Bedienungshilfendienst, um die Zurück-Taste zu erkennen, während ein anderer Emulator geöffnet ist. Android warnt, dass er Ihre Eingaben beobachten kann; Argosy achtet während eines Spiels nur auf die Zurück-Taste.</string>
+    <string name="settings_shell_modal_accessibility_confirm">Einstellungen öffnen</string>
+    <string name="settings_shell_modal_accessibility_not_now">Nicht jetzt</string>
+
     <string name="settings_shell_modal_migrate_downloads_title">Downloads migrieren?</string>
     <string name="settings_shell_modal_migrate_downloads_message">%1$d Spiele (%2$s) an den neuen Speicherort verschieben?</string>
     <string name="settings_shell_modal_migrate_downloads_confirm">Migrieren</string>

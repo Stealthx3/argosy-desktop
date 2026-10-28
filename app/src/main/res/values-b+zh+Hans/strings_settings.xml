@@ -109,6 +109,9 @@
     <string name="settings_interface_hide_system_nav_bar_subtitle">隐藏 Android 的返回、主屏幕和最近任务按钮或手势条。从边缘滑动即可显示</string>
     <string name="settings_interface_hide_system_status_bar_title">隐藏系统状态栏</string>
     <string name="settings_interface_hide_system_status_bar_subtitle">隐藏 Android 状态栏和通知图标。从顶部向下滑动即可显示</string>
+    <string name="settings_interface_quick_panel_in_emulators_title">在其他模拟器中使用快捷面板</string>
+    <string name="settings_interface_quick_panel_in_emulators_subtitle">在 Argosy 启动的模拟器中长按返回即可打开快捷面板。需要 Argosy 的无障碍服务</string>
+    <string name="settings_interface_quick_panel_in_emulators_service_off">无障碍服务已关闭。请在权限中开启</string>
     <string name="settings_interface_lock_screen_art_title">锁屏图片</string>
     <string name="settings_interface_lock_screen_art_subtitle">当 Argosy 是你的主屏幕应用时，锁屏会显示你的游戏库或未退出的游戏。会永久替换你的锁屏壁纸。</string>
     <string name="settings_interface_home_app_title">可用作主屏幕应用</string>
@@ -619,6 +622,8 @@
     <string name="settings_permissions_screen_capture_description">使氛围LED灯光能够在游戏过程中采集屏幕颜色。</string>
     <string name="settings_permissions_display_overlay_title">悬浮在其他应用上层</string>
     <string name="settings_permissions_display_overlay_description">在外部模拟器中游戏时显示存档检测通知。</string>
+    <string name="settings_permissions_accessibility_title">无障碍服务</string>
+    <string name="settings_permissions_accessibility_description">让快捷面板可在其他模拟器上方打开，并可静默截取存档截图</string>
     <string name="settings_permissions_live_wallpaper_title">动态锁屏</string>
     <string name="settings_permissions_live_wallpaper_description">允许 Argosy 应用动态锁屏。</string>
     <string name="settings_lock_screen_wallpaper_label">Argosy 游戏库</string>

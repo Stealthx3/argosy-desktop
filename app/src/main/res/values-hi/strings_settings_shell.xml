@@ -184,6 +184,11 @@
     <string name="settings_shell_modal_import_settings_message">बैकअप फ़ाइल चुनें और उसमें नामित सेटिंग्स आपकी सेटिंग्स की जगह ले लेंगी। फ़ाइल जो छोड़ती है वह अछूता रहेगा, और अकाउंट, सर्वर, सिंक स्टेटस और फ़ाइल लोकेशन कभी नहीं लाए जाते।</string>
     <string name="settings_shell_modal_import_settings_confirm">फ़ाइल चुनें</string>
 
+    <string name="settings_shell_modal_accessibility_title">एक्सेसिबिलिटी चालू करें</string>
+    <string name="settings_shell_modal_accessibility_message">जब कोई दूसरा एमुलेटर खुला हो, तब वापस बटन देखने के लिए Argosy अपनी एक्सेसिबिलिटी सेवा का उपयोग करता है। Android चेतावनी देगा कि यह आपके टाइप किए गए को देख सकती है; Argosy गेम के दौरान केवल वापस बटन पर नज़र रखता है।</string>
+    <string name="settings_shell_modal_accessibility_confirm">सेटिंग्स खोलें</string>
+    <string name="settings_shell_modal_accessibility_not_now">अभी नहीं</string>
+
     <string name="settings_shell_modal_migrate_downloads_title">डाउनलोड माइग्रेट करें?</string>
     <string name="settings_shell_modal_migrate_downloads_message">%1$d गेम (%2$s) नई लोकेशन पर ले जाएँ?</string>
     <string name="settings_shell_modal_migrate_downloads_confirm">माइग्रेट करें</string>

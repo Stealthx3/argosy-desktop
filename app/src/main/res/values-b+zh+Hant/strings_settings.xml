@@ -100,6 +100,9 @@
     <string name="settings_interface_hide_system_nav_bar_subtitle">隱藏 Android 的返回、主畫面和最近使用按鈕或手勢列。從邊緣滑動即可顯示</string>
     <string name="settings_interface_hide_system_status_bar_title">隱藏系統狀態列</string>
     <string name="settings_interface_hide_system_status_bar_subtitle">隱藏 Android 狀態列和通知圖示。從頂部向下滑動即可顯示</string>
+    <string name="settings_interface_quick_panel_in_emulators_title">在其他模擬器中使用快速面板</string>
+    <string name="settings_interface_quick_panel_in_emulators_subtitle">在 Argosy 啟動的模擬器中長按返回即可開啟快速面板。需要 Argosy 的無障礙服務</string>
+    <string name="settings_interface_quick_panel_in_emulators_service_off">無障礙服務已關閉。請在權限中開啟</string>
     <string name="settings_interface_lock_screen_art_title">鎖定畫面圖片</string>
     <string name="settings_interface_lock_screen_art_subtitle">當 Argosy 是你的主畫面應用程式時，鎖定畫面會顯示你的遊戲庫或尚未結束的遊戲。會永久取代你的鎖定畫面桌布。</string>
     <string name="settings_interface_home_app_title">可作為主畫面應用程式</string>
@@ -590,6 +593,8 @@
     <string name="settings_permissions_screen_capture_description">讓環境LED燈光能在遊玩時擷取螢幕色彩。</string>
     <string name="settings_permissions_display_overlay_title">顯示在其他應用程式上層</string>
     <string name="settings_permissions_display_overlay_description">在外部模擬器中遊玩時顯示存檔偵測通知。</string>
+    <string name="settings_permissions_accessibility_title">無障礙服務</string>
+    <string name="settings_permissions_accessibility_description">讓快速面板可在其他模擬器上層開啟，並可靜默擷取存檔截圖</string>
     <string name="settings_permissions_live_wallpaper_title">動態鎖定畫面</string>
     <string name="settings_permissions_live_wallpaper_description">允許 Argosy 套用動態鎖定畫面。</string>
     <string name="settings_lock_screen_wallpaper_label">Argosy 遊戲庫</string>

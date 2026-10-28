@@ -193,6 +193,11 @@
     <string name="settings_shell_modal_import_settings_message">Elige un archivo de copia de seguridad y los ajustes que contiene reemplazarán los tuyos. Todo lo que el archivo no incluya permanece sin cambios, y las cuentas, servidores, estado de sincronización y ubicaciones de archivos nunca se importan.</string>
     <string name="settings_shell_modal_import_settings_confirm">Elegir archivo</string>
 
+    <string name="settings_shell_modal_accessibility_title">Activar accesibilidad</string>
+    <string name="settings_shell_modal_accessibility_message">Argosy usa su servicio de accesibilidad para detectar el botón Atrás mientras otro emulador está abierto. Android advertirá que puede observar lo que escribes; Argosy solo vigila el botón Atrás durante una partida.</string>
+    <string name="settings_shell_modal_accessibility_confirm">Abrir ajustes</string>
+    <string name="settings_shell_modal_accessibility_not_now">Ahora no</string>
+
     <string name="settings_shell_modal_migrate_downloads_title">¿Migrar descargas?</string>
     <string name="settings_shell_modal_migrate_downloads_message">¿Mover %1$d juegos (%2$s) a la nueva ubicación?</string>
     <string name="settings_shell_modal_migrate_downloads_confirm">Migrar</string>

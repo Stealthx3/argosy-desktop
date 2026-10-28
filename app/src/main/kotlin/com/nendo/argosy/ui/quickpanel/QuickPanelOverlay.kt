@@ -10,7 +10,11 @@ import android.view.KeyEvent
 import android.view.WindowManager
 import android.widget.FrameLayout
 import androidx.activity.compose.LocalActivityResultRegistryOwner
+import android.app.Activity
+import androidx.activity.result.ActivityResultRegistry
 import androidx.activity.result.ActivityResultRegistryOwner
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.core.app.ActivityOptionsCompat
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -85,6 +89,7 @@ import com.nendo.argosy.ui.input.mapKeycodeToGamepadEvent
 import com.nendo.argosy.ui.input.GamepadEvent
 import com.nendo.argosy.ui.theme.ALauncherTheme
 import com.nendo.argosy.ui.theme.ThemeViewModel
+import com.nendo.argosy.util.hideWindowSystemBars
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -150,13 +155,14 @@ class QuickPanelOverlay @Inject constructor(
     /**
      * Opens the panel on [displayId]. False when overlay permission is missing or the window
      * cannot be added, so the caller can fall back to its own menu. [resultOwner] runs the
-     * panel's permission requests, such as Bluetooth access on the Connections page.
+     * panel's permission requests, such as Bluetooth access on the Connections page; without one,
+     * each request answers as declined.
      */
-    fun show(displayId: Int, resultOwner: ActivityResultRegistryOwner): Boolean {
+    fun show(displayId: Int, resultOwner: ActivityResultRegistryOwner?): Boolean {
         if (session != null) return true
         if (!canShow()) return false
         val windowContext = windowContextFor(displayId) ?: return false
-        val next = Session(windowContext, resultOwner)
+        val next = Session(windowContext, resultOwner ?: DeclinedResultRegistryOwner())
         if (!next.attach()) {
             next.detach()
             return false
@@ -290,6 +296,7 @@ class QuickPanelOverlay @Inject constructor(
             return runCatching {
                 windowManager?.addView(root, params) ?: return false
                 root.requestFocus()
+                root.hideWindowSystemBars()
                 true
             }.onFailure { Log.w(TAG, "addView failed", it) }.getOrDefault(false)
         }
@@ -392,6 +399,11 @@ class QuickPanelOverlay @Inject constructor(
                 isFocusableInTouchMode = true
             }
 
+            override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
+                super.onWindowFocusChanged(hasWindowFocus)
+                if (hasWindowFocus) hideWindowSystemBars()
+            }
+
             override fun dispatchKeyEvent(event: KeyEvent): Boolean {
                 if (event.action != KeyEvent.ACTION_DOWN || exiting || !shown.value) return true
                 val swaps = prefs.value
@@ -425,6 +437,19 @@ class QuickPanelOverlay @Inject constructor(
             )
             else -> throw IllegalArgumentException("No overlay factory for ${modelClass.name}")
         } as T
+    }
+}
+
+private class DeclinedResultRegistryOwner : ActivityResultRegistryOwner {
+    override val activityResultRegistry: ActivityResultRegistry = object : ActivityResultRegistry() {
+        override fun <I, O> onLaunch(
+            requestCode: Int,
+            contract: ActivityResultContract<I, O>,
+            input: I,
+            options: ActivityOptionsCompat?
+        ) {
+            dispatchResult(requestCode, Activity.RESULT_CANCELED, null)
+        }
     }
 }
 

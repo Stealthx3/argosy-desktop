@@ -1184,6 +1184,19 @@ class SettingsViewModel @Inject constructor(
     fun setHideSystemNavigationBar(hide: Boolean) =
         displayDelegate.setHideSystemNavigationBar(viewModelScope, hide)
     fun setHideSystemStatusBar(hide: Boolean) = displayDelegate.setHideSystemStatusBar(viewModelScope, hide)
+    fun setQuickPanelInEmulators(enabled: Boolean) {
+        permissionsDelegate.refreshPermissions()
+        displayDelegate.setQuickPanelInEmulators(
+            viewModelScope,
+            enabled,
+            permissionsDelegate.state.value.hasAccessibilityService
+        )
+    }
+    fun dismissAccessibilityPrompt() = displayDelegate.dismissAccessibilityPrompt()
+    fun openAccessibilitySettingsFromPrompt() {
+        displayDelegate.dismissAccessibilityPrompt()
+        permissionsDelegate.openAccessibilitySettings()
+    }
     fun setLockScreenArt(enabled: Boolean) = displayDelegate.setLockScreenArt(viewModelScope, enabled)
     fun setPreLaunchRecaps(enabled: Boolean) = displayDelegate.setPreLaunchRecaps(viewModelScope, enabled)
     fun setMonthlyRecap(enabled: Boolean) = displayDelegate.setMonthlyRecap(viewModelScope, enabled)
@@ -1613,6 +1626,7 @@ class SettingsViewModel @Inject constructor(
     fun openNotificationSettings() = permissionsDelegate.openNotificationSettings()
     fun openWriteSettings() = permissionsDelegate.openWriteSettings()
     fun openDisplayOverlaySettings() = permissionsDelegate.openDisplayOverlaySettings()
+    fun openAccessibilitySettings() = permissionsDelegate.openAccessibilitySettings()
 
     fun openLiveWallpaperPicker() = permissionsDelegate.openLiveWallpaperPicker()
 

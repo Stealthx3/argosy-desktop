@@ -917,6 +917,16 @@ fun SettingsScreen(
     )
 
     ArgosyConfirmModalHost(
+        visible = uiState.display.showAccessibilityPrompt,
+        title = stringResource(R.string.settings_shell_modal_accessibility_title),
+        message = stringResource(R.string.settings_shell_modal_accessibility_message),
+        confirmLabel = stringResource(R.string.settings_shell_modal_accessibility_confirm),
+        cancelLabel = stringResource(R.string.settings_shell_modal_accessibility_not_now),
+        onConfirm = { viewModel.openAccessibilitySettingsFromPrompt() },
+        onDismiss = { viewModel.dismissAccessibilityPrompt() }
+    )
+
+    ArgosyConfirmModalHost(
         visible = uiState.showMigrationDialog,
         title = stringResource(R.string.settings_shell_modal_migrate_downloads_title),
         message = stringResource(

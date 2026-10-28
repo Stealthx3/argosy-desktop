@@ -40,6 +40,7 @@ data class ControlsPreferences(
     val selectSwapMode: SelectSwapMode = SelectSwapMode.HOLD,
     val openNavigationKey: Int = DEFAULT_OPEN_NAVIGATION_KEY,
     val openQuickPanelKey: Int = DEFAULT_OPEN_QUICK_PANEL_KEY,
+    val quickPanelInEmulators: Boolean = false,
     val navRingRoutes: List<String>? = null,
     val quickNavigation: Boolean = true,
     val navBarAutoHide: Boolean = true,
@@ -81,6 +82,7 @@ class ControlsPreferencesRepository @Inject constructor(
         val SELECT_SWAP_MODE = stringPreferencesKey("select_swap_mode")
         val OPEN_NAVIGATION_KEY = intPreferencesKey("open_navigation_key")
         val OPEN_QUICK_PANEL_KEY = intPreferencesKey("open_quick_panel_key")
+        val QUICK_PANEL_IN_EMULATORS = booleanPreferencesKey("quick_panel_in_emulators")
         val NAV_RING_ROUTES = stringPreferencesKey("nav_ring_routes")
         val QUICK_NAVIGATION = booleanPreferencesKey("quick_navigation")
         val NAV_BAR_AUTO_HIDE = booleanPreferencesKey("nav_bar_auto_hide")
@@ -112,6 +114,7 @@ class ControlsPreferencesRepository @Inject constructor(
                 ?: ControlsPreferences.DEFAULT_OPEN_NAVIGATION_KEY,
             openQuickPanelKey = prefs[Keys.OPEN_QUICK_PANEL_KEY]
                 ?: ControlsPreferences.DEFAULT_OPEN_QUICK_PANEL_KEY,
+            quickPanelInEmulators = prefs[Keys.QUICK_PANEL_IN_EMULATORS] ?: false,
             navRingRoutes = prefs[Keys.NAV_RING_ROUTES]
                 ?.split(',')
                 ?.map { it.trim() }
@@ -265,6 +268,10 @@ class ControlsPreferencesRepository @Inject constructor(
 
     suspend fun setOpenQuickPanelKey(keyCode: Int) {
         dataStore.edit { it[Keys.OPEN_QUICK_PANEL_KEY] = keyCode }
+    }
+
+    suspend fun setQuickPanelInEmulators(enabled: Boolean) {
+        dataStore.edit { it[Keys.QUICK_PANEL_IN_EMULATORS] = enabled }
     }
 
     suspend fun setQuickNavigation(enabled: Boolean) {

@@ -113,6 +113,9 @@
     <string name="settings_interface_hide_system_nav_bar_subtitle">Masque les boutons Retour, Accueil et Récents d\'Android ou la barre de gestes. Balayez depuis le bord pour les afficher</string>
     <string name="settings_interface_hide_system_status_bar_title">Masquer la barre d\'état système</string>
     <string name="settings_interface_hide_system_status_bar_subtitle">Masque la barre d\'état d\'Android et les icônes de notification. Balayez vers le bas depuis le haut pour l\'afficher</string>
+    <string name="settings_interface_quick_panel_in_emulators_title">Panneau rapide dans les autres émulateurs</string>
+    <string name="settings_interface_quick_panel_in_emulators_subtitle">Maintenez Retour dans un émulateur lancé par Argosy pour ouvrir le panneau rapide. Nécessite le service d\'accessibilité d\'Argosy</string>
+    <string name="settings_interface_quick_panel_in_emulators_service_off">Le service d\'accessibilité est désactivé. Activez-le dans Autorisations</string>
     <string name="settings_interface_lock_screen_art_title">Image de l\'écran de verrouillage</string>
     <string name="settings_interface_lock_screen_art_subtitle">Quand Argosy est votre application d\'accueil, l\'écran de verrouillage affiche votre bibliothèque ou le jeu laissé en cours. Remplace définitivement votre fond d\'écran de verrouillage.</string>
     <string name="settings_interface_home_app_title">Disponible comme application d\'accueil</string>
@@ -647,6 +650,8 @@
     <string name="settings_permissions_screen_capture_description">Permet l\'éclairage LED ambiant en échantillonnant les couleurs de l\'écran pendant le jeu.</string>
     <string name="settings_permissions_display_overlay_title">Affichage par-dessus les autres applications</string>
     <string name="settings_permissions_display_overlay_description">Affiche des notifications de détection de sauvegarde en jouant avec des émulateurs externes.</string>
+    <string name="settings_permissions_accessibility_title">Service d\'accessibilité</string>
+    <string name="settings_permissions_accessibility_description">Permet d\'ouvrir le panneau rapide par-dessus les autres émulateurs et de prendre des captures de sauvegarde en silence</string>
     <string name="settings_permissions_live_wallpaper_title">Écran de verrouillage animé</string>
     <string name="settings_permissions_live_wallpaper_description">Autorisez Argosy à appliquer un écran de verrouillage animé.</string>
     <string name="settings_lock_screen_wallpaper_label">Bibliothèque Argosy</string>

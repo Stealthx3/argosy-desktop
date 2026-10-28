@@ -108,6 +108,7 @@ class UserPreferencesRepository @Inject constructor(
             selectSwapMode = controls.selectSwapMode,
             openNavigationKey = controls.openNavigationKey,
             openQuickPanelKey = controls.openQuickPanelKey,
+            quickPanelInEmulators = controls.quickPanelInEmulators,
             navRingRoutes = controls.navRingRoutes,
             quickNavigation = controls.quickNavigation,
             navBarAutoHide = controls.navBarAutoHide,
@@ -528,6 +529,7 @@ class UserPreferencesRepository @Inject constructor(
     suspend fun setSelectSwapMode(mode: SelectSwapMode) = controlsPrefs.setSelectSwapMode(mode)
     suspend fun setOpenNavigationKey(keyCode: Int) = controlsPrefs.setOpenNavigationKey(keyCode)
     suspend fun setOpenQuickPanelKey(keyCode: Int) = controlsPrefs.setOpenQuickPanelKey(keyCode)
+    suspend fun setQuickPanelInEmulators(enabled: Boolean) = controlsPrefs.setQuickPanelInEmulators(enabled)
     suspend fun setNavRingRoutes(routes: List<String>?) = controlsPrefs.setNavRingRoutes(routes)
     suspend fun setQuickNavigation(enabled: Boolean) = controlsPrefs.setQuickNavigation(enabled)
     suspend fun setNavBarAutoHide(enabled: Boolean) = controlsPrefs.setNavBarAutoHide(enabled)
@@ -866,6 +868,7 @@ data class UserPreferences(
     val selectSwapMode: SelectSwapMode = SelectSwapMode.HOLD,
     val openNavigationKey: Int = ControlsPreferences.DEFAULT_OPEN_NAVIGATION_KEY,
     val openQuickPanelKey: Int = ControlsPreferences.DEFAULT_OPEN_QUICK_PANEL_KEY,
+    val quickPanelInEmulators: Boolean = false,
     val navRingRoutes: List<String>? = null,
     val quickNavigation: Boolean = true,
     val navBarAutoHide: Boolean = true,
