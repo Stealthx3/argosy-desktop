@@ -110,11 +110,7 @@ class RomMRepository @Inject constructor(
      * scheme, host and port. Empty while disconnected or without a token.
      */
     fun mediaAuthHeaders(url: String, token: String?): Map<String, String> =
-        if (token != null && RomMMusicLibraryService.sameOrigin(url, connectionManager.getBaseUrl())) {
-            mapOf("Authorization" to "Bearer $token")
-        } else {
-            emptyMap()
-        }
+        RomMMusicLibraryService.bearerHeaders(url, connectionManager.getBaseUrl(), token)
 
     fun buildCoverUrls(rom: RomMRom): List<String> = apiClient.buildCoverUrls(rom)
 
