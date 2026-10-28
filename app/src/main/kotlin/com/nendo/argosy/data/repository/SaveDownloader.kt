@@ -231,8 +231,7 @@ class SaveDownloader @Inject constructor(
             serverSave.fileName.endsWith(".zip", ignoreCase = true) && !isGciFormat)
         val isSwitchEmulator = sigilRoot == null && resolvedEmulatorId in SaveSyncApiClient.SWITCH_EMULATOR_IDS
         Logger.debug(TAG, "[SaveSync] DOWNLOAD gameId=$gameId | Save info | fileName=${serverSave.fileName}, isFolderBased=$isFolderBased, isGciFormat=$isGciFormat, isSwitchEmulator=$isSwitchEmulator")
-        if (isGciFormat && !GciSaveHandler.isGciServerFileName(serverSave.fileName)) {
-            Logger.info(TAG, "[SaveSync] DOWNLOAD gameId=$gameId | Skipped: server save is not a GameCube memory card file | fileName=${serverSave.fileName}")
+        if (isNonGciSaveForGciGame(gameId, resolvedEmulatorId, serverSave.fileName)) {
             return@withContext SaveSyncResult.NoSaveFound
         }
 
@@ -860,6 +859,7 @@ class SaveDownloader @Inject constructor(
             Logger.error(TAG, "downloadSaveAsChannel: getSave failed", e)
             return@withContext false
         } ?: return@withContext false
+        if (isNonGciSaveForGciGame(gameId, emulatorId, serverSave.fileName)) return@withContext false
 
         val response = try {
             val dlPath = serverSave.downloadPath
@@ -913,6 +913,19 @@ class SaveDownloader @Inject constructor(
         }
     }
 
+    private suspend fun isNonGciSaveForGciGame(gameId: Long, emulatorId: String?, fileName: String): Boolean {
+        val game = gameDao.getById(gameId) ?: return false
+        val resolvedEmulatorId = emulatorId
+            ?: emulatorResolver.getEmulatorIdForGame(gameId, game.platformId, game.platformSlug)
+            ?: return false
+        val config = SavePathRegistry.getConfigForPlatform(resolvedEmulatorId, game.platformSlug)
+        if (config?.usesGciFormat != true) return false
+        if (apiClient.get().isSigilRoutedFor(gameId, config, game.platformSlug, resolvedEmulatorId)) return false
+        if (GciSaveHandler.isGciServerFileName(fileName)) return false
+        Logger.info(TAG, "[SaveSync] DOWNLOAD gameId=$gameId | Skipped: server save is not a GameCube memory card file | fileName=$fileName")
+        return true
+    }
+
     suspend fun downloadAndCacheSave(
         serverSaveId: Long,
         gameId: Long,
@@ -960,6 +973,7 @@ class SaveDownloader @Inject constructor(
             Logger.error(TAG, "downloadToCache: getSave failed", e)
             return@withContext null
         } ?: return@withContext null
+        if (isNonGciSaveForGciGame(gameId, null, serverSave.fileName)) return@withContext null
 
         val response = try {
             val dlPath = serverSave.downloadPath

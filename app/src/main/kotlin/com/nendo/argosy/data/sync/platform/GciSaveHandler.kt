@@ -29,7 +29,8 @@ class GciSaveHandler @Inject constructor(
             fileName.endsWith(".gci", ignoreCase = true) || fileName.endsWith(".zip", ignoreCase = true)
     }
 
-    override fun isValidCachedSavePath(path: String): Boolean = path.endsWith(".gci", ignoreCase = true)
+    override fun isValidCachedSavePath(path: String): Boolean =
+        File(path).extension.let { it.isEmpty() || it.equals("gci", ignoreCase = true) }
 
     override suspend fun prepareForUpload(localPath: String, context: SaveContext): PreparedSave? =
         withContext(Dispatchers.IO) {

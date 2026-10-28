@@ -134,8 +134,9 @@ class GciSaveHandlerRoundTripTest {
     }
 
     @Test
-    fun `a cached path is trusted only when it names a gci`() {
+    fun `a cached path naming a non-gci file is not trusted`() {
         assertTrue(handler.isValidCachedSavePath("/storage/emulated/0/GC/USA/Card A/01-GZLE-ZELDA.gci"))
+        assertTrue(handler.isValidCachedSavePath("/data/user/0/com.nendo.argosy/files/saves/GC"))
         assertFalse(handler.isValidCachedSavePath("/storage/emulated/0/RetroArch/saves/Melee.srm"))
     }
 
