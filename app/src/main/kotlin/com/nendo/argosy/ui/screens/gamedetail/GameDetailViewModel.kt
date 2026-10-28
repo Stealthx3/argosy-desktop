@@ -2551,6 +2551,7 @@ class GameDetailViewModel @Inject constructor(
         onNavigateToPlatformSettings: (Long) -> Unit = {},
         onSnapUp: () -> Boolean = { false },
         onSnapDown: () -> Boolean = { false },
+        onScrollContent: (direction: Int) -> Boolean = { false },
         onSectionLeft: () -> Unit = {},
         onSectionRight: () -> Unit = {},
         onPrevGame: () -> Unit = {},
@@ -2558,73 +2559,50 @@ class GameDetailViewModel @Inject constructor(
         isInScreenshotsSection: () -> Boolean = { false },
         onNavigateToGame: (Long) -> Unit = {}
     ): InputHandler = object : InputHandler {
-        override fun onUp(): InputResult {
-            routeSnapshotInput { it.onUp() }?.let { return it }
+        private fun vertical(direction: Int, onBase: () -> Boolean): InputResult {
+            routeSnapshotInput { if (direction < 0) it.onUp() else it.onDown() }?.let { return it }
             val state = _uiState.value
             val saveState = state.saveChannel
             val pickerState = pickerModalDelegate.state.value
             return when {
-                state.reviewEditor != null -> { moveReviewEditorSection(-1); InputResult.HANDLED }
+                state.reviewEditor != null -> { moveReviewEditorSection(direction); InputResult.HANDLED }
                 saveState.showRenameDialog -> InputResult.UNHANDLED
                 saveState.showRestoreConfirmation -> InputResult.UNHANDLED
                 saveState.showDeleteConfirmation -> InputResult.UNHANDLED
-                saveState.isVisible -> { moveSaveCacheFocus(-1); InputResult.HANDLED }
+                saveState.isVisible -> { moveSaveCacheFocus(direction); InputResult.HANDLED }
                 state.showScreenshotViewer -> InputResult.UNHANDLED
                 state.showRatingPicker -> InputResult.UNHANDLED
                 state.showPermissionModal -> InputResult.UNHANDLED
-                state.showStatusPicker -> { changeStatusValue(-1); InputResult.HANDLED }
+                state.showStatusPicker -> { changeStatusValue(direction); InputResult.HANDLED }
                 state.showMissingDiscPrompt -> InputResult.UNHANDLED
                 state.showExtractionFailedPrompt -> InputResult.HANDLED
-                pickerState.showFilePicker -> { moveFilePickerFocus(-1); InputResult.HANDLED }
-                pickerState.showCorePicker -> { moveCorePickerFocus(-1); InputResult.HANDLED }
-                pickerState.showDiscPicker -> { navigateDiscPicker(-1); InputResult.HANDLED }
-                pickerState.showArtPicker -> { moveArtPickerFocus(-pickerState.artPickerSlot.pickerConfig.columns); InputResult.HANDLED }
-                pickerState.showVariantPicker -> { pickerModalDelegate.moveVariantPickerFocus(-1); InputResult.HANDLED }
-                pickerState.showEmulatorPicker -> { moveEmulatorPickerFocus(-1); InputResult.HANDLED }
-                pickerState.showSteamLauncherPicker -> { moveSteamLauncherPickerFocus(-1); InputResult.HANDLED }
-                state.showAddToCollectionModal -> { moveCollectionFocusUp(); InputResult.HANDLED }
-                state.showRatingsStatusMenu -> { changeRatingsStatusFocus(-1); InputResult.HANDLED }
-                state.showPlayOptions -> { movePlayOptionsFocus(-1); InputResult.HANDLED }
-                state.showMoreOptions -> { moveOptionsFocus(-1); InputResult.HANDLED }
-                state.showAchievementList -> { moveAchievementListFocus(-1); InputResult.HANDLED }
-                state.showReviewList -> { moveReviewListFocus(-1); InputResult.HANDLED }
-                else -> if (onSnapUp()) InputResult.HANDLED else InputResult.UNHANDLED
+                pickerState.showFilePicker -> { moveFilePickerFocus(direction); InputResult.HANDLED }
+                pickerState.showCorePicker -> { moveCorePickerFocus(direction); InputResult.HANDLED }
+                pickerState.showDiscPicker -> { navigateDiscPicker(direction); InputResult.HANDLED }
+                pickerState.showArtPicker -> { moveArtPickerFocus(direction * pickerState.artPickerSlot.pickerConfig.columns); InputResult.HANDLED }
+                pickerState.showVariantPicker -> { pickerModalDelegate.moveVariantPickerFocus(direction); InputResult.HANDLED }
+                pickerState.showEmulatorPicker -> { moveEmulatorPickerFocus(direction); InputResult.HANDLED }
+                pickerState.showSteamLauncherPicker -> { moveSteamLauncherPickerFocus(direction); InputResult.HANDLED }
+                state.showAddToCollectionModal -> {
+                    if (direction < 0) moveCollectionFocusUp() else moveCollectionFocusDown()
+                    InputResult.HANDLED
+                }
+                state.showRatingsStatusMenu -> { changeRatingsStatusFocus(direction); InputResult.HANDLED }
+                state.showPlayOptions -> { movePlayOptionsFocus(direction); InputResult.HANDLED }
+                state.showMoreOptions -> { moveOptionsFocus(direction); InputResult.HANDLED }
+                state.showAchievementList -> { moveAchievementListFocus(direction); InputResult.HANDLED }
+                state.showReviewList -> { moveReviewListFocus(direction); InputResult.HANDLED }
+                else -> if (onBase()) InputResult.HANDLED else InputResult.UNHANDLED
             }
         }
 
-        override fun onDown(): InputResult {
-            routeSnapshotInput { it.onDown() }?.let { return it }
-            val state = _uiState.value
-            val saveState = state.saveChannel
-            val pickerState = pickerModalDelegate.state.value
-            return when {
-                state.reviewEditor != null -> { moveReviewEditorSection(1); InputResult.HANDLED }
-                saveState.showRenameDialog -> InputResult.UNHANDLED
-                saveState.showRestoreConfirmation -> InputResult.UNHANDLED
-                saveState.showDeleteConfirmation -> InputResult.UNHANDLED
-                saveState.isVisible -> { moveSaveCacheFocus(1); InputResult.HANDLED }
-                state.showScreenshotViewer -> InputResult.UNHANDLED
-                state.showRatingPicker -> InputResult.UNHANDLED
-                state.showPermissionModal -> InputResult.UNHANDLED
-                state.showStatusPicker -> { changeStatusValue(1); InputResult.HANDLED }
-                state.showMissingDiscPrompt -> InputResult.UNHANDLED
-                state.showExtractionFailedPrompt -> InputResult.HANDLED
-                pickerState.showFilePicker -> { moveFilePickerFocus(1); InputResult.HANDLED }
-                pickerState.showCorePicker -> { moveCorePickerFocus(1); InputResult.HANDLED }
-                pickerState.showDiscPicker -> { navigateDiscPicker(1); InputResult.HANDLED }
-                pickerState.showArtPicker -> { moveArtPickerFocus(pickerState.artPickerSlot.pickerConfig.columns); InputResult.HANDLED }
-                pickerState.showVariantPicker -> { pickerModalDelegate.moveVariantPickerFocus(1); InputResult.HANDLED }
-                pickerState.showEmulatorPicker -> { moveEmulatorPickerFocus(1); InputResult.HANDLED }
-                pickerState.showSteamLauncherPicker -> { moveSteamLauncherPickerFocus(1); InputResult.HANDLED }
-                state.showAddToCollectionModal -> { moveCollectionFocusDown(); InputResult.HANDLED }
-                state.showRatingsStatusMenu -> { changeRatingsStatusFocus(1); InputResult.HANDLED }
-                state.showPlayOptions -> { movePlayOptionsFocus(1); InputResult.HANDLED }
-                state.showMoreOptions -> { moveOptionsFocus(1); InputResult.HANDLED }
-                state.showAchievementList -> { moveAchievementListFocus(1); InputResult.HANDLED }
-                state.showReviewList -> { moveReviewListFocus(1); InputResult.HANDLED }
-                else -> if (onSnapDown()) InputResult.HANDLED else InputResult.UNHANDLED
-            }
-        }
+        override fun onUp(): InputResult = vertical(-1, onSnapUp)
+
+        override fun onDown(): InputResult = vertical(1, onSnapDown)
+
+        override fun onRightStickUp(): InputResult = vertical(-1) { onScrollContent(-1) }
+
+        override fun onRightStickDown(): InputResult = vertical(1) { onScrollContent(1) }
 
         override fun onLeft(): InputResult {
             routeSnapshotInput { it.onLeft() }?.let { return it }

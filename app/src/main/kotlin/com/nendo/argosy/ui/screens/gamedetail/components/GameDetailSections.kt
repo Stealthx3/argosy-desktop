@@ -445,14 +445,27 @@ fun ActionButtons(
     }
 }
 
+private const val DESCRIPTION_PAGE_FRACTION = 0.75f
+
+internal fun descriptionScrollTarget(scroll: Int, viewport: Int, top: Int, height: Int, direction: Int): Int? {
+    if (viewport <= 0 || height <= 0) return null
+    val step = (viewport * DESCRIPTION_PAGE_FRACTION).toInt()
+    return if (direction > 0) {
+        val endInView = top + height - viewport
+        if (scroll >= endInView) null else minOf(scroll + step, endInView)
+    } else {
+        if (scroll <= top) null else maxOf(scroll - step, top)
+    }
+}
+
 @Composable
 fun DescriptionSection(
     description: String,
-    onPositioned: (Int) -> Unit
+    onPositioned: (top: Int, height: Int) -> Unit
 ) {
     Column(
         modifier = Modifier.onGloballyPositioned { coords ->
-            onPositioned(coords.positionInParent().y.toInt())
+            onPositioned(coords.positionInParent().y.toInt(), coords.size.height)
         }
     ) {
         Text(
@@ -464,9 +477,7 @@ fun DescriptionSection(
         Text(
             text = description,
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
-            maxLines = 6,
-            overflow = TextOverflow.Ellipsis
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
         )
     }
 }

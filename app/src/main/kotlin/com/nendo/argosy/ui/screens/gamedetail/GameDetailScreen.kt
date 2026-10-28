@@ -2,7 +2,9 @@ package com.nendo.argosy.ui.screens.gamedetail
 
 import android.content.Intent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ScrollState
@@ -48,6 +50,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -66,6 +69,7 @@ import com.nendo.argosy.ui.components.FooterSpacer
 import com.nendo.argosy.ui.components.InputButton
 import com.nendo.argosy.ui.components.SyncOverlay
 import com.nendo.argosy.ui.input.LocalInputDispatcher
+import com.nendo.argosy.ui.input.RightStickStepper
 import com.nendo.argosy.ui.input.ModalInputEffect
 import com.nendo.argosy.ui.navigation.Screen
 import com.nendo.argosy.ui.screens.gamedetail.components.AchievementListOverlay
@@ -73,6 +77,7 @@ import com.nendo.argosy.ui.screens.gamedetail.components.AchievementsSection
 import com.nendo.argosy.ui.screens.gamedetail.components.ExpandedHeader
 import com.nendo.argosy.ui.screens.gamedetail.components.StickyCollapsedHeader
 import com.nendo.argosy.ui.screens.gamedetail.components.DescriptionSection
+import com.nendo.argosy.ui.screens.gamedetail.components.descriptionScrollTarget
 import com.nendo.argosy.ui.screens.gamedetail.components.GameDetailMenu
 import com.nendo.argosy.ui.screens.gamedetail.components.GameDetailMenuState
 import com.nendo.argosy.ui.screens.gamedetail.components.GameDetailSkeleton
@@ -118,6 +123,8 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+
+private const val CONTENT_SCROLL_FRACTION = 0.2f
 
 @Composable
 fun GameDetailScreen(
@@ -180,6 +187,7 @@ fun GameDetailScreen(
     val relatedListState = rememberLazyListState()
 
     var descriptionTopY by remember { mutableIntStateOf(0) }
+    var descriptionHeight by remember { mutableIntStateOf(0) }
     var screenshotTopY by remember { mutableIntStateOf(0) }
     var reviewsTopY by remember { mutableIntStateOf(0) }
     var achievementTopY by remember { mutableIntStateOf(0) }
@@ -196,16 +204,53 @@ fun GameDetailScreen(
         relatedListState.scrollToItem(0)
     }
 
+    val descriptionEndSlack = with(LocalDensity.current) { Dimens.spacingXl.roundToPx() }
     val inputHandler = remember(onBack) {
         viewModel.createInputHandler(
             onBack = onBack,
             onNavigateToPlatformSettings = onNavigateToPlatformSettings,
             onSnapUp = {
-                viewModel.moveMenuFocus(-1)
+                val current = viewModel.uiState.value
+                val onDescription = menuLayout.itemAtFocusIndex(current.menuFocusIndex, current.menuLayoutState) == MenuItem.Description
+                val target = descriptionScrollTarget(
+                    scroll = scrollState.value,
+                    viewport = scrollState.viewportSize,
+                    top = descriptionTopY,
+                    height = descriptionHeight + descriptionEndSlack,
+                    direction = -1
+                )
+                if (onDescription && target != null) {
+                    coroutineScope.launch { scrollState.animateScrollTo(target) }
+                } else {
+                    viewModel.moveMenuFocus(-1)
+                }
                 true
             },
             onSnapDown = {
-                viewModel.moveMenuFocus(1)
+                val current = viewModel.uiState.value
+                val onDescription = menuLayout.itemAtFocusIndex(current.menuFocusIndex, current.menuLayoutState) == MenuItem.Description
+                val target = descriptionScrollTarget(
+                    scroll = scrollState.value,
+                    viewport = scrollState.viewportSize,
+                    top = descriptionTopY,
+                    height = descriptionHeight + descriptionEndSlack,
+                    direction = 1
+                )
+                if (onDescription && target != null) {
+                    coroutineScope.launch { scrollState.animateScrollTo(target) }
+                } else {
+                    viewModel.moveMenuFocus(1)
+                }
+                true
+            },
+            onScrollContent = { direction ->
+                val step = scrollState.viewportSize * CONTENT_SCROLL_FRACTION * direction
+                coroutineScope.launch {
+                    scrollState.animateScrollBy(
+                        step,
+                        tween(RightStickStepper.STEP_INTERVAL_MS.toInt(), easing = LinearEasing)
+                    )
+                }
                 true
             },
             onSectionLeft = {
@@ -331,7 +376,10 @@ fun GameDetailScreen(
                 screenshotListState = screenshotListState,
                 achievementListState = achievementListState,
                 relatedListState = relatedListState,
-                onDescriptionPositioned = { descriptionTopY = it },
+                onDescriptionPositioned = { top, height ->
+                    descriptionTopY = top
+                    descriptionHeight = height
+                },
                 onScreenshotPositioned = { screenshotTopY = it },
                 onReviewsPositioned = { reviewsTopY = it },
                 onAchievementPositioned = { achievementTopY = it },
@@ -366,7 +414,7 @@ private fun GameDetailContent(
     screenshotListState: LazyListState,
     achievementListState: LazyListState,
     relatedListState: LazyListState,
-    onDescriptionPositioned: (Int) -> Unit,
+    onDescriptionPositioned: (top: Int, height: Int) -> Unit,
     onScreenshotPositioned: (Int) -> Unit,
     onReviewsPositioned: (Int) -> Unit,
     onAchievementPositioned: (Int) -> Unit,
@@ -608,9 +656,9 @@ private fun GameDetailContent(
                             if (!game.description.isNullOrBlank()) {
                                 DescriptionSection(
                                     description = game.description,
-                                    onPositioned = { y ->
+                                    onPositioned = { y, height ->
                                         descriptionTopY = y
-                                        onDescriptionPositioned(y)
+                                        onDescriptionPositioned(y, height)
                                     }
                                 )
                                 Spacer(modifier = Modifier.height(Dimens.spacingLg))
@@ -753,6 +801,7 @@ private fun GameDetailContent(
                 val viewReviewsHint = stringResource(R.string.gamedetail_footer_view_reviews)
                 val openRelatedHint = stringResource(R.string.gamedetail_footer_open_related)
                 val backHint = stringResource(R.string.gamedetail_footer_back)
+                val scrollContentHint = stringResource(R.string.gamedetail_footer_scroll)
                 val newGameHint = stringResource(R.string.gamedetail_footer_new_game)
                 val shortcutMakePublicHint =
                     stringResource(R.string.gamedetail_footer_shortcut_make_public)
@@ -765,6 +814,7 @@ private fun GameDetailContent(
                 FooterHints(
                     hints = buildList {
                         add(InputButton.LB_RB to prevNextGameHint)
+                        add(InputButton.RIGHT_STICK_VERTICAL to scrollContentHint)
                         if (focusedItem == MenuItem.Screenshots || focusedItem == MenuItem.Achievements || focusedItem == MenuItem.RelatedGames) {
                             add(InputButton.DPAD_HORIZONTAL to sectionScrollHint)
                         }
