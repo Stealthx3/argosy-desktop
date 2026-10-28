@@ -43,6 +43,7 @@ class SaveSyncOrchestrator @Inject constructor(
     private val saveCacheDao: SaveCacheDao,
     private val saveCacheManager: dagger.Lazy<SaveCacheManager>,
     private val activeSaveRepository: ActiveSaveRepository,
+    private val serverSaveGate: ServerSaveGate,
     private val pendingSyncQueueDao: PendingSyncQueueDao,
     private val gameDao: GameDao,
     private val emulatorResolver: EmulatorResolver,
@@ -501,6 +502,14 @@ class SaveSyncOrchestrator @Inject constructor(
             val game = gameDao.getById(entity.gameId) ?: return@mapNotNull null
             if (game.localPath == null) {
                 Logger.debug(TAG, "downloadPendingServerSaves: skipping non-installed gameId=${entity.gameId} silently")
+                return@mapNotNull null
+            }
+            val serverTime = entity.serverUpdatedAt ?: entity.localUpdatedAt
+            serverSaveGate.holdFor(entity.gameId, game.localPath, entity.channelName, serverTime)?.let { hold ->
+                Logger.info(TAG, "[SaveSync] DOWNLOAD gameId=${entity.gameId} channel=${entity.channelName} | Not placed on disk: ${hold.reason}")
+                if (hold is ServerSaveHold.Superseded && entity.syncStatus == SaveSyncEntity.STATUS_SERVER_NEWER) {
+                    saveSyncDao.upsert(entity.copy(syncStatus = SaveSyncEntity.STATUS_SYNCED))
+                }
                 return@mapNotNull null
             }
             if (localMovedSinceUpload(entity, entity.gameId, entity.emulatorId)) {

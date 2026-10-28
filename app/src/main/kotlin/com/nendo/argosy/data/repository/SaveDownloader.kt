@@ -755,8 +755,7 @@ class SaveDownloader @Inject constructor(
 
             val effectiveChannelName = channelName ?: syncEntity.channelName
             val romBaseName = game.localPath?.let { File(it).nameWithoutExtension }
-            val isLatestSave = SaveSyncApiClient.syncKeyOf(effectiveChannelName) == SaveSyncApiClient.AUTOSAVE_SLOT_NAME ||
-                romBaseName != null && effectiveChannelName.equals(romBaseName, ignoreCase = true)
+            val isLatestSave = SaveSyncApiClient.isLatestBucket(effectiveChannelName, romBaseName)
 
             val cacheChannelName = if (isLatestSave) null else effectiveChannelName
             val cacheIsLocked = !isLatestSave

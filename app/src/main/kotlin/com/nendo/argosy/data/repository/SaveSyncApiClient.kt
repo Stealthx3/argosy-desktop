@@ -601,6 +601,14 @@ class SaveSyncApiClient @Inject constructor(
         fun isAutosaveChannel(channelName: String?): Boolean =
             channelName == null || channelName.equals(AUTOSAVE_SLOT_NAME, ignoreCase = true)
 
+        /**
+         * Whether a server slot fills the latest-save bucket: the autosave slot itself, or a slot
+         * named after the ROM, which is how earlier builds uploaded the latest save.
+         */
+        fun isLatestBucket(channelName: String?, romBaseName: String?): Boolean =
+            syncKeyOf(channelName) == AUTOSAVE_SLOT_NAME ||
+                romBaseName != null && channelName.equals(romBaseName, ignoreCase = true)
+
         fun syncKeyOf(channelName: String?): String = when {
             channelName == null -> AUTOSAVE_SLOT_NAME
             channelName.equals(AUTOSAVE_SLOT_NAME, ignoreCase = true) -> AUTOSAVE_SLOT_NAME

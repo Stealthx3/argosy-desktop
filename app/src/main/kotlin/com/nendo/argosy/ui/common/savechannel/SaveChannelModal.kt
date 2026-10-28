@@ -592,19 +592,7 @@ private fun SlotRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
-            .background(
-                if (isSelected) MaterialTheme.colorScheme.secondaryContainer
-                    .copy(alpha = 0.6f)
-                else Color.Transparent
-            )
-            .then(
-                if (isSelected) Modifier.border(
-                    width = 2.dp,
-                    color = MaterialTheme.colorScheme.secondary,
-                    shape = RoundedCornerShape(8.dp)
-                ) else Modifier
-            )
+            .saveRowFocus(isSelected)
             .clickableNoFocus(onClick = onClick)
             .padding(horizontal = 12.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -646,19 +634,7 @@ private fun NewSlotRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
-            .background(
-                if (isSelected) MaterialTheme.colorScheme.secondaryContainer
-                    .copy(alpha = 0.6f)
-                else Color.Transparent
-            )
-            .then(
-                if (isSelected) Modifier.border(
-                    width = 2.dp,
-                    color = MaterialTheme.colorScheme.secondary,
-                    shape = RoundedCornerShape(8.dp)
-                ) else Modifier
-            )
+            .saveRowFocus(isSelected)
             .clickableNoFocus(onClick = onClick)
             .padding(horizontal = 12.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -689,20 +665,7 @@ private fun MigrationSlotRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
-            .background(
-                if (isSelected) MaterialTheme.colorScheme.secondaryContainer
-                    .copy(alpha = 0.4f)
-                else Color.Transparent
-            )
-            .then(
-                if (isSelected) Modifier.border(
-                    width = 2.dp,
-                    color = MaterialTheme.colorScheme.secondary
-                        .copy(alpha = 0.5f),
-                    shape = RoundedCornerShape(8.dp)
-                ) else Modifier
-            )
+            .saveRowFocus(isSelected)
             .clickableNoFocus(onClick = onClick)
             .padding(horizontal = 12.dp, vertical = 10.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -743,19 +706,7 @@ private fun HistoryRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
-            .background(
-                if (isSelected) MaterialTheme.colorScheme.secondaryContainer
-                    .copy(alpha = 0.6f)
-                else Color.Transparent
-            )
-            .then(
-                if (isSelected) Modifier.border(
-                    width = 2.dp,
-                    color = MaterialTheme.colorScheme.secondary,
-                    shape = RoundedCornerShape(8.dp)
-                ) else Modifier
-            )
+            .saveRowFocus(isSelected)
             .clickableNoFocus(onClick = onClick)
             .padding(horizontal = 12.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -1154,18 +1105,7 @@ private fun SlotPickerRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(Dimens.radiusMd))
-            .background(
-                if (isSelected) MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.4f)
-                else Color.Transparent
-            )
-            .then(
-                if (isSelected) Modifier.border(
-                    width = Dimens.borderMedium,
-                    color = MaterialTheme.colorScheme.secondary,
-                    shape = RoundedCornerShape(Dimens.radiusMd)
-                ) else Modifier
-            )
+            .saveRowFocus(isSelected)
             .clickableNoFocus(onClick = onClick)
             .padding(horizontal = Dimens.spacingMd, vertical = Dimens.spacingSm),
         horizontalArrangement = Arrangement.SpaceBetween,

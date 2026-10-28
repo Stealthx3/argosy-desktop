@@ -302,9 +302,10 @@ fun ArgosyApp(
         }
     }
     val currentHandleDeepLink by rememberUpdatedState(handleDeepLink)
-    LaunchedEffect(dsm) {
+    val inputLifecycle = androidx.lifecycle.compose.LocalLifecycleOwner.current.lifecycle
+    LaunchedEffect(dsm, inputLifecycle) {
         val manager = dsm ?: return@LaunchedEffect
-        manager.pendingDeepLink.filterNotNull().collect { uri ->
+        manager.pendingDeepLink.flowWithLifecycle(inputLifecycle).filterNotNull().collect { uri ->
             if (manager.consumeDeepLink(uri)) currentHandleDeepLink(uri)
         }
     }
@@ -904,7 +905,6 @@ fun ArgosyApp(
         inputDispatcher.blockInputFor(Motion.transitionDebounceMs)
     }
 
-    val inputLifecycle = androidx.lifecycle.compose.LocalLifecycleOwner.current.lifecycle
     LaunchedEffect(inputLifecycle) {
         viewModel.gamepadInputHandler.eventFlow().flowWithLifecycle(inputLifecycle).collect { input ->            val result = inputDispatcher.dispatch(input)
             val event = input.event

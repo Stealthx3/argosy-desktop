@@ -932,7 +932,7 @@ class DualScreenManager(
         com.nendo.argosy.ui.dualscreen.DisplayHostRegistry<CompanionHost>()
 
     fun registerCompanionHost(displayId: Int, host: CompanionHost) {
-        companionHosts.register(displayId, host)
+        companionHosts.register(displayId, host)?.finishCompanion()
     }
 
     fun unregisterCompanionHost(displayId: Int, host: CompanionHost) {

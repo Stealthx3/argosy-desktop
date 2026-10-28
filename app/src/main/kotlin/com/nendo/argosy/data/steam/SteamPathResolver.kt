@@ -60,10 +60,8 @@ class SteamPathResolver @Inject constructor(
             val packageDir = "$root/Android/data/$GN_PACKAGE"
             val basePath = "$packageDir/files"
 
-            if (File(packageDir).exists()) {
+            if (File(packageDir).exists() || androidDataAccessor.exists(packageDir)) {
                 results += basePath
-            } else if (androidDataAccessor.exists(packageDir)) {
-                results += androidDataAccessor.transformPath(basePath)
             }
         }
         return results.distinct()

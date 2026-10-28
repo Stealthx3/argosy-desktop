@@ -48,6 +48,7 @@ import com.nendo.argosy.util.LauncherSystemBars
 import com.nendo.argosy.util.installImmersiveMode
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -153,6 +154,7 @@ class SecondaryHomeActivity :
         } else {
             recoverThroughArgosyActivity()
         }
+        recreateWhenManagerReplaced()
 
         setContent {
             val themeState = remember { mutableStateOf(ThemeState()) }
@@ -292,12 +294,6 @@ class SecondaryHomeActivity :
         if (releaseUnsupportedDisplay()) return
         systemBars.apply()
         if (!::dsm.isInitialized) return
-        val currentDsm = DualScreenManagerHolder.instance
-        if (currentDsm != null && dsm !== currentDsm) {
-            android.util.Log.w("SecondaryHome", "DSM stale, reconnecting to new instance")
-            dsm = currentDsm
-            initializeCompanion()
-        }
         dsm.notifyUserActivity("companionResume")
         syncFromSessionStore()
         dsm.onCompanionResumed()
@@ -781,6 +777,17 @@ class SecondaryHomeActivity :
 
     private fun hostDisplayId(): Int =
         androidx.core.content.ContextCompat.getDisplayOrDefault(this).displayId
+
+    private fun recreateWhenManagerReplaced() {
+        lifecycleScope.launch {
+            DualScreenManagerHolder.instanceFlow.filterNotNull().collect { current ->
+                if (::dsm.isInitialized && current !== dsm) {
+                    android.util.Log.w("SecondaryHome", "Dual-screen manager replaced, recreating companion")
+                    recreate()
+                }
+            }
+        }
+    }
 
     private fun initializeCompanion() {
         registerDisplayListener()

@@ -863,7 +863,7 @@ private class Ps2FolderHandler(
         if (!ownerDir.exists() && !ownerDir.mkdirs()) return
 
         loose.forEach { entry ->
-            val moved = runCatching { File(entry.path).renameTo(File(ownerDir, entry.name)) }.getOrDefault(false)
+            val moved = runCatching { fal.getTransformedFile(entry.path).renameTo(File(ownerDir, entry.name)) }.getOrDefault(false)
             Logger.warn(
                 TAG,
                 "repairLooseCardEntries: relocating a stray card entry | file=${entry.name}, into=$owner, moved=$moved"

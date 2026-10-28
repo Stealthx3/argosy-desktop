@@ -1,7 +1,6 @@
 package com.nendo.argosy.ui.common.savechannel
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -50,19 +49,7 @@ fun StateSlotRow(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
-            .background(
-                if (isSelected) MaterialTheme.colorScheme.secondaryContainer
-                    .copy(alpha = 0.6f)
-                else Color.Transparent
-            )
-            .then(
-                if (isSelected) Modifier.border(
-                    width = 2.dp,
-                    color = MaterialTheme.colorScheme.secondary,
-                    shape = RoundedCornerShape(8.dp)
-                ) else Modifier
-            )
+            .saveRowFocus(isSelected)
             .then(clickModifier)
             .padding(horizontal = 12.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,

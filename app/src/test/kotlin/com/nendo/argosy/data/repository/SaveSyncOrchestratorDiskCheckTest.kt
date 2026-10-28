@@ -42,6 +42,7 @@ class SaveSyncOrchestratorDiskCheckTest {
         saveCacheDao = saveCacheDao,
         saveCacheManager = { saveCacheManager },
         activeSaveRepository = activeSaveRepository,
+        serverSaveGate = ServerSaveGate(activeSaveRepository),
         pendingSyncQueueDao = mockk(relaxed = true),
         gameDao = gameDao,
         emulatorResolver = mockk(relaxed = true),
