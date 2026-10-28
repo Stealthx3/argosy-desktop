@@ -1,6 +1,7 @@
 package com.nendo.argosy.data.sync.platform
 
 import android.content.Context
+import com.nendo.argosy.data.emulator.SavePathConfig
 import com.nendo.argosy.data.emulator.SavePathRegistry
 import com.nendo.argosy.data.storage.FileAccessLayer
 import com.nendo.argosy.data.sync.SaveArchiver
@@ -19,6 +20,9 @@ class XboxSaveHandler(
     fal: FileAccessLayer,
     saveArchiver: SaveArchiver
 ) : FolderSaveHandler(context, fal, saveArchiver, PLATFORM_SLUG, TAG) {
+
+    override fun resolveBasePath(config: SavePathConfig, basePathOverride: String?): String? =
+        super.resolveBasePath(config, null)
 
     override fun findSaveFolderBySaveId(basePath: String, saveId: String): String? {
         val staged = stagingDir(saveId)
