@@ -84,6 +84,8 @@
     <string name="notif_steam_settings_library_reset">已移除%1$d款Steam遊戲</string>
     <string name="notif_steam_settings_game_added">已新增：%1$s</string>
     <string name="notif_steam_settings_library_synced">已新增%1$d款Steam遊戲</string>
+    <string name="notif_steam_settings_metadata_refreshed">已重新整理%1$d款Steam遊戲</string>
+    <string name="notif_steam_settings_metadata_refresh_failed">無法重新整理Steam中繼資料：%1$s</string>
 
     <string name="notif_jellyfin_settings_sync_title">正在同步媒體</string>
     <string name="notif_jellyfin_settings_sync_starting">開始中&#8230;</string>

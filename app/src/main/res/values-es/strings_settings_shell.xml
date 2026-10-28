@@ -103,7 +103,6 @@
     <string name="settings_shell_header_accounts">CUENTAS</string>
     <string name="settings_shell_header_saves">GUARDADOS</string>
     <string name="settings_shell_header_sync_settings">AJUSTES DE SINCRONIZACIÓN</string>
-    <string name="settings_shell_header_steam">STEAM (EXPERIMENTAL)</string>
     <string name="settings_shell_header_storage">ALMACENAMIENTO</string>
     <string name="settings_shell_header_storage_games">ALMACENAMIENTO DE JUEGOS</string>
     <string name="settings_shell_header_storage_media">ALMACENAMIENTO MULTIMEDIA</string>

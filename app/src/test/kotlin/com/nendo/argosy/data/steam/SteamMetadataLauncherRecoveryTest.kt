@@ -110,7 +110,7 @@ class SteamMetadataLauncherRecoveryTest {
     @Test
     fun `store enrichment cannot restore a pin retired during its request`() = runTest {
         val appData = mockk<SteamAppData> {
-            every { shortDescription } returns "Store description"
+            every { plainShortDescription } returns "Store description"
             every { genres } returns listOf(SteamGenre("1", "Action"))
             every { metacritic } returns SteamMetacritic(91, null)
             every { screenshots } returns emptyList()

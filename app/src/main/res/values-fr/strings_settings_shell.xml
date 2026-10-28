@@ -103,7 +103,6 @@
     <string name="settings_shell_header_accounts">COMPTES</string>
     <string name="settings_shell_header_saves">SAUVEGARDES</string>
     <string name="settings_shell_header_sync_settings">PARAMÈTRES DE SYNCHRO</string>
-    <string name="settings_shell_header_steam">STEAM (EXPÉRIMENTAL)</string>
     <string name="settings_shell_header_storage">STOCKAGE</string>
     <string name="settings_shell_header_storage_games">STOCKAGE DES JEUX</string>
     <string name="settings_shell_header_storage_media">STOCKAGE MULTIMÉDIA</string>

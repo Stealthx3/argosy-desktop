@@ -111,6 +111,7 @@ class SteamLibraryManager @Inject constructor(
 
     private var syncPhase = SyncPhase.IDLE
     private var picsFailures = 0
+    private var phaseTotal = 0
     private val pendingPackageIds = mutableSetOf<Int>()
     private val pendingAppIds = mutableSetOf<Int>()
     private val packageToAppIds = mutableMapOf<Int, List<Int>>()
@@ -258,7 +259,8 @@ class SteamLibraryManager @Inject constructor(
     private suspend fun requestPackageInfo(packageIds: List<Int>) {
         val apps = steamApps ?: return endSyncDisconnected()
 
-        _syncState.value = LibrarySyncState.FetchingPackages(0, packageIds.size)
+        phaseTotal = packageIds.size
+        _syncState.value = LibrarySyncState.FetchingPackages(0, phaseTotal)
 
         val batches = packageIds.chunked(PACKAGE_BATCH_SIZE)
         for ((index, batch) in batches.withIndex()) {
@@ -345,10 +347,7 @@ class SteamLibraryManager @Inject constructor(
                 }
 
                 pendingPackageIds.remove(packageId)
-
-                val processed = packageToAppIds.size
-                val total = processed + pendingPackageIds.size
-                _syncState.value = LibrarySyncState.FetchingPackages(processed, total)
+                _syncState.value = LibrarySyncState.FetchingPackages(phaseTotal - pendingPackageIds.size, phaseTotal)
 
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to process package $packageId", e)
@@ -384,7 +383,8 @@ class SteamLibraryManager @Inject constructor(
         val apps = steamApps ?: return endSyncDisconnected()
 
         Log.d(TAG, "Requesting app info for ${appIds.size} apps")
-        _syncState.value = LibrarySyncState.FetchingApps(0, appIds.size)
+        phaseTotal = appIds.size
+        _syncState.value = LibrarySyncState.FetchingApps(0, phaseTotal)
 
         val batches = appIds.chunked(APP_BATCH_SIZE)
         for ((index, batch) in batches.withIndex()) {
@@ -426,10 +426,7 @@ class SteamLibraryManager @Inject constructor(
                 }
 
                 pendingAppIds.remove(appId)
-
-                val processed = gamesAdded + gamesUpdated
-                val total = processed + pendingAppIds.size
-                _syncState.value = LibrarySyncState.FetchingApps(processed, total)
+                _syncState.value = LibrarySyncState.FetchingApps(phaseTotal - pendingAppIds.size, phaseTotal)
 
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to process app $appId", e)

@@ -224,6 +224,10 @@
     <string name="notif_steam_settings_game_added">Added: %1$s</string>
     <!-- Notification after an automatic Steam library sync adds games. %1$d is the count. -->
     <string name="notif_steam_settings_library_synced">Added %1$d Steam games</string>
+    <!-- Notification after Refresh Metadata in Steam settings. %1$d is how many games were updated. -->
+    <string name="notif_steam_settings_metadata_refreshed">Refreshed %1$d Steam games</string>
+    <!-- Notification when Refresh Metadata in Steam settings fails. %1$s is the error. -->
+    <string name="notif_steam_settings_metadata_refresh_failed">Couldn\'t refresh Steam metadata: %1$s</string>
 
     <!-- Settings: Jellyfin media library sync (JellyfinSettingsDelegate). -->
 

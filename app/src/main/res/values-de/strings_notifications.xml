@@ -84,6 +84,8 @@
     <string name="notif_steam_settings_library_reset">%1$d Steam-Spiele entfernt</string>
     <string name="notif_steam_settings_game_added">Hinzugefügt: %1$s</string>
     <string name="notif_steam_settings_library_synced">%1$d Steam-Spiele hinzugefügt</string>
+    <string name="notif_steam_settings_metadata_refreshed">%1$d Steam-Spiele aktualisiert</string>
+    <string name="notif_steam_settings_metadata_refresh_failed">Steam-Metadaten konnten nicht aktualisiert werden: %1$s</string>
 
     <string name="notif_jellyfin_settings_sync_title">Medien werden synchronisiert</string>
     <string name="notif_jellyfin_settings_sync_starting">Wird gestartet…</string>

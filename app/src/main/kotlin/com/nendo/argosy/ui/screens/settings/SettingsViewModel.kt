@@ -1095,12 +1095,11 @@ class SettingsViewModel @Inject constructor(
     fun confirmAddSteamGame() = steamDelegate.confirmAddSteamGame(context, viewModelScope)
 
     fun installSteamLauncher(emulatorId: String) = steamDelegate.installSteamLauncher(emulatorId, viewModelScope)
-    fun refreshSteamMetadata() {}
-    fun moveSteamVariantFocus(delta: Int) {}
-    fun confirmSteamVariantSelection() {}
-    fun dismissSteamVariantPicker() {}
-    @Suppress("UNUSED_PARAMETER")
-    fun handleSteamVariantItemTap(index: Int) {}
+    fun refreshSteamMetadata() = steamDelegate.refreshMetadata(viewModelScope)
+    fun moveSteamVariantFocus(delta: Int) = steamDelegate.moveVariantFocus(delta)
+    fun confirmSteamVariantSelection() = steamDelegate.confirmVariant()
+    fun dismissSteamVariantPicker() = steamDelegate.dismissVariantPicker()
+    fun handleSteamVariantItemTap(index: Int) = steamDelegate.selectVariantAt(index)
     fun checkRommConnection() = serverDelegate.checkRommConnection(viewModelScope)
 
     fun navigateBack(): Boolean = routeNavigateBack(this)

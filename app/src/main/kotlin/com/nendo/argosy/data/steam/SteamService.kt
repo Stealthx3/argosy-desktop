@@ -84,6 +84,7 @@ class SteamService : Service() {
     private val subscriptions = mutableListOf<Closeable>()
     private var isRunning = false
     private var reconnectAttempt = 0
+    private var javaSteamLogging = false
 
     inner class LocalBinder : Binder() {
         fun getService(): SteamService = this@SteamService
@@ -227,6 +228,12 @@ class SteamService : Service() {
     }
 
     private fun initializeSteamClient() {
+        if (com.nendo.argosy.BuildConfig.DEBUG && !javaSteamLogging) {
+            javaSteamLogging = true
+            `in`.dragonbra.javasteam.util.log.LogManager.addListener(
+                `in`.dragonbra.javasteam.util.log.DefaultLogListener()
+            )
+        }
         val httpClient = OkHttpClient.Builder()
             .connectTimeout(10, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS)

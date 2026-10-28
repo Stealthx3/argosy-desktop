@@ -105,7 +105,6 @@
     <string name="settings_shell_header_accounts">АККАУНТЫ</string>
     <string name="settings_shell_header_saves">СОХРАНЕНИЯ</string>
     <string name="settings_shell_header_sync_settings">НАСТРОЙКИ СИНХРОНИЗАЦИИ</string>
-    <string name="settings_shell_header_steam">STEAM (ЭКСПЕРИМЕНТАЛЬНО)</string>
     <string name="settings_shell_header_storage">ХРАНИЛИЩЕ</string>
     <string name="settings_shell_header_storage_games">ХРАНИЛИЩЕ ИГР</string>
     <string name="settings_shell_header_storage_media">ХРАНИЛИЩЕ МЕДИА</string>

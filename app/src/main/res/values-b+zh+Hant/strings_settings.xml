@@ -1084,7 +1084,7 @@
     <string name="settings_steam_sync_idle">從Steam同步已擁有的遊戲</string>
     <string name="settings_steam_sync_licenses">正在同步授權&#8230;</string>
     <string name="settings_steam_sync_packages">正在取得套件（%1$d／%2$d）&#8230;</string>
-    <string name="settings_steam_sync_apps">正在取得遊戲（%1$d／%2$d）&#8230;</string>
+    <string name="settings_steam_sync_apps">正在檢查應用程式（%1$d／%2$d）&#8230;</string>
     <string name="settings_steam_sync_complete">已新增%1$d款，已更新%2$d款</string>
     <string name="settings_steam_sync_error">錯誤：%1$s</string>
 

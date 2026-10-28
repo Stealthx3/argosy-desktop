@@ -92,7 +92,6 @@
     <string name="settings_shell_header_accounts">账户</string>
     <string name="settings_shell_header_saves">存档</string>
     <string name="settings_shell_header_sync_settings">同步设置</string>
-    <string name="settings_shell_header_steam">STEAM (实验性)</string>
     <string name="settings_shell_header_storage">存储</string>
     <string name="settings_shell_header_storage_games">游戏存储</string>
     <string name="settings_shell_header_storage_media">媒体存储</string>

@@ -138,9 +138,7 @@
     <string name="settings_shell_header_romm" translatable="false">ROMM</string>
     <string name="settings_shell_header_saves">SAVES</string>
     <string name="settings_shell_header_sync_settings">SYNC SETTINGS</string>
-    <!-- "Steam" is Valve's proprietary storefront name; keep it as-is even if you translate the
-         rest of the heading. -->
-    <string name="settings_shell_header_steam">STEAM (EXPERIMENTAL)</string>
+    <string name="settings_shell_header_steam" translatable="false">STEAM</string>
     <!-- Proper name of the media server this launcher talks to; never translated. -->
     <string name="settings_shell_header_jellyfin" translatable="false">JELLYFIN</string>
     <!-- Proper name of the outside achievements service; never translated. -->

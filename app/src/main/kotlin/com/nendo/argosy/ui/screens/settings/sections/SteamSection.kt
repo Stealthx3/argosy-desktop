@@ -410,7 +410,7 @@ fun SteamSection(uiState: SettingsUiState, viewModel: SettingsViewModel) {
                 SteamItem.RefreshMetadata -> ActionPreference(
                     icon = Icons.Default.Sync,
                     title = stringResource(R.string.settings_steam_refresh_metadata_title),
-                    subtitle = if (steam.isSyncing && steam.syncingLauncher == "refresh") {
+                    subtitle = if (steam.isSyncing && steam.syncingLauncher == com.nendo.argosy.ui.screens.settings.delegates.REFRESH_SYNC_KEY) {
                         stringResource(R.string.settings_steam_refresh_metadata_busy)
                     } else {
                         stringResource(R.string.settings_steam_refresh_metadata_subtitle)

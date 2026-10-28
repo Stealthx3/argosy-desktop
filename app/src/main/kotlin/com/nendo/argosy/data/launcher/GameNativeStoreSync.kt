@@ -392,7 +392,7 @@ class GameNativeStoreSync @Inject constructor(
             title = name,
             coverUrl = "https://steamcdn-a.akamaihd.net/steam/apps/${match.id}/library_600x900.jpg",
             backgroundUrl = "https://steamcdn-a.akamaihd.net/steam/apps/${match.id}/library_hero.jpg",
-            description = details?.shortDescription,
+            description = details?.plainShortDescription,
             genre = details?.genres?.mapNotNull { it.description }?.joinToString(", ")?.takeIf { it.isNotBlank() },
             screenshotUrls = screenshots
         )

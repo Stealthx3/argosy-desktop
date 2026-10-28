@@ -1256,7 +1256,7 @@
     <string name="settings_steam_sync_idle">Синхронизировать купленные игры из Steam</string>
     <string name="settings_steam_sync_licenses">Синхронизация лицензий...</string>
     <string name="settings_steam_sync_packages">Получение пакетов (%1$d/%2$d)...</string>
-    <string name="settings_steam_sync_apps">Получение игр (%1$d/%2$d)...</string>
+    <string name="settings_steam_sync_apps">Проверка приложений (%1$d/%2$d)...</string>
     <string name="settings_steam_sync_complete">Добавлено %1$d, обновлено %2$d</string>
     <string name="settings_steam_sync_error">Ошибка: %1$s</string>
 

@@ -97,6 +97,8 @@
     <string name="notif_steam_settings_library_reset">%1$d Steam गेम हटाए गए</string>
     <string name="notif_steam_settings_game_added">जोड़ा गया: %1$s</string>
     <string name="notif_steam_settings_library_synced">%1$d Steam गेम जोड़े गए</string>
+    <string name="notif_steam_settings_metadata_refreshed">%1$d Steam गेम रीफ़्रेश किए गए</string>
+    <string name="notif_steam_settings_metadata_refresh_failed">Steam मेटाडेटा रीफ़्रेश नहीं हो सका: %1$s</string>
 
     <!-- Settings: Jellyfin media library sync (JellyfinSettingsDelegate). -->
 

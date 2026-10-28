@@ -53,6 +53,7 @@ import javax.inject.Inject
 
 private const val GN_PACKAGE = "app.gamenative"
 private const val QR_CONNECT_TIMEOUT_MS = 75_000L
+internal const val REFRESH_SYNC_KEY = "refresh"
 
 class SteamSettingsDelegate @Inject constructor(
     private val steamRepository: SteamRepository,
@@ -268,7 +269,9 @@ class SteamSettingsDelegate @Inject constructor(
 
     suspend fun refreshLauncherAvailability(context: Context) = withContext(Dispatchers.IO) {
         val gnInstalled = isGnInstalled(context)
-        val installedLaunchers = SteamLaunchers.getInstalled(context).map { launcher ->
+        val installed = SteamLaunchers.getInstalled(context)
+        val installedRegistryIds = installed.mapNotNull { it.registryId }.toSet()
+        val installedLaunchers = installed.map { launcher ->
             InstalledSteamLauncher(
                 packageName = launcher.packageName,
                 displayName = launcher.displayName,
@@ -278,7 +281,7 @@ class SteamSettingsDelegate @Inject constructor(
         }
         val installedPackages = installedLaunchers.map { it.packageName }.toSet()
         val notInstalledLaunchers = EmulatorRegistry.getForPlatform("steam")
-            .filter { it.packageName !in installedPackages }
+            .filter { it.packageName !in installedPackages && it.id !in installedRegistryIds }
             .map { def ->
                 NotInstalledSteamLauncher(
                     emulatorId = def.id,
@@ -391,6 +394,53 @@ class SteamSettingsDelegate @Inject constructor(
                     )
                 }
             }
+        }
+    }
+
+    fun moveVariantFocus(delta: Int) {
+        _state.update { state ->
+            val info = state.variantPickerInfo ?: return@update state
+            val maxIndex = (info.variants.size - 1).coerceAtLeast(0)
+            state.copy(variantPickerFocusIndex = (state.variantPickerFocusIndex + delta).coerceIn(0, maxIndex))
+        }
+    }
+
+    fun dismissVariantPicker() {
+        _state.update { it.copy(variantPickerInfo = null, variantPickerFocusIndex = 0) }
+    }
+
+    fun selectVariantAt(index: Int) {
+        _state.update { it.copy(variantPickerFocusIndex = index) }
+        confirmVariant()
+    }
+
+    fun confirmVariant() {
+        val state = _state.value
+        val info = state.variantPickerInfo ?: return
+        val variant = info.variants.getOrNull(state.variantPickerFocusIndex) ?: return
+        dismissVariantPicker()
+        _state.update { it.copy(downloadingLauncherId = info.emulatorId, downloadProgress = 0f) }
+        emulatorDownloadManager.downloadAndInstall(
+            emulatorId = info.emulatorId,
+            downloadUrl = variant.downloadUrl,
+            assetName = variant.assetName,
+            variant = variant.variant
+        )
+    }
+
+    fun refreshMetadata(scope: CoroutineScope) {
+        if (_state.value.isSyncing) return
+        _state.update { it.copy(isSyncing = true, syncingLauncher = REFRESH_SYNC_KEY) }
+        scope.launch {
+            when (val result = steamRepository.refreshAllMetadata()) {
+                is SteamResult.Success -> notificationManager.show(
+                    NotificationText.Res(R.string.notif_steam_settings_metadata_refreshed, listOf(result.data))
+                )
+                is SteamResult.Error -> notificationManager.showError(
+                    NotificationText.Res(R.string.notif_steam_settings_metadata_refresh_failed, listOf(result.message))
+                )
+            }
+            _state.update { it.copy(isSyncing = false, syncingLauncher = null) }
         }
     }
 

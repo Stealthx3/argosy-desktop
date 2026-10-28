@@ -101,7 +101,6 @@
     <string name="settings_shell_header_accounts">KONTEN</string>
     <string name="settings_shell_header_saves">SPIELSTÄNDE</string>
     <string name="settings_shell_header_sync_settings">SYNC-EINSTELLUNGEN</string>
-    <string name="settings_shell_header_steam">STEAM (EXPERIMENTELL)</string>
     <string name="settings_shell_header_storage">SPEICHER</string>
     <string name="settings_shell_header_storage_games">SPIELE-SPEICHER</string>
     <string name="settings_shell_header_storage_media">MEDIEN-SPEICHER</string>

@@ -2257,9 +2257,9 @@
     <!-- Second line while it reads the ownership records. %1$d is how many are done, %2$d how
          many there are. "Package" is Steam's word for a bundle of games. -->
     <string name="settings_steam_sync_packages">Fetching packages (%1$d/%2$d)...</string>
-    <!-- Second line while it reads the games. %1$d is how many are done, %2$d how many there
-         are. -->
-    <string name="settings_steam_sync_apps">Fetching games (%1$d/%2$d)...</string>
+    <!-- Second line while it checks every app the account owns (games, DLC and tools) for the
+         games to add. %1$d is how many are done, %2$d how many there are. -->
+    <string name="settings_steam_sync_apps">Checking apps (%1$d/%2$d)...</string>
     <!-- Second line when it finishes. %1$d is how many games were new, %2$d how many changed. -->
     <string name="settings_steam_sync_complete">Added %1$d, updated %2$d</string>
     <!-- Second line when it fails. %1$s is the reason. -->

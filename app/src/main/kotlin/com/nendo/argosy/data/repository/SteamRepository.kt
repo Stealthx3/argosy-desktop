@@ -124,7 +124,7 @@ class SteamRepository @Inject constructor(
                 publisher = appData.publishers?.firstOrNull(),
                 releaseYear = parseReleaseYear(appData.releaseDate?.date),
                 genre = appData.genres?.mapNotNull { it.description }?.joinToString(", "),
-                description = appData.shortDescription,
+                description = appData.plainShortDescription,
                 rating = appData.metacritic?.score?.toFloat(),
                 addedAt = Instant.now()
             )
@@ -173,7 +173,7 @@ class SteamRepository @Inject constructor(
 
             gameDao.updateSteamStoreMetadata(
                 gameId = game.id,
-                description = appData.shortDescription,
+                description = appData.plainShortDescription,
                 genre = storeGenres?.takeIf { it.isNotBlank() },
                 rating = appData.metacritic?.score?.toFloat()
             )
@@ -286,7 +286,7 @@ class SteamRepository @Inject constructor(
                             publisher = appData.publishers?.firstOrNull() ?: game.publisher,
                             releaseYear = parseReleaseYear(appData.releaseDate?.date) ?: game.releaseYear,
                             genre = appData.genres?.mapNotNull { it.description }?.joinToString(", ") ?: game.genre,
-                            description = appData.shortDescription ?: game.description,
+                            description = appData.plainShortDescription ?: game.description,
                             rating = appData.metacritic?.score?.toFloat() ?: game.rating
                         )
                     )

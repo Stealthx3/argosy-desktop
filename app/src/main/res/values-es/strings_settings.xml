@@ -1228,7 +1228,7 @@
     <string name="settings_steam_sync_idle">Sincronizar los juegos que posees en Steam</string>
     <string name="settings_steam_sync_licenses">Sincronizando licencias...</string>
     <string name="settings_steam_sync_packages">Obteniendo paquetes (%1$d/%2$d)...</string>
-    <string name="settings_steam_sync_apps">Obteniendo juegos (%1$d/%2$d)...</string>
+    <string name="settings_steam_sync_apps">Comprobando aplicaciones (%1$d/%2$d)...</string>
     <string name="settings_steam_sync_complete">%1$d añadidos, %2$d actualizados</string>
     <string name="settings_steam_sync_error">Error: %1$s</string>
 

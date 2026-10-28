@@ -1177,7 +1177,7 @@
     <string name="settings_steam_sync_idle">Steam से ओन किए गए गेम सिंक करें</string>
     <string name="settings_steam_sync_licenses">लाइसेंस सिंक हो रहे हैं...</string>
     <string name="settings_steam_sync_packages">पैकेज प्राप्त हो रहे हैं (%1$d/%2$d)...</string>
-    <string name="settings_steam_sync_apps">गेम प्राप्त हो रहे हैं (%1$d/%2$d)...</string>
+    <string name="settings_steam_sync_apps">ऐप्स जाँचे जा रहे हैं (%1$d/%2$d)...</string>
     <string name="settings_steam_sync_complete">%1$d जोड़े गए, %2$d अपडेट हुए</string>
     <string name="settings_steam_sync_error">त्रुटि: %1$s</string>
 

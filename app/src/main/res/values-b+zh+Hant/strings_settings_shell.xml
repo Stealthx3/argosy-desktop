@@ -99,7 +99,6 @@
     <string name="settings_shell_header_accounts">帳號</string>
     <string name="settings_shell_header_saves">存檔</string>
     <string name="settings_shell_header_sync_settings">同步設定</string>
-    <string name="settings_shell_header_steam">STEAM（實驗功能）</string>
     <string name="settings_shell_header_storage">儲存空間</string>
     <string name="settings_shell_header_storage_games">遊戲儲存空間</string>
     <string name="settings_shell_header_storage_media">媒體儲存空間</string>
