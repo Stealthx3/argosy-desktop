@@ -171,6 +171,8 @@ public:
     void setAudioVolume(float volume);
 
     void setShaderConfig(ShaderManager::Config shaderConfig);
+    void setShaderSensorState(const std::array<float, 9>& state);
+    int prepareShaderAndGetSensorUsage();
     void setFilterMode(int mode);
     void setIntegerScaling(bool enabled);
     void setTextureCrop(float left, float top, float right, float bottom);

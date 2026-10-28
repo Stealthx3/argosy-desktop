@@ -170,6 +170,7 @@ add_library(libretrodroid SHARED
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_sources(libretrodroid PRIVATE video_original_frame_test.cpp)
+    target_sources(libretrodroid PRIVATE shader_sensor_test.cpp)
 endif()
 
 # Support 16k pages for Android 15

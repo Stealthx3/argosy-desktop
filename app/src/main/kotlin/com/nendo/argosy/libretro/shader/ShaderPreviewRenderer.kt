@@ -134,6 +134,9 @@ class ShaderPreviewRenderer {
                 setUniformVec2(compiled.outputSizeHandle, outW, outH)
                 setUniformInt(compiled.frameCountHandle, 0)
                 setUniformInt(compiled.frameDirectionHandle, 1)
+                setUniformVec3(compiled.gyroscopeHandle, 0f, 0f, 0f)
+                setUniformVec3(compiled.accelerometerHandle, 0f, 0f, 0f)
+                setUniformVec3(compiled.accelerometerRestHandle, 0f, 0f, 0f)
                 setUniformFloat(compiled.screenDensityHandle, outH / texH)
                 if (compiled.mvpMatrixHandle != -1) {
                     GLES20.glUniformMatrix4fv(compiled.mvpMatrixHandle, 1, false, IDENTITY_MATRIX, 0)
@@ -317,6 +320,9 @@ class ShaderPreviewRenderer {
             outputSizeHandle = GLES20.glGetUniformLocation(program, "OutputSize"),
             frameCountHandle = GLES20.glGetUniformLocation(program, "FrameCount"),
             frameDirectionHandle = GLES20.glGetUniformLocation(program, "FrameDirection"),
+            gyroscopeHandle = GLES20.glGetUniformLocation(program, "Gyroscope"),
+            accelerometerHandle = GLES20.glGetUniformLocation(program, "Accelerometer"),
+            accelerometerRestHandle = GLES20.glGetUniformLocation(program, "AccelerometerRest"),
             screenDensityHandle = GLES20.glGetUniformLocation(program, "screenDensity"),
             mvpMatrixHandle = GLES20.glGetUniformLocation(program, "MVPMatrix")
         )
@@ -365,6 +371,10 @@ class ShaderPreviewRenderer {
         if (handle != -1) GLES20.glUniform2f(handle, x, y)
     }
 
+    private fun setUniformVec3(handle: Int, x: Float, y: Float, z: Float) {
+        if (handle != -1) GLES20.glUniform3f(handle, x, y, z)
+    }
+
     private fun setUniformInt(handle: Int, value: Int) {
         if (handle != -1) GLES20.glUniform1i(handle, value)
     }
@@ -387,6 +397,9 @@ class ShaderPreviewRenderer {
         val outputSizeHandle: Int,
         val frameCountHandle: Int,
         val frameDirectionHandle: Int,
+        val gyroscopeHandle: Int,
+        val accelerometerHandle: Int,
+        val accelerometerRestHandle: Int,
         val screenDensityHandle: Int,
         val mvpMatrixHandle: Int
     )

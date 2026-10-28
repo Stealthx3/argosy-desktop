@@ -1078,6 +1078,14 @@ void LibretroDroid::setAudioVolume(float volume) {
     }
 }
 
+void LibretroDroid::setShaderSensorState(const std::array<float, 9>& state) {
+    if (video) video->setShaderSensorState(state);
+}
+
+int LibretroDroid::prepareShaderAndGetSensorUsage() {
+    return video ? video->prepareShaderAndGetSensorUsage() : 0;
+}
+
 void LibretroDroid::setShaderConfig(ShaderManager::Config shaderConfig) {
     fragmentShaderConfig = std::move(shaderConfig);
     if (video) {
