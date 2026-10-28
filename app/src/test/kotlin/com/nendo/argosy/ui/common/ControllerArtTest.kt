@@ -48,4 +48,10 @@ class ControllerArtTest {
         assertEquals(ControllerKind.MODERN, kind(0x1234, 0x5678, "Generic Gamepad Wireless"))
         assertEquals(ControllerKind.MODERN, kind(0x1234, 0x5678, null))
     }
+
+    @Test
+    fun `a built-in pad shows the dual-screen handheld only with two built-in screens`() {
+        assertEquals(ControllerKind.HANDHELD, ControllerArt.handheldKind(builtInScreens = 1))
+        assertEquals(ControllerKind.DUAL_SCREEN, ControllerArt.handheldKind(builtInScreens = 2))
+    }
 }

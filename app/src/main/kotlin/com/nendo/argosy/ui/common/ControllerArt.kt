@@ -5,6 +5,7 @@ import android.view.InputDevice
 import androidx.annotation.DrawableRes
 import com.nendo.argosy.R
 import com.nendo.argosy.core.input.ControllerDetector
+import com.nendo.argosy.util.ScreenCatalog
 
 enum class ControllerKind(@DrawableRes val iconRes: Int) {
     MODERN(R.drawable.ic_pad_modern),
@@ -68,12 +69,17 @@ object ControllerArt {
 
     @Volatile private var table: Map<Int, String>? = null
 
-    fun kindOf(context: Context, device: InputDevice?, dualScreenDevice: Boolean): ControllerKind = when {
+    fun kindOf(context: Context, device: InputDevice?): ControllerKind = when {
         device == null -> ControllerKind.MODERN
-        ControllerDetector.isBuiltInPad(device) ->
-            if (dualScreenDevice) ControllerKind.DUAL_SCREEN else ControllerKind.HANDHELD
+        ControllerDetector.isBuiltInPad(device) -> handheldKind(builtInScreenCount(context))
         else -> externalKind(device.vendorId, device.productId, device.name, sdlTable(context))
     }
+
+    fun handheldKind(builtInScreens: Int): ControllerKind =
+        if (builtInScreens > 1) ControllerKind.DUAL_SCREEN else ControllerKind.HANDHELD
+
+    private fun builtInScreenCount(context: Context): Int =
+        ScreenCatalog(context.applicationContext).attachedScreens().count { it.builtIn }
 
     fun externalKind(vendorId: Int, productId: Int, name: String?, sdlTypes: Map<Int, String>): ControllerKind {
         if (vendorId == NINTENDO) nintendoProducts[productId]?.let { return it }

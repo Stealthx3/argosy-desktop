@@ -144,20 +144,35 @@ object ControllerDetector {
     }
 
     /**
-     * True for the handheld's own controls. Some firmware (Retroid) attaches them over an internal
-     * USB bus that reports external, so a pad named after the device's own brand also counts.
+     * True for the handheld's own controls. Handhelds that wire their pad over an internal USB bus
+     * (AYN, Retroid, AYANEO) report it external, so a handheld maker's vendor id, a pad named after
+     * the device's brand, or the brand's own pad name also counts.
      */
     fun isBuiltInPad(device: InputDevice): Boolean =
         (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q && !device.isExternal) ||
-            padNamedForDevice(device.name, android.os.Build.MODEL)
+            isHandheldVendor(device.vendorId) ||
+            padNamedForDevice(device.name, android.os.Build.MODEL, android.os.Build.MANUFACTURER)
 
-    internal fun padNamedForDevice(padName: String?, deviceModel: String?): Boolean {
+    internal fun isHandheldVendor(vendorId: Int): Boolean = vendorId in HANDHELD_PAD_VENDORS
+
+    private val HANDHELD_PAD_VENDORS = setOf(
+        0x2020,
+        0x2022,
+        0x4001
+    )
+
+    internal fun padNamedForDevice(padName: String?, deviceModel: String?, manufacturer: String? = null): Boolean {
+        val padBrand = padName?.trim()?.substringBefore(' ')?.lowercase() ?: return false
         val brand = deviceModel?.trim()?.substringBefore(' ')?.lowercase().orEmpty()
-        if (brand.length < MIN_BRAND_LENGTH) return false
-        return padName?.trim()?.substringBefore(' ')?.lowercase() == brand
+        if (brand.length >= MIN_BRAND_LENGTH && padBrand == brand) return true
+        return padBrand == BUILT_IN_PAD_BRAND_BY_MANUFACTURER[manufacturer?.trim()?.lowercase()]
     }
 
     private const val MIN_BRAND_LENGTH = 3
+
+    private val BUILT_IN_PAD_BRAND_BY_MANUFACTURER = mapOf(
+        "ayn" to "odin"
+    )
 
     /** Built-in pads on handhelds often report generic names (virtual_gamepad) and junk vendor ids; fall back to the device build. */
     private fun detectFromBuildIdentity(): DetectedLayout? {

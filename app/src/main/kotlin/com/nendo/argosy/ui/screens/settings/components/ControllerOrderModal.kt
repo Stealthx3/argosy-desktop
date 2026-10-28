@@ -62,7 +62,6 @@ import com.nendo.argosy.ui.primitives.InputGlyph
 import com.nendo.argosy.ui.theme.Dimens
 import com.nendo.argosy.ui.theme.LocalArgosyTheme
 import com.nendo.argosy.ui.util.clickableNoFocus
-import com.nendo.argosy.util.ScreenCatalog
 
 private const val PLAYER_DOT_COUNT = 4
 
@@ -80,10 +79,6 @@ fun ControllerOrderModal(
     val state by controller.state.collectAsState()
     val gamepadInputHandler = LocalGamepadInputHandler.current
     val currentOnDismiss = rememberUpdatedState(onDismiss)
-    val context = LocalContext.current
-    val dualScreenDevice = remember {
-        ScreenCatalog(context.applicationContext).attachedScreens().count { it.builtIn } > 1
-    }
 
     DisposableEffect(gamepadInputHandler, controller) {
         val listener: (KeyEvent) -> Boolean = listener@{ event ->
@@ -132,7 +127,6 @@ fun ControllerOrderModal(
                 SeatCard(
                     port = port,
                     holder = holder,
-                    dualScreenDevice = dualScreenDevice,
                     onRelease = { controller.releaseSeat(port) },
                     modifier = Modifier
                         .weight(1f, fill = false)
@@ -177,7 +171,6 @@ private fun playFeedback(outcome: SeatKeyOutcome) {
 private fun SeatCard(
     port: Int,
     holder: SeatHolder?,
-    dualScreenDevice: Boolean,
     onRelease: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -201,7 +194,7 @@ private fun SeatCard(
         }
         val context = LocalContext.current
         val device = remember(holder.deviceId) { holder.deviceId?.let { InputDevice.getDevice(it) } }
-        val kind = remember(device, dualScreenDevice) { ControllerArt.kindOf(context, device, dualScreenDevice) }
+        val kind = remember(device) { ControllerArt.kindOf(context, device) }
         val builtIn = device != null && ControllerDetector.isBuiltInPad(device)
         val name = if (builtIn) Build.MODEL else holder.name ?: stringResource(R.string.settings_controller_order_default_name)
         Column(
