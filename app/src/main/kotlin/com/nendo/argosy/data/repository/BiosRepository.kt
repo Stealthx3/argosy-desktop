@@ -24,6 +24,8 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileInputStream
@@ -111,6 +113,7 @@ class BiosRepository @Inject constructor(
     private val xboxDiskImageProvisioner: com.nendo.argosy.data.sync.xbox.XboxDiskImageProvisioner
 ) {
     private var api: RomMApi? = null
+    private val firmwareRowsLock = Mutex()
 
     fun setApi(api: RomMApi?) {
         this.api = api
@@ -192,6 +195,14 @@ class BiosRepository @Inject constructor(
         platformSlug: String,
         firmware: List<RomMFirmware>
     ) = withContext(Dispatchers.IO) {
+        firmwareRowsLock.withLock { reconcilePlatformFirmware(platformId, platformSlug, firmware) }
+    }
+
+    private suspend fun reconcilePlatformFirmware(
+        platformId: Long,
+        platformSlug: String,
+        firmware: List<RomMFirmware>
+    ) {
         val (missing, available) = firmware.partition { it.missingFromFs }
         val heldWhileMissing = missing.filter { firmwareDao.getByRommId(it.id)?.localPath != null }.map { it.id }
         if (missing.isNotEmpty()) {
@@ -200,7 +211,7 @@ class BiosRepository @Inject constructor(
         if (available.isEmpty() && heldWhileMissing.isEmpty()) {
             Logger.info(TAG, "No firmware available for $platformSlug, clearing its entries")
             firmwareDao.deleteByPlatform(platformId)
-            return@withContext
+            return
         }
 
         Logger.info(TAG, "Syncing ${available.size} firmware files for $platformSlug")
@@ -351,14 +362,20 @@ class BiosRepository @Inject constructor(
                 }
             }
 
-            targetFile.delete()
-            if (!partFile.renameTo(targetFile)) {
-                partFile.delete()
-                Logger.error(TAG, "Could not move ${firmware.fileName} into place")
-                return@withContext BiosDownloadResult.Error("Could not save the downloaded file")
+            firmwareRowsLock.withLock {
+                if (firmwareDao.getByRommId(firmware.rommId) == null) {
+                    partFile.delete()
+                    Logger.info(TAG, "Dropped ${firmware.fileName}: the server stopped offering it during the download")
+                    return@withContext BiosDownloadResult.Error("No longer offered by the server")
+                }
+                targetFile.delete()
+                if (!partFile.renameTo(targetFile)) {
+                    partFile.delete()
+                    Logger.error(TAG, "Could not move ${firmware.fileName} into place")
+                    return@withContext BiosDownloadResult.Error("Could not save the downloaded file")
+                }
+                firmwareDao.updateLocalPath(firmware.id, targetFile.absolutePath, Instant.now())
             }
-
-            firmwareDao.updateLocalPath(firmware.id, targetFile.absolutePath, Instant.now())
             Logger.info(TAG, "Downloaded firmware: ${firmware.fileName}")
 
             attributionRepository.markDirty(StorageCategory.BIOS)
