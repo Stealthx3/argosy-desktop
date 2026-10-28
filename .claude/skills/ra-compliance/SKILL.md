@@ -375,6 +375,15 @@ grep -n "SyncType.ACHIEVEMENT" app/src/main/kotlin/com/nendo/argosy/data/sync/Sy
   disallowed value, and the CYCLE_CORE_OPTION hotkey goes through the same
   function. Cheats are refused in hardcore by `CheatSessionManager`'s
   `isHardcore` gate on every mutator.
+- **Device sensors and the sun level stay on in hardcore**: built-in cores get
+  `RETRO_ENVIRONMENT_GET_SENSOR_INTERFACE` (accelerometer, gyroscope, and
+  illuminance fed by the Sunlight Up/Down hotkeys) with no hardcore gate.
+  RetroArch hands out the same interface with only its user setting checked
+  (runloop.c `RETRO_ENVIRONMENT_GET_SENSOR_INTERFACE`, `input_sensors_enable`),
+  and vendored `rc_libretro.c` disallows no setting for mGBA, VBA-M, melonDS DS
+  or Azahar, so their manual solar-level options are legal in hardcore. The
+  hotkeys produce the same levels as mGBA's manual `mgba_solar_sensor_level`.
+  Revisit if rcheevos adds a sensor or solar rule.
 - **RA session carries the flag, not the heartbeat**:
   `RetroAchievementsSessionManager` starts the session with `requestedHardcore`
   and the verified ROM hash (`raRepository.startSession(raId, hardcore, verifiedHash)`).

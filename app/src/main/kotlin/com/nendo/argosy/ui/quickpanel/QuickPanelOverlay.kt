@@ -306,6 +306,7 @@ class QuickPanelOverlay @Inject constructor(
             dispatcher.unsubscribeDrawer()
             music.onPageHidden()
             runCatching { if (root.isAttachedToWindow) windowManager?.removeView(root) }
+                .onFailure { Log.w(TAG, "removeView failed", it) }
             owner.stop()
             scope.cancel()
         }
