@@ -352,6 +352,42 @@ class ReconcileEffectApplierTest {
     }
 
     @Test
+    fun `CONFLICT dismissed with no server time and no hash comes back when the server changes`() = runTest {
+        coEvery {
+            conflictAutoResolver.classify(any(), any())
+        } returns ConflictAutoResolver.Resolution.AsIs
+        val existing = PendingConflictEntity(
+            gameId = game.id, rommSaveId = 555L, fileName = "save.sav", slot = "autosave", emulator = "mgba",
+            localUpdatedAt = null, serverUpdatedAt = null, localHash = null, serverHash = null,
+            reason = "test", dismissed = true
+        )
+        coEvery {
+            pendingConflictDao.findByGameSaveAndOwner(game.id, 555L, any(), PendingConflictEntity.UNATTRIBUTED)
+        } returns existing
+        val noHashOp = op(ReconcileAction.CONFLICT, saveId = 555L).copy(serverContentHash = null)
+
+        val outcome = applier.apply(noHashOp, sessionId = null)
+
+        assertEquals(1, outcome.conflicts)
+    }
+
+    @Test
+    fun `DOWNLOAD with no server time anywhere is marked server newer, never settled`() = runTest {
+        val stale = SaveSyncEntity(
+            id = 3L, gameId = game.id, rommId = 100L, emulatorId = "mgba", channelName = "autosave",
+            rommSaveId = 42L, syncStatus = SaveSyncEntity.STATUS_SERVER_NEWER,
+            localUpdatedAt = java.time.Instant.parse("2026-01-01T00:00:00Z")
+        )
+        coEvery { saveSyncDao.getByGameEmulatorAndChannel(any(), any(), any(), any()) } returns stale
+        val noTimeOp = op(ReconcileAction.DOWNLOAD).copy(serverUpdatedAt = null)
+
+        val outcome = applierWith(gateWithActive("2026-10-27T00:00:00Z")).apply(noTimeOp, sessionId = 1L)
+
+        assertEquals(1, outcome.applied)
+        coVerify(exactly = 0) { saveSyncDao.upsert(match { it.syncStatus == SaveSyncEntity.STATUS_SYNCED }) }
+    }
+
+    @Test
     fun `DOWNLOAD keeps the server time when RomM sends it with an offset`() = runTest {
         coEvery { saveSyncDao.getByGameEmulatorAndChannel(any(), any(), any(), any()) } returns null
         val offsetOp = op(ReconcileAction.DOWNLOAD).copy(serverUpdatedAt = "2026-10-27T07:39:57+00:00")

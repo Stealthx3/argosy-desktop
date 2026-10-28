@@ -266,7 +266,7 @@ class SaveSyncOrchestratorTest {
     fun `an older save in the ROM-named slot is not placed over a newer active autosave`() = runTest {
         coEvery { activeSaveRepository.getActiveRow(1L) } returns activeAutosave("2026-10-27T07:39:57Z")
         val legacySlot = makeSyncEntity(id = 7L, channelName = "Pokemon Violet").copy(
-            localUpdatedAt = java.time.Instant.parse("2026-06-01T00:01:24Z")
+            serverUpdatedAt = java.time.Instant.parse("2026-06-01T00:01:24Z")
         )
         coEvery { saveSyncDao.getPendingDownloads(any()) } returns listOf(legacySlot)
 
@@ -275,6 +275,19 @@ class SaveSyncOrchestratorTest {
         assertEquals(0, result)
         coVerify(exactly = 0) { mockApiClient.downloadSave(any(), any(), any(), any(), any()) }
         coVerify { saveSyncDao.upsert(match { it.id == 7L && it.syncStatus == SaveSyncEntity.STATUS_SYNCED }) }
+    }
+
+    @Test
+    fun `a pending save with no server time is downloaded, never settled from its local time`() = runTest {
+        coEvery { activeSaveRepository.getActiveRow(1L) } returns activeAutosave("2026-10-27T07:39:57Z")
+        val unknownTime = makeSyncEntity(id = 7L).copy(
+            localUpdatedAt = java.time.Instant.parse("2026-06-01T00:01:24Z")
+        )
+        coEvery { saveSyncDao.getPendingDownloads(any()) } returns listOf(unknownTime)
+        coEvery { mockApiClient.downloadSave(any(), any(), any(), any(), any()) } returns SaveSyncResult.Success()
+
+        assertEquals(1, orchestrator.downloadPendingServerSaves())
+        coVerify(exactly = 0) { saveSyncDao.upsert(match { it.id == 7L && it.syncStatus == SaveSyncEntity.STATUS_SYNCED }) }
     }
 
     @Test

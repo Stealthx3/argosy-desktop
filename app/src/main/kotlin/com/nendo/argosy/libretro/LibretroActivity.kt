@@ -1016,7 +1016,6 @@ class LibretroActivity : ComponentActivity() {
                 forceSoftwareTiming = settings.forceSoftwareTiming
                 rumbleEventsEnabled = settings.rumbleEnabled
                 motionSensorsEnabled = settings.motionEnabled
-                sunSensorEnabled = sunHotkeysBound()
                 coreAccelerometerScale = CoreSensorUnits.accelerometerScale(coreName)
                 variables = coreVariablesFromIntent()
                 preferVulkan = intent.getBooleanExtra(EXTRA_PREFER_VULKAN, false)
@@ -1025,17 +1024,6 @@ class LibretroActivity : ComponentActivity() {
         )
         retroView.illuminance = SunLevel.lux(sunLevel)
         lifecycle.addObserver(retroView)
-    }
-
-    private fun sunHotkeysBound(): Boolean = kotlinx.coroutines.runBlocking {
-        SunLevel.isBound(
-            InputConfigCoordinator.resolveScopedHotkeys(
-                inputConfigRepository,
-                inputConfigRepository.getHotkeys(),
-                platformSlug,
-                resolvedCoreId
-            )
-        )
     }
 
     private fun stepSunLevel(direction: Int) {

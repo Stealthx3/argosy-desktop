@@ -151,7 +151,12 @@ class InputConfigCoordinator(
      * resolving so nothing disabled ever reaches the matcher.
      */
     private fun resolveScopedHotkeys(hotkeys: List<HotkeyEntity>): List<HotkeyEntity> =
-        resolveScopedHotkeys(inputConfigRepository, hotkeys, platformSlug, coreId)
+        HotkeyScopeResolver.resolve(
+            all = hotkeys,
+            platformSlug = platformSlug,
+            coreId = coreId,
+            parseCombo = inputConfigRepository::parseHotkeyCombo
+        ).filter { it.isEnabled }
 
     private fun platformMappedButtons(
         mappings: Map<String, Map<InputSource, Int>>
@@ -174,18 +179,5 @@ class InputConfigCoordinator(
 
     companion object {
         private const val TAG = "InputConfigCoordinator"
-
-        fun resolveScopedHotkeys(
-            repository: InputConfigRepository,
-            hotkeys: List<HotkeyEntity>,
-            platformSlug: String?,
-            coreId: String?
-        ): List<HotkeyEntity> =
-            HotkeyScopeResolver.resolve(
-                all = hotkeys,
-                platformSlug = platformSlug,
-                coreId = coreId,
-                parseCombo = repository::parseHotkeyCombo
-            ).filter { it.isEnabled }
     }
 }

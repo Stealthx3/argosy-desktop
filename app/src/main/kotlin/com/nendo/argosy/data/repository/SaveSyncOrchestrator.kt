@@ -504,8 +504,7 @@ class SaveSyncOrchestrator @Inject constructor(
                 Logger.debug(TAG, "downloadPendingServerSaves: skipping non-installed gameId=${entity.gameId} silently")
                 return@mapNotNull null
             }
-            val serverTime = entity.serverUpdatedAt ?: entity.localUpdatedAt
-            serverSaveGate.holdFor(entity.gameId, game.localPath, entity.channelName, serverTime)?.let { hold ->
+            serverSaveGate.holdFor(entity.gameId, game.localPath, entity.channelName, entity.serverUpdatedAt)?.let { hold ->
                 Logger.info(TAG, "[SaveSync] DOWNLOAD gameId=${entity.gameId} channel=${entity.channelName} | Not placed on disk: ${hold.reason}")
                 if (hold is ServerSaveHold.Superseded && entity.syncStatus == SaveSyncEntity.STATUS_SERVER_NEWER) {
                     saveSyncDao.upsert(entity.copy(syncStatus = SaveSyncEntity.STATUS_SYNCED))

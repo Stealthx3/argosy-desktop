@@ -103,8 +103,8 @@ class ReconcileEffectApplier @Inject constructor(
         val existing = pendingConflictDao.findByGameSaveAndOwner(game.id, op.saveId, op.slot, ownerUserId)
         val previouslyDismissedUnchanged = existing != null &&
             existing.dismissed &&
-            (existing.serverUpdatedAt == null || existing.serverUpdatedAt == opServerTime) &&
-            existing.serverHash == op.serverContentHash
+            existing.serverHash == op.serverContentHash &&
+            (existing.serverUpdatedAt == opServerTime || existing.serverUpdatedAt == null && existing.serverHash != null)
         if (previouslyDismissedUnchanged) {
             Logger.debug(TAG, "applyPlan: skipping CONFLICT for romId=${op.romId} saveId=${op.saveId} (previously dismissed, server unchanged)")
             return ReconcileEffectOutcome.NONE
@@ -190,7 +190,7 @@ class ReconcileEffectApplier @Inject constructor(
             return false
         }
         val serverTime = op.serverUpdatedAt?.let { parseInstantOrNull(it) }
-        val knownServerTime = serverTime ?: existing?.serverUpdatedAt ?: existing?.localUpdatedAt
+        val knownServerTime = serverTime ?: existing?.serverUpdatedAt
         val hold = if (overridesOpenDecision) null else serverSaveGate.holdFor(game.id, game.localPath, op.slot, knownServerTime)
         if (hold is com.nendo.argosy.data.repository.ServerSaveHold.Superseded) {
             Logger.debug(TAG, "applyPlan DOWNLOAD: gameId=${game.id} slot=${op.slot} superseded locally: ${hold.reason}")
