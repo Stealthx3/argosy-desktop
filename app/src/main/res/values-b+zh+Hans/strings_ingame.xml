@@ -167,6 +167,8 @@
     <string name="ingame_settings_game_specific_controls_subtitle_off">使用全局控制器映射</string>
     <string name="ingame_settings_rumble_title">震动</string>
     <string name="ingame_settings_rumble_subtitle">启用控制器震动反馈</string>
+    <string name="ingame_settings_motion_title">体感操控</string>
+    <string name="ingame_settings_motion_subtitle">允许游戏读取设备的倾斜和旋转</string>
     <string name="ingame_settings_controller_order_title">控制器顺序</string>
     <plurals name="ingame_settings_controller_order_assigned">
         <item quantity="other">已分配%d个控制器</item>
@@ -361,6 +363,7 @@
     <string name="ingame_libretro_casual_save_in_hardcore">正在硬核模式下继续休闲存档</string>
 
     <string name="ingame_libretro_disc_swap_inserted">已插入%1$s</string>
+    <string name="ingame_libretro_sun_level">阳光 %1$d/%2$d</string>
     <string name="ingame_libretro_disc_swap_fallback_name">光盘%1$d</string>
 
     <string name="ingame_libretro_speedrun_default_category_name">练习</string>

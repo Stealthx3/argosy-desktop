@@ -1522,6 +1522,8 @@
 
     <string name="settings_builtin_controls_rumble_title">Vibration</string>
     <string name="settings_builtin_controls_rumble_subtitle">Activer le retour par vibration de la manette</string>
+    <string name="settings_builtin_controls_motion_title">Commandes de mouvement</string>
+    <string name="settings_builtin_controls_motion_subtitle">Permet aux jeux de lire l\'inclinaison et la rotation de l\'appareil</string>
     <string name="settings_builtin_controls_order_title">Ordre des manettes</string>
     <string name="settings_builtin_controls_order_subtitle">Définir l\'ordre des joueurs en appuyant sur un bouton de chaque manette</string>
     <plurals name="settings_builtin_controls_order_assigned">
@@ -1975,6 +1977,8 @@
     <string name="settings_hotkeys_action_skip_split">Passer le split</string>
     <string name="settings_hotkeys_action_toggle_timer">Démarrer/Mettre en pause le chrono</string>
     <string name="settings_hotkeys_action_reset_timer">Réinitialiser le chrono</string>
+    <string name="settings_hotkeys_action_sun_brighter">Ensoleillement +</string>
+    <string name="settings_hotkeys_action_sun_dimmer">Ensoleillement -</string>
 
     <!-- ===== Fenetre de mappage des entrees ===== -->
 

@@ -26,7 +26,8 @@ class InputConfigCoordinator(
     private var gameId: Long?,
     private val limitHotkeysToPlayer1: Boolean,
     private val controllerTypeForPort: (Int) -> Int?,
-    private val scope: CoroutineScope
+    private val scope: CoroutineScope,
+    private val onHotkeysResolved: (List<HotkeyEntity>) -> Unit = {}
 ) {
     lateinit var hotkeyManager: HotkeyManager
         private set
@@ -69,6 +70,7 @@ class InputConfigCoordinator(
             hotkeyList = inputConfigRepository.getHotkeys()
             val hotkeys = resolveScopedHotkeys(hotkeyList)
             hotkeyManager.setHotkeys(hotkeys)
+            onHotkeysResolved(hotkeys)
             hotkeyManager.setPlatformMappedButtons(platformMappedButtons(mappings))
             hotkeyManager.setLimitToPlayer1(limitHotkeysToPlayer1)
 
@@ -139,7 +141,9 @@ class InputConfigCoordinator(
 
     suspend fun refreshHotkeys() {
         hotkeyList = inputConfigRepository.getHotkeys()
-        hotkeyManager.setHotkeys(resolveScopedHotkeys(hotkeyList))
+        val hotkeys = resolveScopedHotkeys(hotkeyList)
+        hotkeyManager.setHotkeys(hotkeys)
+        onHotkeysResolved(hotkeys)
     }
 
     /**
@@ -147,12 +151,7 @@ class InputConfigCoordinator(
      * resolving so nothing disabled ever reaches the matcher.
      */
     private fun resolveScopedHotkeys(hotkeys: List<HotkeyEntity>): List<HotkeyEntity> =
-        HotkeyScopeResolver.resolve(
-            all = hotkeys,
-            platformSlug = platformSlug,
-            coreId = coreId,
-            parseCombo = inputConfigRepository::parseHotkeyCombo
-        ).filter { it.isEnabled }
+        resolveScopedHotkeys(inputConfigRepository, hotkeys, platformSlug, coreId)
 
     private fun platformMappedButtons(
         mappings: Map<String, Map<InputSource, Int>>
@@ -175,5 +174,18 @@ class InputConfigCoordinator(
 
     companion object {
         private const val TAG = "InputConfigCoordinator"
+
+        fun resolveScopedHotkeys(
+            repository: InputConfigRepository,
+            hotkeys: List<HotkeyEntity>,
+            platformSlug: String?,
+            coreId: String?
+        ): List<HotkeyEntity> =
+            HotkeyScopeResolver.resolve(
+                all = hotkeys,
+                platformSlug = platformSlug,
+                coreId = coreId,
+                parseCombo = repository::parseHotkeyCombo
+            ).filter { it.isEnabled }
     }
 }

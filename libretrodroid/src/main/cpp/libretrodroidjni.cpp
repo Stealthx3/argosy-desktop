@@ -47,6 +47,7 @@
 #include "vulkan/vulkanbackend.h"
 #include "achievements_test.h"
 #include "stateloadpolicy_test.h"
+#include "sensors/coresensors.h"
 #include <rc_hash.h>
 #include <rc_libretro.h>
 
@@ -679,6 +680,12 @@ JNIEXPORT void JNICALL Java_com_swordfish_libretrodroid_LibretroDroid_step(
         env->CallVoidMethod(glRetroView, requestAspectRatioUpdate);
     }
 
+    LibretroDroid::getInstance().handleCoreSensorRequests([&](int requested) {
+        jclass cls = env->GetObjectClass(glRetroView);
+        jmethodID onCoreSensorsRequested = env->GetMethodID(cls, "onCoreSensorsRequested", "(I)V");
+        env->CallVoidMethod(glRetroView, onCoreSensorsRequested, requested);
+    });
+
     if (LibretroDroid::getInstance().isRumbleEnabled()) {
         LibretroDroid::getInstance().handleRumbleUpdates([&](int port, float weak, float strong) {
             jclass cls = env->GetObjectClass(glRetroView);
@@ -714,6 +721,12 @@ JNIEXPORT void JNICALL Java_com_swordfish_libretrodroid_LibretroDroid_stepForNet
         jmethodID requestAspectRatioUpdate = env->GetMethodID(cls, "refreshAspectRatio", "()V");
         env->CallVoidMethod(glRetroView, requestAspectRatioUpdate);
     }
+
+    LibretroDroid::getInstance().handleCoreSensorRequests([&](int requested) {
+        jclass cls = env->GetObjectClass(glRetroView);
+        jmethodID onCoreSensorsRequested = env->GetMethodID(cls, "onCoreSensorsRequested", "(I)V");
+        env->CallVoidMethod(glRetroView, onCoreSensorsRequested, requested);
+    });
 
     if (LibretroDroid::getInstance().isRumbleEnabled()) {
         LibretroDroid::getInstance().handleRumbleUpdates([&](int port, float weak, float strong) {
@@ -840,15 +853,33 @@ JNIEXPORT jint JNICALL Java_com_swordfish_libretrodroid_LibretroDroid_prepareSha
     }
 }
 
-JNIEXPORT void JNICALL Java_com_swordfish_libretrodroid_LibretroDroid_setShaderSensorState(
+JNIEXPORT void JNICALL Java_com_swordfish_libretrodroid_LibretroDroid_setSensorReadings(
     JNIEnv*, jclass,
     jfloat gyroX, jfloat gyroY, jfloat gyroZ,
     jfloat accelX, jfloat accelY, jfloat accelZ,
-    jfloat restX, jfloat restY, jfloat restZ
+    jfloat restX, jfloat restY, jfloat restZ,
+    jfloat illuminance
 ) {
-    LibretroDroid::getInstance().setShaderSensorState({
-        gyroX, gyroY, gyroZ, accelX, accelY, accelZ, restX, restY, restZ
-    });
+    LibretroDroid::getInstance().setSensorReadings(
+        {gyroX, gyroY, gyroZ},
+        {accelX, accelY, accelZ},
+        {restX, restY, restZ},
+        illuminance
+    );
+}
+
+JNIEXPORT void JNICALL Java_com_swordfish_libretrodroid_LibretroDroid_setCoreSensorAccess(
+    JNIEnv*, jclass,
+    jint mask
+) {
+    CoreSensors::getInstance().setAccess(mask);
+}
+
+JNIEXPORT void JNICALL Java_com_swordfish_libretrodroid_LibretroDroid_setCoreAccelerometerScale(
+    JNIEnv*, jclass,
+    jfloat scale
+) {
+    CoreSensors::getInstance().setAccelerometerScale(scale);
 }
 
 JNIEXPORT void JNICALL Java_com_swordfish_libretrodroid_LibretroDroid_setFilterMode(

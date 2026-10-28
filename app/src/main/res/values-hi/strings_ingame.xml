@@ -169,6 +169,8 @@
     <string name="ingame_settings_game_specific_controls_subtitle_off">आपकी ग्लोबल कंट्रोलर मैपिंग इस्तेमाल हो रही है</string>
     <string name="ingame_settings_rumble_title">रम्बल</string>
     <string name="ingame_settings_rumble_subtitle">कंट्रोलर वाइब्रेशन फीडबैक सक्षम करें</string>
+    <string name="ingame_settings_motion_title">मोशन कंट्रोल</string>
+    <string name="ingame_settings_motion_subtitle">गेम को डिवाइस का झुकाव और घुमाव पढ़ने दें</string>
     <string name="ingame_settings_controller_order_title">कंट्रोलर ऑर्डर</string>
     <plurals name="ingame_settings_controller_order_assigned">
         <item quantity="one">%d कंट्रोलर असाइन किया गया</item>
@@ -369,6 +371,7 @@
     <string name="ingame_libretro_casual_save_in_hardcore">हार्डकोर में कैज़ुअल सेव जारी है</string>
 
     <string name="ingame_libretro_disc_swap_inserted">%1$s डाला गया</string>
+    <string name="ingame_libretro_sun_level">धूप %1$d/%2$d</string>
     <string name="ingame_libretro_disc_swap_fallback_name">डिस्क %1$d</string>
 
     <string name="ingame_libretro_speedrun_default_category_name">प्रैक्टिस</string>

@@ -408,6 +408,13 @@ internal fun routeSetBuiltinRumbleEnabled(vm: SettingsViewModel, enabled: Boolea
     }
 }
 
+internal fun routeSetBuiltinMotionEnabled(vm: SettingsViewModel, enabled: Boolean) {
+    vm._uiState.update { it.copy(builtinControls = it.builtinControls.copy(motionEnabled = enabled)) }
+    vm.viewModelScope.launch {
+        vm.libretroSettingsRepo.setBuiltinMotionEnabled(enabled)
+    }
+}
+
 internal fun routeSetBuiltinLimitHotkeysToPlayer1(vm: SettingsViewModel, enabled: Boolean) {
     vm._uiState.update { it.copy(builtinControls = it.builtinControls.copy(limitHotkeysToPlayer1 = enabled)) }
     vm.viewModelScope.launch {
@@ -799,6 +806,7 @@ internal fun routeUpdatePlatformControlSetting(vm: SettingsViewModel, field: Str
             "analogAsDpad" -> current.copy(analogAsDpad = value)
             "dpadAsAnalog" -> current.copy(dpadAsAnalog = value)
             "rumbleEnabled" -> current.copy(rumbleEnabled = value)
+            "motionEnabled" -> current.copy(motionEnabled = value)
             else -> return@launch
         }
         if (updated.hasAnyOverrides()) {
@@ -813,7 +821,12 @@ internal fun routeResetAllPlatformControlSettings(vm: SettingsViewModel) {
     val platformContext = vm._uiState.value.builtinVideo.currentPlatformContext ?: return
     vm.viewModelScope.launch {
         val current = vm.libretroSettingsRepo.getByPlatformId(platformContext.platformId) ?: return@launch
-        val updated = current.copy(analogAsDpad = null, dpadAsAnalog = null, rumbleEnabled = null)
+        val updated = current.copy(
+            analogAsDpad = null,
+            dpadAsAnalog = null,
+            rumbleEnabled = null,
+            motionEnabled = null
+        )
         if (updated.hasAnyOverrides()) {
             vm.libretroSettingsRepo.upsert(updated)
         } else {
@@ -1181,6 +1194,7 @@ internal fun routeCyclePlatformContext(vm: SettingsViewModel, direction: Int) {
                 showStickMappings = !isGlobal,
                 showDpadAsAnalog = !isGlobal && platformSlug != null && PlatformWeightRegistry.hasAnalogStick(platformSlug),
                 showRumble = isGlobal || (platformSlug != null && PlatformWeightRegistry.hasRumble(platformSlug)),
+                showMotion = isGlobal || (platformSlug != null && PlatformWeightRegistry.hasMotion(platformSlug)),
                 showResetAll = !isGlobal && hasControlOverrides
             ),
             focusedIndex = 0

@@ -156,6 +156,8 @@ add_library(libretrodroid SHARED
         microphone/microphone.cpp
         microphone/microphoneinterface.h
         microphone/microphoneinterface.cpp
+        sensors/coresensors.h
+        sensors/coresensors.cpp
         rewindbuffer.h
         rewindbuffer.cpp
         achievements.h

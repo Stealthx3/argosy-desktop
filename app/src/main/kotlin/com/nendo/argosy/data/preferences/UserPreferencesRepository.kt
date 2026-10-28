@@ -611,6 +611,7 @@ class UserPreferencesRepository @Inject constructor(
     suspend fun setBuiltinLowLatencyAudio(enabled: Boolean) = builtinPrefs.setBuiltinLowLatencyAudio(enabled)
     suspend fun setBuiltinForceSoftwareTiming(enabled: Boolean) = builtinPrefs.setBuiltinForceSoftwareTiming(enabled)
     suspend fun setBuiltinRumbleEnabled(enabled: Boolean) = builtinPrefs.setBuiltinRumbleEnabled(enabled)
+    suspend fun setBuiltinMotionEnabled(enabled: Boolean) = builtinPrefs.setBuiltinMotionEnabled(enabled)
     suspend fun setBuiltinBlackFrameInsertion(enabled: Boolean) = builtinPrefs.setBuiltinBlackFrameInsertion(enabled)
     suspend fun setBuiltinLimitHotkeysToPlayer1(enabled: Boolean) = builtinPrefs.setBuiltinLimitHotkeysToPlayer1(enabled)
     suspend fun setBuiltinAnalogAsDpad(enabled: Boolean) = builtinPrefs.setBuiltinAnalogAsDpad(enabled)
@@ -705,6 +706,7 @@ data class BuiltinEmulatorSettings(
     val audioVolume: Int = 100,
     val forceSoftwareTiming: Boolean = false,
     val rumbleEnabled: Boolean = true,
+    val motionEnabled: Boolean = true,
     val blackFrameInsertion: Boolean = false,
     val framesEnabled: Boolean = false,
     val frame: String? = null,

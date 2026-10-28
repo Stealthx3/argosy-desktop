@@ -51,6 +51,7 @@ class EffectiveLibretroSettingsResolver @Inject constructor(
             rewindBufferDuration = perPlatform?.rewindBufferDuration ?: global.rewindBufferDuration,
             forceSoftwareTiming = perPlatform?.vsync?.let { !it } ?: global.forceSoftwareTiming,
             rumbleEnabled = perPlatform?.rumbleEnabled ?: global.rumbleEnabled,
+            motionEnabled = perPlatform?.motionEnabled ?: global.motionEnabled,
             limitHotkeysToPlayer1 = global.limitHotkeysToPlayer1,
             analogAsDpad = perPlatform?.analogAsDpad
                 ?: !PlatformWeightRegistry.hasAnalogStick(platformSlug),

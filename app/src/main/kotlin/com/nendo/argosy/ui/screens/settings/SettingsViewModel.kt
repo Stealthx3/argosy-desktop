@@ -738,6 +738,7 @@ class SettingsViewModel @Inject constructor(
     fun moveAppPickerFocus(delta: Int) = routeMoveAppPickerFocus(this, delta)
     fun confirmAppPickerSelection() = routeConfirmAppPickerSelection(this)
     fun setBuiltinRumbleEnabled(enabled: Boolean) = routeSetBuiltinRumbleEnabled(this, enabled)
+    fun setBuiltinMotionEnabled(enabled: Boolean) = routeSetBuiltinMotionEnabled(this, enabled)
     fun setBuiltinLimitHotkeysToPlayer1(enabled: Boolean) = routeSetBuiltinLimitHotkeysToPlayer1(this, enabled)
     fun setSpeedrunStartOnReset(enabled: Boolean) = routeSetSpeedrunStartOnReset(this, enabled)
     fun setSpeedrunPanelSide(side: String) = routeSetSpeedrunPanelSide(this, side)

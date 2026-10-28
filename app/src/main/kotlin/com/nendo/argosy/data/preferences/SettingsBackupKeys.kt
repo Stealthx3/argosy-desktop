@@ -192,6 +192,7 @@ object SettingsBackupKeys {
         SettingsBackupKey("builtin_analog_as_dpad", SettingsBackupType.BOOLEAN),
         SettingsBackupKey("builtin_dpad_as_analog", SettingsBackupType.BOOLEAN),
         SettingsBackupKey("builtin_rumble_enabled", SettingsBackupType.BOOLEAN),
+        SettingsBackupKey("builtin_motion_enabled", SettingsBackupType.BOOLEAN),
         SettingsBackupKey("builtin_select_as_back", SettingsBackupType.STRING)
     )
 

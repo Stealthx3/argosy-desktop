@@ -22,9 +22,9 @@ uniform vec3 AccelerometerRest;
 void main() {
     vec3 color = texture2D(Texture, uv).rgb * 0.45;
 #ifdef _HAS_SENSOR_UNIFORMS
-    bool calibrated = length(AccelerometerRest) > 1.0;
+    bool calibrated = length(AccelerometerRest) > 0.5;
     vec3 tilt = Accelerometer - AccelerometerRest;
-    vec2 center = vec2(0.5) + clamp(tilt.xy * 0.04, vec2(-0.35), vec2(0.35));
+    vec2 center = vec2(0.5) + clamp(tilt.xy * 0.4, vec2(-0.35), vec2(0.35));
     float dotMask = 1.0 - smoothstep(0.02, 0.03, distance(uv, center));
     color = mix(color, vec3(0.0, 1.0, 1.0), dotMask);
     if (uv.y > 0.92) {

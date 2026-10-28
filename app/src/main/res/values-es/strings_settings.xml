@@ -1532,6 +1532,8 @@
 
     <string name="settings_builtin_controls_rumble_title">Vibración</string>
     <string name="settings_builtin_controls_rumble_subtitle">Activar la respuesta por vibración del mando</string>
+    <string name="settings_builtin_controls_motion_title">Controles de movimiento</string>
+    <string name="settings_builtin_controls_motion_subtitle">Permite que los juegos lean la inclinación y la rotación del dispositivo</string>
     <string name="settings_builtin_controls_order_title">Orden de mandos</string>
     <string name="settings_builtin_controls_order_subtitle">Define el orden de los jugadores pulsando un botón en cada mando</string>
     <plurals name="settings_builtin_controls_order_assigned">
@@ -1985,6 +1987,8 @@
     <string name="settings_hotkeys_action_skip_split">Saltar split</string>
     <string name="settings_hotkeys_action_toggle_timer">Iniciar/pausar cronómetro</string>
     <string name="settings_hotkeys_action_reset_timer">Reiniciar cronómetro</string>
+    <string name="settings_hotkeys_action_sun_brighter">Subir luz solar</string>
+    <string name="settings_hotkeys_action_sun_dimmer">Bajar luz solar</string>
 
     <!-- ===== Input mapping modal (Settings > components > InputMappingModal) ===== -->
 

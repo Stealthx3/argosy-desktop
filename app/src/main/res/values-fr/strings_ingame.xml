@@ -171,6 +171,8 @@
     <string name="ingame_settings_game_specific_controls_subtitle_off">Utilise votre mappage de manette global</string>
     <string name="ingame_settings_rumble_title">Vibrations</string>
     <string name="ingame_settings_rumble_subtitle">Activer les retours de vibration de la manette</string>
+    <string name="ingame_settings_motion_title">Commandes de mouvement</string>
+    <string name="ingame_settings_motion_subtitle">Permet aux jeux de lire l\'inclinaison et la rotation de l\'appareil</string>
     <string name="ingame_settings_controller_order_title">Ordre des manettes</string>
     <plurals name="ingame_settings_controller_order_assigned">
         <item quantity="one">%d manette assignée</item>
@@ -378,6 +380,7 @@
     <string name="ingame_libretro_casual_save_in_hardcore">Poursuite d\'une sauvegarde casual en hardcore</string>
 
     <string name="ingame_libretro_disc_swap_inserted">%1$s inséré</string>
+    <string name="ingame_libretro_sun_level">Ensoleillement %1$d/%2$d</string>
     <string name="ingame_libretro_disc_swap_fallback_name">Disque %1$d</string>
 
     <string name="ingame_libretro_speedrun_default_category_name">Entraînement</string>

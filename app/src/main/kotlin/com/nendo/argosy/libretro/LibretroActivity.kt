@@ -320,6 +320,7 @@ class LibretroActivity : ComponentActivity() {
 
     private var restoredSram: ByteArray? = null
     private var restoredRtc: ByteArray? = null
+    private var sunLevel = SunLevel.MIN
     private var casualSaveInHardcore: Boolean = false
     private var hardcoreMode by mutableStateOf(false)
     private var hardcoreConfirmed by mutableStateOf(false)
@@ -599,7 +600,10 @@ class LibretroActivity : ComponentActivity() {
             gameId = perGameMappingId,
             limitHotkeysToPlayer1 = limitHotkeysToPlayer1,
             controllerTypeForPort = { port -> appliedControllerTypes[port] ?: effectiveControllerType(port) },
-            scope = lifecycleScope
+            scope = lifecycleScope,
+            onHotkeysResolved = { hotkeys ->
+                if (::retroView.isInitialized) retroView.sunSensorEnabled = SunLevel.isBound(hotkeys)
+            }
         )
         portResolver.setLaunchPad(
             controllerId = intent.getStringExtra(EXTRA_LAUNCH_CONTROLLER_ID),
@@ -1011,12 +1015,33 @@ class LibretroActivity : ComponentActivity() {
                 preferLowLatencyAudio = settings.lowLatencyAudio
                 forceSoftwareTiming = settings.forceSoftwareTiming
                 rumbleEventsEnabled = settings.rumbleEnabled
+                motionSensorsEnabled = settings.motionEnabled
+                sunSensorEnabled = sunHotkeysBound()
+                coreAccelerometerScale = CoreSensorUnits.accelerometerScale(coreName)
                 variables = coreVariablesFromIntent()
                 preferVulkan = intent.getBooleanExtra(EXTRA_PREFER_VULKAN, false)
                 vulkanDriver = vulkanDriverFromIntent()
             }
         )
+        retroView.illuminance = SunLevel.lux(sunLevel)
         lifecycle.addObserver(retroView)
+    }
+
+    private fun sunHotkeysBound(): Boolean = kotlinx.coroutines.runBlocking {
+        SunLevel.isBound(
+            InputConfigCoordinator.resolveScopedHotkeys(
+                inputConfigRepository,
+                inputConfigRepository.getHotkeys(),
+                platformSlug,
+                resolvedCoreId
+            )
+        )
+    }
+
+    private fun stepSunLevel(direction: Int) {
+        sunLevel = SunLevel.step(sunLevel, direction)
+        retroView.illuminance = SunLevel.lux(sunLevel)
+        inGameMessage = getString(R.string.ingame_libretro_sun_level, sunLevel, SunLevel.MAX)
     }
 
     private fun setupRetroViewListeners() {
@@ -1132,6 +1157,7 @@ class LibretroActivity : ComponentActivity() {
             onSpeedrunSkipSplit = { speedrunTimer.skipSplit() },
             onSpeedrunToggleTimer = { speedrunTimer.togglePause() },
             onSpeedrunResetTimer = { speedrunTimer.resetRun() },
+            onStepSunLevel = ::stepSunLevel,
             onHotkeyFired = { deferredCoreKeys.clear() }
         )
     }
@@ -2393,6 +2419,7 @@ class LibretroActivity : ComponentActivity() {
                 supportsGameSpecificControls = gameId != -1L,
                 controllerPorts = buildControllerPortOptions(),
                 rumbleEnabled = videoSettings.currentRumbleEnabled,
+                motionEnabled = videoSettings.currentMotionEnabled,
                 analogAsDpad = videoSettings.currentAnalogAsDpad,
                 dpadAsAnalog = videoSettings.currentDpadAsAnalog,
                 limitHotkeysToPlayer1 = limitHotkeysToPlayer1,
@@ -3077,6 +3104,11 @@ class LibretroActivity : ComponentActivity() {
                     vibrator = null
                 }
                 videoSettings.persistControlSetting("rumbleEnabled", action.enabled)
+            }
+            is InGameControlsAction.SetMotion -> {
+                videoSettings.currentMotionEnabled = action.enabled
+                retroView.motionSensorsEnabled = action.enabled
+                videoSettings.persistControlSetting("motionEnabled", action.enabled)
             }
             is InGameControlsAction.SetAnalogAsDpad -> {
                 videoSettings.currentAnalogAsDpad = action.enabled

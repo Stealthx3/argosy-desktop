@@ -171,7 +171,13 @@ public:
     void setAudioVolume(float volume);
 
     void setShaderConfig(ShaderManager::Config shaderConfig);
-    void setShaderSensorState(const std::array<float, 9>& state);
+    void setSensorReadings(
+        const std::array<float, 3>& gyroscope,
+        const std::array<float, 3>& accelerometer,
+        const std::array<float, 3>& accelerometerRest,
+        float illuminance
+    );
+    void handleCoreSensorRequests(const std::function<void(int)>& handler);
     int prepareShaderAndGetSensorUsage();
     void setFilterMode(int mode);
     void setIntegerScaling(bool enabled);

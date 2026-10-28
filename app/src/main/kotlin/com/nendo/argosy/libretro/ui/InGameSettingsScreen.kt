@@ -110,6 +110,7 @@ data class InGameControlsState(
     val supportsGameSpecificControls: Boolean = false,
     val controllerPorts: List<ControllerPortOption> = emptyList(),
     val rumbleEnabled: Boolean = true,
+    val motionEnabled: Boolean = true,
     val analogAsDpad: Boolean = false,
     val dpadAsAnalog: Boolean = false,
     val limitHotkeysToPlayer1: Boolean = true,
@@ -141,6 +142,7 @@ data class InGameControlsState(
 sealed class InGameControlsAction {
     data class SetGameSpecificControls(val enabled: Boolean) : InGameControlsAction()
     data class SetRumble(val enabled: Boolean) : InGameControlsAction()
+    data class SetMotion(val enabled: Boolean) : InGameControlsAction()
     data class SetAnalogAsDpad(val enabled: Boolean) : InGameControlsAction()
     data class SetDpadAsAnalog(val enabled: Boolean) : InGameControlsAction()
     data class SetLimitHotkeys(val enabled: Boolean) : InGameControlsAction()
@@ -210,6 +212,7 @@ internal sealed class InGameControlsItem(
     data object InputMapping : InGameControlsItem("inputMapping", "controllers")
     data object ControllerGrip : InGameControlsItem("controllerGrip", "controllers")
     data object Rumble : InGameControlsItem("rumble", "controllers")
+    data object Motion : InGameControlsItem("motion", "controllers")
     data object SelectAsBack : InGameControlsItem("selectAsBack", "controllers")
     data object AnalogAsDpad : InGameControlsItem("analogAsDpad", "sticks")
     data object DpadAsAnalog : InGameControlsItem("dpadAsAnalog", "sticks")
@@ -235,6 +238,7 @@ internal sealed class InGameControlsItem(
                 InputMapping,
                 ControllerGrip,
                 Rumble,
+                Motion,
                 SelectAsBack,
                 Header("sticksHeader", "sticks", R.string.ingame_settings_header_sticks),
                 AnalogAsDpad,
@@ -290,6 +294,7 @@ private fun hudSwitchAction(item: InGameHudItem, enabled: Boolean): InGameContro
 internal data class InGameControlsVisibility(
     val hasAnalogStick: Boolean,
     val hasRumble: Boolean,
+    val hasMotion: Boolean,
     val hasGame: Boolean,
     val selectablePorts: Set<Int>
 )
@@ -300,6 +305,7 @@ private val controlsLayout = SettingsLayout<InGameControlsItem, InGameControlsVi
     visibleWhen = { item, visibility ->
         when (item) {
             InGameControlsItem.Rumble -> visibility.hasRumble
+            InGameControlsItem.Motion -> visibility.hasMotion
             InGameControlsItem.DpadAsAnalog -> visibility.hasAnalogStick
             InGameControlsItem.GameSpecificControls -> visibility.hasGame
             is InGameControlsItem.ControllerType -> item.port in visibility.selectablePorts
@@ -358,6 +364,7 @@ fun InGameSettingsScreen(
         InGameControlsVisibility(
             hasAnalogStick = platformSlug != null && PlatformWeightRegistry.hasAnalogStick(platformSlug),
             hasRumble = platformSlug != null && PlatformWeightRegistry.hasRumble(platformSlug),
+            hasMotion = platformSlug != null && PlatformWeightRegistry.hasMotion(platformSlug),
             hasGame = controlsState.supportsGameSpecificControls,
             selectablePorts = selectablePorts
         )
@@ -464,6 +471,7 @@ fun InGameSettingsScreen(
         when (item) {
             InGameControlsItem.GameSpecificControls -> action(InGameControlsAction.SetGameSpecificControls(!state.gameSpecificControls))
             InGameControlsItem.Rumble -> action(InGameControlsAction.SetRumble(!state.rumbleEnabled))
+            InGameControlsItem.Motion -> action(InGameControlsAction.SetMotion(!state.motionEnabled))
             InGameControlsItem.ControllerOrder -> openControllerOrder()
             is InGameControlsItem.ControllerType ->
                 action(InGameControlsAction.CycleControllerType(item.port, 1))
@@ -885,6 +893,14 @@ private fun InGameControlsSection(
                     isEnabled = state.rumbleEnabled,
                     isFocused = isFocused(item),
                     onToggle = { onAction(InGameControlsAction.SetRumble(it)) }
+                )
+
+                InGameControlsItem.Motion -> SwitchPreference(
+                    title = stringResource(R.string.ingame_settings_motion_title),
+                    subtitle = stringResource(R.string.ingame_settings_motion_subtitle),
+                    isEnabled = state.motionEnabled,
+                    isFocused = isFocused(item),
+                    onToggle = { onAction(InGameControlsAction.SetMotion(it)) }
                 )
 
                 InGameControlsItem.SelectAsBack -> SegmentedPreference(

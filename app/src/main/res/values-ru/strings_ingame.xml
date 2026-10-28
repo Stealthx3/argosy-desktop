@@ -173,6 +173,8 @@
     <string name="ingame_settings_game_specific_controls_subtitle_off">Используется глобальная раскладка контроллера</string>
     <string name="ingame_settings_rumble_title">Вибрация</string>
     <string name="ingame_settings_rumble_subtitle">Включить вибрационную отдачу контроллера</string>
+    <string name="ingame_settings_motion_title">Управление движением</string>
+    <string name="ingame_settings_motion_subtitle">Разрешить играм считывать наклон и поворот устройства</string>
     <string name="ingame_settings_controller_order_title">Порядок контроллеров</string>
     <plurals name="ingame_settings_controller_order_assigned">
         <item quantity="one">%d контроллер назначен</item>
@@ -387,6 +389,7 @@
     <string name="ingame_libretro_casual_save_in_hardcore">Продолжение казуального сохранения в хардкоре</string>
 
     <string name="ingame_libretro_disc_swap_inserted">Вставлен %1$s</string>
+    <string name="ingame_libretro_sun_level">Солнечный свет %1$d/%2$d</string>
     <string name="ingame_libretro_disc_swap_fallback_name">Диск %1$d</string>
 
     <string name="ingame_libretro_speedrun_default_category_name">Тренировка</string>

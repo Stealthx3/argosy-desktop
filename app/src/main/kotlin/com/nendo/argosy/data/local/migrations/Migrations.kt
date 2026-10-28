@@ -4279,6 +4279,12 @@ object Migration_217_218 : Migration(217, 218) {
     }
 }
 
+object Migration_218_219 : Migration(218, 219) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE `platform_libretro_settings` ADD COLUMN `motionEnabled` INTEGER")
+    }
+}
+
 object Migration_203_204 : Migration(203, 204) {
     override fun migrate(db: SupportSQLiteDatabase) {
         db.execSQL(

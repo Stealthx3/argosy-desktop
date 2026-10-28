@@ -49,6 +49,7 @@
 #include "errorcodes.h"
 #include "vfs/vfs.h"
 #include "vulkan/vulkanbackend.h"
+#include "sensors/coresensors.h"
 
 namespace libretrodroid {
 
@@ -1078,8 +1079,31 @@ void LibretroDroid::setAudioVolume(float volume) {
     }
 }
 
-void LibretroDroid::setShaderSensorState(const std::array<float, 9>& state) {
-    if (video) video->setShaderSensorState(state);
+void LibretroDroid::setSensorReadings(
+    const std::array<float, 3>& gyroscope,
+    const std::array<float, 3>& accelerometer,
+    const std::array<float, 3>& accelerometerRest,
+    float illuminance
+) {
+    if (video) {
+        video->setShaderSensorState({
+            gyroscope[0], gyroscope[1], gyroscope[2],
+            accelerometer[0], accelerometer[1], accelerometer[2],
+            accelerometerRest[0], accelerometerRest[1], accelerometerRest[2]
+        });
+    }
+    CoreSensors::getInstance().setReadings({
+        accelerometer[0], accelerometer[1], accelerometer[2],
+        gyroscope[0], gyroscope[1], gyroscope[2],
+        illuminance
+    });
+}
+
+void LibretroDroid::handleCoreSensorRequests(const std::function<void(int)>& handler) {
+    int requested = 0;
+    if (CoreSensors::getInstance().takeRequestChange(requested)) {
+        handler(requested);
+    }
 }
 
 int LibretroDroid::prepareShaderAndGetSensorUsage() {

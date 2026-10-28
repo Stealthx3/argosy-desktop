@@ -2834,6 +2834,11 @@
     <string name="settings_builtin_controls_rumble_title">Rumble</string>
     <!-- Second line of that row. -->
     <string name="settings_builtin_controls_rumble_subtitle">Enable controller vibration feedback</string>
+    <!-- Row title. Noun phrase: steering a game by tilting and turning the device through its
+         accelerometer and gyroscope, not on-screen touch controls. -->
+    <string name="settings_builtin_controls_motion_title">Motion controls</string>
+    <!-- Second line of that row. -->
+    <string name="settings_builtin_controls_motion_subtitle">Let games read the device\'s tilt and rotation</string>
     <!-- Row opening the tool that decides which pad is player one. Noun phrase. -->
     <string name="settings_builtin_controls_order_title">Controller Order</string>
     <!-- Second line of that row before any pad is assigned. -->
@@ -3699,6 +3704,10 @@
     <string name="settings_hotkeys_action_toggle_timer">Start/Pause Timer</string>
     <!-- Hotkey action name. Speedrun timer verb phrase: resets the run timer to zero. -->
     <string name="settings_hotkeys_action_reset_timer">Reset Timer</string>
+    <!-- Hotkey that raises the simulated sunlight solar-sensor cartridges (Boktai) read. -->
+    <string name="settings_hotkeys_action_sun_brighter">Sunlight Up</string>
+    <!-- Hotkey that lowers the simulated sunlight solar-sensor cartridges (Boktai) read. -->
+    <string name="settings_hotkeys_action_sun_dimmer">Sunlight Down</string>
 
     <!-- ===== Input mapping modal (Settings > components > InputMappingModal) ===== -->
 

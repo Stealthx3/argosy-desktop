@@ -1438,6 +1438,8 @@
 
     <string name="settings_builtin_controls_rumble_title">震动</string>
     <string name="settings_builtin_controls_rumble_subtitle">启用手柄震动反馈</string>
+    <string name="settings_builtin_controls_motion_title">体感操控</string>
+    <string name="settings_builtin_controls_motion_subtitle">允许游戏读取设备的倾斜和旋转</string>
     <string name="settings_builtin_controls_order_title">手柄顺序</string>
     <string name="settings_builtin_controls_order_subtitle">在每个手柄上按一个按钮以设置玩家顺序</string>
     <plurals name="settings_builtin_controls_order_assigned">
@@ -1875,6 +1877,8 @@
     <string name="settings_hotkeys_action_skip_split">跳过分段</string>
     <string name="settings_hotkeys_action_toggle_timer">开始/暂停计时</string>
     <string name="settings_hotkeys_action_reset_timer">重置计时器</string>
+    <string name="settings_hotkeys_action_sun_brighter">增强阳光</string>
+    <string name="settings_hotkeys_action_sun_dimmer">减弱阳光</string>
 
     <!-- ===== Input mapping modal ===== -->
 

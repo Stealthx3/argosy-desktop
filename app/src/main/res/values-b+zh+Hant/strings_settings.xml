@@ -1370,6 +1370,8 @@
 
     <string name="settings_builtin_controls_rumble_title">震動</string>
     <string name="settings_builtin_controls_rumble_subtitle">啟用控制器震動回饋</string>
+    <string name="settings_builtin_controls_motion_title">體感操控</string>
+    <string name="settings_builtin_controls_motion_subtitle">允許遊戲讀取裝置的傾斜與旋轉</string>
     <string name="settings_builtin_controls_order_title">控制器順序</string>
     <string name="settings_builtin_controls_order_subtitle">在各控制器上按下按鍵以設定玩家順序</string>
     <plurals name="settings_builtin_controls_order_assigned">
@@ -1791,6 +1793,8 @@
     <string name="settings_hotkeys_action_skip_split">跳過分段</string>
     <string name="settings_hotkeys_action_toggle_timer">開始／暫停計時</string>
     <string name="settings_hotkeys_action_reset_timer">重設計時器</string>
+    <string name="settings_hotkeys_action_sun_brighter">增強陽光</string>
+    <string name="settings_hotkeys_action_sun_dimmer">減弱陽光</string>
 
     <string name="settings_input_mapping_title">按鍵對應</string>
     <string name="settings_input_mapping_subtitle">選擇要設定的控制器</string>

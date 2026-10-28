@@ -49,41 +49,70 @@ class GLRetroView(
     private val data: GLRetroViewData
 ) : GLSurfaceView(context), DefaultLifecycleObserver {
 
-    private val shaderSensors = ShaderSensors(context)
+    private val motionSensors = MotionSensors(context)
     private var sensorsResumed = false
     private var shaderSensorUsage = 0
+    private var coreSensorUsage = 0
 
-    private fun updateShaderSensors() {
-        val active = sensorsResumed && !isDestroyed && isAttachedToWindow && hasWindowFocus()
-        shaderSensors.setRequiredSensors(if (active) shaderSensorUsage else 0)
+    var motionSensorsEnabled: Boolean by Delegates.observable(data.motionSensorsEnabled) { _, _, _ ->
+        updateCoreSensorAccess()
+    }
+
+    var sunSensorEnabled: Boolean by Delegates.observable(data.sunSensorEnabled) { _, _, _ ->
+        updateCoreSensorAccess()
+    }
+
+    private var coreSensorsBlocked: Boolean by Delegates.observable(false) { _, _, _ ->
+        updateCoreSensorAccess()
+    }
+
+    @Volatile
+    var illuminance: Float = 0f
+
+    private val coreMotionAllowed get() = motionSensorsEnabled && !coreSensorsBlocked
+
+    private fun updateCoreSensorAccess() {
+        val motion = if (coreMotionAllowed) motionSensors.availableSensors else 0
+        val sun = if (sunSensorEnabled && !coreSensorsBlocked) LibretroDroid.SENSOR_ILLUMINANCE else 0
+        LibretroDroid.setCoreSensorAccess(motion or sun)
+        updateMotionSensors()
+    }
+
+    private fun updateMotionSensors() {
+        val active = sensorsResumed && !isDestroyed && isAttachedToWindow
+        val coreMotion = if (coreMotionAllowed) coreSensorUsage else 0
+        motionSensors.setRequiredSensors(if (active) shaderSensorUsage or coreMotion else 0)
     }
 
     private fun prepareShaderAndUpdateSensors() {
         val usage = LibretroDroid.prepareShaderAndGetSensorUsage()
         KtUtils.runOnUIThread {
             shaderSensorUsage = usage
-            updateShaderSensors()
+            updateMotionSensors()
+        }
+    }
+
+    @Suppress("unused")
+    private fun onCoreSensorsRequested(usage: Int) {
+        KtUtils.runOnUIThread {
+            coreSensorUsage = usage
+            updateMotionSensors()
         }
     }
 
     override fun onResume(owner: LifecycleOwner) {
         sensorsResumed = true
-        updateShaderSensors()
+        updateMotionSensors()
     }
 
     override fun onPause(owner: LifecycleOwner) {
         sensorsResumed = false
-        updateShaderSensors()
-    }
-
-    override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
-        super.onWindowFocusChanged(hasWindowFocus)
-        updateShaderSensors()
+        updateMotionSensors()
     }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        updateShaderSensors()
+        updateMotionSensors()
     }
 
     var audioEnabled: Boolean by Delegates.observable(true) { _, _, value ->
@@ -229,6 +258,10 @@ class GLRetroView(
     var keyMapper: KeyMapper? = null
 
     @Volatile var netplayTick: (() -> Unit)? = null
+        set(value) {
+            field = value
+            KtUtils.runOnUIThread { coreSensorsBlocked = value != null }
+        }
 
     private val openGLESVersion: Int
 
@@ -269,14 +302,14 @@ class GLRetroView(
     }
 
     override fun onPause() {
-        shaderSensors.setRequiredSensors(0)
+        motionSensors.setRequiredSensors(0)
         Log.i(TAG_LOG, "TEARDOWN GLSurfaceView.onPause BEGIN destroyed=$isDestroyed")
         super<GLSurfaceView>.onPause()
         Log.i(TAG_LOG, "TEARDOWN GLSurfaceView.onPause END")
     }
 
     override fun onDetachedFromWindow() {
-        shaderSensors.setRequiredSensors(0)
+        motionSensors.setRequiredSensors(0)
         Log.i(TAG_LOG, "TEARDOWN onDetachedFromWindow BEGIN destroyed=$isDestroyed")
         super<GLSurfaceView>.onDetachedFromWindow()
         Log.i(TAG_LOG, "TEARDOWN onDetachedFromWindow END")
@@ -291,6 +324,8 @@ class GLRetroView(
             context.applicationInfo.nativeLibraryDir,
             context.cacheDir.absolutePath
         )
+        updateCoreSensorAccess()
+        LibretroDroid.setCoreAccelerometerScale(data.coreAccelerometerScale)
         LibretroDroid.create(
             openGLESVersion,
             data.coreFilePath,
@@ -312,7 +347,7 @@ class GLRetroView(
 
     override fun onDestroy(owner: LifecycleOwner) {
         sensorsResumed = false
-        shaderSensors.setRequiredSensors(0)
+        motionSensors.setRequiredSensors(0)
         // Native resources are destroyed via destroyNative() in onPause,
         // while the GL thread is still alive. No cleanup needed here.
         lifecycle = null
@@ -532,7 +567,7 @@ class GLRetroView(
     fun destroyNative() {
         if (isDestroyed) return
         isDestroyed = true
-        post { updateShaderSensors() }
+        post { updateMotionSensors() }
         renderMode = RENDERMODE_WHEN_DIRTY
         runOnGLThreadVoid {
             LibretroDroid.destroy()
@@ -655,18 +690,22 @@ class GLRetroView(
 
     inner class Renderer : GLSurfaceView.Renderer {
         private var bfiShowBlackNext = false
-        private var lastSensorState: ShaderSensorState? = null
+        private var lastSensorState: MotionSensorState? = null
+        private var lastIlluminance = 0f
 
         override fun onDrawFrame(gl: GL10) = catchExceptions {
             if (isDestroyed) return@catchExceptions
-            val sensors = shaderSensors.state
-            if (sensors !== lastSensorState) {
-                LibretroDroid.setShaderSensorState(
+            val sensors = motionSensors.state
+            val lux = illuminance
+            if (sensors !== lastSensorState || lux != lastIlluminance) {
+                LibretroDroid.setSensorReadings(
                     sensors.gyroscope.x, sensors.gyroscope.y, sensors.gyroscope.z,
                     sensors.accelerometer.x, sensors.accelerometer.y, sensors.accelerometer.z,
-                    sensors.accelerometerRest.x, sensors.accelerometerRest.y, sensors.accelerometerRest.z
+                    sensors.accelerometerRest.x, sensors.accelerometerRest.y, sensors.accelerometerRest.z,
+                    lux
                 )
                 lastSensorState = sensors
+                lastIlluminance = lux
             }
             val tick = netplayTick
             if (tick != null) {

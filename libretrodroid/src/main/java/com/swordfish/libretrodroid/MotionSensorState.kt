@@ -9,15 +9,17 @@ internal data class SensorVector(val x: Float = 0f, val y: Float = 0f, val z: Fl
         3 -> SensorVector(-y, x, z)
         else -> this
     }
+
+    fun scaled(factor: Float) = SensorVector(x * factor, y * factor, z * factor)
 }
 
-internal data class ShaderSensorState(
+internal data class MotionSensorState(
     val gyroscope: SensorVector = SensorVector(),
     val accelerometer: SensorVector = SensorVector(),
     val accelerometerRest: SensorVector = SensorVector()
 )
 
-internal class ShaderSensorCalibration {
+internal class MotionSensorCalibration {
     private var rotation: Int? = null
     private var gravityX = 0f
     private var gravityY = 0f
@@ -39,7 +41,7 @@ internal class ShaderSensorCalibration {
         gyroscope = SensorVector()
     }
 
-    fun accelerometerChanged(x: Float, y: Float, z: Float): ShaderSensorState {
+    fun accelerometerChanged(x: Float, y: Float, z: Float): MotionSensorState {
         accelerometer = SensorVector(x, y, z)
         if (rotation == null) {
             gravityX += x
@@ -60,29 +62,32 @@ internal class ShaderSensorCalibration {
                 gravitySamples = 0
             }
         } else if (restSamples < SAMPLE_COUNT) {
-            val rotated = accelerometer.rotated(rotation!!)
+            val rotated = accelerometerInG()
             restSum = SensorVector(restSum.x + rotated.x, restSum.y + rotated.y, restSum.z + rotated.z)
             restSamples++
             if (restSamples == SAMPLE_COUNT) {
-                rest = SensorVector(restSum.x / SAMPLE_COUNT, restSum.y / SAMPLE_COUNT, restSum.z / SAMPLE_COUNT)
+                rest = restSum.scaled(1f / SAMPLE_COUNT)
             }
         }
         return snapshot()
     }
 
-    fun gyroscopeChanged(x: Float, y: Float, z: Float): ShaderSensorState {
+    fun gyroscopeChanged(x: Float, y: Float, z: Float): MotionSensorState {
         gyroscope = SensorVector(x, y, z)
         return snapshot()
     }
 
-    private fun snapshot() = ShaderSensorState(
+    private fun accelerometerInG() = accelerometer.rotated(rotation ?: 0).scaled(1f / STANDARD_GRAVITY)
+
+    private fun snapshot() = MotionSensorState(
         gyroscope.rotated(rotation ?: 0),
-        accelerometer.rotated(rotation ?: 0),
+        accelerometerInG(),
         rest
     )
 
     private companion object {
         const val SAMPLE_COUNT = 30
         const val GRAVITY_THRESHOLD = 5f
+        const val STANDARD_GRAVITY = 9.80665f
     }
 }

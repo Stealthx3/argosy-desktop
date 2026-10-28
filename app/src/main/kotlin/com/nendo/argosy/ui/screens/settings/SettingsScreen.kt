@@ -2149,6 +2149,7 @@ private fun SettingsFooter(
             val ps = platformContext?.let { uiState.platformLibretro.platformSettings[it.platformId] }
             val hasOverride = when (item) {
                 com.nendo.argosy.ui.screens.settings.sections.BuiltinControlsItem.Rumble -> ps?.rumbleEnabled != null
+                com.nendo.argosy.ui.screens.settings.sections.BuiltinControlsItem.Motion -> ps?.motionEnabled != null
                 com.nendo.argosy.ui.screens.settings.sections.BuiltinControlsItem.AnalogAsDpad -> ps?.analogAsDpad != null
                 com.nendo.argosy.ui.screens.settings.sections.BuiltinControlsItem.DpadAsAnalog -> ps?.dpadAsAnalog != null
                 else -> false

@@ -959,6 +959,7 @@ internal fun routeLoadSettings(vm: SettingsViewModel) {
                 builtinControls = BuiltinControlsState(
                     controllerOrderCount = it.builtinControls.controllerOrderCount,
                     rumbleEnabled = refreshSettings.rumbleEnabled,
+                    motionEnabled = refreshSettings.motionEnabled,
                     limitHotkeysToPlayer1 = refreshSettings.limitHotkeysToPlayer1,
                     speedrunStartOnReset = refreshSettings.speedrunStartOnReset,
                     speedrunPanelSide = refreshSettings.speedrunPanelSide,

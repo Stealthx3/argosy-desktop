@@ -169,6 +169,8 @@
     <string name="ingame_settings_game_specific_controls_subtitle_off">Verwendet Ihre globale Controller-Zuordnung</string>
     <string name="ingame_settings_rumble_title">Vibration</string>
     <string name="ingame_settings_rumble_subtitle">Vibrationsfeedback des Controllers aktivieren</string>
+    <string name="ingame_settings_motion_title">Bewegungssteuerung</string>
+    <string name="ingame_settings_motion_subtitle">Spiele dürfen Neigung und Drehung des Geräts auslesen</string>
     <string name="ingame_settings_controller_order_title">Controller-Reihenfolge</string>
     <plurals name="ingame_settings_controller_order_assigned">
         <item quantity="one">%d Controller zugewiesen</item>
@@ -369,6 +371,7 @@
     <string name="ingame_libretro_casual_save_in_hardcore">Fortsetzung eines Casual-Spielstands im Hardcore-Modus</string>
 
     <string name="ingame_libretro_disc_swap_inserted">%1$s eingelegt</string>
+    <string name="ingame_libretro_sun_level">Sonnenlicht %1$d/%2$d</string>
     <string name="ingame_libretro_disc_swap_fallback_name">Disc %1$d</string>
 
     <string name="ingame_libretro_speedrun_default_category_name">Übung</string>

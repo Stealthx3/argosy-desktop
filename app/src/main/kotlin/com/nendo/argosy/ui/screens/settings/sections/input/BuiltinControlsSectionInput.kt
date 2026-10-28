@@ -31,6 +31,18 @@ internal class BuiltinControlsSectionInput(
                 }
                 InputResult.handled(SoundType.TOGGLE)
             }
+            BuiltinControlsItem.Motion -> {
+                if (state.builtinVideo.isGlobalContext) {
+                    viewModel.setBuiltinMotionEnabled(!state.builtinControls.motionEnabled)
+                } else {
+                    val ps = state.builtinVideo.currentPlatformContext?.let {
+                        state.platformLibretro.platformSettings[it.platformId]
+                    }
+                    val effective = ps?.motionEnabled ?: state.builtinControls.motionEnabled
+                    viewModel.updatePlatformControlSetting("motionEnabled", !effective)
+                }
+                InputResult.handled(SoundType.TOGGLE)
+            }
             BuiltinControlsItem.LimitHotkeysToPlayer1 -> {
                 viewModel.setBuiltinLimitHotkeysToPlayer1(!state.builtinControls.limitHotkeysToPlayer1)
                 InputResult.handled(SoundType.TOGGLE)
@@ -146,6 +158,7 @@ internal class BuiltinControlsSectionInput(
         val ps = platformContext?.let { state.platformLibretro.platformSettings[it.platformId] }
         val field = when (item) {
             BuiltinControlsItem.Rumble -> "rumbleEnabled"
+            BuiltinControlsItem.Motion -> "motionEnabled"
             BuiltinControlsItem.AnalogAsDpad -> "analogAsDpad"
             BuiltinControlsItem.DpadAsAnalog -> "dpadAsAnalog"
             else -> null
@@ -153,6 +166,7 @@ internal class BuiltinControlsSectionInput(
         if (field != null) {
             val hasOverride = when (item) {
                 BuiltinControlsItem.Rumble -> ps?.rumbleEnabled != null
+                BuiltinControlsItem.Motion -> ps?.motionEnabled != null
                 BuiltinControlsItem.AnalogAsDpad -> ps?.analogAsDpad != null
                 BuiltinControlsItem.DpadAsAnalog -> ps?.dpadAsAnalog != null
                 else -> false

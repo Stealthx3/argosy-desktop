@@ -799,6 +799,7 @@ data class ControllerPortChoiceUi(
 data class BuiltinControlsState(
     val controllerPorts: List<ControllerPortChoiceUi> = emptyList(),
     val rumbleEnabled: Boolean = true,
+    val motionEnabled: Boolean = true,
     val limitHotkeysToPlayer1: Boolean = true,
     val speedrunStartOnReset: Boolean = true,
     val speedrunPanelSide: String = "Right",
@@ -815,6 +816,7 @@ data class BuiltinControlsState(
     val showStickMappings: Boolean = false,
     val showDpadAsAnalog: Boolean = false,
     val showRumble: Boolean = true,
+    val showMotion: Boolean = true,
     val showResetAll: Boolean = false,
     val touchEnabled: Boolean = true,
     val touchOpacityLandscape: Float = 0.45f,

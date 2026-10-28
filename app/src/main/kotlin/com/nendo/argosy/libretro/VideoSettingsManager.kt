@@ -49,6 +49,7 @@ class VideoSettingsManager(
     var currentRewindSpeed by mutableStateOf("1x")
     var currentRewindBufferDuration by mutableStateOf("15s")
     var currentRumbleEnabled by mutableStateOf(true)
+    var currentMotionEnabled by mutableStateOf(true)
     var currentAnalogAsDpad by mutableStateOf(false)
     var currentDpadAsAnalog by mutableStateOf(false)
     var currentFrame by mutableStateOf<String?>(null)
@@ -100,6 +101,7 @@ class VideoSettingsManager(
         currentRewindSpeed = settings.rewindSpeedDisplay
         currentRewindBufferDuration = settings.rewindBufferDurationDisplay
         currentRumbleEnabled = settings.rumbleEnabled
+        currentMotionEnabled = settings.motionEnabled
         currentAnalogAsDpad = settings.analogAsDpad
         currentDpadAsAnalog = settings.dpadAsAnalog
         currentFrame = settings.frame
@@ -595,6 +597,7 @@ class VideoSettingsManager(
                 "analogAsDpad" -> current.copy(analogAsDpad = value)
                 "dpadAsAnalog" -> current.copy(dpadAsAnalog = value)
                 "rumbleEnabled" -> current.copy(rumbleEnabled = value)
+                "motionEnabled" -> current.copy(motionEnabled = value)
                 else -> return@launch
             }
             if (updated.hasAnyOverrides()) {

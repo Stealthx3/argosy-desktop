@@ -377,6 +377,11 @@
     <string name="ingame_settings_rumble_title">Rumble</string>
     <!-- Second line under that row. -->
     <string name="ingame_settings_rumble_subtitle">Enable controller vibration feedback</string>
+    <!-- Row on the controls tab. Noun phrase: steering a game by tilting and turning the
+         device through its accelerometer and gyroscope, not on-screen touch controls. -->
+    <string name="ingame_settings_motion_title">Motion controls</string>
+    <!-- Second line under that row. -->
+    <string name="ingame_settings_motion_subtitle">Let games read the device\'s tilt and rotation</string>
     <!-- Row on the controls tab. Noun phrase: which physical controller is which player. -->
     <string name="ingame_settings_controller_order_title">Controller Order</string>
     <!-- Second line under that row when ports have been given out, counting them. -->
@@ -807,6 +812,8 @@
     <!-- Disc-swap toast. %1$s is the disc's own label, or the fallback name below if it has
          none. -->
     <string name="ingame_libretro_disc_swap_inserted">Inserted %1$s</string>
+    <!-- Toast after a hotkey changes the simulated sunlight that solar-sensor cartridges (Boktai) read. %1$d is the level, %2$d the maximum. -->
+    <string name="ingame_libretro_sun_level">Sunlight %1$d/%2$d</string>
     <!-- Fallback disc name when the disc has no usable file name. %1$d is a 1-based disc
          number. -->
     <string name="ingame_libretro_disc_swap_fallback_name">Disc %1$d</string>

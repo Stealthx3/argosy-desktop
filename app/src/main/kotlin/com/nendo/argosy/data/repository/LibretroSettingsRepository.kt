@@ -152,6 +152,9 @@ class LibretroSettingsRepository @Inject constructor(
     suspend fun setBuiltinRumbleEnabled(enabled: Boolean) =
         builtinPrefs.setBuiltinRumbleEnabled(enabled)
 
+    suspend fun setBuiltinMotionEnabled(enabled: Boolean) =
+        builtinPrefs.setBuiltinMotionEnabled(enabled)
+
     suspend fun setBuiltinLimitHotkeysToPlayer1(enabled: Boolean) =
         builtinPrefs.setBuiltinLimitHotkeysToPlayer1(enabled)
 

@@ -66,6 +66,7 @@ internal sealed class BuiltinControlsItem(
         { state -> state.controllerPorts.any { it.port == port } }
     )
     data object Rumble : BuiltinControlsItem("rumble", "controllers", { it.showRumble })
+    data object Motion : BuiltinControlsItem("motion", "controllers", { it.showMotion })
     data object SelectAsBack : BuiltinControlsItem("selectAsBack", "controllers")
     data object AnalogAsDpad : BuiltinControlsItem("analogAsDpad", "sticks", { it.showStickMappings })
     data object DpadAsAnalog : BuiltinControlsItem("dpadAsAnalog", "sticks", { it.showStickMappings && it.showDpadAsAnalog })
@@ -120,6 +121,7 @@ internal sealed class BuiltinControlsItem(
                 ControllerType(2),
                 ControllerType(3),
                 Rumble,
+                Motion,
                 SelectAsBack,
                 SticksHeader,
                 AnalogAsDpad,
@@ -194,6 +196,8 @@ fun BuiltinControlsSection(
     }
     val effectiveRumble = if (isGlobal) controlsState.rumbleEnabled
         else platformSettings?.rumbleEnabled ?: controlsState.rumbleEnabled
+    val effectiveMotion = if (isGlobal) controlsState.motionEnabled
+        else platformSettings?.motionEnabled ?: controlsState.motionEnabled
     val platformSlug = platformContext?.platformSlug
     val platformHasAnalog = platformSlug != null && PlatformWeightRegistry.hasAnalogStick(platformSlug)
     val effectiveAnalogAsDpad = if (isGlobal) controlsState.analogAsDpad
@@ -255,6 +259,21 @@ fun BuiltinControlsSection(
                     onToggle = {
                         if (isGlobal) viewModel.setBuiltinRumbleEnabled(it)
                         else viewModel.updatePlatformControlSetting("rumbleEnabled", it)
+                    }
+                )
+
+                BuiltinControlsItem.Motion -> SwitchPreference(
+                    title = stringResource(R.string.settings_builtin_controls_motion_title),
+                    subtitle = if (!isGlobal && platformSettings?.motionEnabled != null) {
+                        stringResource(R.string.settings_builtin_controls_platform_override)
+                    } else {
+                        stringResource(R.string.settings_builtin_controls_motion_subtitle)
+                    },
+                    isEnabled = effectiveMotion,
+                    isFocused = isFocused(item),
+                    onToggle = {
+                        if (isGlobal) viewModel.setBuiltinMotionEnabled(it)
+                        else viewModel.updatePlatformControlSetting("motionEnabled", it)
                     }
                 )
 

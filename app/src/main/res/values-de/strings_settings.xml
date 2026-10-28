@@ -1488,6 +1488,8 @@
 
     <string name="settings_builtin_controls_rumble_title">Rumble</string>
     <string name="settings_builtin_controls_rumble_subtitle">Vibrations-Feedback des Controllers aktivieren</string>
+    <string name="settings_builtin_controls_motion_title">Bewegungssteuerung</string>
+    <string name="settings_builtin_controls_motion_subtitle">Spiele dürfen Neigung und Drehung des Geräts auslesen</string>
     <string name="settings_builtin_controls_order_title">Controller-Reihenfolge</string>
     <string name="settings_builtin_controls_order_subtitle">Spielerreihenfolge durch Drücken einer Taste an jedem Controller festlegen</string>
     <plurals name="settings_builtin_controls_order_assigned">
@@ -1932,6 +1934,8 @@
     <string name="settings_hotkeys_action_skip_split">Split überspringen</string>
     <string name="settings_hotkeys_action_toggle_timer">Timer starten/pausieren</string>
     <string name="settings_hotkeys_action_reset_timer">Timer zurücksetzen</string>
+    <string name="settings_hotkeys_action_sun_brighter">Sonnenlicht heller</string>
+    <string name="settings_hotkeys_action_sun_dimmer">Sonnenlicht dunkler</string>
 
     <!-- ===== Input mapping modal (Settings > components > InputMappingModal) ===== -->
 

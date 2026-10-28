@@ -33,6 +33,7 @@ class BuiltinEmulatorPreferencesRepository @Inject constructor(
         val BUILTIN_AUDIO_VOLUME = intPreferencesKey("builtin_audio_volume")
         val BUILTIN_FORCE_SOFTWARE_TIMING = booleanPreferencesKey("builtin_force_software_timing")
         val BUILTIN_RUMBLE_ENABLED = booleanPreferencesKey("builtin_rumble_enabled")
+        val BUILTIN_MOTION_ENABLED = booleanPreferencesKey("builtin_motion_enabled")
         val BUILTIN_BLACK_FRAME_INSERTION = booleanPreferencesKey("builtin_black_frame_insertion")
         val BUILTIN_LIMIT_HOTKEYS_TO_PLAYER1 = booleanPreferencesKey("builtin_limit_hotkeys_to_player1")
         val BUILTIN_ANALOG_AS_DPAD = booleanPreferencesKey("builtin_analog_as_dpad")
@@ -103,6 +104,7 @@ class BuiltinEmulatorPreferencesRepository @Inject constructor(
             lowLatencyAudio = prefs[Keys.BUILTIN_LOW_LATENCY_AUDIO] ?: true,
             forceSoftwareTiming = prefs[Keys.BUILTIN_FORCE_SOFTWARE_TIMING] ?: false,
             rumbleEnabled = prefs[Keys.BUILTIN_RUMBLE_ENABLED] ?: true,
+            motionEnabled = prefs[Keys.BUILTIN_MOTION_ENABLED] ?: true,
             blackFrameInsertion = prefs[Keys.BUILTIN_BLACK_FRAME_INSERTION] ?: false,
             framesEnabled = prefs[Keys.BUILTIN_FRAMES_ENABLED] ?: false,
             limitHotkeysToPlayer1 = prefs[Keys.BUILTIN_LIMIT_HOTKEYS_TO_PLAYER1] ?: true,
@@ -225,6 +227,10 @@ class BuiltinEmulatorPreferencesRepository @Inject constructor(
 
     suspend fun setBuiltinRumbleEnabled(enabled: Boolean) {
         dataStore.edit { it[Keys.BUILTIN_RUMBLE_ENABLED] = enabled }
+    }
+
+    suspend fun setBuiltinMotionEnabled(enabled: Boolean) {
+        dataStore.edit { it[Keys.BUILTIN_MOTION_ENABLED] = enabled }
     }
 
     suspend fun setBuiltinBlackFrameInsertion(enabled: Boolean) {

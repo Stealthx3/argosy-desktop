@@ -1563,6 +1563,8 @@
 
     <string name="settings_builtin_controls_rumble_title">Вибрация</string>
     <string name="settings_builtin_controls_rumble_subtitle">Включить вибрацию контроллера</string>
+    <string name="settings_builtin_controls_motion_title">Управление движением</string>
+    <string name="settings_builtin_controls_motion_subtitle">Разрешить играм считывать наклон и поворот устройства</string>
     <string name="settings_builtin_controls_order_title">Порядок контроллеров</string>
     <string name="settings_builtin_controls_order_subtitle">Задайте порядок игроков, нажав кнопку на каждом контроллере</string>
     <plurals name="settings_builtin_controls_order_assigned">
@@ -2025,6 +2027,8 @@
     <string name="settings_hotkeys_action_skip_split">Пропустить сплит</string>
     <string name="settings_hotkeys_action_toggle_timer">Старт/пауза таймера</string>
     <string name="settings_hotkeys_action_reset_timer">Сбросить таймер</string>
+    <string name="settings_hotkeys_action_sun_brighter">Больше солнца</string>
+    <string name="settings_hotkeys_action_sun_dimmer">Меньше солнца</string>
 
     <!-- ===== Input mapping modal (Settings > components > InputMappingModal) ===== -->
 
