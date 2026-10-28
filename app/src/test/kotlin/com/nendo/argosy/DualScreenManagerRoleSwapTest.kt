@@ -505,6 +505,113 @@ class DualScreenManagerRoleSwapTest {
         }
     }
 
+    @Test
+    fun `a role override chosen just before the activity is destroyed is still written to preferences`() {
+        every { sessionStateStore.getDisplayRoleOverride() } returns DisplayRoleOverride.STANDARD.name
+        manager = newManager(scope = testScope.backgroundScope)
+        val activityScope = bindToActivityScope()
+
+        manager.applyDisplayRoleOverride(DisplayRoleOverride.STANDARD)
+        activityScope.cancel()
+        testScope.testScheduler.runCurrent()
+
+        io.mockk.coVerify(exactly = 1) {
+            preferencesRepository.setDisplayRoleOverride(DisplayRoleOverride.STANDARD)
+        }
+    }
+
+    @Test
+    fun `pinning an app to the companion just before the activity is destroyed still toggles the pin`() {
+        val appShortcutActions = mockk<com.nendo.argosy.ui.screens.common.AppShortcutActions>(relaxed = true)
+        manager = newManager(scope = testScope.backgroundScope, appShortcutActions = appShortcutActions)
+        val activityScope = bindToActivityScope()
+
+        manager.runAppMenuRow(
+            APP_PACKAGE,
+            com.nendo.argosy.ui.components.AppMenuRow.Action(
+                com.nendo.argosy.ui.components.AppContextMenuItem.TOGGLE_SECONDARY_HOME
+            )
+        )
+        activityScope.cancel()
+        testScope.testScheduler.runCurrent()
+
+        io.mockk.coVerify(exactly = 1) { appShortcutActions.togglePinned(APP_PACKAGE) }
+    }
+
+    @Test
+    fun `hiding an app just before the activity is destroyed still toggles its visibility`() {
+        val appShortcutActions = mockk<com.nendo.argosy.ui.screens.common.AppShortcutActions>(relaxed = true)
+        manager = newManager(scope = testScope.backgroundScope, appShortcutActions = appShortcutActions)
+        val activityScope = bindToActivityScope()
+
+        manager.runAppMenuRow(
+            APP_PACKAGE,
+            com.nendo.argosy.ui.components.AppMenuRow.Action(
+                com.nendo.argosy.ui.components.AppContextMenuItem.TOGGLE_VISIBILITY
+            )
+        )
+        activityScope.cancel()
+        testScope.testScheduler.runCurrent()
+
+        io.mockk.coVerify(exactly = 1) { appShortcutActions.toggleHidden(APP_PACKAGE) }
+    }
+
+    @Test
+    fun `opening an app on a chosen screen just before the activity is destroyed still records that screen`() {
+        val appsRepository = mockk<com.nendo.argosy.data.repository.AppsRepository>(relaxed = true)
+        manager = newManager(scope = testScope.backgroundScope, appsRepository = appsRepository)
+        val activityScope = bindToActivityScope()
+
+        manager.runAppMenuRow(
+            APP_PACKAGE,
+            com.nendo.argosy.ui.components.AppMenuRow.OpenOnScreen(
+                LOWER_SCREEN.displayId,
+                LOWER_SCREEN.number,
+                LOWER_SCREEN.key
+            )
+        )
+        activityScope.cancel()
+        testScope.testScheduler.runCurrent()
+
+        io.mockk.coVerify(exactly = 1) {
+            preferencesRepository.setAppDisplayTarget(APP_PACKAGE, LOWER_SCREEN.key)
+        }
+    }
+
+    @Test
+    fun `a session ended just before the activity is destroyed still stops the external emulator`() {
+        val endedSession = com.nendo.argosy.data.emulator.ActiveSession(
+            gameId = GAME_ID,
+            startTime = java.time.Instant.EPOCH,
+            emulatorPackage = EXTERNAL_EMULATOR
+        )
+        val sessionTracker = mockk<com.nendo.argosy.data.emulator.PlaySessionTracker>(relaxed = true) {
+            every { activeSession } returns MutableStateFlow(endedSession)
+        }
+        val sessionEnd = mockk<com.nendo.argosy.ui.screens.common.SessionEndCoordinator>(relaxed = true)
+        every { sessionStateStore.getEmulatorPackage() } returns EXTERNAL_EMULATOR
+        manager = newManager(
+            scope = testScope.backgroundScope,
+            playSessionTracker = sessionTracker,
+            sessionEndCoordinator = sessionEnd
+        )
+        manager.setDualScreenDevice(true)
+        val activityScope = bindToActivityScope()
+
+        manager.endSessionAfterEmulatorLeft()
+        activityScope.cancel()
+        testScope.testScheduler.runCurrent()
+
+        io.mockk.coVerify(exactly = 1) { sessionEnd.stopBackgroundEmulator(EXTERNAL_EMULATOR) }
+    }
+
+    private fun bindToActivityScope(): kotlinx.coroutines.CoroutineScope {
+        val activityScope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.SupervisorJob() + testDispatcher)
+        manager.rebind(mockk(relaxed = true), activityScope)
+        testScope.testScheduler.runCurrent()
+        return activityScope
+    }
+
     private fun launcherOn(displayId: Int): android.app.Activity =
         mockk(relaxed = true) {
             every { window.decorView.display.displayId } returns displayId
@@ -857,6 +964,7 @@ class DualScreenManagerRoleSwapTest {
     private companion object {
         const val PRIMARY_DISPLAY = 0
         const val EXTERNAL_EMULATOR = "org.example.emulator"
+        const val APP_PACKAGE = "org.example.app"
         const val EMULATOR_SETTLE_MS = 2_000L
         const val PRESENTATION_DISPLAY = 1
         const val VIRTUAL_DISPLAY = 9
@@ -885,7 +993,9 @@ class DualScreenManagerRoleSwapTest {
         },
         permissionHelper: com.nendo.argosy.util.PermissionHelper = mockk(relaxed = true),
         gameDao: com.nendo.argosy.data.local.dao.GameDao = mockk(relaxed = true),
-        imageCacheManager: com.nendo.argosy.data.cache.ImageCacheManager = mockk(relaxed = true)
+        imageCacheManager: com.nendo.argosy.data.cache.ImageCacheManager = mockk(relaxed = true),
+        appsRepository: com.nendo.argosy.data.repository.AppsRepository = mockk(relaxed = true),
+        appShortcutActions: com.nendo.argosy.ui.screens.common.AppShortcutActions = mockk(relaxed = true)
     ): DualScreenManager = DualScreenManager(
         context = hostContext,
         scope = scope,
@@ -920,8 +1030,8 @@ class DualScreenManagerRoleSwapTest {
         syncPreferencesRepository = mockk(relaxed = true),
         homeTileRepository = mockk(relaxed = true),
         homeTilePromptQueue = mockk(relaxed = true),
-        appsRepository = mockk(relaxed = true),
-        appShortcutActions = mockk(relaxed = true),
+        appsRepository = appsRepository,
+        appShortcutActions = appShortcutActions,
         notificationManager = mockk(relaxed = true),
         titleIdDownloadObserver = mockk(relaxed = true),
         homeGridPageRepository = mockk(relaxed = true),

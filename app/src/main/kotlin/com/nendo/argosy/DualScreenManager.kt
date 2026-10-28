@@ -1877,7 +1877,7 @@ class DualScreenManager(
         if (_swappedIsGameActive.value) onSessionChanged(-1L) else broadcastSessionCleared()
         if (emulatorPackage == null || !_isDualScreenDevice.value) return
         if (emulatorPackage == com.nendo.argosy.data.emulator.EmulatorRegistry.BUILTIN_PACKAGE) return
-        scope.launch {
+        activityIndependentScope.launch {
             releaseStoppedEmulator(
                 emulatorPackage = emulatorPackage,
                 endedSession = endedSession,
@@ -1979,9 +1979,9 @@ class DualScreenManager(
                 launchCompanionApp(packageName, row.screenKey)
             is com.nendo.argosy.ui.components.AppMenuRow.Action -> when (row.item) {
                 com.nendo.argosy.ui.components.AppContextMenuItem.TOGGLE_SECONDARY_HOME ->
-                    scope.launch { appShortcutActions.togglePinned(packageName) }
+                    activityIndependentScope.launch { appShortcutActions.togglePinned(packageName) }
                 com.nendo.argosy.ui.components.AppContextMenuItem.TOGGLE_VISIBILITY ->
-                    scope.launch { appShortcutActions.toggleHidden(packageName) }
+                    activityIndependentScope.launch { appShortcutActions.toggleHidden(packageName) }
                 com.nendo.argosy.ui.components.AppContextMenuItem.UNINSTALL ->
                     activityContext.startActivity(appShortcutActions.uninstallIntent(packageName))
                 else -> Unit
@@ -2242,7 +2242,7 @@ class DualScreenManager(
      */
     fun applyDisplayRoleOverride(override: DisplayRoleOverride) {
         sessionStateStore.setDisplayRoleOverride(override.name)
-        scope.launch { preferencesRepository.setDisplayRoleOverride(override) }
+        activityIndependentScope.launch { preferencesRepository.setDisplayRoleOverride(override) }
         val resolved = DisplayRoleResolver(displayAffinityHelper, sessionStateStore).isSwapped
         if (resolved == _isRolesSwapped.value) return
         if (sessionStateStore.hasActiveSession()) {
@@ -2398,10 +2398,12 @@ class DualScreenManager(
     fun launchCompanionApp(packageName: String, pinnedScreenKey: String? = null) {
         val intent = appsRepository.getLaunchIntent(packageName) ?: return
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        scope.launch {
-            if (pinnedScreenKey != null) {
+        if (pinnedScreenKey != null) {
+            activityIndependentScope.launch {
                 preferencesRepository.setAppDisplayTarget(packageName, pinnedScreenKey)
             }
+        }
+        scope.launch {
             val prefs = preferencesRepository.userPreferences.first()
             val options = displayAffinityHelper.getAppLaunchOptions(
                 preferredScreenKey = pinnedScreenKey ?: prefs.appDisplayTargets[packageName],
