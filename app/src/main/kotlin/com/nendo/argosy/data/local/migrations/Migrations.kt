@@ -4285,6 +4285,15 @@ object Migration_218_219 : Migration(218, 219) {
     }
 }
 
+object Migration_219_220 : Migration(219, 220) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            "DELETE FROM `emulator_save_config` WHERE `emulatorId` = 'hakux' " +
+                "AND `isAutoDetected` = 1 AND `isUserOverride` = 0"
+        )
+    }
+}
+
 object Migration_203_204 : Migration(203, 204) {
     override fun migrate(db: SupportSQLiteDatabase) {
         db.execSQL(

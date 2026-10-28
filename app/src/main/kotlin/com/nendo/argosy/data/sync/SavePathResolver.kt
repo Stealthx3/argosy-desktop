@@ -641,13 +641,13 @@ class SavePathResolver @Inject constructor(
     }
 
     private fun findSaveFolderBySaveId(basePath: String, titleId: String, platformSlug: String): String? {
-        if (!directoryExists(basePath)) {
-            Logger.debug(TAG, "[SaveSync] DISCOVER | Base path does not exist | path=$basePath")
-            return null
-        }
         Logger.debug(TAG, "[SaveSync] DISCOVER | Scanning base path | path=$basePath, titleId=$titleId, platform=$platformSlug")
 
         if (platformSlug == "switch") {
+            if (!directoryExists(basePath)) {
+                Logger.debug(TAG, "[SaveSync] DISCOVER | Base path does not exist | path=$basePath")
+                return null
+            }
             return switchSaveHandler.findSaveFolderBySaveId(basePath, titleId)
         }
         return saveHandlerRegistry.getFolderHandler(platformSlug)

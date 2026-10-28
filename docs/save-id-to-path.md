@@ -360,47 +360,33 @@ not been read from the app, and a guessed path resolves to a directory the
 emulator never writes. `EmulatorRegistry` still routes `xbox360` to `ax360e`
 and `ax360e_free`, so AX360E launches games but does not sync their saves.
 
-### Xbox (the path names an image, not a folder)
+### Xbox (`XboxSaveHandler`, root only)
 
-The one platform whose save is not a host file. Saves are written to
-`E:\UDATA\<save_id>\` inside a FATX filesystem inside the disk image the
-emulator boots, and `save_id` here is the raw hex title id the console names
-the directory after, not the `MS-100` serial printed on the disc.
+`save_id` is the raw hex title id from the XBE certificate, not the `MS-100`
+serial printed on the disc. The game writes its save to `E:\UDATA\<save_id>\`.
 
-`hakux`'s `defaultPaths` names the directory holding that image, not the saves:
+hakuX 1.x runs its own core and keeps E: as host folders in its private app
+storage (`NativeCoreActivity.hddDir()` is `File(filesDir, "native/hdd")`, and
+no setting moves it):
 
 ```
-{extStorage}/Android/data/com.rfandango.haku_x/files/x1box
+/data/data/com.rfandango.haku_x/files/native/hdd/Partition1/UDATA/<save_id>/
 ```
 
-hakuX ingests the flash ROM, MCPX and hard disk into that directory during
-setup, renaming them to `flash.bin`, `mcpx.bin` and `hdd.img`, and boots from
-its own copies. The file is qcow2 despite the `.img` name, so the reader checks
-the `QFI\xfb` magic rather than trusting the extension.
+hakuX names the folders in lower case and its core matches them in any case, so
+lookup is case-insensitive and a new folder is written in lower case.
 
-Two layers sit between the path and the save. `Qcow2Image` maps guest offsets
-through the L1 and L2 tables, and `FatxVolume` reads the filesystem inside. The
-E: partition begins at sector `0x55F400` on every Xbox-shaped image and runs to
-the end of the disk, which is upstream-exact and must not be recomputed.
+Only the vendor root daemon reaches that folder, so the config is
+`requiresRoot`. `XboxSaveHandler` copies the title's folder through root into
+`cache/xbox-saves/<save_id>` and hands that to the ordinary folder pipeline. It
+restages on every read, because hakuX writes the folder without telling us. On
+restore it unpacks into the staging folder, then root-copies the tree back over
+the title's folder, owned by hakuX's uid, dirs 700 and files 600.
 
-`XboxSaveHandler` stages a save out of the image into the app cache and hands
-that directory to the ordinary folder pipeline, then writes the staged tree back
-in on restore. Nothing downstream of the handler knows a container is involved.
-Staging is rebuilt from the image on every read, because the emulator writes the
-image without telling us and a cached copy would upload a stale save.
-
-Writing is in place only. A file must already exist in the image at the same
-size, so a save can be restored over itself but one the emulator has never
-written cannot be introduced. Growing a file or creating one needs cluster
-allocation, which means updating the qcow2 refcount tables, and a mistake there
-damages an image the user cannot rebuild.
-
-The image is also registered in `BiosPathRegistry` under the firmware name
-`xbox_hdd.qcow2`, mapped to `hdd.img` on disk and listed in
-`writeOnceFileNames`, so BIOS
-redistribution never copies a fresh one over it. Every other firmware entry is a
-static blob where overwriting is harmless; this one is a volume the user's saves
-live inside.
+hakuX signs saves with a default HD key every install shares, unless the user
+imported their own console's EEPROM, so a save carries between hakuX installs as
+is. The 0.3.x disk image (`x1box/hdd.img`, qcow2) is no longer read, and
+`xbox_hdd.qcow2` firmware is never distributed.
 
 ### Dreamcast (`DreamcastSaveHandler`)
 

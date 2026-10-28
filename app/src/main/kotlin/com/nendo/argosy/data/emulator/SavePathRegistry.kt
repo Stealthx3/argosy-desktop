@@ -600,19 +600,14 @@ object SavePathRegistry {
             usesFolderBasedSaves = true
         ),
 
-        /**
-         * Xbox - the path names the directory holding the emulator's disk image, not the saves.
-         * Saves live at `E:\UDATA\<save_id>\` inside a FATX filesystem inside `hdd.img`, which
-         * hakuX ingests into its own directory during setup and boots from there. `XboxSaveHandler`
-         * stages them out of the image and back into it, so everything downstream sees files.
-         */
         "hakux" to SavePathConfig(
             emulatorId = "hakux",
             defaultPaths = listOf(
-                "{extStorage}/Android/data/com.rfandango.haku_x/files/x1box"
+                "/data/data/com.rfandango.haku_x/files/native/hdd/Partition1/UDATA"
             ),
             saveExtensions = listOf("*"),
-            usesFolderBasedSaves = true
+            usesFolderBasedSaves = true,
+            requiresRoot = true
         ),
 
         // Wii U - folder-based saves by title ID

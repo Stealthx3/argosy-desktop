@@ -38,7 +38,6 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 private const val TAG = "BiosRepository"
-private const val XBOX_EMULATOR_ID = "hakux"
 private const val BIOS_INTERNAL_DIR = "bios"
 private const val FIRMWARE_STALL_TIMEOUT_MS = 90_000L
 private const val FIRMWARE_PART_SUFFIX = ".part"
@@ -107,8 +106,7 @@ class BiosRepository @Inject constructor(
     private val platformDao: PlatformDao,
     private val userPreferencesRepository: UserPreferencesRepository,
     private val switchKeyManager: SwitchKeyManager,
-    private val attributionRepository: StorageAttributionRepository,
-    private val xboxDiskImageProvisioner: com.nendo.argosy.data.sync.xbox.XboxDiskImageProvisioner
+    private val attributionRepository: StorageAttributionRepository
 ) {
     private var api: RomMApi? = null
 
@@ -518,7 +516,7 @@ class BiosRepository @Inject constructor(
             for (dir in dirs) {
                 if (!dir.exists()) continue
                 for (firmware in firmwareFiles) {
-                    if (config.isWriteOnce(firmware.fileName)) continue
+                    if (config.skips(firmware.fileName)) continue
                     try {
                         deleteDistributedCopy(File(dir, firmware.fileName), firmware)
                         deleteDistributedCopy(File(dir, config.targetNameFor(firmware.fileName)), firmware)
@@ -585,11 +583,8 @@ class BiosRepository @Inject constructor(
                     config.targetNameFor(firmware.fileName)
                 }
 
+                if (config.skips(firmware.fileName)) continue
                 val targetFile = File(targetDir, targetFileName)
-                if (config.isWriteOnce(firmware.fileName) && targetFile.exists()) {
-                    Logger.debug(TAG, "Keeping existing ${targetFile.name}; it is written once")
-                    continue
-                }
                 try {
                     targetFile.parentFile?.mkdirs()
                     sourceFile.copyTo(targetFile, overwrite = true)
@@ -603,19 +598,7 @@ class BiosRepository @Inject constructor(
             if (copiedCount > 0) break
         }
 
-        provisionXboxDiskImage(emulatorId, targetPaths)
         copiedCount
-    }
-
-    /**
-     * hakuX cannot boot without a hard disk, and unlike the flash ROM and MCPX that disk holds
-     * nothing copyrighted, so a blank one is generated rather than demanded from the user. An
-     * image already in place is left alone; it is where their saves live.
-     */
-    private suspend fun provisionXboxDiskImage(emulatorId: String, targetPaths: List<String>) {
-        if (emulatorId != XBOX_EMULATOR_ID) return
-        targetPaths.firstOrNull { File(it).isDirectory }
-            ?.let { xboxDiskImageProvisioner.ensureImageExists(it) }
     }
 
     suspend fun distributeAllBiosToEmulators(): Map<String, Int> = withContext(Dispatchers.IO) {
