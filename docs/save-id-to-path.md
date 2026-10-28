@@ -385,8 +385,9 @@ the title's folder, owned by hakuX's uid, dirs 700 and files 600.
 
 hakuX signs saves with a default HD key every install shares, unless the user
 imported their own console's EEPROM, so a save carries between hakuX installs as
-is. The 0.3.x disk image (`x1box/hdd.img`, qcow2) is no longer read, and
-`xbox_hdd.qcow2` firmware is never distributed.
+is. The 0.3.x disk image (`x1box/hdd.img`, qcow2) is no longer read.
+`xbox_hdd.qcow2` is retired firmware (`BiosPathRegistry.isRetiredFirmware`):
+firmware sync gives it no row and deletes any copy in Argosy's BIOS folders.
 
 ### Dreamcast (`DreamcastSaveHandler`)
 

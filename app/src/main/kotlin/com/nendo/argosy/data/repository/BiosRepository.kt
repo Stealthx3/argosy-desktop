@@ -201,7 +201,9 @@ class BiosRepository @Inject constructor(
         platformSlug: String,
         firmware: List<RomMFirmware>
     ) {
-        val (missing, available) = firmware.partition { it.missingFromFs }
+        val (retired, offered) = firmware.partition { BiosPathRegistry.isRetiredFirmware(it.fileName) }
+        purgeRetiredFirmware(platformSlug, retired)
+        val (missing, available) = offered.partition { it.missingFromFs }
         val heldWhileMissing = missing.filter { firmwareDao.getByRommId(it.id)?.localPath != null }.map { it.id }
         if (missing.isNotEmpty()) {
             Logger.info(TAG, "Skipping ${missing.size} firmware files missing from the server for $platformSlug, keeping ${heldWhileMissing.size} already downloaded")
@@ -234,6 +236,27 @@ class BiosRepository @Inject constructor(
 
         if (entities.isNotEmpty()) firmwareDao.upsertAll(entities)
         firmwareDao.deleteRemovedFirmware(platformId, available.map { it.id } + heldWhileMissing)
+    }
+
+    private suspend fun purgeRetiredFirmware(platformSlug: String, retired: List<RomMFirmware>) {
+        if (retired.isEmpty()) return
+        val roots = biosRootsArgosyWritesTo()
+        val recorded = retired.mapNotNull { firmwareDao.getByRommId(it.id)?.localPath }
+            .filter { path -> roots.any { path.startsWith(it) } }
+            .map(::File)
+        val expected = roots.flatMap { root -> retired.map { File(File(root, platformSlug), it.fileName) } }
+        val freed = (recorded + expected)
+            .flatMap { listOf(it, File(it.path + FIRMWARE_PART_SUFFIX)) }
+            .distinctBy { it.absolutePath }
+            .filter { it.isFile }
+            .sumOf { file ->
+                val size = file.length()
+                if (file.delete()) size else 0L.also { Logger.warn(TAG, "Could not delete retired firmware $file") }
+            }
+        if (freed > 0) {
+            Logger.info(TAG, "Deleted retired firmware for $platformSlug, freeing $freed bytes")
+            attributionRepository.markDirty(StorageCategory.BIOS)
+        }
     }
 
     suspend fun downloadFirmware(
@@ -540,7 +563,6 @@ class BiosRepository @Inject constructor(
             for (dir in dirs) {
                 if (!dir.exists()) continue
                 for (firmware in firmwareFiles) {
-                    if (config.skips(firmware.fileName)) continue
                     try {
                         deleteDistributedCopy(File(dir, firmware.fileName), firmware)
                         deleteDistributedCopy(File(dir, config.targetNameFor(firmware.fileName)), firmware)
@@ -607,7 +629,6 @@ class BiosRepository @Inject constructor(
                     config.targetNameFor(firmware.fileName)
                 }
 
-                if (config.skips(firmware.fileName)) continue
                 val targetFile = File(targetDir, targetFileName)
                 try {
                     targetFile.parentFile?.mkdirs()

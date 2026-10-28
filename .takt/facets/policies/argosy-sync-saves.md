@@ -49,4 +49,4 @@ any handler or path change; it holds the per-platform rules. Sources: AGENTS.md 
 
 - `XboxSaveHandler` restages from hakuX's `UDATA` folder through root on each read.
 - Every restore door reaches hakuX through `unpackArchive`'s root write-back, owned by hakuX's uid.
-- `xbox_hdd.qcow2` stays in hakuX's `skippedFileNames` in `BiosPathRegistry`.
+- `xbox_hdd.qcow2` stays retired firmware (`BiosPathRegistry.isRetiredFirmware`), never tracked or kept.

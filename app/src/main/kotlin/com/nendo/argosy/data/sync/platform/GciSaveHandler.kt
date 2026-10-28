@@ -24,10 +24,19 @@ class GciSaveHandler @Inject constructor(
 ) : PlatformSaveHandler {
     companion object {
         private const val TAG = "GciSaveHandler"
+
+        fun isGciServerFileName(fileName: String): Boolean =
+            fileName.endsWith(".gci", ignoreCase = true) || fileName.endsWith(".zip", ignoreCase = true)
     }
+
+    override fun isValidCachedSavePath(path: String): Boolean = path.endsWith(".gci", ignoreCase = true)
 
     override suspend fun prepareForUpload(localPath: String, context: SaveContext): PreparedSave? =
         withContext(Dispatchers.IO) {
+            if (GameCubeHeaderParser.parseGciHeader(fal.getTransformedFile(localPath)) == null) {
+                Logger.warn(TAG, "prepareForUpload: not a GCI, refusing to upload it as a GameCube save | localPath=$localPath")
+                return@withContext null
+            }
             val gciPaths = unitMembers(localPath)
             if (gciPaths.isEmpty()) {
                 Logger.debug(TAG, "prepareForUpload: No GCI files found | localPath=$localPath")

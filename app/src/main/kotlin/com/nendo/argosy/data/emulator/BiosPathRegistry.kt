@@ -33,21 +33,13 @@ data class BiosPathConfig(
      * the user supplies; the shared md5 and nested-path tables stay global because those names
      * are not one emulator's private preference.
      */
-    val fileNameOverrides: Map<String, String> = emptyMap(),
-    /**
-     * Firmware this emulator never takes. Distribution does not copy these names and cleanup
-     * does not touch them.
-     */
-    val skippedFileNames: Set<String> = emptySet()
+    val fileNameOverrides: Map<String, String> = emptyMap()
 ) {
     fun targetNameFor(fileName: String): String =
         fileNameOverrides.entries
             .firstOrNull { it.key.equals(fileName, ignoreCase = true) }
             ?.value
             ?: fileName
-
-    fun skips(fileName: String): Boolean =
-        skippedFileNames.any { it.equals(fileName, ignoreCase = true) }
 
     fun supports(canonicalSlug: String): Boolean =
         acceptsAnyPlatform || canonicalSlug in supportedPlatforms
@@ -303,6 +295,15 @@ object BiosPathRegistry {
         )
     )
 
+    private val retiredFirmwareNames = setOf("xbox_hdd.qcow2")
+
+    /**
+     * Firmware no supported emulator reads. Argosy neither tracks nor keeps these files, even
+     * when the server offers them.
+     */
+    fun isRetiredFirmware(fileName: String): Boolean =
+        retiredFirmwareNames.any { it.equals(fileName, ignoreCase = true) }
+
     private val primaryRoot: String get() = StoragePathUtils.primaryExternalRoot
 
     private val emulatorBiosPaths: Map<String, BiosPathConfig> by lazy {
@@ -351,8 +352,7 @@ object BiosPathRegistry {
                 "Complex_4627.bin" to "flash.bin",
                 "Complex_4627v1.03.bin" to "flash.bin",
                 "mcpx_1.0.bin" to "mcpx.bin"
-            ),
-            skippedFileNames = setOf("xbox_hdd.qcow2")
+            )
         ),
         "melonds" to BiosPathConfig(
             emulatorId = "melonds",

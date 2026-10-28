@@ -211,6 +211,19 @@ class BiosFirmwareSyncTest {
     }
 
     @Test
+    fun `retired firmware the server still lists gets no row and its local copies are deleted`() = runBlocking {
+        val disk = biosFile("xbox_hdd.qcow2").apply { parentFile.mkdirs(); writeBytes(ByteArray(16)) }
+        val part = biosFile("xbox_hdd.qcow2.part").apply { writeBytes(ByteArray(8)) }
+        rows += row(30, 3, "xbox_hdd.qcow2", localPath = disk.absolutePath)
+
+        repository.syncPlatformFirmware(3, "3ds", listOf(remote(30, "xbox_hdd.qcow2"), remote(11, "aes_keys.txt")))
+
+        assertEquals(listOf(11L), rows.map { it.rommId })
+        assertFalse(disk.exists())
+        assertFalse(part.exists())
+    }
+
+    @Test
     fun `a download whose row is pruned while it transfers leaves no file behind`() = runBlocking {
         rows += row(10, 3, "firmware.bin")
         duringTransfer = { rows.removeAll { it.rommId == 10L } }

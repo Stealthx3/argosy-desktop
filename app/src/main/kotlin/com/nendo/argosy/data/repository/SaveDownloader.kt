@@ -231,6 +231,10 @@ class SaveDownloader @Inject constructor(
             serverSave.fileName.endsWith(".zip", ignoreCase = true) && !isGciFormat)
         val isSwitchEmulator = sigilRoot == null && resolvedEmulatorId in SaveSyncApiClient.SWITCH_EMULATOR_IDS
         Logger.debug(TAG, "[SaveSync] DOWNLOAD gameId=$gameId | Save info | fileName=${serverSave.fileName}, isFolderBased=$isFolderBased, isGciFormat=$isGciFormat, isSwitchEmulator=$isSwitchEmulator")
+        if (isGciFormat && !GciSaveHandler.isGciServerFileName(serverSave.fileName)) {
+            Logger.info(TAG, "[SaveSync] DOWNLOAD gameId=$gameId | Skipped: server save is not a GameCube memory card file | fileName=${serverSave.fileName}")
+            return@withContext SaveSyncResult.NoSaveFound
+        }
 
         var strandedCardToMigrate: String? = null
         val preDownloadTargetPath = if (sigilRoot != null) {

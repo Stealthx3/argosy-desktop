@@ -154,6 +154,7 @@ class PlatformSaveHandlerRegistry @Inject constructor(
     fun isValidCachedSavePath(platformSlug: String, path: String): Boolean {
         val canonical = canonicalSlug(platformSlug)
         if (canonical == "switch") return switchSaveHandler.isValidCachedSavePath(path)
+        if (canonical == GAMECUBE_SLUG) return gciSaveHandler.isValidCachedSavePath(path)
         return folderHandlers[canonical]?.isValidCachedSavePath(path) ?: true
     }
 
@@ -183,6 +184,7 @@ class PlatformSaveHandlerRegistry @Inject constructor(
         val RETROARCH_EMULATOR_IDS = setOf("retroarch", "retroarch_64", "retroarch_32")
         val UNIT_EMULATOR_IDS = RETROARCH_EMULATOR_IDS + EmulatorRegistry.BUILTIN_ID + EmulatorRegistry.LEGACY_BUILTIN_ID
         private const val FLYCAST_STANDALONE_ID = "flycast"
+        private const val GAMECUBE_SLUG = "gc"
     }
 }
 
