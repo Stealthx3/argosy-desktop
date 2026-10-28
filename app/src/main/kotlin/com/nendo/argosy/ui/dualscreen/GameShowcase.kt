@@ -140,11 +140,11 @@ fun GameShowcase(
     val reduced = LocalMotionTier.current == MotionTier.Reduced
     val durations = remember(reduced) { showcaseMotionDurations(reduced) }
     val scope = rememberCoroutineScope()
-    val coordinator = remember(scope) {
+    val coordinator = remember(scope, reduced) {
         ShowcaseMotionCoordinator(scope, if (reduced) 0L else Motion.transitionDebounceMs)
     }
     val key = liveDetail.gameId ?: UNIDENTIFIED_GAME_KEY
-    LaunchedEffect(key) { coordinator.focus(key) }
+    LaunchedEffect(coordinator, key) { coordinator.focus(key) }
     val motion by coordinator.state.collectAsState()
     val last = remember { arrayOfNulls<CompanionDetail>(1) }
     val heldDetail = if (motion.contentKey == key) liveDetail else last[0]
@@ -272,7 +272,8 @@ private fun GameShowcaseContent(
                         motion, durations, durations.coverDelayMs, durations.coverDriftDp,
                         horizontal = false, onFinished = onEntranceFinished
                     ).modifier,
-                    floatLayer = Modifier.showcaseFloat(motion, durations)
+                    motion = motion,
+                    durations = durations
                 )
                 PresentationLayout.CINEMATIC -> CinematicShowcase(
                     detail = heldDetail,
@@ -344,7 +345,13 @@ private fun presentationScrimColor(): Color = if (LocalLauncherTheme.current.isD
 }
 
 @Composable
-private fun LogoShowcase(detail: CompanionDetail, gutter: Dp, coverLayer: Modifier, floatLayer: Modifier) {
+private fun LogoShowcase(
+    detail: CompanionDetail,
+    gutter: Dp,
+    coverLayer: Modifier,
+    motion: ShowcaseMotionState,
+    durations: ShowcaseMotionDurations
+) {
     val theme = LocalArgosyTheme.current
     Box(
         modifier = Modifier
@@ -354,6 +361,7 @@ private fun LogoShowcase(detail: CompanionDetail, gutter: Dp, coverLayer: Modifi
     ) {
         var logoFailed by remember(detail.logoUrl) { mutableStateOf(false) }
         val logo = detail.logoUrl?.takeIf { !logoFailed }
+        val floatLayer = Modifier.showcaseFloat(motion, durations, enabled = logo != null)
         Box(Modifier.fillMaxSize().then(coverLayer).then(floatLayer), contentAlignment = Alignment.Center) {
             if (logo != null) {
                 val glow = theme.surfaceBase

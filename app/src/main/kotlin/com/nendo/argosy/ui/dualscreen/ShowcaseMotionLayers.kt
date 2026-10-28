@@ -113,11 +113,12 @@ internal fun rememberShowcaseLayer(
 @Composable
 internal fun Modifier.showcaseFloat(
     motion: ShowcaseMotionState,
-    durations: ShowcaseMotionDurations
+    durations: ShowcaseMotionDurations,
+    enabled: Boolean
 ): Modifier {
     val halfTravel = with(LocalDensity.current) { durations.floatTravelDp.dp.toPx() } / 2f
     val offset = remember { Animatable(0f) }
-    val floating = motion.phase == ShowcaseMotionPhase.AtRest && durations.floatEnabled
+    val floating = enabled && motion.phase == ShowcaseMotionPhase.AtRest && durations.floatEnabled
     LaunchedEffect(floating, halfTravel) {
         if (floating) {
             while (true) {
