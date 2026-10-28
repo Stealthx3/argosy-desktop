@@ -363,7 +363,8 @@ class BiosRepository @Inject constructor(
             }
 
             firmwareRowsLock.withLock {
-                if (firmwareDao.getByRommId(firmware.rommId) == null) {
+                val current = firmwareDao.getByRommId(firmware.rommId)
+                if (current == null) {
                     partFile.delete()
                     Logger.info(TAG, "Dropped ${firmware.fileName}: the server stopped offering it during the download")
                     return@withContext BiosDownloadResult.Error("No longer offered by the server")
@@ -374,7 +375,7 @@ class BiosRepository @Inject constructor(
                     Logger.error(TAG, "Could not move ${firmware.fileName} into place")
                     return@withContext BiosDownloadResult.Error("Could not save the downloaded file")
                 }
-                firmwareDao.updateLocalPath(firmware.id, targetFile.absolutePath, Instant.now())
+                firmwareDao.updateLocalPath(current.id, targetFile.absolutePath, Instant.now())
             }
             Logger.info(TAG, "Downloaded firmware: ${firmware.fileName}")
 

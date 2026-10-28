@@ -224,6 +224,21 @@ class BiosFirmwareSyncTest {
     }
 
     @Test
+    fun `a download whose row is re-created under a new id while it transfers records on the new row`() = runBlocking {
+        rows += row(10, 3, "firmware.bin")
+        duringTransfer = {
+            rows.removeAll { it.rommId == 10L }
+            rows += row(10, 3, "firmware.bin").copy(id = 99)
+        }
+
+        val result = repository.downloadFirmware(10)
+
+        assertTrue(result is BiosDownloadResult.Success)
+        assertTrue(biosFile("firmware.bin").exists())
+        assertEquals(biosFile("firmware.bin").absolutePath, rows.single().localPath)
+    }
+
+    @Test
     fun `a sync running while a download finishes never leaves a file without its row`() = runBlocking {
         rows += row(10, 3, "firmware.bin")
         val syncReading = CompletableDeferred<Unit>()
