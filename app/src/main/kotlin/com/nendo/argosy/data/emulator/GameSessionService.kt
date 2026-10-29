@@ -70,6 +70,7 @@ class GameSessionService : Service() {
     @Inject lateinit var activityReporter:
         com.nendo.argosy.data.social.uploader.RomMActivityReporter
     @Inject lateinit var permissionHelper: PermissionHelper
+    @Inject lateinit var pspSavePrefixLearner: com.nendo.argosy.data.sync.PspSavePrefixLearner
 
     private val serviceScope = SafeCoroutineScope(Dispatchers.IO, "GameSessionService")
     private val handler = Handler(Looper.getMainLooper())
@@ -95,6 +96,8 @@ class GameSessionService : Service() {
     private var sessionStartTime: Long = 0
     private var isOverlayVisible = false
     private var isWaitingForDirectory = false
+    private var watchRoot: File? = null
+    private val sessionWrittenFolders = mutableSetOf<String>()
     private var lastMidGameCacheId: Long = -1
     private val midGameCacheMutex = Mutex()
     private var lastOverlayShownAt: Long = 0L
@@ -303,6 +306,7 @@ class GameSessionService : Service() {
 
     private fun startWatching(watchPath: String) {
         val watchDir = File(watchPath)
+        watchRoot = watchDir
 
         if (!watchDir.exists()) {
             Logger.debug(TAG, "Save directory doesn't exist yet, polling: ${watchDir.absolutePath}")
@@ -375,6 +379,7 @@ class GameSessionService : Service() {
 
                     if (event and ALL_EVENTS == MODIFY) {
                         handler.post {
+                            recordWrittenFolder(dir, path)
                             if (!inPlaceWriteSeen) {
                                 inPlaceWriteSeen = true
                                 Logger.debug(TAG, "Save written in place: $path in ${dir.name}")
@@ -387,6 +392,7 @@ class GameSessionService : Service() {
                     }
 
                     handler.post {
+                        recordWrittenFolder(dir, path)
                         Logger.debug(TAG, "Save change detected: $path in ${dir.name} (event=$event)")
                         if (currentGameId != -1L) {
                             com.nendo.argosy.util.SaveDebugLogger.logLiveCacheObserve(
@@ -406,9 +412,17 @@ class GameSessionService : Service() {
         }
     }
 
+    private fun recordWrittenFolder(dir: File, path: String) {
+        val root = watchRoot ?: return
+        val relative = if (dir == root) path else "${dir.relativeTo(root).path}/$path"
+        relative.substringBefore('/').takeIf { it.isNotEmpty() }?.let { sessionWrittenFolders += it }
+    }
+
     private fun stopWatching() {
         watchGeneration++
         isWaitingForDirectory = false
+        watchRoot = null
+        sessionWrittenFolders.clear()
         fileObservers.forEach { it.stopWatching() }
         fileObservers.clear()
         handler.removeCallbacksAndMessages(null)
@@ -451,26 +465,37 @@ class GameSessionService : Service() {
         com.nendo.argosy.util.SaveDebugLogger.logLiveCacheFire(gameId = gameId, savePath = savePath)
 
         updateNotification(currentGameTitle, NotificationState.SAVE_DETECTED)
-        if (currentEmulatorPackage != EmulatorRegistry.BUILTIN_PACKAGE) showOverlayBriefly()
+        val isBuiltin = currentEmulatorPackage == EmulatorRegistry.BUILTIN_PACKAGE
+        if (!isBuiltin) showOverlayBriefly()
 
         broadcastSaveStateChanged(isDirty = true)
+        val writtenFolders = sessionWrittenFolders.toSet()
+        val channelName = currentChannelName
+        val isHardcore = currentIsHardcore
 
         serviceScope.launch {
             midGameCacheMutex.withLock {
                 try {
                     val previousCacheId = lastMidGameCacheId
+                    val cache = suspend {
+                        saveCacheManager.cacheCurrentSave(
+                            gameId = gameId,
+                            emulatorId = emulatorId,
+                            savePath = savePath,
+                            channelName = channelName,
+                            isLocked = false,
+                            isHardcore = isHardcore,
+                            skipDuplicateCheck = false,
+                            needsRemoteSync = true,
+                            claimNewSaves = true
+                        )
+                    }
 
-                    val result = saveCacheManager.cacheCurrentSave(
-                        gameId = gameId,
-                        emulatorId = emulatorId,
-                        savePath = savePath,
-                        channelName = currentChannelName,
-                        isLocked = false,
-                        isHardcore = currentIsHardcore,
-                        skipDuplicateCheck = false,
-                        needsRemoteSync = true,
-                        claimNewSaves = true
-                    )
+                    val first = cache()
+                    val result = if (
+                        first is SaveCacheManager.CacheResult.Failed && isBuiltin &&
+                        pspSavePrefixLearner.adopt(gameId, writtenFolders) != null
+                    ) cache() else first
 
                     if (result is SaveCacheManager.CacheResult.Created && previousCacheId > 0) {
                         saveCacheManager.deleteCachedSave(previousCacheId)

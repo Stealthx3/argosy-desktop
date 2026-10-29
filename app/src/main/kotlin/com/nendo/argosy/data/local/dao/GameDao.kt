@@ -1144,6 +1144,12 @@ interface GameDao {
     @Query("UPDATE games SET saveId = :saveId WHERE id = :gameId")
     suspend fun setSaveId(gameId: Long, saveId: String?)
 
+    @Query(
+        "SELECT COUNT(*) FROM games WHERE id != :gameId AND platformSlug = :platformSlug " +
+            "AND (UPPER(saveId) = UPPER(:saveId) OR UPPER(titleId) = UPPER(:saveId))"
+    )
+    suspend fun countOtherGamesKeyedBy(gameId: Long, platformSlug: String, saveId: String): Int
+
     @Query("UPDATE games SET saveFeatures = :features WHERE id = :gameId")
     suspend fun setSaveFeatures(gameId: Long, features: Int)
 

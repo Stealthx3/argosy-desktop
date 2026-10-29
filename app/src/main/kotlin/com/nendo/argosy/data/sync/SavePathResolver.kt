@@ -521,6 +521,18 @@ class SavePathResolver @Inject constructor(
             for (basePath in resolvedPaths) {
                 val saveFolder = findSaveFolderBySaveId(basePath, extractedSaveId, platformSlug)
                 if (saveFolder != null) {
+                    val replacesStaleSaveId = gameId != null && !shouldCacheExtracted &&
+                        extractionResult.fromBinary &&
+                        !storedGame?.saveId.equals(extractedSaveId, ignoreCase = true) &&
+                        (!isSwitchPlatform || switchSaveHandler.isValidTitleId(extractedSaveId))
+                    if (replacesStaleSaveId) {
+                        Logger.info(
+                            TAG,
+                            "[SaveSync] DISCOVER | Stored saveId=${storedGame?.saveId} found no save, " +
+                                "extracted saveId=$extractedSaveId did; storing it for gameId=$gameId"
+                        )
+                        gameDao.setSaveId(gameId, extractedSaveId)
+                    }
                     return saveFolder
                 }
             }

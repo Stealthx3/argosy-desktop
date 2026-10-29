@@ -899,6 +899,67 @@ class SavePathResolverDiscoveryTest {
         assertEquals(SaveLookup.Unreadable(root), lookup)
     }
 
+    private fun storePspGame(): GameEntity = rommGame().copy(
+        platformSlug = "psp", localPath = "/roms/masou.chd",
+        titleId = "NPJH50804", saveId = "NPJH50804", titleIdLocked = true
+    )
+
+    private fun pspHandlerFinding(saveId: String, path: String): com.nendo.argosy.data.sync.platform.FolderSaveHandler {
+        val handler = mockk<com.nendo.argosy.data.sync.platform.FolderSaveHandler>(relaxed = true)
+        every { saveHandlerRegistry.getFolderHandler("psp") } returns handler
+        every { handler.findSaveFolderBySaveId(any(), any()) } returns null
+        every { handler.findSaveFolderBySaveId(any(), saveId) } returns path
+        return handler
+    }
+
+    @Test
+    fun `a stored save id that finds nothing is replaced by the extracted one that finds the save`() = runTest {
+        coEvery { gameDao.getById(1L) } returns storePspGame()
+        val romFile = File(tempDir, "masou.chd").apply { writeBytes(byteArrayOf(0)) }
+        every { titleIdExtractor.extractTitleIdWithSource(any(), "psp", any()) } returns
+            TitleIdResult(titleId = "NPJH50804", fromBinary = true, saveId = "ULJS00445")
+        pspHandlerFinding("ULJS00445", "/sd/PSP/SAVEDATA")
+
+        val result = resolver.discoverSavePath(
+            emulatorId = "ppsspp", gameTitle = "Masou Kishin", platformSlug = "psp",
+            romPath = romFile.absolutePath, cachedSaveId = "NPJH50804", gameId = 1L,
+        )
+
+        assertEquals("/sd/PSP/SAVEDATA", result)
+        coVerify(exactly = 1) { gameDao.setSaveId(1L, "ULJS00445") }
+        coVerify(exactly = 0) { gameDao.setTitleAndSaveIdWithLock(any(), any(), any(), any()) }
+    }
+
+    @Test
+    fun `a stored save id is kept when the extracted one finds nothing either`() = runTest {
+        coEvery { gameDao.getById(1L) } returns storePspGame()
+        val romFile = File(tempDir, "masou.chd").apply { writeBytes(byteArrayOf(0)) }
+        every { titleIdExtractor.extractTitleIdWithSource(any(), "psp", any()) } returns
+            TitleIdResult(titleId = "NPJH50804", fromBinary = true, saveId = "ULJS00445")
+        pspHandlerFinding("ULUS99999", "/sd/PSP/SAVEDATA")
+
+        resolver.discoverSavePath(
+            emulatorId = "ppsspp", gameTitle = "Masou Kishin", platformSlug = "psp",
+            romPath = romFile.absolutePath, cachedSaveId = "NPJH50804", gameId = 1L,
+        )
+
+        coVerify(exactly = 0) { gameDao.setSaveId(any(), any()) }
+    }
+
+    @Test
+    fun `a stored save id that finds its save is never re-extracted`() = runTest {
+        coEvery { gameDao.getById(1L) } returns storePspGame()
+        pspHandlerFinding("NPJH50804", "/sd/PSP/SAVEDATA")
+
+        resolver.discoverSavePath(
+            emulatorId = "ppsspp", gameTitle = "Masou Kishin", platformSlug = "psp",
+            romPath = "/roms/masou.chd", cachedSaveId = "NPJH50804", gameId = 1L,
+        )
+
+        coVerify(exactly = 0) { titleIdExtractor.extractTitleIdWithSource(any(), any(), any()) }
+        coVerify(exactly = 0) { gameDao.setSaveId(any(), any()) }
+    }
+
     private fun rommGame(): GameEntity = GameEntity(
         id = 1L, platformId = 10L, platformSlug = "switch",
         title = "BOTW", sortTitle = "botw",

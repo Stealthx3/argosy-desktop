@@ -4294,6 +4294,15 @@ object Migration_219_220 : Migration(219, 220) {
     }
 }
 
+object Migration_220_221 : Migration(220, 221) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            "UPDATE `games` SET `titleIdLocked` = 0 WHERE `titleId` LIKE 'NP%' AND `platformId` IN " +
+                "(SELECT `id` FROM `platforms` WHERE `slug` = 'psp')"
+        )
+    }
+}
+
 object Migration_203_204 : Migration(203, 204) {
     override fun migrate(db: SupportSQLiteDatabase) {
         db.execSQL(

@@ -174,8 +174,23 @@ its libretro `pcsx2` layout (`armsx2` aliases to `pcsx2`). The core has no
 
 ### PSP (`PspFolderHandler`)
 
-`save_id` is the 9-character disc id (`ULUS10064`), `FOLDER_PREFIX`. Profile
-and system data are separate sibling folders sharing it.
+`save_id` is the 9-character save prefix, `FOLDER_PREFIX`. Profile and system
+data are separate sibling folders sharing it. It is the disc id (`ULUS10064`)
+except for a Store release that keeps its disc release's prefix: the dump reads
+`NPJH50804` and the game saves as `ULJS00445`. Two sources give that prefix:
+
+- sigil, from the game's executable when it is readable. The rule is in
+  sigil's `docs/platforms/psp.md`; only an `NP…` disc id is ever re-keyed.
+- `PspSavePrefixLearner`, when the executable is encrypted. A built-in session
+  whose live cache matched nothing adopts the one serial every folder the game
+  wrote during that session starts with, unless another game is keyed by it.
+  Only the built-in core qualifies: its `SAVEDATA` is Argosy's own and runs one
+  game at a time. Standalone PPSSPP's folder is shared, so it is never learned
+  from.
+
+Discovery replaces a stored `save_id` that finds nothing with an extracted one
+that finds the save, and migration 220 to 221 unlocks `NP…` rows so the next
+launch reads them again.
 
 ```
 <base>/PSP/SAVEDATA/<discId><saveName>
