@@ -48,5 +48,19 @@ tree.write(path)
 PY
 virsh define "$tmp" >> "$log" 2>&1
 rm -f "$tmp"
+
+# Any power-off ends the first boot, including an interrupted one, and graphical.target is active even
+# without a desktop, so require tester's autologin session on seat0 before snapshotting.
+virsh start "$dom" >> "$log" 2>&1
+ok=0
+for _ in $(seq 120); do
+    if virsh qemu-agent-command "$dom" '{"execute":"guest-ping"}' >/dev/null 2>&1 \
+        && "$here/exec.sh" "$profile" 'loginctl list-sessions --no-legend | grep -w tester | grep -qw seat0' >> "$log" 2>&1; then ok=1; break; fi
+    sleep 2
+done
+virsh shutdown "$dom" >> "$log" 2>&1
+for _ in $(seq 60); do [ "$(virsh domstate "$dom")" = "shut off" ] && break; sleep 2; done
+[ "$(virsh domstate "$dom")" = "shut off" ] || virsh destroy "$dom" >> "$log" 2>&1
+[ "$ok" = 1 ] || { echo "$dom: no guest agent or tester desktop session after the first boot (interrupted build?); see $log" >&2; exit 1; }
 virsh snapshot-create-as "$dom" clean "cloud-init done, desktop installed, powered off" >> "$log" 2>&1
 echo "built $dom ($(du -h "$disk" | cut -f1) on disk); snapshot: clean"

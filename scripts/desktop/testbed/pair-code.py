@@ -13,12 +13,24 @@ CREDENTIALS = Path(ROOT, "build/desktop-testbed/credentials.env")
 OUT = os.path.join(ROOT, "build/desktop-testbed/pair-code.txt")
 
 
+def prune_abandoned(session, base):
+    """RomM caps client tokens at 25 per user. A token this script minted that was never used is a
+    pairing that never completed (no install holds it); drop those once their code has long expired."""
+    cutoff = time.time() - 600
+    for token in session.get(f"{base}/api/client-tokens").json():
+        if not token["name"].startswith("argosy-desktop-") or token.get("last_used_at"):
+            continue
+        if int(token["name"].rsplit("-", 1)[1]) < cutoff:
+            session.delete(f"{base}/api/client-tokens/{token['id']}").raise_for_status()
+
+
 def main():
     creds = romm_setup.load(CREDENTIALS)
     base = creds["ROMM_BASE_URL"]
     session = romm_setup.ensure_admin(base, creds)
     session.get(f"{base}/api/heartbeat")
     session.headers["x-csrftoken"] = session.cookies.get("romm_csrftoken")
+    prune_abandoned(session, base)
     name = f"argosy-desktop-{int(time.time())}"
     response = session.post(f"{base}/api/client-tokens", json={"name": name, "scopes": romm_setup.TOKEN_SCOPES})
     if not response.ok:

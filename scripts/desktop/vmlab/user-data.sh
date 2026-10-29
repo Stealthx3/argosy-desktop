@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 # Prints the cloud-init user-data that turns a cloud image into an autologin desktop test VM.
+# Ubuntu leaves out the firefox deb (its preinst installs a snap, which fails under cloud-init and
+# aborts the whole apt run); Fedora 44 KDE logs in through plasmalogin (not SDDM) and disables plasma-setup,
+# which takes the seat ahead of autologin. Both hide their per-user welcome window.
 # On Fedora the guest agent's SELinux domain is made permissive, or guest-exec cannot read the system.
 # Lab settings for every profile: no sleep, no idle blanking or screen lock (GNOME and KDE), since a
 # suspended guest drops its agent channel. `--settings-only` prints just those, for apply.sh.
@@ -15,11 +18,11 @@ case "$profile" in
     fedora-kde)
         groups='wheel, input'
         install='dnf -y install @kde-desktop-environment qemu-guest-agent flatpak policycoreutils-python-utils && semanage permissive -a virt_qemu_ga_t'
-        login='mkdir -p /etc/sddm.conf.d && printf "[Autologin]\nUser=tester\nSession=plasma\n" > /etc/sddm.conf.d/autologin.conf' ;;
+        login='mkdir -p /etc/plasmalogin.conf.d && printf "[Autologin]\nUser=tester\nSession=plasma\n" > /etc/plasmalogin.conf.d/autologin.conf; systemctl disable plasma-setup.service; install -d -o tester -g tester /home/tester/.config /home/tester/.config/autostart; printf "[Desktop Entry]\nHidden=true\n" > /home/tester/.config/autostart/org.kde.plasma-welcome.desktop; chown tester:tester /home/tester/.config/autostart/org.kde.plasma-welcome.desktop' ;;
     ubuntu-gnome)
         groups='sudo, input'
-        install='DEBIAN_FRONTEND=noninteractive apt-get -y install ubuntu-desktop-minimal qemu-guest-agent flatpak gnome-software-plugin-flatpak'
-        login='printf "[daemon]\nAutomaticLoginEnable=True\nAutomaticLogin=tester\nWaylandEnable=true\n" > /etc/gdm3/custom.conf' ;;
+        install='DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::=--force-confold install ubuntu-desktop-minimal firefox- qemu-guest-agent flatpak gnome-software-plugin-flatpak'
+        login='printf "[daemon]\nAutomaticLoginEnable=True\nAutomaticLogin=tester\nWaylandEnable=true\n" > /etc/gdm3/custom.conf; install -d -o tester -g tester /home/tester/.config; echo yes > /home/tester/.config/gnome-initial-setup-done; chown tester:tester /home/tester/.config/gnome-initial-setup-done; install -d -o tester -g tester /home/tester/.config/systemd /home/tester/.config/systemd/user; ln -sf /dev/null /home/tester/.config/systemd/user/gnome-initial-setup-upgrade-login.service; chown -h tester:tester /home/tester/.config/systemd/user/gnome-initial-setup-upgrade-login.service' ;;
     *) echo "unknown profile $profile" >&2; exit 2 ;;
 esac
 settings() {

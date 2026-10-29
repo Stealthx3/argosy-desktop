@@ -1522,3 +1522,26 @@ The owner's tests are the step 5 side-by-side checklist and the alpha 5.4 Game M
   - Fedora KDE and Ubuntu GNOME: `build.sh` still in first boot, built with the user-data before the no-sleep settings, so each needs `apply.sh <profile>` once built.
   - Found and fixed: GNOME's idle lock and suspend broke the agent channel (lab settings in `user-data.sh`, `apply.sh` re-applies them to a built VM). `qemu-ga` aborted (core dump, 615 MB peak) after ~20 min of a captured `flatpak install`, so `exec.sh --long` runs long commands detached with a guest log and checks an exit-code file every 10 s.
   - New scripts not yet run end to end: `app.sh` (install, start with key pipe, term, kill, status) and `walk.sh` (key-pipe steps and VM screenshots).
+
+### 2026-10-29 — Step 4, VM lab unit 1 resumed: first Flatpak run and wizard on Fedora GNOME
+
+**Owner decision (2026-10-29):** "resume".
+**Action:**
+- `apply.sh` ran on Fedora KDE and Ubuntu GNOME, then a probe showed both boot to a text console with no desktop: their first boot ended at 19:55 on 2026-10-28, a minute after the owner's pause, and `build.sh` took any power-off as the end of cloud-init. Both domains and overlay disks were removed (failed builds only; the base images stay; the old logs are kept as `*.build.interrupted.log`) and rebuilt.
+- The rebuilt VMs passed a `graphical.target` check but still had no desktop, which exposed three build faults, now fixed in `user-data.sh` and repaired in place on both VMs (then `clean` retaken):
+  - Ubuntu 26.04: the `firefox` transitional deb's preinst installs a snap, which fails under cloud-init and aborts the whole `apt-get`, leaving `gdm3` unconfigured. The install now leaves out `firefox` and passes `--force-confold` (the lab's `custom.conf` is written before `gdm3` configures). Ubuntu's welcome runs as the user service `gnome-initial-setup-upgrade-login`, masked for `tester`.
+  - Fedora 44 KDE: the display manager is `plasmalogin`, not SDDM, and `plasma-setup.service` (first-boot wizard) takes seat0. Autologin now goes in `/etc/plasmalogin.conf.d/`, `plasma-setup` is disabled, and the Welcome Center autostart is hidden for `tester`.
+- `build.sh` now boots the finished VM once and requires `tester`'s session on seat0 before it takes `clean` (`graphical.target` is active without a desktop), so an interrupted or broken build fails instead of passing.
+- All three proven from `clean`: autologin desktop at 1920x1080 (GNOME Wayland, Plasma Wayland, Ubuntu GNOME), guest-exec, screenshots, RomM heartbeat 200 from the guest, Flathub remote.
+- Fedora GNOME (Wayland, app on XWayland): the public alpha (0.3.0) installed from the `.flatpakref` with the Flathub runtime; first run shows the welcome screen; the wizard paired with the testbed RomM at `http://10.0.2.2:8093` by pairing code, synced 17 games on 5 platforms, and reached Home and the Library. SIGTERM exit: 497 ms.
+**Fixes found on the way:**
+- `reset.sh` returned as soon as the agent answered, before the guest's network was up, so the next Pages fetch failed to resolve. It now also waits for DNS.
+- `app.sh status|term` looked for `java.*key-pipe`, which never matched the app (the jpackage launcher shows as `argosy-desktop`) but did match its own shell. Both now match `^/app/lib/argosy-desktop/bin/argosy-desktop`.
+- The testbed RomM hit its limit of 25 client tokens per user, mostly abandoned pairings. `pair-code.py` now drops its own never-used `argosy-desktop-*` tokens older than ten minutes before minting; tokens that were ever used stay.
+- The Flatpak wizard recipe in `gotchas.md` predated the display-setup step and used keyboard `A`, which does not choose a card there. Replaced by a pad recipe that runs end to end.
+**Findings to report (not fixed; shared code, owner's call):**
+- QR pairing screen: the "Sign in on this device" and "Use a pairing code" buttons sit side by side, but only Up/Down moves between them (`moveButtonFocus` ignores the ROMM_LOGIN step).
+- "Sign in on this device" in the Flatpak on GNOME opened no browser and showed no "no browser" message (to retest with a browser present and check the portal call).
+- skiko logs `Cannot create Linux GL context` in the VM and falls back to the next render API (expected without 3D in the guest; rendering is fine).
+- GNOME left the new window in the Overview because a guest-exec launch has no activation token; a launch from the dash does not do this.
+**Reasoning:** the lab has to fail loudly when a VM is not what its snapshot claims, or every later desktop result is suspect. The wizard and pairing flow is the first thing every user sees, so it was walked by hand before scripting the per-desktop test.

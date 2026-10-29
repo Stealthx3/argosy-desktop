@@ -15,8 +15,8 @@ case "$action" in
     install) "$here/exec.sh" "$profile" --long --user "flatpak install --user -y --noninteractive --from $ref; flatpak info --user $app | grep -E 'Version|Commit'" ;;
     start)
         "$here/exec.sh" "$profile" --user "$session_env; mkdir -p \$HOME/.var/app/$app/cache; rm -f $pipe; mkfifo $pipe; echo \"session \$XDG_SESSION_TYPE \$XDG_CURRENT_DESKTOP DISPLAY=\$DISPLAY WAYLAND_DISPLAY=\$WAYLAND_DISPLAY\"; setsid nohup flatpak run $app --key-pipe=$pipe $* > \$HOME/argosy-vm.log 2>&1 < /dev/null &" ;;
-    term) "$here/exec.sh" "$profile" --user "pid=\$(pgrep -u tester -f 'java.*key-pipe' | head -1); [ -n \"\$pid\" ] || { echo 'not running'; exit 1; }; t0=\$(date +%s%N); kill -TERM \$pid; while kill -0 \$pid 2>/dev/null; do sleep 0.1; [ \$(( (\$(date +%s%N) - t0) / 1000000 )) -gt 10000 ] && { echo 'still running after 10 s'; exit 1; }; done; echo \"exited in \$(( (\$(date +%s%N) - t0) / 1000000 )) ms\"" ;;
+    term) "$here/exec.sh" "$profile" --user "pid=\$(pgrep -u tester -f '^[/]app/lib/argosy-desktop/bin/argosy-desktop' | head -1); [ -n \"\$pid\" ] || { echo 'not running'; exit 1; }; t0=\$(date +%s%N); kill -TERM \$pid; while kill -0 \$pid 2>/dev/null; do sleep 0.1; [ \$(( (\$(date +%s%N) - t0) / 1000000 )) -gt 10000 ] && { echo 'still running after 10 s'; exit 1; }; done; echo \"exited in \$(( (\$(date +%s%N) - t0) / 1000000 )) ms\"" ;;
     kill) "$here/exec.sh" "$profile" --user "flatpak kill $app 2>/dev/null; echo killed" ;;
-    status) "$here/exec.sh" "$profile" --user "pgrep -a -u tester -f 'java.*key-pipe' | cut -c1-120 || echo 'not running'" ;;
+    status) "$here/exec.sh" "$profile" --user "pgrep -a -u tester -f '^[/]app/lib/argosy-desktop/bin/argosy-desktop' | cut -c1-120; [ \${PIPESTATUS[0]} = 0 ] || echo 'not running'" ;;
     *) echo "unknown action $action" >&2; exit 2 ;;
 esac
