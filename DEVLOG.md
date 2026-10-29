@@ -1501,3 +1501,24 @@ The owner's tests are the step 5 side-by-side checklist and the alpha 5.4 Game M
 - Removed `docs/desktop/side-by-side-checklist.md` and `scripts/desktop/check/side-by-side.sh`. The fixes the side-by-side pass produced stay: dual-screen gated off, About without the APK updater and System section, Flatpak update wording.
 - Phase 5 exit criterion (`PORT_PLAN.md`) and the Roadmap scope now name Linux compatibility instead of parity with Android. The `CLAUDE.md` goal line says the same.
 **Reasoning:** the owner's tests no longer include the side-by-side checklist, so the pause waits only on the Game Mode checks; the VM lab supplies the desktop-environment results. The Brightness question stays open as a Linux feature question (backlight control on desktops and handhelds), not as an Android difference.
+
+### 2026-10-28 — Step 4, VM lab unit 1: lab scripts, Fedora GNOME VM proven
+
+**Owner decision (2026-10-28):** "Begin testing", and start now rather than wait for the weekly reset (weekly usage was at 54%). The owner also asked for the lab VMs to be visible in Virtual Machine Manager to watch the work live.
+**Action:**
+- `scripts/desktop/vmlab/`: `lab.sh` (shared settings), `user-data.sh` (cloud-init per profile), `build.sh <profile>`, `exec.sh <profile> [--user] '<cmd>'` (qemu-guest-agent guest-exec), `shot.sh <profile> <png>` (`virsh screenshot`), `reset.sh <profile>` (revert to `clean` and boot).
+- Images in `/mnt/FileDrive/VMs/argosy-lab/images/`: Fedora Cloud Base 44-1.7 and Ubuntu 26.04 server cloud image, both checked against the published SHA256 sums.
+- `build.sh` puts a 40 GB qcow2 overlay on the cloud image and runs `virt-install --import --cloud-init`. cloud-init installs the desktop, qemu-guest-agent and Flatpak with Flathub, and sets up an autologin user `tester`, then powers off. The display is set to virtio at 1920x1080, then the internal snapshot `clean` is taken.
+- `argosy-lab-fedora-gnome` built and proven: autologin into GNOME on Wayland at 1920x1080, guest-exec as root, `virsh screenshot`, the guest reaches RomM at `http://10.0.2.2:8093` (heartbeat 200), Flathub remote present.
+- Fedora KDE and Ubuntu GNOME builds started with the fixed script.
+**Deviations from the approved design, and why:**
+- **Session libvirt** (`qemu:///session`), not `qemu:///system`: `/mnt/FileDrive` is mode 0700, so the system `libvirt-qemu` user cannot open disks there. Changing the drive's permissions was not needed. Session mode also keeps the lab apart from the owner's system VMs. Guests use user-mode networking and reach the host at 10.0.2.2. virt-manager shows them under "QEMU/KVM User session" (connection added to virt-manager's settings; it needs a restart to pick it up).
+- **cloud-init instead of `virt-customize`:** libguestfs' supermin appliance fails on this host (it cannot read the host kernel without root), so all guest setup runs inside the guest on first boot.
+**Fixes found on the way:**
+- Fedora's SELinux confines qemu-ga (`virt_qemu_ga_t`), so guest-exec ran as root but could not read most files. The Fedora profiles now install `policycoreutils-python-utils` and make that domain permissive (lab VMs only). The first VM got the change through a second cloud-init seed with a new instance id.
+- virt-install with `--cloud-init` boots the VM again after the setup power-off, so the first `clean` snapshot was live. `build.sh` now passes `--noreboot`, waits for "shut off" and only then snapshots.
+- **Paused by the owner (2026-10-28, "pause all further development")** mid-unit. State at the pause:
+  - Fedora GNOME: built, `clean` retaken with the lab settings (no sleep, no idle blank or lock); a detached `app.sh fedora-gnome install` of the public alpha was running.
+  - Fedora KDE and Ubuntu GNOME: `build.sh` still in first boot, built with the user-data before the no-sleep settings, so each needs `apply.sh <profile>` once built.
+  - Found and fixed: GNOME's idle lock and suspend broke the agent channel (lab settings in `user-data.sh`, `apply.sh` re-applies them to a built VM). `qemu-ga` aborted (core dump, 615 MB peak) after ~20 min of a captured `flatpak install`, so `exec.sh --long` runs long commands detached with a guest log and checks an exit-code file every 10 s.
+  - New scripts not yet run end to end: `app.sh` (install, start with key pipe, term, kill, status) and `walk.sh` (key-pipe steps and VM screenshots).
