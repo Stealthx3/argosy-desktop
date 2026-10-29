@@ -1051,6 +1051,7 @@ class RomMLibrarySyncService @Inject constructor(
             syncAndroidPlatformMetadata(remote)
             return
         }
+        val storedSlug = FileNames.sanitizeSlug(effectiveSlug)
         val existing = platformDao.getById(platformId)
         val platformDef = PlatformDefinitions.getBySlug(effectiveSlug)
         val romRules = PlatformDefinitions.definitionFor(effectiveSlug)
@@ -1068,7 +1069,7 @@ class RomMLibrarySyncService @Inject constructor(
         val resolvedShortName = derivedNames?.second ?: platformDef?.shortName ?: normalizedName
         val entity = PlatformEntity(
             id = platformId,
-            slug = FileNames.sanitizeSlug(effectiveSlug),
+            slug = storedSlug,
             fsSlug = remote.fsSlug?.let(FileNames::sanitizeSlug),
             name = normalizedName,
             shortName = resolvedShortName,
@@ -1095,7 +1096,7 @@ class RomMLibrarySyncService @Inject constructor(
         }
 
         remote.firmware?.let { firmware ->
-            biosRepository.syncPlatformFirmware(platformId, effectiveSlug, firmware)
+            biosRepository.syncPlatformFirmware(platformId, storedSlug, firmware)
         }
     }
 
@@ -1731,13 +1732,15 @@ class RomMLibrarySyncService @Inject constructor(
 
     private suspend fun cleanupLegacyPlatforms(remotePlatforms: List<RomMPlatform>) {
         val remoteIds = remotePlatforms.map { it.id }.toSet()
-        val remoteByComposite = remotePlatforms.associateBy { it.slug to it.fsSlug }
+        val remoteByComposite = remotePlatforms.associateBy {
+            FileNames.sanitizeSlug(it.slug) to it.fsSlug?.let(FileNames::sanitizeSlug)
+        }
         val remoteBySlug = remotePlatforms
             .filter { it.slug.isNotBlank() }
-            .groupBy { it.slug }
+            .groupBy { FileNames.sanitizeSlug(it.slug) }
         val remoteByFsSlug = remotePlatforms
             .filter { !it.fsSlug.isNullOrBlank() }
-            .groupBy { it.fsSlug!! }
+            .groupBy { FileNames.sanitizeSlug(it.fsSlug!!) }
         val allLocal = platformDao.getAllPlatforms()
 
         for (local in allLocal) {
@@ -1769,9 +1772,10 @@ class RomMLibrarySyncService @Inject constructor(
     private suspend fun migratePlatformData(old: PlatformEntity, remote: RomMPlatform) {
         val label = "${old.name} (${old.id} -> ${remote.id})"
         val owner = overlayWriter.activeOwnerId()
+        val remoteSlug = FileNames.sanitizeSlug(remote.slug)
         database.withTransaction {
             val gameCount = gameDao.countByPlatform(old.id, owner)
-            gameDao.migratePlatform(old.id, remote.id, remote.slug)
+            gameDao.migratePlatform(old.id, remote.id, remoteSlug)
             Logger.info(TAG, "migratePlatformData [$label]: moved $gameCount games")
 
             emulatorConfigDao.migratePlatform(old.id, remote.id)
@@ -1790,9 +1794,9 @@ class RomMLibrarySyncService @Inject constructor(
                 Logger.info(TAG, "migratePlatformData [$label]: migrated $firmwareMigrated firmware entries")
             }
 
-            if (old.slug.isNotBlank() && old.slug != remote.slug) {
-                controllerMappingDao.migratePlatformSlug(old.slug, remote.slug)
-                Logger.info(TAG, "migratePlatformData [$label]: remapped controller bindings ${old.slug} -> ${remote.slug}")
+            if (old.slug.isNotBlank() && old.slug != remoteSlug) {
+                controllerMappingDao.migratePlatformSlug(old.slug, remoteSlug)
+                Logger.info(TAG, "migratePlatformData [$label]: remapped controller bindings ${old.slug} -> $remoteSlug")
             }
 
             val newPlatform = platformDao.getById(remote.id)

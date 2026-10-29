@@ -413,9 +413,11 @@ class RomMApiClient @Inject constructor(
                 val entities = platforms.map { remote ->
                     val effectiveSlug = PlatformDefinitions.resolveImportSlug(remote.slug, remote.displayName ?: remote.name, remote.fsSlug)
                     val isSubPlatform = !effectiveSlug.equals(remote.slug, ignoreCase = true)
+                    val storedRemoteSlug = FileNames.sanitizeSlug(remote.slug)
+                    val storedFsSlug = remote.fsSlug?.let(FileNames::sanitizeSlug)
                     val existing = platformDao.getById(remote.id)
-                        ?: platformDao.getBySlugAndFsSlug(remote.slug, remote.fsSlug)
-                        ?: platformDao.getBySlug(remote.slug)
+                        ?: platformDao.getBySlugAndFsSlug(storedRemoteSlug, storedFsSlug)
+                        ?: platformDao.getBySlug(storedRemoteSlug)
                     val platformDef = PlatformDefinitions.getBySlug(effectiveSlug)
                     val romRules = PlatformDefinitions.definitionFor(effectiveSlug)
                     val logoUrl = buildMediaUrl(remote.logoUrl)
@@ -431,7 +433,7 @@ class RomMApiClient @Inject constructor(
                     PlatformEntity(
                         id = remote.id,
                         slug = FileNames.sanitizeSlug(effectiveSlug),
-                        fsSlug = remote.fsSlug?.let(FileNames::sanitizeSlug),
+                        fsSlug = storedFsSlug,
                         name = normalizedName,
                         shortName = resolvedShortName,
                         romExtensions = romRules?.extensions?.joinToString(",") ?: "",

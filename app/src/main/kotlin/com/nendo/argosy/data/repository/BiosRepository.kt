@@ -634,7 +634,10 @@ class BiosRepository @Inject constructor(
                 }
 
                 val relativeTarget = FileNames.sanitizeRelativePath(targetFileName)
-                if (relativeTarget.isEmpty()) continue
+                if (relativeTarget.isEmpty()) {
+                    Logger.debug(TAG, "Skipped ${firmware.fileName}: target name $targetFileName folds to nothing")
+                    continue
+                }
                 val targetFile = File(targetDir, relativeTarget)
                 try {
                     targetFile.parentFile?.mkdirs()

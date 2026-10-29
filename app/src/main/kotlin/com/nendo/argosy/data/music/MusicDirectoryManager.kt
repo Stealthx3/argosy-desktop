@@ -46,7 +46,7 @@ class MusicDirectoryManager @Inject constructor(
         title: String?,
         fileName: String
     ): File {
-        val extension = fileName.substringAfterLast('.', "")
+        val extension = fileName.substringAfterLast('.', "").replace(INVALID_CHARS, "_")
         val baseTitle = sanitize(title ?: fileName.substringBeforeLast('.'))
         val baseName = if (trackNumber != null) {
             String.format(Locale.ROOT, "%02d - %s", trackNumber, baseTitle)
@@ -91,8 +91,10 @@ class MusicDirectoryManager @Inject constructor(
         MediaScannerConnection.scanFile(context, arrayOf(file.absolutePath), null, null)
     }
 
-    private fun sanitize(name: String): String =
-        name.replace(INVALID_CHARS, "_").trim().ifEmpty { "track" }
+    private fun sanitize(name: String): String {
+        val folded = name.replace(INVALID_CHARS, "_").trim()
+        return if (folded.isEmpty() || folded.all { it == '.' }) "track" else folded
+    }
 
     companion object {
         private val INVALID_CHARS = Regex("[\\\\/:*?\"<>|;=]")
