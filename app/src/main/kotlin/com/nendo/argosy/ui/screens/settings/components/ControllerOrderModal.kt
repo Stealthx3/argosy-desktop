@@ -240,11 +240,11 @@ private fun PlayerDots(port: Int) {
 @Composable
 private fun PadBattery(device: InputDevice?, tint: Color) {
     val battery = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) device?.batteryState else null
-    val capacity = battery?.capacity
-    if (battery == null || !battery.isPresent || capacity == null || capacity.isNaN()) {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || battery == null || !battery.isPresent || battery.capacity.isNaN()) {
         Spacer(modifier = Modifier.size(width = Dimens.iconMd, height = Dimens.radiusLg))
         return
     }
+    val capacity = battery.capacity
     BatteryIcon(
         level = (capacity * 100).toInt(),
         isCharging = battery.status == BatteryState.STATUS_CHARGING,
