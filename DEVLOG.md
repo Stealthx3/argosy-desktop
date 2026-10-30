@@ -1553,3 +1553,16 @@ The owner's tests are the step 5 side-by-side checklist and the alpha 5.4 Game M
 - On Ubuntu with no browser, the host `xdg-open` opened the RomM pair page's HTML in Text Editor. That is the guest's handler fallback, not Argosy; a real Ubuntu desktop ships a browser.
 - The wizard recipe now goes through the QR "Scan to pair" step (`DPAD_DOWN`, then choose "Use a pairing code"); `gotchas.md` updated with the bundle-signing step (the guest remote verifies GPG).
 **Reasoning:** the per-desktop test has to be one command so every later change can be checked on all three desktops the same way; the pairing-screen browser is part of first run for anyone without a phone, so it was fixed in this unit rather than parked.
+
+### 2026-10-29 — Step 4, VM lab unit 3: download, RetroArch launch and Close Argosy in `desktop-test.sh`
+- `desktop-test.sh` now also installs `org.libretro.RetroArch` from Flathub in the guest with the `fceumm`, `mgba` and `gambatte` cores from the libretro buildbot (what RetroArch's Core Downloader fetches), waits for the first library sync, presses A on Home (download) and A again (launch), ends RetroArch, checks the session end, and closes Argosy from Quick Settings; then restarts and checks SIGTERM. Waits are log-driven (`log_wait` polls the guest log through guest-exec).
+- Fedora KDE: everything PASSES (download to `~/Games/Argosy/nes`, RetroArch 1.22.2 started with `fceumm`, session end, Close Argosy within 1 s, SIGTERM 510 ms).
+- Fedora GNOME and Ubuntu: Close Argosy, log and SIGTERM checks PASS; download and launch FAIL because A on Home hit "View All" (see findings).
+- Findings:
+  - **No RetroArch cores on a fresh Flathub RetroArch.** Launch fails with "No core available for nes: fceumm_libretro.so is not installed in RetroArch" until the user downloads cores inside RetroArch. The message is accurate, but first launch fails for every new user. Owner question: should Argosy install the needed core into `~/.var/app/org.libretro.RetroArch/config/retroarch/cores` (it already has `LibretroBuildbot`), or point the user to RetroArch's Core Downloader?
+  - **Home may not refresh after the first sync.** On Ubuntu the Home NES row still showed only "View All" 10 s after `syncLibrary returned - added=17`; on KDE the row had the games. To investigate (HomeViewModel's row source after a first sync), not yet confirmed as a bug.
+  - With RetroArch installed, the wizard's "Emulators Argosy should manage" step focuses the RetroArch row (A toggles it); Continue needs `DPAD_DOWN` first.
+  - Close Argosy is `R3`, `DPAD_DOWN*8`, A (opens the confirmation), A.
+  - A session under the minimum length logs `SessionEnd: short session (14s), cancelling without backup` and no `endSession result` line (expected).
+  - The wizard walk still uses fixed sleeps; one Fedora GNOME run drifted (Games Path reached before pairing, so nothing synced). Replace the remaining sleeps with log or screen markers.
+**Reasoning:** download and launch are the core loop, so they go into the per-desktop test even before every desktop passes; the two failures are timing on the test side and a possible Home refresh gap, which need an investigation, not more reruns.

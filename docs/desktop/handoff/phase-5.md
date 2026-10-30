@@ -2,7 +2,7 @@
 
 Rewritten (not appended) at the end of every work unit, so a fresh session can start from it alone. History and reasoning live in `DEVLOG.md`. Earlier phases: `phase-0.md` … `phase-4.md` (closed summaries).
 
-**Updated:** 2026-10-29 (owner said "resume" in the main session; VM lab unit 2 done). Steps 1–3 done; step 4 in progress.
+**Updated:** 2026-10-29 (owner said "resume" in the main session; VM lab unit 3 done). Steps 1–3 done; step 4 in progress.
 
 ## Scope and exit criterion
 
@@ -30,15 +30,17 @@ Plan (`DEVLOG.md`, Phase 5 plan): 1 wizard wording, 2 Close Argosy, 3 thumbnails
 - Lab runs in `qemu:///session` (visible in virt-manager under "QEMU/KVM User session"); scripts in `scripts/desktop/vmlab/`: `build.sh`, `apply.sh`, `reset.sh`, `exec.sh [--long] [--user]`, `shot.sh`, `app.sh`, `walk.sh`. Guests reach RomM at `http://10.0.2.2:8093`. Gotchas in `docs/desktop/gotchas.md` ("VM test lab").
 - Unit 1 done (2026-10-29): all three VMs proven from `clean` (autologin desktop, guest-exec, screenshots, RomM 200, Flathub). KDE and Ubuntu were rebuilt (the pause had cut their first boot short) and repaired; `build.sh` now refuses to snapshot without `tester`'s seat0 session. Fedora GNOME: alpha 0.3.0 installed from the Pages `.flatpakref`, wizard to Home with 17 games synced, SIGTERM exit 497 ms (screens in `build/vmlab/fedora-gnome/`, not in git).
 - Unit 2 done (2026-10-29): `desktop-test.sh <profile> <out>` (report in `<out>/report.txt`; `LAB_BUNDLE=<file>` installs a local build over the alpha) PASSES on all three desktops with the local build f684db1a. It fixes "Sign in on this device" (host `xdg-open`; it opened nothing in the Flatpak before). The fix is committed but not published: the alpha on Pages is still 2e7a3c30 until the step-5.4 close.
-- Open findings: QR pairing buttons move with Up/Down only; one 5.7 s SIGTERM exit on Fedora GNOME that did not reproduce (watch for it); Ubuntu VM has no browser (xdg-open falls back to Text Editor).
-- **Next action (unit 3):** extend `desktop-test.sh`: a ROM download, install `org.libretro.RetroArch` from Flathub in the guest and launch a game, Close Argosy from Quick Settings (`R3 DOWN*8`, see Gotchas), XWayland (`--socket=x11` today; check `GDK_BACKEND`/`DISPLAY` path) and HiDPI at 125%/150% (GNOME `scale-monitor-framebuffer`, KDE scale). Run on all three with `LAB_BUNDLE` set to a fresh signed bundle.
+- Unit 3 done (2026-10-29): the test now covers RetroArch from Flathub (plus buildbot cores), the first sync, ROM download, RetroArch launch, session end and Close Argosy. Fedora KDE passes everything; on GNOME and Ubuntu, Close Argosy, log and SIGTERM pass, but download and launch fail because A on Home hit "View All" (details in `DEVLOG.md`, unit 3).
+- Open findings: (1) fresh Flathub RetroArch has no cores, so first launch fails with "No core available" (owner question below); (2) Home may not refresh after the first sync (Ubuntu); (3) the wizard walk's fixed sleeps drift (one Fedora GNOME run never paired); (4) QR buttons move with Up/Down only; (5) one 5.7 s SIGTERM exit that did not reproduce.
+- **Next action (unit 4):** investigate finding 2: start on Ubuntu (`reset.sh`, install, bundle, wizard), then compare Home before and after `syncLibrary returned`, and read how the desktop Home rows observe the games table. Fix it if it is a refresh bug. Then replace the wizard's fixed sleeps with log markers, and rerun `desktop-test.sh` on all three (`LAB_BUNDLE=build/vmlab/bundle/argosy.flatpak`; rebuild and re-sign the bundle after any code change). After that: XWayland and HiDPI at 125%/150%.
 - Later units: the full test per desktop (alpha repo install, wizard, sync, covers, download and RetroArch launch, Close Argosy, SIGTERM, XWayland and HiDPI at 125%/150%), with a report per desktop.
 
 ## Open owner questions (revisit after testing, owner decision 2026-10-27)
 
 1. Quick Settings Brightness is hidden on desktop (`screenBrightnessAvailable`): leave it out, or add backlight control for Linux handhelds and laptops?
 2. The Flathub build's startup abort (step 5 next action).
-3. The app-id rename `io.github.Stealthx3.argosy_desktop` and the Flathub screenshots.
+3. Fresh Flathub RetroArch has no cores: should Argosy install the core a launch needs (libretro buildbot, into RetroArch's cores folder), or tell the user to use RetroArch's Core Downloader?
+4. The app-id rename `io.github.Stealthx3.argosy_desktop` and the Flathub screenshots.
 
 ## Step 5 (Flathub) groundwork (owner OK 2026-10-27)
 
