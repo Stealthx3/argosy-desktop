@@ -2,7 +2,7 @@
 
 Rewritten (not appended) at the end of every work unit, so a fresh session can start from it alone. History and reasoning live in `DEVLOG.md`. Earlier phases: `phase-0.md` … `phase-4.md` (closed summaries).
 
-**Updated:** 2026-10-29 (owner said "resume" in the main session; VM lab unit 4 done). Steps 1–3 done; step 4 in progress.
+**Updated:** 2026-10-29 (owner said "resume" in the main session; VM lab unit 5 done). Steps 1–3 done; step 4 in progress.
 
 ## Scope and exit criterion
 
@@ -33,8 +33,8 @@ Plan (`DEVLOG.md`, Phase 5 plan): 1 wizard wording, 2 Close Argosy, 3 thumbnails
 - Unit 3 done (2026-10-29): the test now covers RetroArch from Flathub (plus buildbot cores), the first sync, ROM download, RetroArch launch, session end and Close Argosy. Fedora KDE passes everything; on GNOME and Ubuntu, Close Argosy, log and SIGTERM pass, but download and launch fail because A on Home hit "View All" (details in `DEVLOG.md`, unit 3).
 - Unit 4 done (2026-10-30): Home now refreshes when any library sync ends (`HomeSyncDelegate.observeLibrarySyncEnd`; shared code, Android gate green, Android emulator not run). `desktop-test.sh` passes every product check on all three desktops with local build e68b1170 (signed bundle `build/vmlab/bundle/argosy.flatpak`); reports in `build/vmlab/<profile>/test-u4*`. Not yet published: Pages still serves 2e7a3c30.
 - Open findings: (1) fresh Flathub RetroArch has no cores (owner question 3); (2) the wizard walk still relies on waits (made longer; markers would be sturdier); (3) QR buttons move with Up/Down only; (4) one 5.7 s SIGTERM exit that did not reproduce; (5) Ubuntu VM has no browser.
-- **Next action (unit 5):** XWayland and HiDPI. Today the Flatpak has `--socket=x11` only, so every desktop runs it on XWayland; check rendering and input at 125% and 150% scale on GNOME (`gsettings set org.gnome.mutter experimental-features "['scale-monitor-framebuffer']"`, then `gdctl`/`monitors.xml`) and KDE (`kscreen-doctor output.Virtual-1.scale.1.25`), screenshots of Home and the wizard. Then the step-4 close: the owner's Game Mode checks on the Deck are still pending, so ask the owner before `--step-close 5.4`.
-- Later units: the full test per desktop (alpha repo install, wizard, sync, covers, download and RetroArch launch, Close Argosy, SIGTERM, XWayland and HiDPI at 125%/150%), with a report per desktop.
+- Unit 5 done (2026-10-30): XWayland and HiDPI at 125% and 150% render correctly on KDE and GNOME (`scale.sh`; screens in `build/vmlab/<profile>/u5/`). GNOME at 125% opens a smaller window (cosmetic; fullscreen is fine). The desktop part of step 4 is covered.
+- **Next action:** step 4 closes only after the owner's Game Mode checks on the Deck (alpha 5.4 list above), so they remain pending; do not run `--step-close 5.4` before them. Meanwhile start the step 5 groundwork next action below (the Flathub build's startup abort).
 
 ## Open owner questions (revisit after testing, owner decision 2026-10-27)
 
@@ -49,7 +49,7 @@ Plan (`DEVLOG.md`, Phase 5 plan): 1 wizard wording, 2 Close Argosy, 3 thumbnails
 - SDK-less desktop build: `ANDROID_HOME=<empty dir>` plus `-Pargosy.desktopOnly=true` (leaves out `:sigil` and `:libretrodroid`).
 - Offline sources: `desktopApp/flatpak/generated/gradle-sources.json` (1,448 files; regenerate with `scripts/desktop/flatpak/regen-gradle-sources.sh <scratch>`).
 - The from-source manifest `io.github.stealthx3.ArgosyDesktop.flathub.yml` builds offline locally with the openjdk21 extension; lint shows only owner-gated items. CI draft `.github/workflows/flatpak.yml` is untested until the phase-close push.
-- **Next action (after testing):** the startup abort (`pure virtual method called`) in the Flathub build only. Run the build-dir launcher under `strace -f -e trace=process` to see which process aborts. If it is the jpackage launcher, compare with a host 21.0.13 jpackage. Smoke run: `flatpak build --socket=x11 --device=dri --share=network --env=XDG_{DATA,CONFIG,CACHE}_HOME=<scratch> <build-dir> /app/bin/argosy-desktop --windowed` (never the owner's data).
+- **Next action (now):** the startup abort (`pure virtual method called`) in the Flathub build only. Run the build-dir launcher under `strace -f -e trace=process` to see which process aborts. If it is the jpackage launcher, compare with a host 21.0.13 jpackage. Smoke run: `flatpak build --socket=x11 --device=dri --share=network --env=XDG_{DATA,CONFIG,CACHE}_HOME=<scratch> <build-dir> /app/bin/argosy-desktop --windowed` (never the owner's data).
 
 ## Gotchas
 
