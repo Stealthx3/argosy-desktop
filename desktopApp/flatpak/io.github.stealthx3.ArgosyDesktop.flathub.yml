@@ -140,7 +140,9 @@ modules:
           -Pargosy.desktopOnly=true :desktopApp:createDistributable
       - mkdir -p /app/lib/argosy-desktop
       - cp -a desktopApp/build/compose/binaries/main/app/argosy-desktop/. /app/lib/argosy-desktop/
-      - install -Dm755 desktopApp/flatpak/argosy-desktop.sh /app/bin/argosy-desktop
+      - rm -rf /app/lib/argosy-desktop/bin /app/lib/argosy-desktop/lib/runtime
+      - /usr/lib/sdk/openjdk21/install.sh
+      - install -Dm755 desktopApp/flatpak/argosy-desktop-jre.sh /app/bin/argosy-desktop
       - install -Dm644 desktopApp/flatpak/io.github.stealthx3.ArgosyDesktop.desktop -t /app/share/applications
       - install -Dm644 desktopApp/flatpak/io.github.stealthx3.ArgosyDesktop.metainfo.xml -t /app/share/metainfo
       - install -Dm644 argosy_icon.svg /app/share/icons/hicolor/scalable/apps/io.github.stealthx3.ArgosyDesktop.svg
