@@ -2,7 +2,7 @@
 
 Rewritten (not appended) at the end of every work unit, so a fresh session can start from it alone. History and reasoning live in `DEVLOG.md`. Earlier phases: `phase-0.md` … `phase-4.md` (closed summaries).
 
-**Updated:** 2026-10-29 (owner said "resume" in the main session; VM lab unit 5 done). Steps 1–3 done; step 4 in progress.
+**Updated:** 2026-10-29 (owner said "resume" in the main session; Flathub abort diagnosed). Steps 1–3 done; step 4 in progress.
 
 ## Scope and exit criterion
 
@@ -49,7 +49,8 @@ Plan (`DEVLOG.md`, Phase 5 plan): 1 wizard wording, 2 Close Argosy, 3 thumbnails
 - SDK-less desktop build: `ANDROID_HOME=<empty dir>` plus `-Pargosy.desktopOnly=true` (leaves out `:sigil` and `:libretrodroid`).
 - Offline sources: `desktopApp/flatpak/generated/gradle-sources.json` (1,448 files; regenerate with `scripts/desktop/flatpak/regen-gradle-sources.sh <scratch>`).
 - The from-source manifest `io.github.stealthx3.ArgosyDesktop.flathub.yml` builds offline locally with the openjdk21 extension; lint shows only owner-gated items. CI draft `.github/workflows/flatpak.yml` is untested until the phase-close push.
-- **Next action (now):** the startup abort (`pure virtual method called`) in the Flathub build only. Run the build-dir launcher under `strace -f -e trace=process` to see which process aborts. If it is the jpackage launcher, compare with a host 21.0.13 jpackage. Smoke run: `flatpak build --socket=x11 --device=dri --share=network --env=XDG_{DATA,CONFIG,CACHE}_HOME=<scratch> <build-dir> /app/bin/argosy-desktop --windowed` (never the owner's data).
+- Startup abort diagnosed (2026-10-30): the jpackage launcher's helper process aborts on exit (JDK-8348560, the extension JDK's dynamic libstdc++); the app runs, but each launch leaves a SIGABRT core dump. Scratch build in `build/flathub-scratch/` (Builder: `flatpak run --filesystem=<repo> org.flatpak.Builder ...`, no host `flatpak-builder`).
+- **Next action (now):** in `io.github.stealthx3.ArgosyDesktop.flathub.yml`, install the extension JRE into `/app/jre` (`/usr/lib/sdk/openjdk21/install.sh`) and replace `/app/bin/argosy-desktop` with a script that runs `/app/jre/bin/java` using the classpath, main class and `java-options` from `lib/app/argosy-desktop.cfg`. Rebuild in `build/flathub-scratch/`, smoke-run with scratch `XDG_*` (no abort; `coredumpctl list --since -10min` empty), then manifest and repo lint.
 
 ## Gotchas
 
