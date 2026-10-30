@@ -2,7 +2,7 @@
 
 Rewritten (not appended) at the end of every work unit, so a fresh session can start from it alone. History and reasoning live in `DEVLOG.md`. Earlier phases: `phase-0.md` … `phase-4.md` (closed summaries).
 
-**Updated:** 2026-10-29 (owner said "resume" in the main session; Flathub abort diagnosed). Steps 1–3 done; step 4 in progress.
+**Updated:** 2026-10-29 (owner said "resume" in the main session; Flathub abort fixed). Steps 1–3 done; step 4 in progress.
 
 ## Scope and exit criterion
 
@@ -49,8 +49,9 @@ Plan (`DEVLOG.md`, Phase 5 plan): 1 wizard wording, 2 Close Argosy, 3 thumbnails
 - SDK-less desktop build: `ANDROID_HOME=<empty dir>` plus `-Pargosy.desktopOnly=true` (leaves out `:sigil` and `:libretrodroid`).
 - Offline sources: `desktopApp/flatpak/generated/gradle-sources.json` (1,448 files; regenerate with `scripts/desktop/flatpak/regen-gradle-sources.sh <scratch>`).
 - The from-source manifest `io.github.stealthx3.ArgosyDesktop.flathub.yml` builds offline locally with the openjdk21 extension; lint shows only owner-gated items. CI draft `.github/workflows/flatpak.yml` is untested until the phase-close push.
-- Startup abort diagnosed (2026-10-30): the jpackage launcher's helper process aborts on exit (JDK-8348560, the extension JDK's dynamic libstdc++); the app runs, but each launch leaves a SIGABRT core dump. Scratch build in `build/flathub-scratch/` (Builder: `flatpak run --filesystem=<repo> org.flatpak.Builder ...`, no host `flatpak-builder`).
-- **Next action (now):** in `io.github.stealthx3.ArgosyDesktop.flathub.yml`, install the extension JRE into `/app/jre` (`/usr/lib/sdk/openjdk21/install.sh`) and replace `/app/bin/argosy-desktop` with a script that runs `/app/jre/bin/java` using the classpath, main class and `java-options` from `lib/app/argosy-desktop.cfg`. Rebuild in `build/flathub-scratch/`, smoke-run with scratch `XDG_*` (no abort; `coredumpctl list --since -10min` empty), then manifest and repo lint.
+- Startup abort fixed (2026-10-30): the Flathub manifest starts the app from `/app/jre` through `desktopApp/flatpak/argosy-desktop-jre.sh` (reads the jpackage `.cfg`), not the jpackage launcher, which hit JDK-8348560. The smoke run shows no abort and no core dump; lint shows only the owner-gated items. Scratch build in `build/flathub-scratch/` (Builder: `flatpak run --filesystem=<repo> org.flatpak.Builder ...`; commit manifest inputs first, since the build uses git HEAD).
+- Remaining step 5 work needs the owner: the app id (question 4), screenshots, the CI run (at the phase-close push), and the Flathub PR (owner go-ahead).
+- **Next action:** nothing left that does not need the owner. Ask the owner, in one message: the Deck Game Mode checks for 5.4 (list above), the RetroArch core question, the app id and screenshots, and the Brightness question. Then set the pacer state to `waiting-owner`.
 
 ## Gotchas
 
