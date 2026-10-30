@@ -319,6 +319,10 @@ class HomeViewModel @Inject constructor(
             onSyncComplete = { refreshRecentGames() },
             onFavoritesRefreshed = { libraryDelegate.loadFavorites() }
         )
+        syncDelegate.observeLibrarySyncEnd(viewModelScope) {
+            libraryDelegate.loadRecentGames()
+            refreshCurrentRowInternal()
+        }
         observeBackgroundSettings()
         observeDockApps()
         observeGradientChanges()

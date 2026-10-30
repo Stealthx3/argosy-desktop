@@ -40,13 +40,14 @@ cores='d=$HOME/.var/app/org.libretro.RetroArch/config/retroarch/cores; mkdir -p 
 check retroarch "$here/exec.sh" "$profile" --long --user "flatpak install --user -y --noninteractive flathub org.libretro.RetroArch >/dev/null && $cores"
 check session "$here/exec.sh" "$profile" --user 'systemctl --user show-environment | grep -E "^(XDG_SESSION_TYPE|XDG_CURRENT_DESKTOP)=" | tr "\n" " "'
 check start "$here/app.sh" "$profile" start
-sleep 45
-walk shot:01-welcome
-walk PAD:SOUTH wait:3 shot:02-display LEFT wait:1 PAD:SOUTH wait:4 \
-    ENTER wait:2 "TYPE:$ROMM_FROM_GUEST" wait:1 ENTER wait:8 shot:03-pairing PAD:SOUTH wait:10
+check first-frame log_wait 'restoreQueueFromDatabase' 120
+walk wait:10 shot:01-welcome
+walk PAD:SOUTH wait:6 shot:02-display LEFT wait:2 PAD:SOUTH wait:8 \
+    ENTER wait:3 "TYPE:$ROMM_FROM_GUEST" wait:2 ENTER wait:12 shot:03-pairing PAD:SOUTH wait:10
 check sign-in-browser "$here/exec.sh" "$profile" --user 'for b in firefox chromium epiphany konqueror falkon; do command -v $b >/dev/null && found=1; done; [ -n "$found" ] || { echo "skipped: no browser in guest"; exit 0; }; p=$(pgrep -u tester -x -l "firefox|firefox-bin|chrome|chromium|epiphany|konqueror|falkon" | head -1); pkill -u tester -x "firefox|firefox-bin|chrome|chromium|epiphany|konqueror|falkon"; [ -n "$p" ] && echo "opened: $p" || { echo "no browser opened"; exit 1; }'
-walk PAD:DPAD_DOWN wait:1 PAD:SOUTH wait:3 PAD:SOUTH wait:1 "RUN:$venv $root/scripts/desktop/testbed/pair-code.py" "TYPEFILE:$code" wait:2 ENTER wait:15 \
-    shot:04-connected
+walk PAD:DPAD_DOWN wait:1 PAD:SOUTH wait:3 PAD:SOUTH wait:1 "RUN:$venv $root/scripts/desktop/testbed/pair-code.py --vmlab" "TYPEFILE:$code" wait:2 ENTER
+check pair log_wait 'Device (already )?registered' 120
+walk wait:3 shot:04-connected
 walk PAD:SOUTH wait:3 PAD:SOUTH wait:3 shot:04b-emulators PAD:DPAD_DOWN wait:1 PAD:SOUTH wait:3 PAD:SOUTH wait:3 PAD:SOUTH wait:5
 check sync log_wait 'syncLibrary returned' 300
 walk wait:10 shot:05-home PAD:SOUTH

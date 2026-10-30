@@ -65,6 +65,16 @@ class HomeSyncDelegate @Inject constructor(
         }
     }
 
+    fun observeLibrarySyncEnd(scope: CoroutineScope, onEnd: suspend () -> Unit) {
+        scope.launch {
+            var wasBusy = false
+            platformSyncQueue.isLibraryBusy.collect { busy ->
+                if (wasBusy && !busy) onEnd()
+                wasBusy = busy
+            }
+        }
+    }
+
     fun syncFromRomm(@Suppress("UNUSED_PARAMETER") scope: CoroutineScope, onSyncComplete: () -> Unit) {
         platformSyncQueue.enqueueLibrary(initializeFirst = true, onComplete = onSyncComplete)
     }

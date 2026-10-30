@@ -2,7 +2,7 @@
 
 Rewritten (not appended) at the end of every work unit, so a fresh session can start from it alone. History and reasoning live in `DEVLOG.md`. Earlier phases: `phase-0.md` … `phase-4.md` (closed summaries).
 
-**Updated:** 2026-10-29 (owner said "resume" in the main session; VM lab unit 3 done). Steps 1–3 done; step 4 in progress.
+**Updated:** 2026-10-29 (owner said "resume" in the main session; VM lab unit 4 done). Steps 1–3 done; step 4 in progress.
 
 ## Scope and exit criterion
 
@@ -31,8 +31,9 @@ Plan (`DEVLOG.md`, Phase 5 plan): 1 wizard wording, 2 Close Argosy, 3 thumbnails
 - Unit 1 done (2026-10-29): all three VMs proven from `clean` (autologin desktop, guest-exec, screenshots, RomM 200, Flathub). KDE and Ubuntu were rebuilt (the pause had cut their first boot short) and repaired; `build.sh` now refuses to snapshot without `tester`'s seat0 session. Fedora GNOME: alpha 0.3.0 installed from the Pages `.flatpakref`, wizard to Home with 17 games synced, SIGTERM exit 497 ms (screens in `build/vmlab/fedora-gnome/`, not in git).
 - Unit 2 done (2026-10-29): `desktop-test.sh <profile> <out>` (report in `<out>/report.txt`; `LAB_BUNDLE=<file>` installs a local build over the alpha) PASSES on all three desktops with the local build f684db1a. It fixes "Sign in on this device" (host `xdg-open`; it opened nothing in the Flatpak before). The fix is committed but not published: the alpha on Pages is still 2e7a3c30 until the step-5.4 close.
 - Unit 3 done (2026-10-29): the test now covers RetroArch from Flathub (plus buildbot cores), the first sync, ROM download, RetroArch launch, session end and Close Argosy. Fedora KDE passes everything; on GNOME and Ubuntu, Close Argosy, log and SIGTERM pass, but download and launch fail because A on Home hit "View All" (details in `DEVLOG.md`, unit 3).
-- Open findings: (1) fresh Flathub RetroArch has no cores, so first launch fails with "No core available" (owner question below); (2) Home may not refresh after the first sync (Ubuntu); (3) the wizard walk's fixed sleeps drift (one Fedora GNOME run never paired); (4) QR buttons move with Up/Down only; (5) one 5.7 s SIGTERM exit that did not reproduce.
-- **Next action (unit 4):** investigate finding 2: start on Ubuntu (`reset.sh`, install, bundle, wizard), then compare Home before and after `syncLibrary returned`, and read how the desktop Home rows observe the games table. Fix it if it is a refresh bug. Then replace the wizard's fixed sleeps with log markers, and rerun `desktop-test.sh` on all three (`LAB_BUNDLE=build/vmlab/bundle/argosy.flatpak`; rebuild and re-sign the bundle after any code change). After that: XWayland and HiDPI at 125%/150%.
+- Unit 4 done (2026-10-30): Home now refreshes when any library sync ends (`HomeSyncDelegate.observeLibrarySyncEnd`; shared code, Android gate green, Android emulator not run). `desktop-test.sh` passes every product check on all three desktops with local build e68b1170 (signed bundle `build/vmlab/bundle/argosy.flatpak`); reports in `build/vmlab/<profile>/test-u4*`. Not yet published: Pages still serves 2e7a3c30.
+- Open findings: (1) fresh Flathub RetroArch has no cores (owner question 3); (2) the wizard walk still relies on waits (made longer; markers would be sturdier); (3) QR buttons move with Up/Down only; (4) one 5.7 s SIGTERM exit that did not reproduce; (5) Ubuntu VM has no browser.
+- **Next action (unit 5):** XWayland and HiDPI. Today the Flatpak has `--socket=x11` only, so every desktop runs it on XWayland; check rendering and input at 125% and 150% scale on GNOME (`gsettings set org.gnome.mutter experimental-features "['scale-monitor-framebuffer']"`, then `gdctl`/`monitors.xml`) and KDE (`kscreen-doctor output.Virtual-1.scale.1.25`), screenshots of Home and the wizard. Then the step-4 close: the owner's Game Mode checks on the Deck are still pending, so ask the owner before `--step-close 5.4`.
 - Later units: the full test per desktop (alpha repo install, wizard, sync, covers, download and RetroArch launch, Close Argosy, SIGTERM, XWayland and HiDPI at 125%/150%), with a report per desktop.
 
 ## Open owner questions (revisit after testing, owner decision 2026-10-27)

@@ -19,7 +19,7 @@ python3 -I - "$dom" "$cmd" "$long" <<'PY'
 import base64, json, subprocess, sys, time
 dom, cmd, long = sys.argv[1], sys.argv[2], sys.argv[3] == '1'
 def agent(payload):
-    out = subprocess.run(['virsh', 'qemu-agent-command', dom, json.dumps(payload)], check=True, capture_output=True, text=True).stdout
+    out = subprocess.run(['virsh', 'qemu-agent-command', dom, json.dumps(payload)], check=True, capture_output=True, text=True, timeout=60).stdout
     return json.loads(out)['return']
 def run(command, poll):
     pid = agent({'execute': 'guest-exec', 'arguments': {'path': '/bin/sh', 'arg': ['-c', command], 'capture-output': True}})['pid']
@@ -34,7 +34,10 @@ if long:
     run(f"(setsid sh -c {quoted} > {job}.log 2>&1 < /dev/null; echo $? > {job}.rc) > /dev/null 2>&1 &", 0.5)
     while True:
         time.sleep(10)
-        st = run(f'cat {job}.rc 2>/dev/null', 0.5)
+        try:
+            st = run(f'cat {job}.rc 2>/dev/null', 0.5)
+        except (subprocess.TimeoutExpired, subprocess.CalledProcessError):
+            continue
         rc = base64.b64decode(st.get('out-data', '')).decode().strip()
         if rc:
             break
