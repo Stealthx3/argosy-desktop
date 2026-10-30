@@ -2,7 +2,7 @@
 
 Rewritten (not appended) at the end of every work unit, so a fresh session can start from it alone. History and reasoning live in `DEVLOG.md`. Earlier phases: `phase-0.md` … `phase-4.md` (closed summaries).
 
-**Updated:** 2026-10-29 (owner said "resume"; VM lab unit 1 done). Steps 1–3 done; step 4 in progress.
+**Updated:** 2026-10-29 (owner said "resume" in the main session; VM lab unit 2 done). Steps 1–3 done; step 4 in progress.
 
 ## Scope and exit criterion
 
@@ -29,8 +29,9 @@ Plan (`DEVLOG.md`, Phase 5 plan): 1 wizard wording, 2 Close Argosy, 3 thumbnails
 - Disks under `/mnt/FileDrive/VMs/argosy-lab/`, libvirt `qemu:///system`, VM names `argosy-lab-*`. Never touch `debian13` or the Windows VMs.
 - Lab runs in `qemu:///session` (visible in virt-manager under "QEMU/KVM User session"); scripts in `scripts/desktop/vmlab/`: `build.sh`, `apply.sh`, `reset.sh`, `exec.sh [--long] [--user]`, `shot.sh`, `app.sh`, `walk.sh`. Guests reach RomM at `http://10.0.2.2:8093`. Gotchas in `docs/desktop/gotchas.md` ("VM test lab").
 - Unit 1 done (2026-10-29): all three VMs proven from `clean` (autologin desktop, guest-exec, screenshots, RomM 200, Flathub). KDE and Ubuntu were rebuilt (the pause had cut their first boot short) and repaired; `build.sh` now refuses to snapshot without `tester`'s seat0 session. Fedora GNOME: alpha 0.3.0 installed from the Pages `.flatpakref`, wizard to Home with 17 games synced, SIGTERM exit 497 ms (screens in `build/vmlab/fedora-gnome/`, not in git).
-- Findings so far (in `DEVLOG.md`, 2026-10-29): QR pairing buttons move with Up/Down only; "Sign in on this device" opened no browser in the Flatpak (the VM has no browser; retest where one exists before calling it a bug).
-- **Next action (unit 2):** write `scripts/desktop/vmlab/desktop-test.sh <profile> <out>` from the steps proven by hand: `reset.sh`, `app.sh install`, `app.sh start`, the Flatpak wizard walk in `gotchas.md` (server `http://10.0.2.2:8093`), covers on Home, `app.sh term` timing, plus a short report file. Run it on all three; then add a download and a RetroArch launch (install `org.libretro.RetroArch` from Flathub in the guest), Close Argosy, XWayland and HiDPI at 125%/150%.
+- Unit 2 done (2026-10-29): `desktop-test.sh <profile> <out>` (report in `<out>/report.txt`; `LAB_BUNDLE=<file>` installs a local build over the alpha) PASSES on all three desktops with the local build f684db1a. It fixes "Sign in on this device" (host `xdg-open`; it opened nothing in the Flatpak before). The fix is committed but not published: the alpha on Pages is still 2e7a3c30 until the step-5.4 close.
+- Open findings: QR pairing buttons move with Up/Down only; one 5.7 s SIGTERM exit on Fedora GNOME that did not reproduce (watch for it); Ubuntu VM has no browser (xdg-open falls back to Text Editor).
+- **Next action (unit 3):** extend `desktop-test.sh`: a ROM download, install `org.libretro.RetroArch` from Flathub in the guest and launch a game, Close Argosy from Quick Settings (`R3 DOWN*8`, see Gotchas), XWayland (`--socket=x11` today; check `GDK_BACKEND`/`DISPLAY` path) and HiDPI at 125%/150% (GNOME `scale-monitor-framebuffer`, KDE scale). Run on all three with `LAB_BUNDLE` set to a fresh signed bundle.
 - Later units: the full test per desktop (alpha repo install, wizard, sync, covers, download and RetroArch launch, Close Argosy, SIGTERM, XWayland and HiDPI at 125%/150%), with a report per desktop.
 
 ## Open owner questions (revisit after testing, owner decision 2026-10-27)
