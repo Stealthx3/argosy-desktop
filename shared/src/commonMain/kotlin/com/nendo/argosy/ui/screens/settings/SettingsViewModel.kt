@@ -169,6 +169,7 @@ class SettingsViewModel @Inject constructor(
     val serverDelegate: ServerSettingsDelegate,
     val accountsDelegate: AccountsSettingsDelegate,
     val storageDelegate: StorageSettingsDelegate,
+    val resetDelegate: com.nendo.argosy.ui.screens.settings.delegates.ResetSettingsDelegate,
     val attributionDelegate: StorageAttributionDelegate,
     val storagePlatformGamesDelegate: com.nendo.argosy.ui.screens.settings.delegates.StoragePlatformGamesDelegate,
     val storageCachesDelegate: com.nendo.argosy.ui.screens.settings.delegates.StorageCachesDelegate,
@@ -349,6 +350,13 @@ class SettingsViewModel @Inject constructor(
     fun stepControllerType(port: Int, delta: Int) = routeStepControllerType(this, port, delta)
 
     fun selectControllerType(port: Int, index: Int) = routeSelectControllerType(this, port, index)
+
+    fun confirmPlatformReset() = resetDelegate.confirmPlatformReset(viewModelScope) { loadSettings() }
+
+    fun requestFactoryReset() = resetDelegate.requestFactoryReset(viewModelScope)
+
+    fun confirmFactoryReset() =
+        resetDelegate.confirmFactoryReset(viewModelScope, storageDelegate::hardResetBlockerMessage)
 
     internal fun loadSettings() = routeLoadSettings(this)
 

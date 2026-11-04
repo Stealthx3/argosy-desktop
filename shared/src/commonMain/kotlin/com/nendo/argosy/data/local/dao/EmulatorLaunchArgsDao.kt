@@ -24,4 +24,7 @@ interface EmulatorLaunchArgsDao {
 
     @Query("SELECT EXISTS(SELECT 1 FROM emulator_launch_args WHERE platformId = :platformId AND emulatorId = :emulatorId)")
     suspend fun hasOverride(platformId: Long, emulatorId: String): Boolean
+
+    @Query("DELETE FROM emulator_launch_args")
+    suspend fun deleteAll()
 }

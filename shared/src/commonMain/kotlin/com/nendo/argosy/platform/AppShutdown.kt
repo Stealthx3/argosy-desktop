@@ -27,4 +27,12 @@ object AppShutdown {
         _confirmOpen.value = false
         _requested.value = true
     }
+
+    private val _factoryResetRequested = MutableStateFlow(false)
+    val factoryResetRequested: StateFlow<Boolean> = _factoryResetRequested.asStateFlow()
+
+    fun requestFactoryReset() {
+        _factoryResetRequested.value = true
+        request()
+    }
 }

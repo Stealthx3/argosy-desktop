@@ -30,4 +30,7 @@ interface EmulatorSaveConfigDao {
 
     @Query("DELETE FROM emulator_save_config WHERE isAutoDetected = 1")
     suspend fun clearAutoDetected()
+
+    @Query("DELETE FROM emulator_save_config")
+    suspend fun deleteAll()
 }

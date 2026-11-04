@@ -1018,7 +1018,7 @@ class StorageSettingsDelegate @Inject constructor(
         }
     }
 
-    private fun hardResetBlockerMessage(blocker: HardResetBlocker): NotificationText = when (blocker) {
+    internal fun hardResetBlockerMessage(blocker: HardResetBlocker): NotificationText = when (blocker) {
         HardResetBlocker.ActiveSession ->
             NotificationText.Res(R.string.notif_storage_hardreset_blocked_active_session)
         is HardResetBlocker.PendingUploads -> pendingUploadsMessage(blocker)

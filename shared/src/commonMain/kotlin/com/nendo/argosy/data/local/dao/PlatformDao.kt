@@ -113,4 +113,7 @@ interface PlatformDao {
 
     @Query("SELECT slug FROM platforms GROUP BY slug HAVING COUNT(*) > 1")
     fun observeAmbiguousSlugs(): Flow<List<String>>
+
+    @Query("UPDATE platforms SET customRomPath = NULL")
+    suspend fun clearAllCustomRomPaths()
 }

@@ -164,9 +164,59 @@ class DatabaseAdminRepository @Inject constructor(
         null
     }
 
+    /**
+     * Returns every platform to Not configured: emulator, core and launch choices, ROM folder and
+     * save path overrides. Per-game overrides, games and saves stay.
+     */
+    suspend fun resetPlatformConfigurations() = withContext(Dispatchers.IO) {
+        database.withTransaction {
+            database.emulatorConfigDao().deleteAllPlatformConfigs()
+            database.emulatorSaveConfigDao().deleteAll()
+            database.emulatorLaunchArgsDao().deleteAll()
+            database.platformLibretroSettingsDao().deleteAll()
+            database.platformDao().clearAllCustomRomPaths()
+        }
+    }
+
+    suspend fun pendingSaveUploadCount(): Int =
+        pendingUploadsByAccount()?.accounts?.sumOf { it.pendingCount } ?: 0
+
+    suspend fun factoryResetBlocker(): HardResetBlocker? = withContext(Dispatchers.IO) {
+        if (sessionStateStore.hasActiveSession()) HardResetBlocker.ActiveSession else activeDownloadBlocker()
+    }
+
+    /**
+     * Deletes the game files Argosy downloaded, with their extra files and discs, then the folders
+     * that leaves empty. Files Argosy only found on disk stay.
+     */
+    suspend fun deleteFactoryResetFiles(storageBase: File, defaultStorageBase: File) = withContext(Dispatchers.IO) {
+        val games = database.gameDao().getDownloadedBySources(GameSource.entries)
+        val downloadedGameIds = games.filter { it.fileOrigin.deletedOnReset }.map { it.id }.toSet()
+        val extras = database.gameFileDao().getAllWithLocalPath()
+            .filter { it.gameId in downloadedGameIds }.mapNotNull { it.localPath } +
+            database.gameDiscDao().getAllWithLocalPath()
+                .filter { it.gameId in downloadedGameIds }.mapNotNull { it.localPath }
+        val mainFiles = games.filter { it.id in downloadedGameIds }.mapNotNull { it.localPath }
+        val customRoots = database.platformDao().getAllPlatforms().mapNotNull { it.customRomPath }.map(::File)
+
+        deleteDownloadedFiles(GameSource.entries)
+        extras.map(::File).forEach { file ->
+            if (!file.deleteRecursively()) Log.w(TAG, "deleteFactoryResetFiles: could not delete ${file.path}")
+        }
+        pruneEmptyParents(
+            deleted = (mainFiles + extras).map(::File),
+            roots = (customRoots + storageBase + defaultStorageBase).toSet(),
+            removableRoots = setOf(defaultStorageBase)
+        )
+    }
+
     private suspend fun checkHardResetBlockers(): HardResetBlocker? {
         if (sessionStateStore.hasActiveSession()) return HardResetBlocker.ActiveSession
         pendingUploadsByAccount()?.let { return it }
+        return activeDownloadBlocker()
+    }
+
+    private fun activeDownloadBlocker(): HardResetBlocker? {
         val downloadState = downloadManager.get().state.value
         if (downloadState.activeDownloads.isNotEmpty() || downloadState.queue.isNotEmpty()) {
             return HardResetBlocker.ActiveDownloads

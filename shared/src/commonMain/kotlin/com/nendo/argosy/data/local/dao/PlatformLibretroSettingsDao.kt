@@ -29,4 +29,7 @@ interface PlatformLibretroSettingsDao {
 
     @Query("UPDATE platform_libretro_settings SET platformId = :newPlatformId WHERE platformId = :oldPlatformId")
     suspend fun migratePlatform(oldPlatformId: Long, newPlatformId: Long)
+
+    @Query("DELETE FROM platform_libretro_settings")
+    suspend fun deleteAll()
 }

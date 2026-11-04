@@ -66,6 +66,8 @@ internal sealed class EmulatorsItem(
 
     data object CheckForUpdates : EmulatorsItem("check_updates", "platforms")
 
+    data object ResetPlatforms : EmulatorsItem("reset_platforms", "platforms")
+
     class SectionHeader(key: String, section: String, val titleRes: Int) : EmulatorsItem(
         key = key, section = section
     ) { override val isFocusable = false }
@@ -83,6 +85,7 @@ internal sealed class EmulatorsItem(
                 add(SectionHeader("header_active", "platforms", R.string.settings_emulators_section_active))
                 add(CloseOnSessionEnd)
                 add(CheckForUpdates)
+                if (com.nendo.argosy.platform.PlatformFeatures.desktopWindow) add(ResetPlatforms)
                 active.forEach { config ->
                     add(PlatformItem(config, platforms.indexOf(config)))
                 }
@@ -207,6 +210,13 @@ fun EmulatorsSection(
                         },
                         isFocused = isFocused(item),
                         onClick = { viewModel.forceCheckEmulatorUpdates() }
+                    )
+
+                    EmulatorsItem.ResetPlatforms -> ActionPreference(
+                        title = stringResource(R.string.settings_emulators_reset_title),
+                        subtitle = stringResource(R.string.settings_emulators_reset_subtitle),
+                        isFocused = isFocused(item),
+                        onClick = { openFrom(item) { viewModel.resetDelegate.requestPlatformReset() } }
                     )
 
                     is EmulatorsItem.PlatformItem -> {

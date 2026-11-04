@@ -134,6 +134,7 @@ import com.nendo.argosy.ui.screens.settings.components.PlatformSettingsModal
 import com.nendo.argosy.ui.screens.settings.components.ReleaseChangelogModal
 import com.nendo.argosy.ui.screens.settings.components.SoundPickerPopup
 import com.nendo.argosy.ui.screens.settings.delegates.BuiltinNavigationTarget
+import com.nendo.argosy.ui.screens.settings.delegates.ResetDialog
 import com.nendo.argosy.ui.screens.settings.sections.AboutSection
 import com.nendo.argosy.ui.screens.settings.sections.PresentationSection
 import com.nendo.argosy.ui.screens.settings.sections.AccountsSection
@@ -901,6 +902,40 @@ fun SettingsScreen(
         )
         null -> ""
     }
+    val resetDialog by viewModel.resetDelegate.dialog.collectAsState()
+    val pendingSaveUploads by viewModel.resetDelegate.pendingSaveUploads.collectAsState()
+    ArgosyConfirmModalHost(
+        visible = resetDialog == ResetDialog.PLATFORMS,
+        title = stringResource(R.string.settings_emulators_reset_confirm_title),
+        message = stringResource(R.string.settings_emulators_reset_confirm_message),
+        confirmLabel = stringResource(R.string.settings_emulators_reset_confirm_action),
+        onConfirm = viewModel::confirmPlatformReset,
+        onDismiss = viewModel.resetDelegate::dismiss,
+        destructive = true
+    )
+    ArgosyConfirmModalHost(
+        visible = resetDialog == ResetDialog.FACTORY_WARNING,
+        title = stringResource(R.string.settings_factory_reset_warning_title),
+        message = stringResource(R.string.settings_factory_reset_warning_message) +
+            if (pendingSaveUploads > 0) {
+                "\n\n" + stringResource(R.string.settings_factory_reset_warning_unsynced, pendingSaveUploads)
+            } else {
+                ""
+            },
+        confirmLabel = stringResource(R.string.settings_factory_reset_warning_action),
+        onConfirm = viewModel.resetDelegate::continueFactoryReset,
+        onDismiss = viewModel.resetDelegate::dismiss,
+        destructive = true
+    )
+    ArgosyConfirmModalHost(
+        visible = resetDialog == ResetDialog.FACTORY_CONFIRM,
+        title = stringResource(R.string.settings_factory_reset_confirm_title),
+        message = stringResource(R.string.settings_factory_reset_confirm_message),
+        confirmLabel = stringResource(R.string.settings_factory_reset_confirm_action),
+        onConfirm = viewModel::confirmFactoryReset,
+        onDismiss = viewModel.resetDelegate::dismiss,
+        destructive = true
+    )
     ArgosyConfirmModalHost(
         visible = uiState.showBuiltinPathMigrationDialog && builtinMigration != null,
         title = builtinMigrationTitle,

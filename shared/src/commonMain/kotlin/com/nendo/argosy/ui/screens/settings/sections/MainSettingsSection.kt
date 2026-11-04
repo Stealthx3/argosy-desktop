@@ -39,6 +39,7 @@ import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.material.icons.filled.PowerSettingsNew
+import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Storage
@@ -214,6 +215,13 @@ internal sealed class MainSettingsItem(
     )
     data object About :
         MainSettingsItem("about", Icons.Default.Info, R.string.settings_main_about_title, "system")
+    data object FactoryReset : MainSettingsItem(
+        "factoryReset",
+        Icons.Default.RestartAlt,
+        R.string.settings_main_factory_reset_title,
+        "system",
+        { PlatformFeatures.desktopWindow }
+    )
     data object CloseApp : MainSettingsItem(
         "closeApp",
         Icons.Default.PowerSettingsNew,
@@ -234,7 +242,7 @@ internal sealed class MainSettingsItem(
                 Header("connectionsHeader", "connections", R.string.settings_main_section_connections),
                 RomM, Steam, Jellyfin, Social,
                 Header("systemHeader", "system", R.string.settings_main_section_system),
-                Permissions, ManagedInstallers, DeviceSettings, About, CloseApp
+                Permissions, ManagedInstallers, DeviceSettings, About, FactoryReset, CloseApp
             )
     }
 }
@@ -360,6 +368,7 @@ fun MainSettingsSection(uiState: SettingsUiState, viewModel: SettingsViewModel) 
             )
         }
         MainSettingsItem.About -> context.getString(R.string.settings_main_about_subtitle, uiState.appVersion)
+        MainSettingsItem.FactoryReset -> context.getString(R.string.settings_main_factory_reset_subtitle)
         MainSettingsItem.CloseApp -> context.getString(R.string.settings_main_close_app_subtitle)
     }
 
@@ -391,6 +400,7 @@ fun MainSettingsSection(uiState: SettingsUiState, viewModel: SettingsViewModel) 
             MainSettingsItem.Social -> viewModel.navigateToSection(SettingsSection.SOCIAL)
             MainSettingsItem.Permissions -> viewModel.navigateToSection(SettingsSection.PERMISSIONS)
             MainSettingsItem.About -> viewModel.navigateToSection(SettingsSection.ABOUT)
+            MainSettingsItem.FactoryReset -> viewModel.requestFactoryReset()
             MainSettingsItem.CloseApp -> AppShutdown.requestConfirm()
         }
     }

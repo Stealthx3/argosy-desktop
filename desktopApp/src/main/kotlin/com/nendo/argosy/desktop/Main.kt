@@ -4,6 +4,7 @@ import com.nendo.argosy.ui.util.LocalHoverHighlight
 import com.nendo.argosy.ui.util.rememberHoverHighlight
 import kotlin.system.exitProcess
 import com.nendo.argosy.platform.AppShutdown
+import com.nendo.argosy.platform.FactoryResetWipe
 import com.nendo.argosy.ui.input.DesktopGamepadDispatcher
 import com.nendo.argosy.platform.mpv.MpvProbe
 import kotlinx.coroutines.flow.drop
@@ -61,6 +62,7 @@ fun main(args: Array<String>) {
         println(MpvProbe.run(it.removePrefix(PROBE_VIDEO_FLAG)))
         return
     }
+    FactoryResetWipe.runIfPending()
     val options = ShellOptions.parse(args)
     val app = DesktopApplication()
     installDesktopImageLoader(app.component.rommConnectionManager(), app.component.userCertStore())
@@ -79,7 +81,7 @@ fun main(args: Array<String>) {
     val detectedProfile = DisplayProfileDetection.detect()
     val blankCursor = Toolkit.getDefaultToolkit()
         .createCustomCursor(BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB), Point(0, 0), "blank")
-    application {
+    application(exitProcessOnExit = false) {
         val shutdownRequested by AppShutdown.requested.collectAsState()
         LaunchedEffect(shutdownRequested) { if (shutdownRequested) exitApplication() }
         val state = rememberWindowState(
@@ -155,16 +157,20 @@ fun main(args: Array<String>) {
         }
     }
     keyDispatcher.releaseAll()
-    exitProcess(0)
+    if (AppShutdown.factoryResetRequested.value) FactoryResetWipe.schedule()
+    exitProcess(shellExitCode())
 }
 
 private fun shutDown(gamepadDispatcher: DesktopGamepadDispatcher) {
     Thread({
         Thread.sleep(SHUTDOWN_GRACE_MS)
-        Runtime.getRuntime().halt(0)
+        Runtime.getRuntime().halt(shellExitCode())
     }, "argosy-shutdown-watchdog").apply { isDaemon = true }.start()
     gamepadDispatcher.stop()
 }
+
+private fun shellExitCode(): Int =
+    if (AppShutdown.factoryResetRequested.value) FactoryResetWipe.RESTART_EXIT_CODE else 0
 
 private const val SHUTDOWN_GRACE_MS = 3_000L
 

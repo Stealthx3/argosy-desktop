@@ -158,4 +158,7 @@ interface EmulatorConfigDao {
 
     @Query("SELECT DISTINCT packageName FROM emulator_configs WHERE isDefault = 1 AND gameId IS NULL AND packageName IS NOT NULL")
     fun observeAssignedPackageNames(): Flow<List<String>>
+
+    @Query("DELETE FROM emulator_configs WHERE platformId IS NOT NULL AND gameId IS NULL")
+    suspend fun deleteAllPlatformConfigs()
 }

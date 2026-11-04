@@ -187,6 +187,7 @@ internal fun routeConfirm(vm: SettingsViewModel): InputResult {
                 MainSettingsItem.Drivers -> vm.navigateToSection(SettingsSection.DRIVERS)
                 MainSettingsItem.Permissions -> vm.navigateToSection(SettingsSection.PERMISSIONS)
                 MainSettingsItem.About -> vm.navigateToSection(SettingsSection.ABOUT)
+                MainSettingsItem.FactoryReset -> vm.requestFactoryReset()
                 MainSettingsItem.CloseApp -> com.nendo.argosy.platform.AppShutdown.requestConfirm()
                 MainSettingsItem.Social -> vm.navigateToSection(SettingsSection.SOCIAL)
                 MainSettingsItem.Steam -> vm.navigateToSection(SettingsSection.STEAM_SETTINGS)
@@ -1136,6 +1137,7 @@ private fun routeEmulatorsConfirm(vm: SettingsViewModel, state: SettingsUiState)
             return InputResult.handled(SoundType.TOGGLE)
         }
         EmulatorsItem.CheckForUpdates -> vm.forceCheckEmulatorUpdates()
+        EmulatorsItem.ResetPlatforms -> vm.resetDelegate.requestPlatformReset()
         is EmulatorsItem.PlatformItem -> vm.navigateToPlatformDetail(item.index)
         else -> {}
     }

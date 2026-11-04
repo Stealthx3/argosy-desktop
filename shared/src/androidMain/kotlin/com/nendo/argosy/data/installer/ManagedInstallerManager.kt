@@ -124,6 +124,8 @@ actual class ManagedInstallerManager @Inject constructor(
         _job.value = null
     }
 
+    actual suspend fun removeInstalledApps(rows: List<ManagedInstallerEntity>) = Unit
+
     actual fun reconcilePendingInstall() {
         val waiting = pending ?: return
         if (_job.value?.state !is InstallerJobState.WaitingForInstall) return

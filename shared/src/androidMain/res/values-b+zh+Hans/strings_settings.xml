@@ -1676,6 +1676,21 @@
     <string name="settings_emulators_close_on_session_end_subtitle_off">模拟器应用将继续在后台运行</string>
     <string name="settings_emulators_check_updates_title">检查更新</string>
     <string name="settings_emulators_check_updates_subtitle">检查模拟器更新</string>
+    <string name="settings_emulators_reset_title">恢复默认设置</string>
+    <string name="settings_emulators_reset_subtitle">将所有平台恢复为未配置</string>
+    <string name="settings_emulators_reset_confirm_title">要重置所有平台吗？</string>
+    <string name="settings_emulators_reset_confirm_message">每个平台的模拟器、核心、启动参数、ROM 文件夹和存档路径都会恢复为未配置。游戏和存档不受影响。</string>
+    <string name="settings_emulators_reset_confirm_action">重置</string>
+    <string name="settings_emulators_reset_done">平台已恢复为未配置</string>
+    <string name="settings_main_factory_reset_title">恢复出厂设置</string>
+    <string name="settings_main_factory_reset_subtitle">清除 Argosy 创建的所有内容并重新开始</string>
+    <string name="settings_factory_reset_warning_title">要恢复出厂设置吗？</string>
+    <string name="settings_factory_reset_warning_message">这会清除所有设置和登录信息，删除 Argosy 下载的游戏和媒体及其保存的数据，并移除它安装的模拟器。你自己添加的文件，以及模拟器或 RomM 服务器上的存档会保留。之后 Argosy 会重启并进入首次设置。</string>
+    <string name="settings_factory_reset_warning_action">继续</string>
+    <string name="settings_factory_reset_warning_unsynced">尚未上传到服务器的存档：%1$d 个。它们将会丢失。</string>
+    <string name="settings_factory_reset_confirm_title">你完全确定吗？</string>
+    <string name="settings_factory_reset_confirm_message">此操作无法撤销。上述所有内容将立即被清除。</string>
+    <string name="settings_factory_reset_confirm_action">全部清除</string>
     <plurals name="settings_emulators_check_updates_available">
         <item quantity="other">有%d个可用更新</item>
     </plurals>

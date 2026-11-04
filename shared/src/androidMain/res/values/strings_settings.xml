@@ -3236,6 +3236,21 @@
     <string name="settings_emulators_check_updates_title">Check for Updates</string>
     <!-- Second line of that row before it runs. -->
     <string name="settings_emulators_check_updates_subtitle">Check for emulator updates</string>
+    <string name="settings_emulators_reset_title">Reset to Defaults</string>
+    <string name="settings_emulators_reset_subtitle">Set every platform back to Not configured</string>
+    <string name="settings_emulators_reset_confirm_title">Reset all platforms?</string>
+    <string name="settings_emulators_reset_confirm_message">Emulator, core, launch argument, ROM folder and save path choices for every platform go back to Not configured. Games and saves stay where they are.</string>
+    <string name="settings_emulators_reset_confirm_action">Reset</string>
+    <string name="settings_emulators_reset_done">Platforms reset to Not configured</string>
+    <string name="settings_main_factory_reset_title">Factory Reset</string>
+    <string name="settings_main_factory_reset_subtitle">Erase everything Argosy created and start over</string>
+    <string name="settings_factory_reset_warning_title">Factory reset?</string>
+    <string name="settings_factory_reset_warning_message">This clears all settings and sign-ins, deletes the games and media Argosy downloaded and its saved data, and removes emulators it installed. Files you added yourself, and saves kept by your emulators or your RomM server, stay. Argosy then restarts into first-time setup.</string>
+    <string name="settings_factory_reset_warning_action">Continue</string>
+    <string name="settings_factory_reset_warning_unsynced">Saves not yet on your server: %1$d. They will be lost.</string>
+    <string name="settings_factory_reset_confirm_title">Are you absolutely sure?</string>
+    <string name="settings_factory_reset_confirm_message">This cannot be undone. Everything listed will be erased now.</string>
+    <string name="settings_factory_reset_confirm_action">Erase Everything</string>
     <!-- Second line of that row when newer versions were found. -->
     <plurals name="settings_emulators_check_updates_available">
         <item quantity="one">%d update available</item>

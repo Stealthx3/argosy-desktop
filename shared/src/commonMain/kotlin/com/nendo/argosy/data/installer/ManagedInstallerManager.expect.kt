@@ -24,6 +24,8 @@ expect class ManagedInstallerManager {
 
     fun clearJob()
 
+    suspend fun removeInstalledApps(rows: List<ManagedInstallerEntity>)
+
     fun reconcilePendingInstall()
 
     suspend fun refresh(rows: List<ManagedInstallerEntity>)

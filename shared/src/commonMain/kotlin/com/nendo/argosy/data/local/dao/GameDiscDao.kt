@@ -76,4 +76,7 @@ interface GameDiscDao {
 
     @Query("UPDATE game_discs SET localPath = NULL WHERE id = :discId")
     suspend fun clearLocalPath(discId: Long)
+
+    @Query("SELECT * FROM game_discs WHERE localPath IS NOT NULL")
+    suspend fun getAllWithLocalPath(): List<GameDiscEntity>
 }

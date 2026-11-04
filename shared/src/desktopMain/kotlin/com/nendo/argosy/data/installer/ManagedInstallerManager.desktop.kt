@@ -62,6 +62,13 @@ actual class ManagedInstallerManager @Inject constructor(
 
     actual fun reconcilePendingInstall() = Unit
 
+    actual suspend fun removeInstalledApps(rows: List<ManagedInstallerEntity>) {
+        val home = System.getProperty("user.home")
+        rows.filter { it.tagAtInstall != null }.mapNotNull { it.assetVariant }.forEach { asset ->
+            runCatching { HostShell.run(listOf("rm", "-f", "$home/Applications/$asset")) }
+        }
+    }
+
     actual suspend fun refresh(rows: List<ManagedInstallerEntity>) {
         emulatorDetector.detectEmulators()
         repository.syncPlatformRows(FLATHUB_OWNER, installedFlatpakRows())
