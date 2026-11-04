@@ -2,6 +2,7 @@ package com.nendo.argosy.ui.common.savechannel
 
 import androidx.compose.foundation.background
 import com.nendo.argosy.ui.util.clickableNoFocus
+import com.nendo.argosy.ui.util.clickableSurfaceNoFocus
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -144,7 +145,7 @@ fun SaveChannelModal(
         modifier = Modifier
             .fillMaxSize()
             .background(overlayColor)
-            .clickableNoFocus(onClick = onDismiss),
+            .clickableSurfaceNoFocus(onClick = onDismiss),
         contentAlignment = Alignment.Center
     ) {
         val theme = LocalArgosyTheme.current
@@ -157,7 +158,7 @@ fun SaveChannelModal(
                 .clip(panelShape)
                 .background(theme.surfaceBase)
                 .border(Dimens.borderThin, theme.hairlineLow, panelShape)
-                .clickableNoFocus {}
+                .clickableSurfaceNoFocus {}
                 .padding(horizontal = Dimens.spacingLg, vertical = Dimens.spacingMd)
         ) {
             ModalHeader(

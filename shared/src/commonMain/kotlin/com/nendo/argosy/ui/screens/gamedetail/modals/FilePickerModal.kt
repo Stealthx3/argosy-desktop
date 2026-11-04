@@ -59,6 +59,7 @@ import com.nendo.argosy.ui.primitives.ModalActionButton
 import com.nendo.argosy.ui.theme.Dimens
 import com.nendo.argosy.ui.theme.LocalArgosyTheme
 import com.nendo.argosy.ui.util.clickableNoFocus
+import com.nendo.argosy.ui.util.clickableSurfaceNoFocus
 import com.nendo.argosy.util.formatBytes
 
 enum class GroupCheckState { ALL, NONE, PARTIAL }
@@ -118,7 +119,7 @@ fun FilePickerModal(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.7f))
-            .clickableNoFocus { onDismiss() },
+            .clickableSurfaceNoFocus { onDismiss() },
         contentAlignment = Alignment.Center
     ) {
         Surface(
@@ -127,7 +128,7 @@ fun FilePickerModal(
             modifier = Modifier
                 .widthIn(max = Dimens.modalWidthLg)
                 .fillMaxWidth(0.92f)
-                .clickableNoFocus { }
+                .clickableSurfaceNoFocus { }
         ) {
             Column(
                 modifier = Modifier

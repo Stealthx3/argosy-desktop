@@ -40,6 +40,7 @@ import com.nendo.argosy.ui.theme.Dimens
 import com.nendo.argosy.ui.theme.LocalArgosyTheme
 import com.nendo.argosy.ui.theme.LocalLauncherTheme
 import com.nendo.argosy.ui.util.clickableNoFocus
+import com.nendo.argosy.ui.util.clickableSurfaceNoFocus
 
 @Composable
 fun VariantPickerModal(
@@ -64,7 +65,7 @@ fun VariantPickerModal(
         modifier = Modifier
             .fillMaxSize()
             .background(overlayColor)
-            .clickableNoFocus(onClick = onDismiss),
+            .clickableSurfaceNoFocus(onClick = onDismiss),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -184,7 +185,7 @@ fun EmulatorUpdateModal(
         modifier = Modifier
             .fillMaxSize()
             .background(overlayColor)
-            .clickableNoFocus(onClick = {
+            .clickableSurfaceNoFocus(onClick = {
                 val dismissable = modal.state is com.nendo.argosy.ui.screens.settings.UpdateModalState.SelectVariant ||
                     modal.state is com.nendo.argosy.ui.screens.settings.UpdateModalState.Installed ||
                     modal.state is com.nendo.argosy.ui.screens.settings.UpdateModalState.Failed

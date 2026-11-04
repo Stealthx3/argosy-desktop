@@ -32,6 +32,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import com.nendo.argosy.ui.util.clickableNoFocus
+import com.nendo.argosy.ui.util.clickableSurfaceNoFocus
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -387,7 +388,7 @@ fun AppsScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(Color.Black.copy(alpha = 0.6f))
-                    .clickableNoFocus { viewModel.dismissContextMenu() },
+                    .clickableSurfaceNoFocus { viewModel.dismissContextMenu() },
                 contentAlignment = Alignment.Center
             ) {
                 Surface(

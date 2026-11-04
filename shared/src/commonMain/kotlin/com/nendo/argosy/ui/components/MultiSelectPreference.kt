@@ -54,6 +54,7 @@ import com.nendo.argosy.ui.theme.LocalArgosyTheme
 import com.nendo.argosy.ui.theme.Motion
 import com.nendo.argosy.ui.theme.gripReserveBottomInset
 import com.nendo.argosy.ui.util.clickableNoFocus
+import com.nendo.argosy.ui.util.clickableSurfaceNoFocus
 
 private const val MODAL_SCRIM_ALPHA = 0.55f
 private const val MODAL_MAX_HEIGHT_SHARE = 0.85f
@@ -193,14 +194,14 @@ private fun MultiSelectPickerModal(
                     .fillMaxSize()
                     .background(Color.Black.copy(alpha = MODAL_SCRIM_ALPHA))
                     .padding(bottom = gripReserveBottomInset())
-                    .clickableNoFocus { onDismiss() },
+                    .clickableSurfaceNoFocus { onDismiss() },
                 contentAlignment = Alignment.Center
             ) {
                 Box(
                     modifier = Modifier
                         .widthIn(max = Dimens.modalWidthLg)
                         .heightIn(max = maxHeight * MODAL_MAX_HEIGHT_SHARE)
-                        .clickableNoFocus { }
+                        .clickableSurfaceNoFocus { }
                 ) {
                     GlassPanel {
                         Column(modifier = Modifier.padding(Dimens.spacingLg)) {

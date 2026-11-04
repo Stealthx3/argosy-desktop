@@ -162,6 +162,7 @@ import com.nendo.argosy.ui.components.SourceBadge
 import com.nendo.argosy.ui.screens.home.GameDownloadIndicator
 import com.nendo.argosy.ui.screens.home.HomeGameUi
 import com.nendo.argosy.ui.util.clickableNoFocus
+import com.nendo.argosy.ui.util.clickableSurfaceNoFocus
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -1507,7 +1508,7 @@ private fun FilterMenuOverlay(
         modifier = Modifier
             .fillMaxSize()
             .background(overlayColor)
-            .clickableNoFocus(onClick = onDismiss),
+            .clickableSurfaceNoFocus(onClick = onDismiss),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -1869,7 +1870,7 @@ private fun QuickMenuOverlay(
         modifier = Modifier
             .fillMaxSize()
             .background(overlayColor)
-            .clickableNoFocus(onClick = onDismiss),
+            .clickableSurfaceNoFocus(onClick = onDismiss),
         contentAlignment = Alignment.Center
     ) {
         Column(

@@ -96,6 +96,7 @@ import com.nendo.argosy.ui.theme.Motion
 import com.nendo.argosy.ui.theme.MotionTier
 import com.nendo.argosy.ui.theme.generated.ComponentDefaults
 import com.nendo.argosy.ui.util.clickableNoFocus
+import com.nendo.argosy.ui.util.clickableSurfaceNoFocus
 
 /**
  * The launch in progress over the surface that starts launches. It holds the input stack while a
@@ -216,7 +217,7 @@ private fun LaunchOverlayContent(
             modifier = Modifier
                 .fillMaxSize()
                 .background(scrimColor)
-                .clickableNoFocus { },
+                .clickableSurfaceNoFocus { },
             contentAlignment = Alignment.Center
         ) {
             when (val step = shown.step) {

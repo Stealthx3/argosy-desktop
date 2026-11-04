@@ -23,12 +23,33 @@ import com.nendo.argosy.ui.theme.generated.MotionTokens
 fun Modifier.clickableNoFocus(onClick: () -> Unit): Modifier = composed {
     clickable(
         interactionSource = remember { MutableInteractionSource() },
-        indication = null,
+        indication = LocalHoverHighlight.current,
         onClick = onClick
     )
 }
 
 fun Modifier.clickableNoFocus(enabled: Boolean, onClick: () -> Unit): Modifier = composed {
+    clickable(
+        enabled = enabled,
+        interactionSource = remember { MutableInteractionSource() },
+        indication = LocalHoverHighlight.current,
+        onClick = onClick
+    )
+}
+
+/**
+ * A click area that is a surface rather than a control: a modal scrim, a tap-swallowing panel, a
+ * full-screen tap zone. It takes clicks and never shows the hover highlight.
+ */
+fun Modifier.clickableSurfaceNoFocus(onClick: () -> Unit): Modifier = composed {
+    clickable(
+        interactionSource = remember { MutableInteractionSource() },
+        indication = null,
+        onClick = onClick
+    )
+}
+
+fun Modifier.clickableSurfaceNoFocus(enabled: Boolean, onClick: () -> Unit): Modifier = composed {
     clickable(
         enabled = enabled,
         interactionSource = remember { MutableInteractionSource() },
@@ -41,7 +62,7 @@ fun Modifier.clickableNoFocus(enabled: Boolean, onClick: () -> Unit): Modifier =
 fun Modifier.clickableNoFocus(onClick: () -> Unit, onLongClick: () -> Unit): Modifier = composed {
     combinedClickable(
         interactionSource = remember { MutableInteractionSource() },
-        indication = null,
+        indication = LocalHoverHighlight.current,
         onClick = onClick,
         onLongClick = onLongClick
     )
@@ -52,12 +73,14 @@ fun Modifier.clickableNoFocus(
     interactionSource: MutableInteractionSource,
     onClick: () -> Unit,
     onLongClick: () -> Unit
-): Modifier = combinedClickable(
-    interactionSource = interactionSource,
-    indication = null,
-    onClick = onClick,
-    onLongClick = onLongClick
-)
+): Modifier = composed {
+    combinedClickable(
+        interactionSource = interactionSource,
+        indication = LocalHoverHighlight.current,
+        onClick = onClick,
+        onLongClick = onLongClick
+    )
+}
 
 @OptIn(ExperimentalFoundationApi::class)
 fun Modifier.doubleTapNoFocus(onDoubleClick: () -> Unit): Modifier = composed {
@@ -73,12 +96,14 @@ fun Modifier.clickableNoFocus(
     interactionSource: MutableInteractionSource,
     enabled: Boolean = true,
     onClick: () -> Unit
-): Modifier = clickable(
-    interactionSource = interactionSource,
-    indication = null,
-    enabled = enabled,
-    onClick = onClick
-)
+): Modifier = composed {
+    clickable(
+        interactionSource = interactionSource,
+        indication = LocalHoverHighlight.current,
+        enabled = enabled,
+        onClick = onClick
+    )
+}
 
 fun Modifier.touchOnly(onClick: () -> Unit): Modifier = composed {
     val currentOnClick by rememberUpdatedState(onClick)

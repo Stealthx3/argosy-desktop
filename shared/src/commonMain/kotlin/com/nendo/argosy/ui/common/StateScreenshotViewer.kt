@@ -21,6 +21,7 @@ import com.nendo.argosy.platform.image.bitmap
 import com.nendo.argosy.platform.image.intrinsicHeight
 import com.nendo.argosy.platform.image.intrinsicWidth
 import com.nendo.argosy.ui.util.clickableNoFocus
+import com.nendo.argosy.ui.util.clickableSurfaceNoFocus
 import java.io.File
 
 @Composable
@@ -35,7 +36,7 @@ fun StateScreenshotViewer(
         modifier = modifier
             .fillMaxSize()
             .background(Color.Black)
-            .clickableNoFocus(onClick = onDismiss),
+            .clickableSurfaceNoFocus(onClick = onDismiss),
         contentAlignment = Alignment.Center
     ) {
         val file = File(screenshotPath)

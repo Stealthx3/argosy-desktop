@@ -61,6 +61,7 @@ import com.nendo.argosy.ui.theme.Dimens
 import com.nendo.argosy.ui.theme.LocalArgosyTheme
 import com.nendo.argosy.ui.theme.LocalLauncherTheme
 import com.nendo.argosy.ui.util.clickableNoFocus
+import com.nendo.argosy.ui.util.clickableSurfaceNoFocus
 
 @Composable
 fun BgmPlaylistManagerScreen(
@@ -185,7 +186,7 @@ fun BgmPlaylistManagerScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .clickableNoFocus {}
+            .clickableSurfaceNoFocus {}
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             BgmPlaylistHeader(

@@ -20,6 +20,7 @@ import com.nendo.argosy.ui.input.ModalPresenceEffect
 import com.nendo.argosy.ui.theme.Dimens
 import com.nendo.argosy.ui.theme.Motion
 import com.nendo.argosy.ui.util.clickableNoFocus
+import com.nendo.argosy.ui.util.clickableSurfaceNoFocus
 
 @Composable
 fun ModalScaffold(
@@ -46,13 +47,13 @@ fun ModalScaffold(
                     if (scrim) Modifier.background(Color.Black.copy(alpha = 0.55f))
                     else Modifier
                 )
-                .clickableNoFocus { onDismiss() },
+                .clickableSurfaceNoFocus { onDismiss() },
             contentAlignment = Alignment.Center,
         ) {
             Box(
                 modifier = Modifier
                     .widthIn(max = maxWidth ?: Dimens.modalWidthLg)
-                    .clickableNoFocus { },
+                    .clickableSurfaceNoFocus { },
             ) {
                 GlassPanel {
                     Box(content = content)

@@ -90,6 +90,7 @@ import com.nendo.argosy.ui.theme.Dimens
 import com.nendo.argosy.ui.theme.LocalArgosyTheme
 import com.nendo.argosy.ui.theme.LocalLauncherTheme
 import com.nendo.argosy.ui.util.clickableNoFocus
+import com.nendo.argosy.ui.util.clickableSurfaceNoFocus
 
 @Composable
 fun MusicBrowserScreen(
@@ -252,7 +253,7 @@ fun MusicBrowserScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .clickableNoFocus {}
+            .clickableSurfaceNoFocus {}
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             MusicBrowserHeader(
@@ -857,7 +858,7 @@ private fun FacetPickerPopup(
         modifier = Modifier
             .fillMaxSize()
             .background(overlayColor)
-            .clickableNoFocus(onClick = onDismiss),
+            .clickableSurfaceNoFocus(onClick = onDismiss),
         contentAlignment = Alignment.Center
     ) {
         val maxModalHeight = maxHeight * 0.85f

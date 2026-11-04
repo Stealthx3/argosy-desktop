@@ -7,6 +7,7 @@ import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.core.storage.StorageVolume
 import com.nendo.argosy.core.storage.StorageVolumeType
 import com.nendo.argosy.ui.util.clickableNoFocus
+import com.nendo.argosy.ui.util.clickableSurfaceNoFocus
 import com.nendo.argosy.util.formatBytes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -132,7 +133,7 @@ fun FileBrowserScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .clickableNoFocus {}
+            .clickableSurfaceNoFocus {}
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             FileBrowserHeader(

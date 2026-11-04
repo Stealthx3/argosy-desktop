@@ -2,6 +2,7 @@ package com.nendo.argosy.ui.components
 
 import androidx.compose.foundation.background
 import com.nendo.argosy.ui.util.clickableNoFocus
+import com.nendo.argosy.ui.util.clickableSurfaceNoFocus
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -53,7 +54,7 @@ fun Modal(
         modifier = Modifier
             .fillMaxSize()
             .background(overlayColor)
-            .clickableNoFocus(onClick = onDismiss ?: {}),
+            .clickableSurfaceNoFocus(onClick = onDismiss ?: {}),
         contentAlignment = Alignment.Center
     ) {
         val modalWidth = (baseWidth * scale).coerceIn(280.dp, maxWidth * 0.9f)
@@ -68,7 +69,7 @@ fun Modal(
                 )
                 .clip(RoundedCornerShape(Dimens.radiusPanel))
                 .background(MaterialTheme.colorScheme.surface)
-                .clickableNoFocus {}
+                .clickableSurfaceNoFocus {}
         ) {
             Column(
                 modifier = Modifier
@@ -133,7 +134,7 @@ fun CenteredModal(
         modifier = Modifier
             .fillMaxSize()
             .background(overlayColor)
-            .clickableNoFocus(onClick = onDismiss ?: {}),
+            .clickableSurfaceNoFocus(onClick = onDismiss ?: {}),
         contentAlignment = Alignment.Center
     ) {
         val modalWidth = (baseWidth * scale).coerceIn(280.dp, maxWidth * 0.9f)
@@ -145,7 +146,7 @@ fun CenteredModal(
                     MaterialTheme.colorScheme.surface,
                     RoundedCornerShape(Dimens.radiusPanel)
                 )
-                .clickableNoFocus {}
+                .clickableSurfaceNoFocus {}
                 .padding(Dimens.spacingLg),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -184,7 +185,7 @@ fun NestedModal(
         modifier = Modifier
             .fillMaxSize()
             .background(overlayColor)
-            .clickableNoFocus(onClick = onDismiss ?: {}),
+            .clickableSurfaceNoFocus(onClick = onDismiss ?: {}),
         contentAlignment = Alignment.Center
     ) {
         val modalWidth = (baseWidth * scale).coerceIn(280.dp, maxWidth * 0.9f)
@@ -196,7 +197,7 @@ fun NestedModal(
                     MaterialTheme.colorScheme.surface,
                     RoundedCornerShape(Dimens.radiusPanel)
                 )
-                .clickableNoFocus {}
+                .clickableSurfaceNoFocus {}
                 .padding(Dimens.spacingLg),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {

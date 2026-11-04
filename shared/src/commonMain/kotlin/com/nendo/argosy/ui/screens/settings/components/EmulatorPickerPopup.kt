@@ -3,6 +3,7 @@ package com.nendo.argosy.ui.screens.settings.components
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import com.nendo.argosy.ui.util.clickableNoFocus
+import com.nendo.argosy.ui.util.clickableSurfaceNoFocus
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -147,7 +148,7 @@ fun EmulatorPickerPopup(
         modifier = Modifier
             .fillMaxSize()
             .background(overlayColor)
-            .clickableNoFocus(onClick = onDismiss),
+            .clickableSurfaceNoFocus(onClick = onDismiss),
         contentAlignment = Alignment.Center
     ) {
         val popupMaxHeight = maxHeight * 0.85f

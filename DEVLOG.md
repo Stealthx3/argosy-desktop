@@ -1609,3 +1609,10 @@ The owner's tests are the step 5 side-by-side checklist and the alpha 5.4 Game M
 
 **Alpha published early (owner go-ahead, 2026-11-04):** the owner approved publishing this build before step 4 closes, so the Deck checks run on it. Built from 996687dd8 and pushed with `push-pages.sh --step-close 5.4`, the script's only step-level flag, so the `gh-pages` commit message (b0e1c150) says "step 5.4 close" although **step 4 is still open**. The repo serves flatpak commit f99eb770; all four URLs answer 200. The step's real close republishes.
 
+### 2026-11-04 — Step 4: accent hover highlight on the Desktop display profile
+
+**Owner request:** a mouse-highlight animation on interactive objects in the Desktop layout, in the theme's accent colour.
+**Action:** `LocalHoverHighlight` (null by default) holds an `IndicationNodeFactory` that fades a `focusAccent` wash and ring in and out over `Motion.durationContent`. `clickableNoFocus` passes it as the click indication, so every control using it gets the highlight; `Main.kt` provides it only when the effective profile is `DESKTOP`, so Handheld, TV and Android draw nothing. Token: `components.hoverHighlight` (`fillAlpha`, `ringAlpha`). New `clickableSurfaceNoFocus` for click areas that are not controls (modal scrims, tap-swallowing panels, screenshot tap zones), which never highlight; 42 sites moved to it.
+**Verification:** gate passes. On Fedora KDE with a real pointer through QMP (`scripts/desktop/vmlab/mouse.sh`, screens in `build/vmlab/fedora-kde/hover-check/`): Desktop profile highlights the Home "View All" tile and drawer rows; Handheld profile draws nothing; mouse clicks reach drawer rows.
+**Known gaps:** Material `IconButton`, `Switch`, `Slider` and `TextField` keep their own hover behaviour; rows drawn with their own pointer handling (for example the UI Scale row) have no row-level highlight. Clicking a Display Profile card only moves focus to the row (seen in the VM, not changed here).
+

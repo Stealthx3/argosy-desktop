@@ -2,6 +2,7 @@ package com.nendo.argosy.ui.screens.settings.components
 
 import androidx.compose.foundation.background
 import com.nendo.argosy.ui.util.clickableNoFocus
+import com.nendo.argosy.ui.util.clickableSurfaceNoFocus
 import com.nendo.argosy.ui.util.verticalEdgeFade
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -210,7 +211,7 @@ internal fun RegionPopupFrame(
         modifier = Modifier
             .fillMaxSize()
             .background(overlayColor)
-            .clickableNoFocus(onClick = onDismiss),
+            .clickableSurfaceNoFocus(onClick = onDismiss),
         contentAlignment = Alignment.Center
     ) {
         Column(

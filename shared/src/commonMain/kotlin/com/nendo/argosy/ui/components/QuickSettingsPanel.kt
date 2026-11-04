@@ -75,6 +75,7 @@ import com.nendo.argosy.ui.theme.Motion
 import com.nendo.argosy.ui.theme.MotionTier
 import com.nendo.argosy.ui.theme.generated.ComponentDefaults
 import com.nendo.argosy.ui.util.clickableNoFocus
+import com.nendo.argosy.ui.util.clickableSurfaceNoFocus
 import kotlin.math.roundToInt
 
 private const val WIDE_PAGE_MAX_SCREEN_FRACTION = 0.65f
@@ -114,7 +115,7 @@ fun QuickSettingsPanel(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(scrim)
-                    .clickableNoFocus(onClick = onDismiss)
+                    .clickableSurfaceNoFocus(onClick = onDismiss)
             )
         }
 

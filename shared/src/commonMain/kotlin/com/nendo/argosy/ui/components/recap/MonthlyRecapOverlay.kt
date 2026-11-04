@@ -53,6 +53,7 @@ import com.nendo.argosy.ui.theme.LocalLauncherTheme
 import com.nendo.argosy.ui.theme.Motion
 import com.nendo.argosy.ui.theme.generated.ComponentDefaults
 import com.nendo.argosy.ui.util.clickableNoFocus
+import com.nendo.argosy.ui.util.clickableSurfaceNoFocus
 
 @Composable
 private fun rememberMonthlyRecapController(): MonthlyRecapController {
@@ -147,7 +148,7 @@ private fun MonthlyRecapContent(
             modifier = Modifier
                 .fillMaxSize()
                 .background(scrimColor)
-                .clickableNoFocus { },
+                .clickableSurfaceNoFocus { },
             contentAlignment = Alignment.Center
         ) {
             if (rememberRecapFullCardSurface() == surface) {

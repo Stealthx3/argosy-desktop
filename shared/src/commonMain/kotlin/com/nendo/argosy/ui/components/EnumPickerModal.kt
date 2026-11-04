@@ -51,6 +51,7 @@ import com.nendo.argosy.ui.theme.LocalArgosyTheme
 import com.nendo.argosy.ui.theme.Motion
 import com.nendo.argosy.ui.theme.gripReserveBottomInset
 import com.nendo.argosy.ui.util.clickableNoFocus
+import com.nendo.argosy.ui.util.clickableSurfaceNoFocus
 import com.nendo.argosy.ui.util.verticalEdgeFade
 
 /** V2 enum option picker: self-contained full-list modal, current value pre-focused + marked. */
@@ -132,7 +133,7 @@ fun EnumPickerModal(
                     .fillMaxSize()
                     .background(Color.Black.copy(alpha = 0.55f))
                     .padding(bottom = gripReserveBottomInset())
-                    .clickableNoFocus { onDismiss() },
+                    .clickableSurfaceNoFocus { onDismiss() },
                 contentAlignment = Alignment.Center,
             ) {
                 val maxPanelHeight = maxHeight * 0.85f
@@ -140,7 +141,7 @@ fun EnumPickerModal(
                     modifier = Modifier
                         .widthIn(max = Dimens.modalWidthLg)
                         .heightIn(max = maxPanelHeight)
-                        .clickableNoFocus { },
+                        .clickableSurfaceNoFocus { },
                 ) {
                     GlassPanel {
                         Column(modifier = Modifier.padding(Dimens.spacingLg)) {

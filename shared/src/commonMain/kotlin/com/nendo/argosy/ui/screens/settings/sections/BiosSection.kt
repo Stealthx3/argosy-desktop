@@ -2,6 +2,7 @@ package com.nendo.argosy.ui.screens.settings.sections
 
 import androidx.compose.foundation.background
 import com.nendo.argosy.ui.util.clickableNoFocus
+import com.nendo.argosy.ui.util.clickableSurfaceNoFocus
 import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -611,7 +612,7 @@ private fun GpuDriverPromptModal(
         modifier = Modifier
             .fillMaxSize()
             .background(overlayColor)
-            .clickableNoFocus(enabled = !isInstalling) { onSkip() },
+            .clickableSurfaceNoFocus(enabled = !isInstalling) { onSkip() },
         contentAlignment = Alignment.Center
     ) {
         Column(

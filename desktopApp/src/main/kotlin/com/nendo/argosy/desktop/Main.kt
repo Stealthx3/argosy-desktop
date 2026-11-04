@@ -1,5 +1,7 @@
 package com.nendo.argosy.desktop
 
+import com.nendo.argosy.ui.util.LocalHoverHighlight
+import com.nendo.argosy.ui.util.rememberHoverHighlight
 import kotlin.system.exitProcess
 import com.nendo.argosy.platform.AppShutdown
 import com.nendo.argosy.ui.input.DesktopGamepadDispatcher
@@ -137,8 +139,13 @@ fun main(args: Array<String>) {
                     ) {
                         MultiResumeLifecycle {
                             ALauncherTheme {
-                                Surface(modifier = Modifier.fillMaxSize()) {
-                                    ArgosyApp()
+                                CompositionLocalProvider(
+                                    LocalHoverHighlight provides
+                                        if (profile == DisplayProfile.DESKTOP) rememberHoverHighlight() else null,
+                                ) {
+                                    Surface(modifier = Modifier.fillMaxSize()) {
+                                        ArgosyApp()
+                                    }
                                 }
                             }
                         }

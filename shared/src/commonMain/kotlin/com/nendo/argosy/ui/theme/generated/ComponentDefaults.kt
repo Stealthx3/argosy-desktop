@@ -424,6 +424,11 @@ object ComponentDefaults {
         const val offTrackAlpha = 0.4f
     }
 
+    object HoverHighlight {
+        const val fillAlpha = 0.14f
+        const val ringAlpha = 0.8f
+    }
+
     object QuickPanel {
         const val selectedFillAlpha = 0.108f
         const val offlineAvatarAlpha = 0.6f

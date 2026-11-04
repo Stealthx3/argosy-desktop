@@ -79,6 +79,7 @@ import com.nendo.argosy.ui.theme.Motion
 import com.nendo.argosy.ui.theme.generated.ComponentDefaults
 import com.nendo.argosy.ui.theme.gripReserveBottomInset
 import com.nendo.argosy.ui.util.clickableNoFocus
+import com.nendo.argosy.ui.util.clickableSurfaceNoFocus
 import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -199,10 +200,10 @@ fun DirectionRingModal(
                     .fillMaxSize()
                     .background(Color.Black.copy(alpha = 0.55f))
                     .padding(bottom = gripReserveBottomInset())
-                    .clickableNoFocus { onDismiss() },
+                    .clickableSurfaceNoFocus { onDismiss() },
                 contentAlignment = Alignment.Center,
             ) {
-                Box(modifier = Modifier.clickableNoFocus { }) {
+                Box(modifier = Modifier.clickableSurfaceNoFocus { }) {
                     GlassPanel {
                         Column(
                             modifier = Modifier.padding(Dimens.spacingLg),

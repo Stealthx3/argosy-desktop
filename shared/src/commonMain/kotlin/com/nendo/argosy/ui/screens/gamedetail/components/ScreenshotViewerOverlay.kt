@@ -2,6 +2,7 @@ package com.nendo.argosy.ui.screens.gamedetail.components
 
 import androidx.compose.foundation.background
 import com.nendo.argosy.ui.util.clickableNoFocus
+import com.nendo.argosy.ui.util.clickableSurfaceNoFocus
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -76,19 +77,19 @@ fun ScreenshotViewerOverlay(
                 modifier = Modifier
                     .weight(0.25f)
                     .fillMaxHeight()
-                    .clickableNoFocus { onNavigate(-1) }
+                    .clickableSurfaceNoFocus { onNavigate(-1) }
             )
             Box(
                 modifier = Modifier
                     .weight(0.5f)
                     .fillMaxHeight()
-                    .clickableNoFocus(onClick = onDismiss)
+                    .clickableSurfaceNoFocus(onClick = onDismiss)
             )
             Box(
                 modifier = Modifier
                     .weight(0.25f)
                     .fillMaxHeight()
-                    .clickableNoFocus { onNavigate(1) }
+                    .clickableSurfaceNoFocus { onNavigate(1) }
             )
         }
 
