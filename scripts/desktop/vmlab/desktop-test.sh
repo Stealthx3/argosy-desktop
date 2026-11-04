@@ -57,7 +57,7 @@ check launch log_wait 'HostGameProcess: Started' 60
 walk wait:10 shot:06-game
 "$here/exec.sh" "$profile" --user 'pkill -TERM -u tester -x retroarch' >/dev/null 2>&1
 check session-end log_wait 'SessionEnd' 60
-walk wait:3 PAD:RIGHT_STICK wait:2 PAD:DPAD_DOWN*8 wait:1 PAD:SOUTH wait:2 shot:07-close-confirm PAD:SOUTH
+walk wait:3 PAD:DPAD_LEFT wait:2 PAD:DPAD_DOWN*8 wait:1 shot:07a-drawer-close PAD:SOUTH wait:2 shot:07-close-confirm PAD:DPAD_RIGHT wait:1 PAD:SOUTH
 check close-argosy "$here/exec.sh" "$profile" --user 'for i in $(seq 20); do pgrep -u tester -f "^[/]app/lib/argosy-desktop/bin/argosy-desktop" >/dev/null || { echo "closed within ${i} s"; exit 0; }; sleep 1; done; echo "still running after 20 s"; exit 1'
 "$here/exec.sh" "$profile" --user 'cat $HOME/argosy-vm.log' > "$out/argosy-vm.log" 2>&1
 n=$(grep -E "Exception|FATAL|pure virtual" "$out/argosy-vm.log" | grep -c -v "Cannot create Linux GL context")

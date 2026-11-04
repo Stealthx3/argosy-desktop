@@ -1153,10 +1153,10 @@
          performance and fan settings. Full sentence. -->
     <string name="ui_quick_settings_device_access_notice">Argosy needs permission to change these.</string>
     <!-- Button beside that notice that opens the permission settings. Verb. -->
-    <string name="ui_quick_settings_close_app_label">Close Argosy</string>
-    <string name="ui_quick_settings_close_app_action">Close</string>
-    <string name="ui_quick_settings_close_app_confirm_title">Close Argosy?</string>
-    <string name="ui_quick_settings_close_app_confirm_message">Argosy stops and its window closes. Anything syncing finishes the next time you open it.</string>
+    <string name="ui_drawer_close_app">Close Argosy</string>
+    <string name="ui_close_app_confirm_action">Close</string>
+    <string name="ui_close_app_confirm_title">Close Argosy?</string>
+    <string name="ui_close_app_confirm_message">Argosy stops and its window closes. Anything syncing finishes the next time you open it.</string>
     <string name="ui_quick_settings_device_access_allow">Allow</string>
     <!-- Row of that panel: light or dark. Noun. -->
     <string name="ui_quick_settings_theme">Theme</string>

@@ -70,6 +70,8 @@
     <string name="settings_main_device_subtitle">Paramètres système</string>
     <string name="settings_main_about_title">À propos</string>
     <string name="settings_main_about_subtitle">Version %1$s</string>
+    <string name="settings_main_close_app_title">Fermer Argosy</string>
+    <string name="settings_main_close_app_subtitle">Quitter l\'application</string>
 
     <!-- ===== Section Audio ===== -->
 

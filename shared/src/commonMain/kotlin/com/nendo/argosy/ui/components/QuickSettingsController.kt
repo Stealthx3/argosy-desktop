@@ -1,6 +1,5 @@
 package com.nendo.argosy.ui.components
 
-import com.nendo.argosy.platform.AppShutdown
 import com.nendo.argosy.platform.PlatformFeatures
 import com.nendo.argosy.DualScreenManagerHolder
 import com.nendo.argosy.core.input.SoundType
@@ -556,62 +555,30 @@ class QuickSettingsController(
                 onOpenDeviceAccess()
                 InputResult.HANDLED
             }
-            QuickSettingsItem.CloseApp -> {
-                requestClose()
-                InputResult.handled(SoundType.OPEN_MODAL)
-            }
             else -> InputResult.handled(SoundType.SILENT)
         }
     }
 
-    private val _closeConfirm = MutableStateFlow<Int?>(null)
-    val closeConfirm: StateFlow<Int?> = _closeConfirm.asStateFlow()
-
-    fun requestClose() {
-        _closeConfirm.value = CLOSE_CONFIRM_INDEX
-    }
-
-    fun cancelClose() {
-        _closeConfirm.value = null
-    }
-
-    fun confirmClose() {
-        _closeConfirm.value = null
-        AppShutdown.request()
-    }
 
     fun createInputHandler(
         onDismiss: () -> Unit,
         onOpenDeviceAccess: () -> Unit
     ): InputHandler = object : InputHandler {
-        override fun onUp(): InputResult = if (_closeConfirm.value != null) InputResult.HANDLED else moveFocus(-1)
+        override fun onUp(): InputResult = moveFocus(-1)
 
-        override fun onDown(): InputResult = if (_closeConfirm.value != null) InputResult.HANDLED else moveFocus(1)
+        override fun onDown(): InputResult = moveFocus(1)
 
-        override fun onLeft(): InputResult = _closeConfirm.value?.let {
-            _closeConfirm.value = 0
-            InputResult.HANDLED
-        } ?: adjust(-1)
+        override fun onLeft(): InputResult = adjust(-1)
 
-        override fun onRight(): InputResult = _closeConfirm.value?.let {
-            _closeConfirm.value = CLOSE_CONFIRM_INDEX
-            InputResult.HANDLED
-        } ?: adjust(1)
+        override fun onRight(): InputResult = adjust(1)
 
-        override fun onPrevSection(): InputResult = if (_closeConfirm.value != null) InputResult.HANDLED else cyclePage(-1)
+        override fun onPrevSection(): InputResult = cyclePage(-1)
 
-        override fun onNextSection(): InputResult = if (_closeConfirm.value != null) InputResult.HANDLED else cyclePage(1)
+        override fun onNextSection(): InputResult = cyclePage(1)
 
-        override fun onConfirm(): InputResult = _closeConfirm.value?.let { focus ->
-            if (focus == CLOSE_CONFIRM_INDEX) confirmClose() else cancelClose()
-            InputResult.HANDLED
-        } ?: confirm(onOpenDeviceAccess)
+        override fun onConfirm(): InputResult = confirm(onOpenDeviceAccess)
 
         override fun onBack(): InputResult {
-            if (_closeConfirm.value != null) {
-                cancelClose()
-                return InputResult.handled(SoundType.CLOSE_MODAL)
-            }
             onDismiss()
             return InputResult.handled(SoundType.CLOSE_MODAL)
         }
@@ -622,5 +589,3 @@ class QuickSettingsController(
         }
     }
 }
-
-private const val CLOSE_CONFIRM_INDEX = 1

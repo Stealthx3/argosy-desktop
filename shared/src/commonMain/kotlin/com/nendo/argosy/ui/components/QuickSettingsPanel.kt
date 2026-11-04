@@ -164,17 +164,6 @@ fun QuickSettingsPanel(
             }
         }
     }
-    val closeConfirm by controller.closeConfirm.collectAsState()
-    closeConfirm?.let { focus ->
-        com.nendo.argosy.ui.primitives.ArgosyConfirmModal(
-            title = stringResource(R.string.ui_quick_settings_close_app_confirm_title),
-            message = stringResource(R.string.ui_quick_settings_close_app_confirm_message),
-            confirmLabel = stringResource(R.string.ui_quick_settings_close_app_action),
-            onConfirm = controller::confirmClose,
-            onDismiss = controller::cancelClose,
-            focusedIndex = focus
-        )
-    }
 }
 
 @Composable
@@ -456,16 +445,6 @@ private fun QuickSettingsItemRow(
             isFocused = isFocused,
             onFocus = focus,
             onToggle = controller::setSwapStartSelect
-        )
-
-        QuickSettingsItem.CloseApp -> QuickNoticeRow(
-            message = stringResource(R.string.ui_quick_settings_close_app_label),
-            actionLabel = stringResource(R.string.ui_quick_settings_close_app_action),
-            isFocused = isFocused,
-            onAction = {
-                focus()
-                controller.requestClose()
-            }
         )
 
         QuickSettingsItem.DeviceAccess -> QuickNoticeRow(

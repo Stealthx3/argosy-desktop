@@ -232,6 +232,8 @@
     <string name="settings_main_about_title">About</string>
     <!-- Second line of that row. %1$s is the version number. -->
     <string name="settings_main_about_subtitle">Version %1$s</string>
+    <string name="settings_main_close_app_title">Close Argosy</string>
+    <string name="settings_main_close_app_subtitle">Quit the app</string>
 
     <!-- ===== Audio section ===== -->
 

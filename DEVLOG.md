@@ -1598,3 +1598,12 @@ The owner's tests are the step 5 side-by-side checklist and the alpha 5.4 Game M
 - Size: the full JRE is 196 MB in place of the trimmed jlink runtime.
 - The script has to be committed before a build, because the manifest builds from the repo's git HEAD.
 **Reasoning:** an extension JRE plus a script is the standard Flathub layout for Java apps and avoids the JDK-8348560 launcher bug, instead of waiting for a JDK backport. Reading the cfg keeps the Gradle build as the single source of the launch arguments.
+
+### 2026-11-04 — Step 4: Close Argosy moved to the left drawer, second exit in Settings
+
+**Owner report:** the exit button seemed to be missing from "quick settings"; the owner meant the left drawer (Home, Library, Settings), and asked for a second exit as the final row of the Settings page.
+**Finding:** the step 2 row was in the alpha (`QuickSettingsItem$CloseApp` in the installed jar), but as the last row of the Quick Settings list only a sliver of its button showed until the list scrolled (`build/vmlab/fedora-kde/qs-check/06-fresh-open.png`).
+**Action:** the Quick Settings row and its dialog state are gone. `AppShutdown` now owns the dialog state (`confirmOpen`, `requestConfirm`, `dismissConfirm`), and `ArgosyApp` hosts one `ArgosyConfirmModalHost` for both entry points. `MainDrawer` draws a "Close Argosy" row below the scrolling list, directly under Settings, so it never scrolls out of view; it is the last drawer focus stop. `MainSettingsItem.CloseApp` is the last row of the System section. All are desktop only through `PlatformFeatures.desktopWindow`. Strings: `ui_quick_settings_close_app_*` renamed to `ui_drawer_close_app` and `ui_close_app_confirm_*`; new `settings_main_close_app_title` and `_subtitle`, in all eight locales.
+**Reasoning:** one dialog for two entry points, so input capture and the shutdown path cannot differ. The shared host starts on Cancel, where the step 2 dialog started on Close; the walk is now `A RIGHT A`.
+**Verification:** gate `:shared:compileKotlinDesktop :shared:desktopTest :app:assembleDebug :app:testDebugUnitTest` passes, including the new `MainSettingsCloseRowTest`. Signed local bundle on Fedora KDE with the gamepad (`build/vmlab/fedora-kde/close-check/`): drawer row visible and focusable, dialog over the drawer, B cancels; Settings last row opens the same dialog, Close exits the app. Not run: mouse clicks on the two rows, the updated `desktop-test.sh` end to end, GNOME, an Android device. Android hides both rows through `desktopWindow`. Not on the alpha repo: step 4 is still open.
+

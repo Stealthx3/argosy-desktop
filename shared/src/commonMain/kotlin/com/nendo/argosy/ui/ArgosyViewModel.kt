@@ -1,5 +1,7 @@
 package com.nendo.argosy.ui
 
+import com.nendo.argosy.platform.AppShutdown
+import com.nendo.argosy.platform.PlatformFeatures
 import com.nendo.argosy.platform.PlatformApplication as Application
 import com.nendo.argosy.platform.applicationContext
 import com.nendo.argosy.platform.cacheDir
@@ -498,9 +500,12 @@ class ArgosyViewModel @Inject constructor(
     /**
      * The drawer's navigation column carries one row that is not a [DrawerItem]: the account row
      * at index 0. Every nav item therefore sits at `drawerItems index + 1`, and this is the only
-     * place that offset is defined.
+     * place that offset is defined. On desktop the close row follows the last item.
      */
-    private val drawerNavLastIndex: Int get() = drawerItems.size
+    private val drawerCloseItemIndex: Int get() = drawerItems.size
+
+    private val drawerNavLastIndex: Int
+        get() = drawerItems.size + if (PlatformFeatures.desktopWindow) DRAWER_NAV_ITEM_OFFSET else 0
 
     fun initDrawerFocus(currentRoute: String?, parentRoute: String? = null) {
         var index = drawerItems.indexOfFirst { NavRing.routeMatches(it.route, currentRoute) }
@@ -545,6 +550,9 @@ class ArgosyViewModel @Inject constructor(
             if (itemIndex in drawerItems.indices) {
                 Log.d("ArgosyViewModel", "Navigating to drawer item: ${drawerItems[itemIndex].route}")
                 onNavigate(drawerItems[itemIndex].route)
+            } else if (itemIndex == drawerCloseItemIndex) {
+                AppShutdown.requestConfirm()
+                return InputResult.handled(SoundType.OPEN_MODAL)
             }
             return InputResult.HANDLED
         }

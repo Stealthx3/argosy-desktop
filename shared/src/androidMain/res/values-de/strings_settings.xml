@@ -78,6 +78,8 @@
     <string name="settings_main_device_subtitle">Systemeinstellungen</string>
     <string name="settings_main_about_title">Über</string>
     <string name="settings_main_about_subtitle">Version %1$s</string>
+    <string name="settings_main_close_app_title">Argosy beenden</string>
+    <string name="settings_main_close_app_subtitle">App beenden</string>
 
     <!-- ===== Audio section ===== -->
 

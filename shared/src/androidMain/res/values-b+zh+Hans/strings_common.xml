@@ -537,10 +537,10 @@
     <string name="ui_quick_settings_hud">性能信息叠加层</string>
     <string name="ui_quick_settings_hud_description">在内置模拟器游戏中显示</string>
     <string name="ui_quick_settings_device_access_notice">Argosy 需要权限才能更改这些设置。</string>
-    <string name="ui_quick_settings_close_app_label">关闭 Argosy</string>
-    <string name="ui_quick_settings_close_app_action">关闭</string>
-    <string name="ui_quick_settings_close_app_confirm_title">关闭 Argosy？</string>
-    <string name="ui_quick_settings_close_app_confirm_message">Argosy 将停止并关闭窗口。正在进行的同步会在下次打开时完成。</string>
+    <string name="ui_drawer_close_app">关闭 Argosy</string>
+    <string name="ui_close_app_confirm_action">关闭</string>
+    <string name="ui_close_app_confirm_title">关闭 Argosy？</string>
+    <string name="ui_close_app_confirm_message">Argosy 将停止并关闭窗口。正在进行的同步会在下次打开时完成。</string>
     <string name="ui_quick_settings_device_access_allow">允许</string>
     <string name="ui_quick_settings_theme">主题</string>
     <string name="ui_quick_settings_accent">强调色</string>

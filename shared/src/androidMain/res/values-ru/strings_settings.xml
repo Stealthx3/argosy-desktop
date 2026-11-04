@@ -71,6 +71,8 @@
     <string name="settings_main_device_subtitle">Системные настройки</string>
     <string name="settings_main_about_title">О приложении</string>
     <string name="settings_main_about_subtitle">Версия %1$s</string>
+    <string name="settings_main_close_app_title">Закрыть Argosy</string>
+    <string name="settings_main_close_app_subtitle">Выйти из приложения</string>
 
     <!-- ===== Audio section ===== -->
 

@@ -68,6 +68,8 @@
     <string name="settings_main_device_subtitle">सिस्टम सेटिंग्स</string>
     <string name="settings_main_about_title">परिचय</string>
     <string name="settings_main_about_subtitle">वर्शन %1$s</string>
+    <string name="settings_main_close_app_title">Argosy बंद करें</string>
+    <string name="settings_main_close_app_subtitle">ऐप से बाहर निकलें</string>
 
     <!-- ===== Audio section ===== -->
 

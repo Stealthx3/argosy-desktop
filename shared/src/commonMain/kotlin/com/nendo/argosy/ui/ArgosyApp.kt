@@ -1,5 +1,7 @@
 package com.nendo.argosy.ui
 
+import com.nendo.argosy.platform.AppShutdown
+import com.nendo.argosy.ui.primitives.ArgosyConfirmModalHost
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -1256,6 +1258,7 @@ fun ArgosyApp(
                             scope.launch { drawerState.close() }
                             navigateFromDrawer(route)
                         },
+                        onCloseApp = AppShutdown::requestConfirm,
                         modifier = Modifier.onSizeChanged { drawerWidthPx = it.width.toFloat() }
                     )
                 }
@@ -1433,6 +1436,16 @@ fun ArgosyApp(
                 controller = viewModel.quickFriends,
                 onOpenProfile = quickFriendsInputHandler::openProfile,
                 onEditAvatar = quickFriendsInputHandler::editAvatar
+            )
+
+            val closeConfirmOpen by AppShutdown.confirmOpen.collectAsState()
+            ArgosyConfirmModalHost(
+                visible = closeConfirmOpen,
+                title = stringResource(R.string.ui_close_app_confirm_title),
+                message = stringResource(R.string.ui_close_app_confirm_message),
+                confirmLabel = stringResource(R.string.ui_close_app_confirm_action),
+                onConfirm = AppShutdown::request,
+                onDismiss = AppShutdown::dismissConfirm
             )
 
             saveConflictInfo?.let { info ->

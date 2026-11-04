@@ -576,10 +576,10 @@
     <string name="ui_quick_settings_hud">Оверлей статистики</string>
     <string name="ui_quick_settings_hud_description">Во встроенных играх</string>
     <string name="ui_quick_settings_device_access_notice">Argosy нужно разрешение, чтобы менять эти настройки.</string>
-    <string name="ui_quick_settings_close_app_label">Закрыть Argosy</string>
-    <string name="ui_quick_settings_close_app_action">Закрыть</string>
-    <string name="ui_quick_settings_close_app_confirm_title">Закрыть Argosy?</string>
-    <string name="ui_quick_settings_close_app_confirm_message">Argosy остановится, окно закроется. Незавершённая синхронизация продолжится при следующем запуске.</string>
+    <string name="ui_drawer_close_app">Закрыть Argosy</string>
+    <string name="ui_close_app_confirm_action">Закрыть</string>
+    <string name="ui_close_app_confirm_title">Закрыть Argosy?</string>
+    <string name="ui_close_app_confirm_message">Argosy остановится, окно закроется. Незавершённая синхронизация продолжится при следующем запуске.</string>
     <string name="ui_quick_settings_device_access_allow">Разрешить</string>
     <string name="ui_quick_settings_theme">Тема</string>
     <string name="ui_quick_settings_accent">Цвет акцента</string>

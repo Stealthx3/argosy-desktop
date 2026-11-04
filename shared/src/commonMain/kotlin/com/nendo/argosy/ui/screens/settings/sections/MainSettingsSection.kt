@@ -1,5 +1,6 @@
 package com.nendo.argosy.ui.screens.settings.sections
 
+import com.nendo.argosy.platform.AppShutdown
 import com.nendo.argosy.platform.PlatformFeatures
 import com.nendo.argosy.platform.PlatformIntentType as Intent
 import com.nendo.argosy.platform.action
@@ -37,6 +38,7 @@ import androidx.compose.material.icons.filled.Memory
 import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.PhoneAndroid
+import androidx.compose.material.icons.filled.PowerSettingsNew
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Storage
@@ -212,6 +214,13 @@ internal sealed class MainSettingsItem(
     )
     data object About :
         MainSettingsItem("about", Icons.Default.Info, R.string.settings_main_about_title, "system")
+    data object CloseApp : MainSettingsItem(
+        "closeApp",
+        Icons.Default.PowerSettingsNew,
+        R.string.settings_main_close_app_title,
+        "system",
+        { PlatformFeatures.desktopWindow }
+    )
 
     companion object {
         val ALL: List<MainSettingsItem>
@@ -225,7 +234,7 @@ internal sealed class MainSettingsItem(
                 Header("connectionsHeader", "connections", R.string.settings_main_section_connections),
                 RomM, Steam, Jellyfin, Social,
                 Header("systemHeader", "system", R.string.settings_main_section_system),
-                Permissions, ManagedInstallers, DeviceSettings, About
+                Permissions, ManagedInstallers, DeviceSettings, About, CloseApp
             )
     }
 }
@@ -351,6 +360,7 @@ fun MainSettingsSection(uiState: SettingsUiState, viewModel: SettingsViewModel) 
             )
         }
         MainSettingsItem.About -> context.getString(R.string.settings_main_about_subtitle, uiState.appVersion)
+        MainSettingsItem.CloseApp -> context.getString(R.string.settings_main_close_app_subtitle)
     }
 
     fun handleClick(item: MainSettingsItem) {
@@ -381,6 +391,7 @@ fun MainSettingsSection(uiState: SettingsUiState, viewModel: SettingsViewModel) 
             MainSettingsItem.Social -> viewModel.navigateToSection(SettingsSection.SOCIAL)
             MainSettingsItem.Permissions -> viewModel.navigateToSection(SettingsSection.PERMISSIONS)
             MainSettingsItem.About -> viewModel.navigateToSection(SettingsSection.ABOUT)
+            MainSettingsItem.CloseApp -> AppShutdown.requestConfirm()
         }
     }
 

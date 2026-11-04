@@ -560,10 +560,10 @@
     <string name="ui_quick_settings_hud">Statistik-Overlay</string>
     <string name="ui_quick_settings_hud_description">In integrierten Spielen</string>
     <string name="ui_quick_settings_device_access_notice">Argosy benötigt eine Berechtigung, um dies zu ändern.</string>
-    <string name="ui_quick_settings_close_app_label">Argosy beenden</string>
-    <string name="ui_quick_settings_close_app_action">Beenden</string>
-    <string name="ui_quick_settings_close_app_confirm_title">Argosy beenden?</string>
-    <string name="ui_quick_settings_close_app_confirm_message">Argosy wird beendet und das Fenster geschlossen. Laufende Synchronisierungen werden beim nächsten Start fortgesetzt.</string>
+    <string name="ui_drawer_close_app">Argosy beenden</string>
+    <string name="ui_close_app_confirm_action">Beenden</string>
+    <string name="ui_close_app_confirm_title">Argosy beenden?</string>
+    <string name="ui_close_app_confirm_message">Argosy wird beendet und das Fenster geschlossen. Laufende Synchronisierungen werden beim nächsten Start fortgesetzt.</string>
     <string name="ui_quick_settings_device_access_allow">Erlauben</string>
     <string name="ui_quick_settings_theme">Design</string>
     <string name="ui_quick_settings_accent">Akzentfarbe</string>

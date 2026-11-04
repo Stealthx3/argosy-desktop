@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.FeaturedPlayList
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PowerSettingsNew
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.VideoLibrary
 import com.nendo.argosy.ui.quaypass.QuayPassIcons
@@ -48,6 +49,7 @@ import com.nendo.argosy.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.data.social.SocialUser
+import com.nendo.argosy.platform.PlatformFeatures
 import com.nendo.argosy.ui.ACCOUNTS_SECTION_NAME
 import com.nendo.argosy.ui.DRAWER_ACCOUNT_ROW_INDEX
 import com.nendo.argosy.ui.DRAWER_NAV_ITEM_OFFSET
@@ -68,6 +70,7 @@ fun MainDrawer(
     drawerState: DrawerState,
     isOpen: Boolean,
     onNavigate: (String) -> Unit,
+    onCloseApp: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     ModalDrawerSheet(modifier = modifier.width(Dimens.navDrawerWidth)) {
@@ -99,6 +102,7 @@ fun MainDrawer(
                 badgeFor = drawerState::badgeCountFor,
                 isRommConnected = drawerState.rommConnected,
                 onNavigate = onNavigate,
+                onCloseApp = onCloseApp,
                 modifier = Modifier.weight(1f)
             )
         }
@@ -117,6 +121,7 @@ private fun NavigationContent(
     badgeFor: (String) -> Int?,
     isRommConnected: Boolean,
     onNavigate: (String) -> Unit,
+    onCloseApp: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val listState = rememberLazyListState()
@@ -155,6 +160,17 @@ private fun NavigationContent(
                     trailing = { badge?.let { DrawerBadge(it) } }
                 )
             }
+        }
+
+        if (PlatformFeatures.desktopWindow) {
+            NavDrawerRow(
+                icon = Icons.Default.PowerSettingsNew,
+                label = stringResource(R.string.ui_drawer_close_app),
+                isFocused = focusedIndex == items.size,
+                isSelected = false,
+                onClick = onCloseApp,
+                modifier = Modifier.padding(end = Dimens.spacingMd)
+            )
         }
 
         DrawerDeviceStatus(isRommConnected = isRommConnected)

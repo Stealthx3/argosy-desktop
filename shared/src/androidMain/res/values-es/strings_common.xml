@@ -573,10 +573,10 @@
     <string name="ui_quick_settings_hud">Estadísticas en pantalla</string>
     <string name="ui_quick_settings_hud_description">En juegos del emulador integrado</string>
     <string name="ui_quick_settings_device_access_notice">Argosy necesita permiso para cambiar estos ajustes.</string>
-    <string name="ui_quick_settings_close_app_label">Cerrar Argosy</string>
-    <string name="ui_quick_settings_close_app_action">Cerrar</string>
-    <string name="ui_quick_settings_close_app_confirm_title">¿Cerrar Argosy?</string>
-    <string name="ui_quick_settings_close_app_confirm_message">Argosy se detiene y su ventana se cierra. Lo que se esté sincronizando terminará la próxima vez que lo abras.</string>
+    <string name="ui_drawer_close_app">Cerrar Argosy</string>
+    <string name="ui_close_app_confirm_action">Cerrar</string>
+    <string name="ui_close_app_confirm_title">¿Cerrar Argosy?</string>
+    <string name="ui_close_app_confirm_message">Argosy se detiene y su ventana se cierra. Lo que se esté sincronizando terminará la próxima vez que lo abras.</string>
     <string name="ui_quick_settings_device_access_allow">Permitir</string>
     <string name="ui_quick_settings_theme">Tema</string>
     <string name="ui_quick_settings_accent">Color de acento</string>

@@ -66,6 +66,8 @@
     <string name="settings_main_device_subtitle">系统设置</string>
     <string name="settings_main_about_title">关于</string>
     <string name="settings_main_about_subtitle">版本%1$s</string>
+    <string name="settings_main_close_app_title">关闭 Argosy</string>
+    <string name="settings_main_close_app_subtitle">退出应用</string>
 
     <!-- ===== Audio section ===== -->
 
