@@ -33,11 +33,13 @@ walk() { "$here/walk.sh" "$profile" "$out" "$@" >> "$log" 2>&1; }
 
 : > "$report"
 note "desktop-test $profile $(date -Iseconds)"
-check reset "$here/reset.sh" "$profile"
-check install "$here/app.sh" "$profile" install
-[ -n "${LAB_BUNDLE:-}" ] && check bundle "$here/app.sh" "$profile" bundle "$LAB_BUNDLE"
-cores='d=$HOME/.var/app/org.libretro.RetroArch/config/retroarch/cores; mkdir -p $d; for c in fceumm mgba gambatte; do curl -sfLo /tmp/$c.zip https://buildbot.libretro.com/nightly/linux/x86_64/latest/${c}_libretro.so.zip && python3 -m zipfile -e /tmp/$c.zip $d || exit 1; done; flatpak info --user org.libretro.RetroArch | grep Version; ls $d | tr "\n" " "'
-check retroarch "$here/exec.sh" "$profile" --long --user "flatpak install --user -y --noninteractive flathub org.libretro.RetroArch >/dev/null && $cores"
+if [ -z "${LAB_KEEP:-}" ]; then
+    check reset "$here/reset.sh" "$profile"
+    check install "$here/app.sh" "$profile" install
+    [ -n "${LAB_BUNDLE:-}" ] && check bundle "$here/app.sh" "$profile" bundle "$LAB_BUNDLE"
+cores='d=$HOME/.var/app/org.libretro.RetroArch/config/retroarch/cores; mkdir -p $d; for c in fceumm mgba gambatte; do curl -sfL --max-time 180 -o /tmp/$c.zip https://buildbot.libretro.com/nightly/linux/x86_64/latest/${c}_libretro.so.zip && python3 -m zipfile -e /tmp/$c.zip $d || exit 1; done; flatpak info --user org.libretro.RetroArch | grep Version; ls $d | tr "\n" " "'
+    check retroarch "$here/exec.sh" "$profile" --long --user "flatpak install --user -y --noninteractive flathub org.libretro.RetroArch >/dev/null && $cores"
+fi
 check session "$here/exec.sh" "$profile" --user 'systemctl --user show-environment | grep -E "^(XDG_SESSION_TYPE|XDG_CURRENT_DESKTOP)=" | tr "\n" " "'
 check start "$here/app.sh" "$profile" start
 check first-frame log_wait 'restoreQueueFromDatabase' 120

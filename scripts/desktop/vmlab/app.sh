@@ -21,6 +21,10 @@ case "$action" in
         sleep 1
         "$here/exec.sh" "$profile" --long --user "curl -sfo /var/tmp/$name http://10.0.2.2:8765/$name && flatpak install --user -y --noninteractive --reinstall --bundle /var/tmp/$name && flatpak info --user $app | grep -E 'Version|Commit'" ;;
     start)
+        if [ "$("$here/exec.sh" "$profile" --user "busctl --user get-property org.gnome.Shell /org/gnome/Shell org.gnome.Shell OverviewActive 2>/dev/null" | head -n 1)" = "b true" ]; then
+            virsh send-key "$(lab_domain "$profile")" KEY_LEFTMETA >/dev/null
+            sleep 2
+        fi
         "$here/exec.sh" "$profile" --user "$session_env; mkdir -p \$HOME/.var/app/$app/cache; rm -f $pipe; mkfifo $pipe; echo \"session \$XDG_SESSION_TYPE \$XDG_CURRENT_DESKTOP DISPLAY=\$DISPLAY WAYLAND_DISPLAY=\$WAYLAND_DISPLAY\"; setsid nohup flatpak run $app --key-pipe=$pipe $* > \$HOME/argosy-vm.log 2>&1 < /dev/null &" ;;
     term) "$here/exec.sh" "$profile" --user "pid=\$(pgrep -u tester -f '^[/]app/lib/argosy-desktop/bin/argosy-desktop' | head -1); [ -n \"\$pid\" ] || { echo 'not running'; exit 1; }; t0=\$(date +%s%N); kill -TERM \$pid; while kill -0 \$pid 2>/dev/null; do sleep 0.1; [ \$(( (\$(date +%s%N) - t0) / 1000000 )) -gt 10000 ] && { echo 'still running after 10 s'; exit 1; }; done; echo \"exited in \$(( (\$(date +%s%N) - t0) / 1000000 )) ms\"" ;;
     kill) "$here/exec.sh" "$profile" --user "flatpak kill $app 2>/dev/null; echo killed" ;;

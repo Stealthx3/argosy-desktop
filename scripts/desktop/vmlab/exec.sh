@@ -22,7 +22,7 @@ def agent(payload):
     out = subprocess.run(['virsh', 'qemu-agent-command', dom, json.dumps(payload)], check=True, capture_output=True, text=True, timeout=60).stdout
     return json.loads(out)['return']
 def run(command, poll):
-    pid = agent({'execute': 'guest-exec', 'arguments': {'path': '/bin/sh', 'arg': ['-c', command], 'capture-output': True}})['pid']
+    pid = agent({'execute': 'guest-exec', 'arguments': {'path': '/bin/bash', 'arg': ['-c', command], 'capture-output': True}})['pid']
     while True:
         st = agent({'execute': 'guest-exec-status', 'arguments': {'pid': pid}})
         if st.get('exited'):
