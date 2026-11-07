@@ -57,7 +57,7 @@ compose.desktop {
 
         nativeDistributions {
             packageName = "argosy-desktop"
-            packageVersion = "0.3.0"
+            packageVersion = "0.4.0"
             modules(
                 "java.instrument",
                 "java.management",

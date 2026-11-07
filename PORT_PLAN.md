@@ -1,6 +1,6 @@
 # Argosy Desktop — Linux Flatpak Port Plan
 
-As of 2026-10-16 · Micaiah Fonken · Source of truth: the "Argosy Desktop — Linux Flatpak Port Plan" doc. This file is a copy kept in the repository.
+As of 2026-10-16, last updated 2026-11-06 · Micaiah Fonken · Source of truth: the "Argosy Desktop — Linux Flatpak Port Plan" doc. This file is a copy kept in the repository.
 
 > **Phase 0 corrections** (from the codebase survey, see `docs/desktop/phase-0-survey.md`): upstream is now **v2.23.0** (not v2.10), and **TV Compose is no longer used anywhere**, so the TV Compose swap below is already done upstream.
 
@@ -10,6 +10,8 @@ As of 2026-10-16 · Micaiah Fonken · Source of truth: the "Argosy Desktop — L
 
 > **Phase 2 results** (2026-10-22, details in `DEVLOG.md`): upstream's whole UI runs in the desktop window. `commonMain` now holds 1,720 Kotlin files and `androidMain` 243; `app` keeps 30. SDL3 gamepad input and the keyboard drive upstream's own InputDispatcher, so focus and navigation behave as on Android. Every screen reachable with the RomM testbed was walked with the same pad steps on an Android handheld emulator and on the desktop and matches (first run, Home and drawer, Game Detail and its sheets, Library, Collections, Downloads, Library Sync, Save Sync, Check-In, Apps, every Settings page, About, Changelog, file browser). Not yet opened on the desktop: Media Library/Detail (needs a Jellyfin server in the testbed), the Social screens (need an Argosy Social session), Save Timeline and the emulator rows of Per-Game Settings (need Phase 3 emulators); Search and Manage Pins have no entry point in upstream v2.24.0 on either platform. Still to check: a physical pad, Nintendo layouts and stick navigation.
 
+> **Phase 5 progress: Beta 1** (2026-11-06, details in `DEVLOG.md`): the current build is the first beta, version 0.4.0. Owner decision 2026-10-27: Phase 5 aims at Linux adaptation and compatibility, not a 1:1 copy of the Android app. Done since Phase 4: the first-run emulator step is worded as "Emulators Argosy should manage"; cover art is fetched and cached during the library sync; Close Argosy sits in the left drawer and as the last Settings row, with a confirmation; on the Desktop profile, hovering with the mouse shows each control's own gamepad focus look, and controls without one get an accent background wash; Platforms has Reset to Defaults and Settings has Factory Reset (warning and a second confirmation, then Argosy deletes what it created and restarts into the first-run wizard); Game Mode fixes (`libsigil-jni`, a shutdown hook, SIGTERM exits in about 0.4 s). A VM lab (`scripts/desktop/vmlab/`) runs install, wizard, sync, download, RetroArch launch, the resets and both exits on Fedora GNOME, Fedora KDE and Ubuntu GNOME, at 125 % and 150 % scaling, and under headless gamescope. Flathub groundwork: offline from-source manifest, lint clean apart from owner-gated items, and the startup abort fixed. Still open: the owner's Steam Deck Game Mode checks, then the Flathub submission (step 5).
+>
 > **Phase 4 results** (2026-10-24, details in `DEVLOG.md`): Linux adaptation complete. Controller input mode (Auto / Steam Input / SDL3) and per-controller button mapping; Steam, Jellyfin, Social (with QuayPass), the Android Settings row and built-in emulation removed on desktop through one capability (JavaSteam kept on the classpath, inert); decorated window with F11, gamescope and a Start in Full Screen setting, dark first launch; display profiles Handheld / Desktop / TV with detection, TV couch scale (125 %, 3 % safe area), cursor auto-hide, profile cards and a first-run Display setup step; Flatpak permissions and host GPU screens; the Linux emulator compatibility database with Flathub suggestions and managed installers (AppImage releases, Flathub updates); libmpv local video and theme audio (YouTube trailers deferred). The alpha was republished at every step close. Hardware checks wait on the owner (`docs/desktop/owner-test-phase-4.md`).
 >
 > **Phase 3 results** (2026-10-23, details in `DEVLOG.md`): closed by owner decision. Desktop detects Linux emulators (Flatpak, AppImage, EmuDeck, PATH), launches RetroArch, Dolphin, PPSSPP, Cemu and DOSBox-X on the host through `flatpak-spawn --host`, supervises the process and returns to Argosy, records play sessions, and syncs RetroArch saves and states with RomM (live proof against the testbed: GET /api/saves, `no_op` twice). Apps tab, Quick Settings (volume, backlight, rumble), the first-run wizard with an emulator folder-access step and the XDG file chooser portal all run on the desktop. The alpha Flatpak is signed and published at `https://stealthx3.github.io/argosy-desktop/` and installs from its `.flatpakref`. Owner test on Bazzite (HTPC on a TV, production RomM): install, wizard, library, downloads, keyboard/mouse and standalone-emulator launches pass; Steam Controller mapping and rumble fail (Phase 4 step 1) and a stall when downloading a ROM already in the folder moves to Phase 5. Not exercised on real machines: save sync, a clean Fedora install; DuckStation, PCSX2, RPCS3, Azahar, Vita3K and ScummVM still return a launch error.
@@ -289,6 +291,8 @@ Six phases over about 32 weeks; restructure first, then get every screen on the 
 | 4 · Linux adaptation | 20–28 | libmpv video wallpaper; Desktop removals (Steam / Jellyfin / Social / Android Settings); Linux emulator suggestions and managed installers; Host GPU screen; Flatpak permissions screen; Window title bar and full-screen setting; Controller input mode (Auto / Steam Input / SDL3); Navigation button mapping; Display profiles and wizard display setup | — |
 | 5 · Beta and Flathub | 29–32 | Linux desktop and Steam Game Mode compatibility (GNOME, KDE, SteamOS); Flathub submission | 1.0 live on Flathub |
 
+Status (2026-11-06): Phases 0–4 are complete. In Phase 5, steps 1–3 are done, step 4 (Linux desktop and Steam Game Mode compatibility) waits on the owner's Steam Deck checks, and step 5 (Flathub submission) has its groundwork done. The current build is Beta 1 (0.4.0).
+
 Exit criteria per phase:
 
 1. **Phase 0:** upstream's Library screen renders in a desktop window; a sandboxed test Flatpak starts the RetroArch Flatpak on a ROM; upstream's schema opens under Room KMP on the JVM.
@@ -328,6 +332,12 @@ Four decisions shape everything after Phase 0; settle them in the first two week
 - **Handheld/TV options.** Decided 2026-10-23: display profiles (Handheld/Desktop/TV), TV layout reuse, TV safe area, touch on handhelds, and a Display setup step with thumbnail previews in the first-run wizard.
 - **Emulator catalogue and managed installers.** Decided 2026-10-23: a database approach for emulator compatibility (a data-driven Linux emulator catalogue that emulator suggestions, managed installers and detection read from, instead of hard-coded seeds). Which emulators it starts with, its schema, where it lives and how it is updated are decided while planning Phase 4.
 
+Open owner decisions in Phase 5 (2026-11-06):
+
+- **RetroArch cores.** A fresh Flathub RetroArch has no cores: Argosy installs the core a launch needs, or points to RetroArch's Core Downloader.
+- **App id and store listing.** The Flathub app id (`io.github.Stealthx3.argosy_desktop` proposed) and the store screenshots.
+- **Brightness.** Quick Settings Brightness is hidden on desktop: leave it out, or add backlight control for Linux handhelds and laptops.
+
 Phase 0 tasks:
 
 - [x] Fork rommapp/argosy-launcher (done: Stealthx3/argosy-desktop)
@@ -339,3 +349,18 @@ Phase 0 tasks:
 - [x] Spike: Room KMP + bundled SQLite opening upstream's schema on the JVM
 - [x] Check what CameraX and BLE are used for, and whether `testbed/romm` gives a disposable RomM for tests
 - [ ] Open an issue or Discord thread with rommapp maintainers proposing the shared KMP codebase (draft in `docs/desktop/upstream-proposal.md`; posting is the owner's call)
+
+## Where to go from here
+
+Ideas for after Beta 1, roughly in order of value. None of them is scheduled yet; each needs an owner decision.
+
+1. **Finish 1.0.** The Steam Deck Game Mode checks, then the Flathub PR, with CI building offline for x86_64 and aarch64. aarch64 also opens ARM handhelds and single-board computers.
+2. **First launch without dead ends.** Install the RetroArch core a game needs on its first launch, and walk the user through emulator folder access in one pass instead of per emulator.
+3. **More emulators, proven end to end.** Launch and save-sync proof for the standalone emulators that still need it (DuckStation, PCSX2, RPCS3, Azahar, Vita3K, ScummVM), and save sync for standalone emulators beyond RetroArch.
+4. **Mouse and keyboard as first-class input.** Clicking a control could move gamepad focus to it, with mouse-wheel paging, right-click for the context menu and keyboard shortcuts shown in the footer.
+5. **Native Wayland.** JetBrains Runtime's Wayland toolkit instead of XWayland, for sharp fractional scaling and smoother frame pacing.
+6. **Native Steam Input.** The planned post-1.0 revisit: `ISteamInput` loaded at runtime when present, with Steam glyphs and rumble through Steam.
+7. **Handheld polish.** Backlight control in Quick Settings, battery and suspend awareness, and per-device display profiles for the Deck, Ally and Legion Go.
+8. **Automated compatibility runs.** Run the VM lab (GNOME, KDE, Ubuntu, gamescope) on a schedule against every new build and publish the reports.
+9. **Upstream collaboration.** Offer rommapp the shared Kotlin Multiplatform codebase (the draft is in `docs/desktop/upstream-proposal.md`), so Android and desktop share one tree and stop drifting.
+10. **Features left out of this version.** Built-in libretro emulation, netplay, YouTube trailers (yt-dlp) and, if wanted, Jellyfin and Argosy Social on the desktop.
