@@ -2,7 +2,7 @@
 
 Rewritten (not appended) at the end of every work unit, so a fresh session can start from it alone. History and reasoning live in `DEVLOG.md`. Earlier phases: `phase-0.md` … `phase-4.md` (closed summaries).
 
-**Updated:** 2026-11-06 (hover reworked to the focus look; Beta 1 labelled, README and plan rebuilt). Steps 1–3 done; step 4 in progress.
+**Updated:** 2026-11-06 (Beta 1, 0.4.0, published to Pages). Steps 1–3 done; step 4 in progress.
 
 ## Scope and exit criterion
 
@@ -35,11 +35,11 @@ Plan (`DEVLOG.md`, Phase 5 plan): 1 wizard wording, 2 Close Argosy, 3 thumbnails
 - Owner changes (2026-11-04, on the alpha repo by the owner's OK): accent hover highlight on the Desktop profile; Platforms "Reset to Defaults"; Settings "Factory Reset" (restart through exit code 75 and the launcher loop). Details in `DEVLOG.md`. Lab: `mouse.sh` drives a real pointer. The wizard walk's `LEFT` picks Handheld in the VM; the hover highlight needs Desktop.
 - Second early publish (2026-11-04, owner OK): Pages serves 7b68c15f (from 87824d162; `gh-pages` 10ab2ded, labelled "step 5.4 close", but step 4 is still open).
 - VM tests of that build (2026-11-05): `desktop-test.sh` and new `reset-test.sh` pass on Fedora GNOME and Ubuntu GNOME; new `gamescope-test.sh` passes under headless gamescope on software rendering. Reports in `build/vmlab/fedora-gnome/{test-u7,reset-u7}`, `build/vmlab/ubuntu-gnome/{test-u9,reset-u9}`, `build/vmlab/fedora-kde/gamescope`. Not covered: real Steam (overlay, keyboard), a real GPU, mouse clicks on the new rows, Managed Installer removal, the Flathub launcher script. No product bug found. Open lab flake: Ubuntu's RetroArch install hung twice right after a reset; run by hand it took 6 min.
-- Owner changes (2026-11-06, local): hover shows each control's own focus look (`HoverFocus`), fallback wash matches the focus fill, card hover capped at 1.1x, `LocalPointerInWindow` clears hover when the pointer leaves. Beta 1: version 0.4.0, README with install steps, plan with "Where to go from here". Publishing Beta 1 to Pages waits on the owner's go-ahead.
+- Owner changes (2026-11-06, local): hover shows each control's own focus look (`HoverFocus`), fallback wash matches the focus fill, card hover capped at 1.1x, `LocalPointerInWindow` clears hover when the pointer leaves. Beta 1: version 0.4.0, README with install steps, plan with "Where to go from here". Beta 1 is published.
 - Unit 4 done (2026-10-30): Home now refreshes when any library sync ends (`HomeSyncDelegate.observeLibrarySyncEnd`; shared code, Android gate green, Android emulator not run). `desktop-test.sh` passes every product check on all three desktops with local build e68b1170 (signed bundle `build/vmlab/bundle/argosy.flatpak`); reports in `build/vmlab/<profile>/test-u4*`. Not yet published: Pages still serves 2e7a3c30.
 - Open findings: (1) fresh Flathub RetroArch has no cores (owner question 3); (2) the wizard walk still relies on waits (made longer; markers would be sturdier); (3) QR buttons move with Up/Down only; (4) one 5.7 s SIGTERM exit that did not reproduce; (5) Ubuntu VM has no browser.
 - Unit 5 done (2026-10-30): XWayland and HiDPI at 125% and 150% render correctly on KDE and GNOME (`scale.sh`; screens in `build/vmlab/<profile>/u5/`). GNOME at 125% opens a smaller window (cosmetic; fullscreen is fine). The desktop part of step 4 is covered.
-- **Next action (2026-11-06):** ask the owner to publish Beta 1 (0.4.0) to Pages (`build-alpha.sh` → `publish-repo.sh` → `push-pages.sh --step-close 5.4`; the README already points there). Then, as before: step 4 closes only after the owner's Game Mode checks on the Deck (alpha 5.4 list above), so they remain pending; do not run `--step-close 5.4` before them. Meanwhile start the step 5 groundwork next action below (the Flathub build's startup abort).
+- **Beta 1 published (2026-11-06):** Pages serves 963973e6 (0.4.0, from 02494a9e3; `gh-pages` 7e0e20b, labelled "step 5.4 close" while step 4 stays open). Next action: step 4 closes only after the owner's Game Mode checks on the Deck (list above), now on Beta 1.
 
 ## Open owner questions (revisit after testing, owner decision 2026-10-27)
 

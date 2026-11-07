@@ -1646,3 +1646,9 @@ The owner's tests are the step 5 side-by-side checklist and the alpha 5.4 Game M
 **Action:** `packageVersion` 0.4.0 and a 0.4.0 release entry in the metainfo (validates). `PORT_PLAN.md`: a Beta 1 progress note, a status line under the Roadmap, the open Phase 5 owner decisions, and "Where to go from here" (ten ideas). `README.md` rebuilt: intro, "Install the beta" (install, run, first RetroArch, Steam Deck, updates, uninstall), status, the full plan, the upstream link.
 **Not done:** the Pages repository still serves 7b68c15f (0.3.0); publishing Beta 1 needs the owner's go-ahead. Pushing the README to GitHub waits for the phase close.
 
+### 2026-11-06 — Beta 1 published
+
+**Owner request:** "Yes, publish Beta 1".
+**Action:** the Pages index heading and the remote's comment say "beta" (`push-pages.sh`, `publish-repo.sh`). `build-alpha.sh` from 02494a9e3 → `publish-repo.sh` → `push-pages.sh --step-close 5.4` (the script's only step-level flag; step 4 itself stays open until the owner's Deck checks).
+**Result:** Pages serves flatpak commit 963973e6 (version 0.4.0), `gh-pages` 7e0e20b; index, summary, summary.sig, `.flatpakref` and `.flatpakrepo` answer 200. A clean Fedora KDE VM installed it from the public `.flatpakref`: version 0.4.0, commit 963973e6.
+
