@@ -28,7 +28,7 @@ icon=https://raw.githubusercontent.com/Stealthx3/argosy-desktop/main/argosy_icon
   echo "Title=Argosy Desktop"
   echo "Url=$url"
   echo "Homepage=$homepage"
-  echo "Comment=Argosy Desktop alpha builds"
+  echo "Comment=Argosy Desktop beta builds"
   echo "Description=Flatpak repository of Argosy Desktop, the Linux port of the Argosy launcher"
   echo "Icon=$icon"
   [ -n "$gpg_line" ] && echo "$gpg_line"

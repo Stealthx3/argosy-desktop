@@ -25,7 +25,7 @@ cp "$src/argosy-desktop.flatpakrepo" "$src/$app_id.flatpakref" "$site/"
 touch "$site/.nojekyll"
 cat > "$site/index.html" <<HTML
 <!doctype html><meta charset="utf-8"><title>Argosy Desktop Flatpak repo</title>
-<h1>Argosy Desktop (alpha)</h1>
+<h1>Argosy Desktop (beta)</h1>
 <p><code>flatpak install --user --from https://stealthx3.github.io/argosy-desktop/$app_id.flatpakref</code></p>
 <p>Or add the repo: <a href="argosy-desktop.flatpakrepo">argosy-desktop.flatpakrepo</a>.
 Source: <a href="https://github.com/Stealthx3/argosy-desktop">Stealthx3/argosy-desktop</a>.</p>
