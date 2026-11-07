@@ -425,8 +425,7 @@ object ComponentDefaults {
     }
 
     object HoverHighlight {
-        const val fillAlpha = 0.14f
-        const val ringAlpha = 0.8f
+        const val fillAlpha = 0.18f
     }
 
     object QuickPanel {

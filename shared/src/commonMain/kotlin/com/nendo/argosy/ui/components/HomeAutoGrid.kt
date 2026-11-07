@@ -54,6 +54,7 @@ import com.nendo.argosy.ui.theme.Motion
 import com.nendo.argosy.ui.theme.MotionTier
 import com.nendo.argosy.ui.theme.generated.ComponentDefaults
 import com.nendo.argosy.ui.util.clickableNoFocus
+import com.nendo.argosy.ui.util.clickableSurfaceNoFocus
 import kotlinx.coroutines.flow.first
 import com.nendo.argosy.platform.asImageBitmap
 import com.nendo.argosy.platform.config
@@ -460,7 +461,7 @@ private fun AutoGridCell(
                                 if (fitByHeight) Modifier.fillMaxHeight() else Modifier.fillMaxWidth()
                             )
                             .aspectRatio(artRatio, matchHeightConstraintsFirst = fitByHeight)
-                            .clickableNoFocus(onClick = onTap, onLongClick = onLongPress)
+                            .clickableSurfaceNoFocus(onClick = onTap, onLongClick = onLongPress)
                     )
                 }
             }

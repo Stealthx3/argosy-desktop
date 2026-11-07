@@ -2,6 +2,7 @@ package com.nendo.argosy.ui.screens.gamedetail.components
 
 import androidx.compose.foundation.background
 import com.nendo.argosy.ui.util.clickableNoFocus
+import com.nendo.argosy.ui.util.clickableSurfaceNoFocus
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -663,7 +664,7 @@ fun RelatedGamesSection(
                         focusScale = 1f,
                         modifier = Modifier
                             .fillMaxSize()
-                            .clickableNoFocus {
+                            .clickableSurfaceNoFocus {
                                 if (isActive) onGameTap(related.id) else onSectionFocus()
                             }
                     )

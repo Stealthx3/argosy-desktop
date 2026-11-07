@@ -26,6 +26,7 @@ import com.nendo.argosy.ui.components.InputButton
 import com.nendo.argosy.ui.theme.Dimens
 import com.nendo.argosy.ui.theme.LocalArgosyTheme
 import com.nendo.argosy.ui.util.clickableNoFocus
+import com.nendo.argosy.ui.util.rememberHoverFocus
 import com.nendo.argosy.ui.util.pressScale
 
 /** V2 list/menu row: focus fill when plain, stripe + fill when accented (nav/drill row). */
@@ -41,6 +42,8 @@ fun RowButton(
     val theme = LocalArgosyTheme.current
     val tint = accent ?: theme.focusAccent
     val interaction = remember { MutableInteractionSource() }
+    val hover = rememberHoverFocus(interaction)
+    val focused = focused || hover.isHovered
     val indicators = if (accent != null) FocusIndicators.NavRow else FocusIndicators.ListRow
     val shape = RoundedCornerShape(Dimens.radiusControl)
     Box(
@@ -56,7 +59,7 @@ fun RowButton(
             )
             .clip(shape)
             .heightIn(min = Dimens.menuRowHeight)
-            .clickableNoFocus(interactionSource = interaction, enabled = enabled, onClick = onClick)
+            .clickableNoFocus(hover, enabled = enabled, onClick = onClick)
             .padding(horizontal = Dimens.spacingMd, vertical = Dimens.spacingSm),
         contentAlignment = Alignment.CenterStart,
     ) {

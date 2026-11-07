@@ -59,6 +59,16 @@ fun Modifier.clickableSurfaceNoFocus(enabled: Boolean, onClick: () -> Unit): Mod
 }
 
 @OptIn(ExperimentalFoundationApi::class)
+fun Modifier.clickableSurfaceNoFocus(onClick: () -> Unit, onLongClick: () -> Unit): Modifier = composed {
+    combinedClickable(
+        interactionSource = remember { MutableInteractionSource() },
+        indication = null,
+        onClick = onClick,
+        onLongClick = onLongClick
+    )
+}
+
+@OptIn(ExperimentalFoundationApi::class)
 fun Modifier.clickableNoFocus(onClick: () -> Unit, onLongClick: () -> Unit): Modifier = composed {
     combinedClickable(
         interactionSource = remember { MutableInteractionSource() },
@@ -104,6 +114,33 @@ fun Modifier.clickableNoFocus(
         onClick = onClick
     )
 }
+
+/**
+ * A click area for a component that draws its own focus look while [hover] reports a hover. It
+ * draws no hover wash.
+ */
+fun Modifier.clickableNoFocus(
+    hover: HoverFocus,
+    enabled: Boolean = true,
+    onClick: () -> Unit
+): Modifier = clickable(
+    interactionSource = hover.interactionSource,
+    indication = null,
+    enabled = enabled,
+    onClick = onClick
+)
+
+@OptIn(ExperimentalFoundationApi::class)
+fun Modifier.clickableNoFocus(
+    hover: HoverFocus,
+    onClick: () -> Unit,
+    onLongClick: () -> Unit
+): Modifier = combinedClickable(
+    interactionSource = hover.interactionSource,
+    indication = null,
+    onClick = onClick,
+    onLongClick = onLongClick
+)
 
 fun Modifier.touchOnly(onClick: () -> Unit): Modifier = composed {
     val currentOnClick by rememberUpdatedState(onClick)

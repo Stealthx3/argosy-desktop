@@ -10,6 +10,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -105,6 +106,7 @@ import com.nendo.argosy.ui.theme.LocalBoxArtStyle
 import com.nendo.argosy.ui.theme.LocalLauncherTheme
 import com.nendo.argosy.ui.theme.Motion
 import com.nendo.argosy.ui.theme.generated.ComponentDefaults
+import com.nendo.argosy.ui.util.rememberHoverFocus
 
 @Composable
 fun GameCard(
@@ -124,6 +126,9 @@ fun GameCard(
     saturationOverride: Float? = null,
     useBoxArt: Boolean = false
 ) {
+    val hover = rememberHoverFocus()
+    val hoverScale = if (hover.isHovered && !isFocused) minOf(focusScale, ComponentDefaults.Focus.scaleFocused) else focusScale
+    val isFocused = isFocused || hover.isHovered
     val boxArtStyle = LocalBoxArtStyle.current
     val resolvedArt = com.nendo.argosy.ui.common.rememberResolvedArt(game.id)
     val resolvedCoverPath = resolvedArt?.coverPath ?: game.coverPath
@@ -184,9 +189,10 @@ fun GameCard(
 
     BoxWithConstraints(
         modifier = modifier
+            .hoverable(hover.interactionSource)
             .boxArtFrame(
                 isFocused = isFocused,
-                focusScale = focusScale,
+                focusScale = hoverScale,
                 scalePivotY = scalePivotY,
                 scaleOverride = scaleOverride,
                 alphaOverride = alphaOverride,
@@ -610,12 +616,15 @@ fun GameCardWithNewBadge(
     useBoxArt: Boolean = false,
     interactionModifier: Modifier = Modifier
 ) {
+    val hover = rememberHoverFocus()
+    val hoverScale = if (hover.isHovered && !isFocused) minOf(focusScale, ComponentDefaults.Focus.scaleFocused) else focusScale
+    val isFocused = isFocused || hover.isHovered
     val showNewBadge = game.isNew && !downloadIndicator.isActive
     val badgeWidthDp = ComponentDefaults.Carousel.newBadgeWidthDp.dp
     val badgeHeightDp = ComponentDefaults.Carousel.newBadgeHeightDp.dp
 
 
-    val scaleTarget = scaleOverride ?: if (isFocused) focusScale else ComponentDefaults.Focus.scaleDefault
+    val scaleTarget = scaleOverride ?: if (isFocused) hoverScale else ComponentDefaults.Focus.scaleDefault
     val scale by animateFloatAsState(
         targetValue = scaleTarget,
         animationSpec = Motion.focusSpring,
@@ -653,7 +662,7 @@ fun GameCardWithNewBadge(
                 )
             }
         },
-        modifier = modifier.graphicsLayer {
+        modifier = modifier.hoverable(hover.interactionSource).graphicsLayer {
             scaleX = scale
             scaleY = scale
             val overflowPx = NEW_BADGE_TOP_OVERFLOW.toPx()

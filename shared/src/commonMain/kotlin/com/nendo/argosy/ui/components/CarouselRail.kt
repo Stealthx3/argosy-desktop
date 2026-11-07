@@ -58,6 +58,7 @@ import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.ui.platform.LocalLayoutDirection
 import com.nendo.argosy.ui.theme.generated.ComponentDefaults
 import com.nendo.argosy.ui.util.clickableNoFocus
+import com.nendo.argosy.ui.util.clickableSurfaceNoFocus
 import com.nendo.argosy.ui.util.touchOnly
 
 internal const val HERO_START_PADDING_SCREEN_RATIO = 0.09f
@@ -488,12 +489,12 @@ private fun carouselTapModifier(
     onItemLongPress: ((Int) -> Unit)?
 ): Modifier = when (tapMode) {
     CarouselTapMode.CLICK -> if (onItemLongPress != null) {
-        Modifier.clickableNoFocus(
+        Modifier.clickableSurfaceNoFocus(
             onClick = { onItemTap(index) },
             onLongClick = { onItemLongPress(index) }
         )
     } else {
-        Modifier.clickableNoFocus { onItemTap(index) }
+        Modifier.clickableSurfaceNoFocus { onItemTap(index) }
     }
     CarouselTapMode.TOUCH -> Modifier.touchOnly { onItemTap(index) }
 }

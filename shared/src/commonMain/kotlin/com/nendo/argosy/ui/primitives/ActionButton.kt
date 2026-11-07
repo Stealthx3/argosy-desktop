@@ -30,6 +30,7 @@ import com.nendo.argosy.ui.theme.LocalArgosyTheme
 import com.nendo.argosy.ui.theme.Motion
 import com.nendo.argosy.ui.theme.generated.ComponentDefaults
 import com.nendo.argosy.ui.util.clickableNoFocus
+import com.nendo.argosy.ui.util.rememberHoverFocus
 import com.nendo.argosy.ui.util.pressScale
 
 /** V2 action button: wrapped fill (fill inside a brighter rim) that solidifies on focus; never moves. */
@@ -46,6 +47,8 @@ fun ActionButton(
     val theme = LocalArgosyTheme.current
     val accent = accentColor ?: theme.focusAccent
     val interaction = remember { MutableInteractionSource() }
+    val hover = rememberHoverFocus(interaction)
+    val focused = focused || hover.isHovered
     val shape = RoundedCornerShape(Dimens.radiusControl)
     val restFill = if (primary) accent.copy(alpha = ComponentDefaults.ActionButton.restFillAlpha) else theme.surfaceElevated
     val focusedFill = if (primary) lerp(accent, Color.White, 0.18f)
@@ -77,7 +80,7 @@ fun ActionButton(
             .clip(shape)
             .background(fill, shape)
             .border(width = Dimens.borderThin, color = rim, shape = shape)
-            .clickableNoFocus(interactionSource = interaction, enabled = enabled, onClick = onClick)
+            .clickableNoFocus(hover, enabled = enabled, onClick = onClick)
             .padding(horizontal = Dimens.buttonPaddingH, vertical = Dimens.buttonPaddingV),
         contentAlignment = Alignment.Center,
     ) {

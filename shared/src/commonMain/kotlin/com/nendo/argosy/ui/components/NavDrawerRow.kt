@@ -31,6 +31,7 @@ import com.nendo.argosy.ui.theme.Dimens
 import com.nendo.argosy.ui.theme.LocalArgosyTheme
 import com.nendo.argosy.ui.theme.Motion
 import com.nendo.argosy.ui.util.clickableNoFocus
+import com.nendo.argosy.ui.util.rememberHoverFocus
 
 internal const val DRAWER_FOCUS_WASH_ALPHA = 0.15f
 private const val NAV_ROW_SELECTED_FILL_ALPHA = 0.5f
@@ -53,6 +54,8 @@ fun NavDrawerRow(
     labelVisible: Boolean = true,
     trailing: @Composable RowScope.() -> Unit = {}
 ) {
+    val hover = rememberHoverFocus()
+    val isFocused = isFocused || hover.isHovered
     val backgroundColor = when {
         isFocused -> LocalArgosyTheme.current.focusAccent.copy(alpha = DRAWER_FOCUS_WASH_ALPHA)
         isSelected -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = NAV_ROW_SELECTED_FILL_ALPHA)
@@ -76,7 +79,7 @@ fun NavDrawerRow(
             .fillMaxWidth()
             .clip(shape)
             .background(backgroundColor)
-            .clickableNoFocus(enabled = enabled, onClick = onClick)
+            .clickableNoFocus(hover, enabled = enabled, onClick = onClick)
     ) {
         Box(
             modifier = Modifier

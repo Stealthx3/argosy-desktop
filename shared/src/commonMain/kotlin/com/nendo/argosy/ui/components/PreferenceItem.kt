@@ -2,11 +2,15 @@ package com.nendo.argosy.ui.components
 
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.foundation.background
+import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
+import com.nendo.argosy.ui.util.HoverFocus
 import com.nendo.argosy.ui.util.clickableNoFocus
+import com.nendo.argosy.ui.util.clickableSurfaceNoFocus
+import com.nendo.argosy.ui.util.rememberHoverFocus
 import com.nendo.argosy.ui.util.focusBackground
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -90,6 +94,7 @@ private fun preferenceAccent(isDangerous: Boolean = false): Color =
  */
 @Composable
 internal fun preferenceModifier(
+    hover: HoverFocus,
     isFocused: Boolean,
     isDangerous: Boolean = false,
     onClick: (() -> Unit)? = null,
@@ -112,7 +117,7 @@ internal fun preferenceModifier(
         .background(background)
         .then(
             when {
-                onClick != null -> Modifier.clickableNoFocus(onClick = onClick)
+                onClick != null -> Modifier.clickableNoFocus(hover, onClick = onClick)
                 onDirectionalTap != null -> Modifier.pointerInput(Unit) {
                     detectTapGestures { offset ->
                         currentDirectionalTap?.invoke(if (offset.x < size.width / 2f) -1 else 1)
@@ -121,7 +126,21 @@ internal fun preferenceModifier(
                 else -> Modifier
             }
         )
+        .then(
+            if (onClick == null) Modifier.hoverable(hover.interactionSource) else Modifier
+        )
         .padding(horizontal = Dimens.spacingMd, vertical = Dimens.spacingSm)
+}
+
+@Composable
+internal fun preferenceModifier(
+    isFocused: Boolean,
+    isDangerous: Boolean = false,
+    onClick: (() -> Unit)? = null,
+    onDirectionalTap: ((Int) -> Unit)? = null
+): Modifier {
+    val hover = rememberHoverFocus()
+    return preferenceModifier(hover, isFocused || hover.isHovered, isDangerous, onClick, onDirectionalTap)
 }
 
 @Composable
@@ -151,8 +170,10 @@ fun NavigationPreference(
     onClick: () -> Unit,
     badge: String? = null
 ) {
+    val hover = rememberHoverFocus()
+    val isFocused = isFocused || hover.isHovered
     Row(
-        modifier = preferenceModifier(isFocused, onClick = onClick),
+        modifier = preferenceModifier(hover, isFocused, onClick = onClick),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
@@ -204,6 +225,8 @@ fun CyclePreference(
     pickerRequestToken: Int = 0,
     onPickerVisibilityChange: ((Boolean) -> Unit)? = null
 ) {
+    val hover = rememberHoverFocus()
+    val isFocused = isFocused || hover.isHovered
     val valueColor = when {
         isFocused -> MaterialTheme.colorScheme.onPrimaryContainer
         isCustom -> MaterialTheme.colorScheme.primary
@@ -222,11 +245,11 @@ fun CyclePreference(
     }
 
     val modifier = if (showResetButton && onReset != null) {
-        preferenceModifier(isFocused).then(
-            Modifier.clickableNoFocus(onClick = onClick, onLongClick = onReset)
+        preferenceModifier(hover, isFocused).then(
+            Modifier.clickableNoFocus(hover, onClick = onClick, onLongClick = onReset)
         )
     } else {
-        preferenceModifier(isFocused, onClick = onClick)
+        preferenceModifier(hover, isFocused, onClick = onClick)
     }
 
     Row(
@@ -352,6 +375,8 @@ private fun SegmentedPreferenceRow(
     trackWidth: Dp,
     onReset: (() -> Unit)?
 ) {
+    val hover = rememberHoverFocus()
+    val isFocused = isFocused || hover.isHovered
     val labels: @Composable () -> Unit = {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(modifier = Modifier.weight(1f)) {
@@ -375,7 +400,7 @@ private fun SegmentedPreferenceRow(
     }
     if (inline) {
         Row(
-            modifier = preferenceModifier(isFocused),
+            modifier = preferenceModifier(hover, isFocused),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(
@@ -392,7 +417,7 @@ private fun SegmentedPreferenceRow(
             )
         }
     } else {
-        Column(modifier = preferenceModifier(isFocused)) {
+        Column(modifier = preferenceModifier(hover, isFocused)) {
             labels()
             SegmentedControl(
                 options = options,
@@ -420,8 +445,10 @@ fun SliderPreference(
     onAdjust: ((Int) -> Unit)? = null,
     valueLabel: String? = null
 ) {
+    val hover = rememberHoverFocus()
+    val isFocused = isFocused || hover.isHovered
     Row(
-        modifier = preferenceModifier(
+        modifier = preferenceModifier(hover, 
             isFocused,
             onClick = onClick,
             onDirectionalTap = onAdjust?.let { adjust -> { direction: Int -> adjust(direction * step) } }
@@ -458,6 +485,8 @@ fun TrackSliderPreference(
     suffix: String = "%",
     onValueChange: (Float) -> Unit
 ) {
+    val hover = rememberHoverFocus()
+    val isFocused = isFocused || hover.isHovered
     val displayValue = (value * 100).toInt()
     val aspectRatioClass = LocalUiScale.current.aspectRatioClass
     val isWideDisplay = aspectRatioClass == AspectRatioClass.ULTRA_WIDE ||
@@ -465,7 +494,7 @@ fun TrackSliderPreference(
 
     if (isWideDisplay) {
         Row(
-            modifier = preferenceModifier(isFocused),
+            modifier = preferenceModifier(hover, isFocused),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
@@ -496,7 +525,7 @@ fun TrackSliderPreference(
         }
     } else {
         Column(
-            modifier = preferenceModifier(isFocused)
+            modifier = preferenceModifier(hover, isFocused)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -539,16 +568,18 @@ fun SwitchPreference(
     showResetButton: Boolean = false,
     onReset: (() -> Unit)? = null
 ) {
+    val hover = rememberHoverFocus()
+    val isFocused = isFocused || hover.isHovered
     Row(
-        modifier = preferenceModifier(isFocused),
+        modifier = preferenceModifier(hover, isFocused),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Row(
             modifier = Modifier
                 .weight(1f)
                 .then(
-                    if (onLabelClick != null) Modifier.clickableNoFocus(onClick = onLabelClick)
-                    else Modifier.clickableNoFocus { onToggle(!isEnabled) }
+                    if (onLabelClick != null) Modifier.clickableSurfaceNoFocus(onClick = onLabelClick)
+                    else Modifier.clickableSurfaceNoFocus { onToggle(!isEnabled) }
                 ),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -625,8 +656,10 @@ fun InfoPreference(
     icon: ImageVector? = null,
     subtitle: String? = null
 ) {
+    val hover = rememberHoverFocus()
+    val isFocused = isFocused || hover.isHovered
     Row(
-        modifier = preferenceModifier(isFocused),
+        modifier = preferenceModifier(hover, isFocused),
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (icon != null) {
@@ -679,15 +712,18 @@ fun ActionPreference(
     onLongClick: (() -> Unit)? = null,
     onClick: () -> Unit
 ) {
+    val hover = rememberHoverFocus()
+    val isFocused = isFocused || hover.isHovered
     val rowModifier = if (onLongClick != null) {
-        preferenceModifier(isFocused, isDangerous).then(
+        preferenceModifier(hover, isFocused, isDangerous).then(
             Modifier.clickableNoFocus(
+                hover,
                 onClick = { if (isEnabled) onClick() },
                 onLongClick = { if (isEnabled) onLongClick() }
             )
         )
     } else {
-        preferenceModifier(isFocused, isDangerous) { if (isEnabled) onClick() }
+        preferenceModifier(hover, isFocused, isDangerous) { if (isEnabled) onClick() }
     }
     Row(
         modifier = rowModifier,
@@ -828,8 +864,10 @@ fun PlatformStatsPreference(
     downloadedText: String,
     isFocused: Boolean
 ) {
+    val hover = rememberHoverFocus()
+    val isFocused = isFocused || hover.isHovered
     Row(
-        modifier = preferenceModifier(isFocused),
+        modifier = preferenceModifier(hover, isFocused),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -863,8 +901,10 @@ fun ColorPickerPreference(
     onColorSelect: (Int?) -> Unit,
     colorCircleContent: @Composable (color: Int?, isSelected: Boolean, isColorFocused: Boolean) -> Unit
 ) {
+    val hover = rememberHoverFocus()
+    val isFocused = isFocused || hover.isHovered
     Column(
-        modifier = preferenceModifier(isFocused)
+        modifier = preferenceModifier(hover, isFocused)
     ) {
         Text(
             text = title,
@@ -903,6 +943,8 @@ fun HueSliderPreference(
     readableOnTheme: Boolean = false,
     defaultLabel: String = stringResource(R.string.ui_hue_slider_default)
 ) {
+    val hover = rememberHoverFocus()
+    val isFocused = isFocused || hover.isHovered
     val isDarkTheme = LocalArgosyTheme.current.isDark
     fun swatch(hue: Float): Color {
         val raw = Color(ColorUtils.HSLToColor(floatArrayOf(hue, saturation, lightness)))
@@ -914,7 +956,7 @@ fun HueSliderPreference(
     val currentColor = currentHue?.let(::swatch)
 
     Column(
-        modifier = preferenceModifier(isFocused)
+        modifier = preferenceModifier(hover, isFocused)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -1011,12 +1053,14 @@ fun DualActionPreference(
     onPrimary: () -> Unit,
     onSecondary: () -> Unit
 ) {
+    val hover = rememberHoverFocus()
+    val isFocused = isFocused || hover.isHovered
     val contentColor = preferenceContentColor(isFocused)
     val secondaryColor = preferenceSecondaryColor(isFocused)
     val primaryBusy = isBusy && busyDisablesPrimary
 
     Row(
-        modifier = preferenceModifier(isFocused),
+        modifier = preferenceModifier(hover, isFocused),
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (icon != null) {

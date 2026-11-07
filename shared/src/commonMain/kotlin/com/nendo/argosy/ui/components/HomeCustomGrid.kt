@@ -69,6 +69,7 @@ import com.nendo.argosy.ui.theme.generated.ComponentDefaults
 import com.nendo.argosy.ui.theme.generated.MotionTokens
 import kotlinx.coroutines.launch
 import com.nendo.argosy.ui.util.clickableNoFocus
+import com.nendo.argosy.ui.util.clickableSurfaceNoFocus
 import com.nendo.argosy.platform.image.bitmap
 import com.nendo.argosy.platform.image.intrinsicHeight
 import com.nendo.argosy.platform.image.intrinsicWidth
@@ -641,9 +642,9 @@ private fun CustomGridCellBox(
                         .fillMaxSize()
                         .then(
                             if (onLongClick == null) {
-                                Modifier.clickableNoFocus(onClick = onClick)
+                                Modifier.clickableSurfaceNoFocus(onClick = onClick)
                             } else {
-                                Modifier.clickableNoFocus(
+                                Modifier.clickableSurfaceNoFocus(
                                     onClick = onClick,
                                     onLongClick = onLongClick
                                 )

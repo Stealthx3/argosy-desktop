@@ -1,6 +1,12 @@
 package com.nendo.argosy.desktop
 
 import com.nendo.argosy.ui.util.LocalHoverHighlight
+import com.nendo.argosy.ui.util.LocalPointerInWindow
+import java.awt.AWTEvent
+import javax.swing.SwingUtilities
+import java.awt.event.AWTEventListener
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
 import com.nendo.argosy.ui.util.rememberHoverHighlight
 import kotlin.system.exitProcess
 import com.nendo.argosy.platform.AppShutdown
@@ -118,6 +124,22 @@ fun main(args: Array<String>) {
                 window.contentPane.addMouseMotionListener(mouseListener)
                 onDispose { window.contentPane.removeMouseMotionListener(mouseListener) }
             }
+            val pointerInWindow = remember { mutableStateOf(true) }
+            DisposableEffect(window) {
+                val pointerListener = AWTEventListener { event ->
+                    if (event is MouseEvent && (event.component == window || SwingUtilities.getWindowAncestor(event.component) == window)) {
+                        when (event.id) {
+                            MouseEvent.MOUSE_EXITED -> pointerInWindow.value = false
+                            MouseEvent.MOUSE_ENTERED, MouseEvent.MOUSE_MOVED -> pointerInWindow.value = true
+                        }
+                    }
+                }
+                Toolkit.getDefaultToolkit().addAWTEventListener(
+                    pointerListener,
+                    AWTEvent.MOUSE_EVENT_MASK or AWTEvent.MOUSE_MOTION_EVENT_MASK
+                )
+                onDispose { Toolkit.getDefaultToolkit().removeAWTEventListener(pointerListener) }
+            }
             DisposableEffect(window) {
                 keyPipe?.attach(window)
                 val focusListener = object : WindowAdapter() {
@@ -142,6 +164,7 @@ fun main(args: Array<String>) {
                         MultiResumeLifecycle {
                             ALauncherTheme {
                                 CompositionLocalProvider(
+                                    LocalPointerInWindow provides pointerInWindow,
                                     LocalHoverHighlight provides
                                         if (profile == DisplayProfile.DESKTOP) rememberHoverHighlight() else null,
                                 ) {
