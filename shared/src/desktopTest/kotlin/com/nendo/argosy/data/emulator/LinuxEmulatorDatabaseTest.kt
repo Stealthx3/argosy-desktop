@@ -14,7 +14,7 @@ class LinuxEmulatorDatabaseTest {
 
     @Test
     fun everyEntryIsAnUpstreamIdOrListsItsOwnPlatforms() {
-        assertEquals(42, bundled.emulators.size)
+        assertEquals(41, bundled.emulators.size)
         val upstream = bundled.emulators.filter { it.platforms.isEmpty() }
         assertEquals(20, upstream.size)
         upstream.forEach { assertNotNull(EmulatorRegistry.getById(it.id), it.id) }

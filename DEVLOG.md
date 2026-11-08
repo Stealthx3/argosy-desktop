@@ -1696,3 +1696,7 @@ The owner's tests are the step 5 side-by-side checklist and the alpha 5.4 Game M
 - **Folder access:** Hatari, gopher64, RMG and DeSmuME have no home-folder access in their manifests. Argosy's existing Permissions step (`HostFolderAccess.emulators`) walks `LinuxEmulators.all` through the registry, so it already lists them and grants the games folder with `flatpak override`. After the same override, Hatari and DeSmuME ran.
 - **End to end through Argosy:** with the new bundle, Rope and Anchor (NES) defaulted to ares; the per-game picker listed ares, Nestopia UE [1.53.2] and puNES [v0.111]. Choosing Nestopia UE and pressing Play started `nestopia "/home/tester/Games/Argosy/nes/Rope and Anchor (Homebrew).nes"` and the game ran (`build/vmlab/emue2e/`).
 - Gate: `:shared:desktopTest` green (added a check that a native shadPS4 install gets no command).
+
+### 2026-11-08 — Step 4: VBA-M removed from the emulator database (owner request)
+
+**Action:** removed `linux_vbam` (VisualBoyAdvance-M) from `linux-emulators.json`; the database now has 41 entries, 21 of them desktop-only. **Reason:** the owner asked to drop it for now after the VM test, where the Flatpak crashed even with no arguments. GB/GBC/GBA stay covered by ares, SameBoy, Mednafen and Mesen. `:shared:desktopTest` green.

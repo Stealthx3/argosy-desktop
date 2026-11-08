@@ -522,27 +522,6 @@
       ]
     },
     {
-      "id": "linux_vbam",
-      "name": "VisualBoyAdvance-M",
-      "platforms": [
-        "gba",
-        "gb",
-        "gbc"
-      ],
-      "binaries": [
-        "visualboyadvance-m"
-      ],
-      "launch": {
-        "args": [
-          "{rom}"
-        ]
-      },
-      "flathub": "com.vba_m.visualboyadvance-m",
-      "flatpakIds": [
-        "com.vba_m.visualboyadvance-m"
-      ]
-    },
-    {
       "id": "linux_desmume",
       "name": "DeSmuME",
       "platforms": [
