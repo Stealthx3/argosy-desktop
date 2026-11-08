@@ -43,8 +43,12 @@ class LinuxEmulatorDatabaseTest {
             LinuxLaunch.standalone("linux_play", flatpak("org.purei.Play"), "/g/p.iso")
         )
         assertEquals(
-            listOf("flatpak", "run", "net.shadps4.shadPS4", "-g", "/g/e.bin"),
+            listOf("flatpak", "run", "net.shadps4.shadPS4", "-d", "-g", "/g/e.bin"),
             LinuxLaunch.standalone("linux_shadps4", flatpak("net.shadps4.shadPS4"), "/g/e.bin")
+        )
+        assertEquals(
+            null,
+            LinuxLaunch.standalone("linux_shadps4", LinuxInstall(LinuxInstallKind.NATIVE, "/usr/bin/shadps4", null), "/g/e.bin")
         )
         assertEquals(
             listOf("flatpak", "run", "net.fsuae.FS-UAE", "--floppy_drive_0=/g/a.adf"),
