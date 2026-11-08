@@ -4,7 +4,8 @@ import androidx.compose.runtime.getValue
 
 data class BatteryState(
     val level: Int = 100,
-    val isCharging: Boolean = false
+    val isCharging: Boolean = false,
+    val present: Boolean = true
 )
 
 enum class NetworkLink { OFFLINE, WIFI, ETHERNET, CELLULAR }

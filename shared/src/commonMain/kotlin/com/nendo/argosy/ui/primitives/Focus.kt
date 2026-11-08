@@ -1,5 +1,8 @@
 package com.nendo.argosy.ui.primitives
 
+import com.nendo.argosy.ui.util.isTvLayout
+import com.nendo.argosy.ui.util.tvFocusGlow
+
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.border
@@ -104,7 +107,12 @@ fun Modifier.argosyFocusIndicators(
         label = "argosy-stripe-alpha",
     )
 
-    var m: Modifier = this
+    val tv = isTvLayout
+    var m: Modifier = if (tv && (indicators.fill || indicators.ring)) {
+        this.tvFocusGlow(focused, shape, effectiveTint)
+    } else {
+        this
+    }
     if (indicators.halo && haloAlpha > 0f) {
         m = m.drawBehind {
             val centerY = size.height / 2f
@@ -138,7 +146,7 @@ fun Modifier.argosyFocusIndicators(
             drawFocusOutline(outline, effectiveTint.copy(alpha = fillAlphaAnim))
         }
     }
-    if (indicators.ring && ringAlpha > 0f) {
+    if (indicators.ring && ringAlpha > 0f && !tv) {
         m = m.border(width = ringThickness, color = effectiveRingColor.copy(alpha = ringAlpha), shape = shape)
     }
     if (indicators.stripe && stripeAlphaAnim > 0f) {

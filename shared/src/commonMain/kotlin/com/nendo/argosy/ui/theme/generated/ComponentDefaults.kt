@@ -428,6 +428,17 @@ object ComponentDefaults {
         const val fillAlpha = 0.18f
     }
 
+    object TvLayout {
+        const val glowRadiusDp = 8
+        const val glowAlpha = 0.5f
+        const val lineMinDp = 2
+        const val minTextSp = 14
+        const val sidebarWidthRatio = 0.25f
+        const val scrollbarWidthDp = 3
+        const val scrollbarGlowAlpha = 0.35f
+        const val newDotDp = 8
+    }
+
     object QuickPanel {
         const val selectedFillAlpha = 0.108f
         const val offlineAvatarAlpha = 0.6f

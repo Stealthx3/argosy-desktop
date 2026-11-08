@@ -4,6 +4,8 @@ import androidx.compose.foundation.background
 import com.nendo.argosy.ui.util.clickableNoFocus
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.ui.unit.Dp
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.Row
@@ -41,6 +43,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import com.nendo.argosy.ui.theme.generated.ComponentDefaults
+import com.nendo.argosy.ui.util.isTvLayout
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -73,7 +78,14 @@ fun MainDrawer(
     onCloseApp: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    ModalDrawerSheet(modifier = modifier.width(Dimens.navDrawerWidth)) {
+    val tv = isTvLayout
+    BoxWithConstraints {
+    val drawerWidth = if (tv && maxWidth != Dp.Infinity) {
+        minOf(Dimens.navDrawerWidth, maxWidth * ComponentDefaults.TvLayout.sidebarWidthRatio)
+    } else {
+        Dimens.navDrawerWidth
+    }
+    ModalDrawerSheet(modifier = modifier.width(drawerWidth)) {
         Column(
             modifier = Modifier
                 .fillMaxHeight()
@@ -108,6 +120,8 @@ fun MainDrawer(
         }
     }
 
+    }
+
     if (isOpen) {
         FooterHints(hints = emptyList())
     }
@@ -132,7 +146,10 @@ private fun NavigationContent(
         }
     }
 
+    val tv = isTvLayout
     Column(modifier = modifier) {
+        Row(modifier = Modifier.weight(1f)) {
+        if (tv) SpindleScrollIndicator(listState, Modifier.padding(start = Dimens.spacingXs))
         LazyColumn(
             state = listState,
             modifier = Modifier.weight(1f)
@@ -160,6 +177,7 @@ private fun NavigationContent(
                     trailing = { badge?.let { DrawerBadge(it) } }
                 )
             }
+        }
         }
 
         if (PlatformFeatures.desktopWindow) {

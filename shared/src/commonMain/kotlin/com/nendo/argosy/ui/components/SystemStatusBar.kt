@@ -173,7 +173,7 @@ fun SystemStatusBar(
                 if (shown.network) {
                     NetworkIndicator(color = effectiveColor)
                 }
-                if (shown.battery) {
+                if (shown.battery && batteryState.present) {
                     BatteryIndicator(
                         level = batteryState.level,
                         isCharging = batteryState.isCharging,

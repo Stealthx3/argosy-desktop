@@ -1,5 +1,8 @@
 package com.nendo.argosy.ui.components
 
+import com.nendo.argosy.core.input.AndroidKeyCodes
+import com.nendo.argosy.ui.util.isTvLayout
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -137,12 +140,14 @@ fun SectionBreadcrumb(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.End
             ) {
-                Icon(
-                    painter = InputIcons.TriggerLeft,
-                    contentDescription = null,
-                    tint = navIconTint,
-                    modifier = triggerIconModifier
-                )
+                if (!(isTvLayout && ControllerButtonGlyph(AndroidKeyCodes.KEYCODE_BUTTON_L2, triggerPaintedHeight, MaterialTheme.typography.labelSmall.fontSize))) {
+                    Icon(
+                        painter = InputIcons.TriggerLeft,
+                        contentDescription = null,
+                        tint = navIconTint,
+                        modifier = triggerIconModifier
+                    )
+                }
             }
 
             val virtualMultiplier = 10000
@@ -285,12 +290,14 @@ fun SectionBreadcrumb(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start
             ) {
-                Icon(
-                    painter = InputIcons.TriggerRight,
-                    contentDescription = null,
-                    tint = navIconTint,
-                    modifier = triggerIconModifier
-                )
+                if (!(isTvLayout && ControllerButtonGlyph(AndroidKeyCodes.KEYCODE_BUTTON_R2, triggerPaintedHeight, MaterialTheme.typography.labelSmall.fontSize))) {
+                    Icon(
+                        painter = InputIcons.TriggerRight,
+                        contentDescription = null,
+                        tint = navIconTint,
+                        modifier = triggerIconModifier
+                    )
+                }
             }
         }
     }

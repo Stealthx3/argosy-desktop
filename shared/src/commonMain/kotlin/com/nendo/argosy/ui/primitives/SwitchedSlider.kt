@@ -85,6 +85,7 @@ fun SwitchedTrackSlider(
     focused: Boolean = false,
 ) {
     val theme = LocalArgosyTheme.current
+    val hairline = Dimens.borderThin
     val s = LocalUiScale.current.scale
     val trackHeight = ComponentDefaults.TrackSlider.trackHeight * s
     val trackRadius = ComponentDefaults.TrackSlider.trackRadius * s
@@ -129,7 +130,7 @@ fun SwitchedTrackSlider(
                 topLeft = Offset(0f, centerY - trackPx / 2f),
                 size = Size(fillWidth, trackPx),
                 cornerRadius = radius,
-                style = Stroke(width = Dimens.borderThin.toPx()),
+                style = Stroke(width = hairline.toPx()),
             )
         }
         if (fillScale > 0f) {

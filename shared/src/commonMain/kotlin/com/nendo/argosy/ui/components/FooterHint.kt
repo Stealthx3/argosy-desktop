@@ -41,6 +41,7 @@ import com.nendo.argosy.ui.input.LocalXYIconsSwapped
 import com.nendo.argosy.ui.input.LocalSwapStartSelect
 import com.nendo.argosy.ui.input.LocalButtonGlyphRemap
 import com.nendo.argosy.core.input.AndroidKeyCodes as KeyEvent
+import com.nendo.argosy.ui.util.isTvLayout
 import com.nendo.argosy.platform.LocalPlatformConfiguration as LocalConfiguration
 import com.nendo.argosy.platform.orientation
 import com.nendo.argosy.platform.screenHeightDp
@@ -116,6 +117,14 @@ fun InputButton.toPainter(): Painter? {
     }
 }
 
+@Composable
+internal fun InputButton.physicalKeyCode(): Int? {
+    val remap = LocalButtonGlyphRemap.current
+    val swapAB = LocalABIconsSwapped.current xor remap.nintendo
+    val swapXY = LocalXYIconsSwapped.current xor remap.nintendo
+    return standardKeyCode(swapAB, swapXY, LocalSwapStartSelect.current)?.let { remap.physicalFor(it) }
+}
+
 private fun InputButton.standardKeyCode(swapAB: Boolean, swapXY: Boolean, swapStartSelect: Boolean): Int? = when (this) {
     InputButton.A -> if (swapAB) KeyEvent.KEYCODE_BUTTON_B else KeyEvent.KEYCODE_BUTTON_A
     InputButton.B -> if (swapAB) KeyEvent.KEYCODE_BUTTON_A else KeyEvent.KEYCODE_BUTTON_B
@@ -186,8 +195,11 @@ fun FooterHint(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
+        val tvKey = if (isTvLayout && !button.isComposite()) button.physicalKeyCode() else null
         if (button.isComposite()) {
             CompositeButtonIcon(button, iconColor)
+        } else if (tvKey != null && ControllerButtonGlyph(tvKey, Dimens.iconSm + Dimens.borderMedium, footerTextStyle.fontSize * TV_GLYPH_TEXT_RATIO)) {
+            Unit
         } else {
             button.toPainter()?.let { painter ->
                 Icon(
@@ -211,6 +223,26 @@ fun FooterHint(
 
 @Composable
 private fun CompositeButtonIcon(button: InputButton, iconColor: Color) {
+    if (isTvLayout) {
+        val keys = if (button == InputButton.LB_RB) {
+            KeyEvent.KEYCODE_BUTTON_L1 to KeyEvent.KEYCODE_BUTTON_R1
+        } else {
+            KeyEvent.KEYCODE_BUTTON_L2 to KeyEvent.KEYCODE_BUTTON_R2
+        }
+        val glyphSize = Dimens.iconSm + Dimens.borderMedium
+        val glyphText = footerTextStyle.fontSize * TV_GLYPH_TEXT_RATIO
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            ControllerButtonGlyph(keys.first, glyphSize, glyphText)
+            Text(
+                text = COMPOSITE_SEPARATOR,
+                style = footerTextStyle,
+                color = iconColor,
+                modifier = Modifier.padding(horizontal = Dimens.borderMedium)
+            )
+            ControllerButtonGlyph(keys.second, glyphSize, glyphText)
+        }
+        return
+    }
     when (button) {
         InputButton.LB_RB -> {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -601,3 +633,6 @@ fun SubtleFooterBar(
         }
     }
 }
+
+private const val TV_GLYPH_TEXT_RATIO = 0.7f
+private const val COMPOSITE_SEPARATOR = "/"

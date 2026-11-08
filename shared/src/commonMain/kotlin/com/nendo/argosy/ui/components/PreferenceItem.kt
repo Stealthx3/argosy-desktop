@@ -11,6 +11,7 @@ import com.nendo.argosy.ui.util.HoverFocus
 import com.nendo.argosy.ui.util.clickableNoFocus
 import com.nendo.argosy.ui.util.clickableSurfaceNoFocus
 import com.nendo.argosy.ui.util.rememberHoverFocus
+import com.nendo.argosy.ui.util.tvFocusGlow
 import com.nendo.argosy.ui.util.focusBackground
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -113,6 +114,7 @@ internal fun preferenceModifier(
     return Modifier
         .fillMaxWidth()
         .heightIn(min = Dimens.settingsItemMinHeight)
+        .tvFocusGlow(isFocused, preferenceShape, accent)
         .clip(preferenceShape)
         .background(background)
         .then(

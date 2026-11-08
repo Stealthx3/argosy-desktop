@@ -56,6 +56,8 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.DividerDefaults
+import com.nendo.argosy.ui.util.tvLineWidth
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -139,6 +141,9 @@ import com.nendo.argosy.ui.components.AddToCollectionModal
 import com.nendo.argosy.ui.components.FooterHint
 import androidx.compose.ui.text.style.TextAlign
 import com.nendo.argosy.ui.components.AlphabetSidebar
+import com.nendo.argosy.ui.components.ShoulderGlyph
+import com.nendo.argosy.ui.components.TopRowNavRingSlot
+import com.nendo.argosy.core.input.AndroidKeyCodes
 import com.nendo.argosy.ui.components.AlphabetSidebarWidth
 import com.nendo.argosy.ui.components.CollectionItem
 import com.nendo.argosy.ui.components.FooterHints
@@ -927,6 +932,8 @@ private fun LibraryHeader(
                     }
                 }
 
+                TopRowNavRingSlot()
+
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center,
@@ -940,11 +947,12 @@ private fun LibraryHeader(
                             .padding(Dimens.spacingSm),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
+                        ShoulderGlyph(
+                            keyCode = AndroidKeyCodes.KEYCODE_BUTTON_L2,
                             painter = InputIcons.TriggerLeft,
-                            contentDescription = stringResource(R.string.library_header_previous_platform),
                             tint = navIconTint,
-                            modifier = Modifier.size(Dimens.iconSm)
+                            size = Dimens.iconSm,
+                            contentDescription = stringResource(R.string.library_header_previous_platform)
                         )
                     }
 
@@ -964,11 +972,12 @@ private fun LibraryHeader(
                             .padding(Dimens.spacingSm),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
+                        ShoulderGlyph(
+                            keyCode = AndroidKeyCodes.KEYCODE_BUTTON_R2,
                             painter = InputIcons.TriggerRight,
-                            contentDescription = stringResource(R.string.library_header_next_platform),
                             tint = navIconTint,
-                            modifier = Modifier.size(Dimens.iconSm)
+                            size = Dimens.iconSm,
+                            contentDescription = stringResource(R.string.library_header_next_platform)
                         )
                     }
                 }
@@ -1410,6 +1419,7 @@ internal fun SectionDivider(
         )
         HorizontalDivider(
             modifier = Modifier.weight(1f),
+            thickness = tvLineWidth(DividerDefaults.Thickness),
             color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
         )
     }

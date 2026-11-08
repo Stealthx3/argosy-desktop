@@ -87,6 +87,9 @@ import com.nendo.argosy.ui.components.FooterHostController
 import com.nendo.argosy.ui.components.LocalFooterHost
 import com.nendo.argosy.ui.components.LocalFooterHostVisible
 import com.nendo.argosy.ui.components.isBarVisible
+import com.nendo.argosy.ui.components.LocalTopRowNavRing
+import com.nendo.argosy.ui.components.TopRowNavRing
+import com.nendo.argosy.ui.util.isTvLayout
 import com.nendo.argosy.ui.components.LocalNavBarClearance
 import com.nendo.argosy.ui.components.LocalFrostedBackdrop
 import com.nendo.argosy.ui.components.frostedBackdropSource
@@ -1118,7 +1121,11 @@ fun ArgosyApp(
         LocalSwapStartSelect provides uiState.swapStartSelect,
         com.nendo.argosy.ui.input.LocalButtonGlyphRemap provides uiState.buttonGlyphRemap,
         LocalFooterHost provides footerHostController,
-        LocalFooterHostVisible provides (!presentationShowsHints && !navRingState.footerYieldsToBar),
+        LocalFooterHostVisible provides (
+            !presentationShowsHints &&
+                (!navRingState.footerYieldsToBar || isTvLayout) &&
+                !(isTvLayout && isDrawerOpen)
+            ),
         LocalFrostedBackdrop provides frostedBackdrop,
         com.nendo.argosy.ui.common.LocalImageCacheManager provides viewModel.imageCacheManager,
         com.nendo.argosy.ui.components.LocalArtworkScraping provides isScrapingArtwork,
@@ -1288,6 +1295,7 @@ fun ArgosyApp(
                     modifier = Modifier.fillMaxSize()
                 ) {
                     val monthlyRecapShowing = com.nendo.argosy.ui.components.recap.monthlyRecapShowing()
+                    val tvLayout = isTvLayout
                     val density = LocalDensity.current
                     var navBarHeight by remember { mutableStateOf(0.dp) }
                     val navBarHoldsSpace = navRingState.isAlwaysVisible && onRingDestination &&
@@ -1310,7 +1318,17 @@ fun ArgosyApp(
                                 !presentationShowsHints && navBarAllowed && navRingState.isBarVisible
                             ),
                         LocalFrostedBackdrop provides screenFrostedBackdrop,
-                        LocalNavBarClearance provides navBarClearance
+                        LocalNavBarClearance provides (if (tvLayout) 0.dp else navBarClearance),
+                        LocalTopRowNavRing provides if (tvLayout && navBarAllowed && !uiState.isFirstRun) {
+                            TopRowNavRing(
+                                destinations = navRingState.destinations,
+                                currentRoute = currentRoute,
+                                onNavigate = { route -> navigateFromDrawer(route) },
+                                badgeFor = drawerUiState::badgeCountFor
+                            )
+                        } else {
+                            null
+                        }
                     ) {
                         NavGraph(
                             navController = navController,
@@ -1336,7 +1354,7 @@ fun ArgosyApp(
                     }
 
                     FloatingNavBar(
-                        visible = navBarAllowed && navRingState.isBarVisible,
+                        visible = navBarAllowed && navRingState.isBarVisible && !tvLayout,
                         destinations = navRingState.destinations,
                         currentRoute = currentRoute,
                         onNavigate = { route ->
@@ -1531,7 +1549,7 @@ fun ArgosyApp(
                 }
             } else {
                 AnimatedVisibility(
-                    visible = !navRingState.footerYieldsToBar,
+                    visible = (!navRingState.footerYieldsToBar || isTvLayout) && !(isTvLayout && isDrawerOpen),
                     enter = slideInVertically(tween(Motion.durationSlide)) { it },
                     exit = slideOutVertically(tween(Motion.durationSlide)) { it },
                     modifier = Modifier.align(Alignment.BottomCenter)

@@ -14,10 +14,10 @@ private const val PROBE_INTERVAL_MS = 15_000L
 
 @Composable
 actual fun rememberBatteryState(): State<BatteryState> {
-    val state = remember { mutableStateOf(BatteryState()) }
+    val state = remember { mutableStateOf(BatteryState(present = false)) }
     LaunchedEffect(Unit) {
         while (true) {
-            withContext(Dispatchers.IO) { readBattery() }?.let { state.value = it }
+            state.value = withContext(Dispatchers.IO) { readBattery() } ?: BatteryState(present = false)
             delay(PROBE_INTERVAL_MS)
         }
     }

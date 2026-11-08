@@ -334,8 +334,10 @@ fun ALauncherTheme(
     val themeState by viewModel.themeState.collectAsState()
     val customFonts by viewModel.customFonts.collectAsState()
     val palette = rememberArgosyPalette(themeState)
-    val typography = remember(customFonts, themeState.displayFontScale, themeState.bodyFontScale) {
+    val tv = com.nendo.argosy.ui.util.isTvLayout
+    val typography = remember(customFonts, themeState.displayFontScale, themeState.bodyFontScale, tv) {
         argosyTypography(customFonts, themeState.displayFontScale, themeState.bodyFontScale)
+            .let { if (tv) it.withTvTextFloor() else it }
     }
 
     ProvideArgosyThemeLocals(
@@ -344,7 +346,7 @@ fun ALauncherTheme(
         isSecondaryDisplay = isSecondaryDisplay
     ) {
         MaterialTheme(
-            colorScheme = argosyColorScheme(palette),
+            colorScheme = argosyColorScheme(palette).let { if (tv) it.withTvSecondaryContrast() else it },
             typography = typography,
             content = content
         )

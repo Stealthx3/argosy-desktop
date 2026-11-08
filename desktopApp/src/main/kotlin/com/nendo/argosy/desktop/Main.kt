@@ -2,6 +2,7 @@ package com.nendo.argosy.desktop
 
 import com.nendo.argosy.ui.util.LocalHoverHighlight
 import com.nendo.argosy.ui.util.LocalPointerInWindow
+import com.nendo.argosy.ui.util.LocalDisplayProfile
 import java.awt.AWTEvent
 import javax.swing.SwingUtilities
 import java.awt.event.AWTEventListener
@@ -172,6 +173,7 @@ fun main(args: Array<String>) {
                             ALauncherTheme {
                                 CompositionLocalProvider(
                                     LocalPointerInWindow provides pointerInWindow,
+                                    LocalDisplayProfile provides profile,
                                     LocalHoverHighlight provides
                                         if (profile == DisplayProfile.DESKTOP) rememberHoverHighlight() else null,
                                 ) {

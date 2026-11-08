@@ -117,7 +117,7 @@ object Dimens {
     val timelineDotSelected: Dp @Composable get() = DimensionTokens.Layout.timelineDotSelected.dp * scale
     val timelineCoverHeight: Dp @Composable get() = DimensionTokens.Layout.timelineCoverHeight.dp * scale
 
-    val borderThin = DimensionTokens.Border.thin.dp
+    val borderThin: Dp @Composable get() = com.nendo.argosy.ui.util.tvLineWidth(DimensionTokens.Border.thin.dp)
     val borderMedium = DimensionTokens.Border.medium.dp
     val borderThick = DimensionTokens.Border.thick.dp
 

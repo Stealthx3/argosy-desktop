@@ -363,6 +363,7 @@ private fun HighlightableText(
     val currentHighlights by androidx.compose.runtime.rememberUpdatedState(highlights)
     val currentPageStart by androidx.compose.runtime.rememberUpdatedState(pageStart)
     val cornerPx = with(androidx.compose.ui.platform.LocalDensity.current) { Dimens.radiusSm.toPx() }
+    val hairline = Dimens.borderThin
     Text(
         text = text,
         style = style,
@@ -395,7 +396,7 @@ private fun HighlightableText(
                         topLeft = Offset(left, top),
                         size = androidx.compose.ui.geometry.Size(size.width - left, bottom - top),
                         cornerRadius = androidx.compose.ui.geometry.CornerRadius(cornerPx),
-                        style = androidx.compose.ui.graphics.drawscope.Stroke(width = Dimens.borderThin.toPx())
+                        style = androidx.compose.ui.graphics.drawscope.Stroke(width = hairline.toPx())
                     )
                     if (range.first >= pageStart) drawBookmark(color, gutterPx, top)
                 }

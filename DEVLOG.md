@@ -1659,3 +1659,16 @@ The owner's tests are the step 5 side-by-side checklist and the alpha 5.4 Game M
 **Action:** `Main.kt` opens the window undecorated under gamescope (`undecorated = gamescope`), and paints the window, content pane and root pane black, so any gap left is black. A first idea, pinning `sun.java2d.uiScale=1`, was dropped: the strip does not depend on the scale.
 **Verified:** local signed bundle 3549db4c in the VM under gamescope at 720p, 1080p and 4K: no #EEEEEE pixels, even margins on all four sides (`build/vmlab/fedora-kde/edgefix/`). Not published (owner: no rebuild of the public repo yet). Not checked on the owner's Deck and TV.
 **Also this session:** a TV-profile audit at 480, 720p, 1080p and 4K (`build/vmlab/fedora-kde/tv*/`), and mock-ups of TV tweaks for owner approval. Owner answers so far: hint glyphs per controller, minimum text size and contrast, quieter NEW badges and 2 px lines approved; Home's LB/RB card navigator moves to the top row with controller glyphs and the hint bar stops auto-hiding; sidebar at most a quarter of the screen with a left scroll indicator; focus as an accent edge glow behind the item; content-above-the-bar to be previewed in the VM; 480 deferred until 720p, 1080p and 4K are done.
+
+### 2026-11-07 — Step 4: TV-layout tweaks built for owner preview (uncommitted)
+
+**Owner request:** apply the approved TV tweaks and preview them in the VM before committing.
+**Action:** TV profile only, via `LocalDisplayProfile`/`isTvLayout` (provided by `Main.kt`): nav ring moved into each screen's top row (`TopRowNavRingSlot`, Home, Library and Settings headers) with bumper glyphs, bottom bar off and the hint bar no longer yielding; per-controller face and shoulder glyphs (`ControllerGlyphs.kt`, family from the SDL GUID vendor: Sony, Nintendo, Valve, else Xbox); sidebar capped at 25% width, tighter rows, `SpindleScrollIndicator`; desktop battery hidden when there is none (`BatteryState.present`, all profiles); 14 sp text floor and lighter `onSurfaceVariant`; `tvFocusGlow` behind focused rows in place of the ring; NEW badge as a dot except on the focused card; `Dimens.borderThin` and Library/drawer dividers at least 2 dp. Tokens: `components.tvLayout`, `color.domain.controllerGlyph`.
+**Verified:** full gate green; preview bundle in the Fedora KDE VM under gamescope at 720p, 1080p and 4K. Faults seen: hint bar over the open sidebar; Home's platform selector squeezed. Not committed, pending the owner's review. Under Steam Input every pad reports Valve's vendor id, so Game Mode will show Steam-style glyphs; settings override is a queued owner request.
+**Paused** for usage pacing (5-hour window at 46%).
+
+### 2026-11-07 — Step 4: TV-layout tweaks committed
+
+**Owner:** "Yes, fix and commit" after the previews.
+**Action:** the hint bar now hides while the sidebar is open on TV (`ArgosyApp.kt`, both footer gates), so the sidebar's clock row shows. Home's header gives the platform selector the remaining width with spacers around the switcher.
+**Verified:** gate green apart from one `PushInstallCoordinatorTest` failure that passed on two `--rerun` runs (flake, unrelated). VM at 1080p under gamescope: sidebar fixed. Not fixed: Home's platform selector is still narrow; `SectionBreadcrumb` seems to cap its own width. Next unit.

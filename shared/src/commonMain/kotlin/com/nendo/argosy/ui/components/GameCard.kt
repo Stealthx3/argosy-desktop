@@ -107,6 +107,8 @@ import com.nendo.argosy.ui.theme.LocalLauncherTheme
 import com.nendo.argosy.ui.theme.Motion
 import com.nendo.argosy.ui.theme.generated.ComponentDefaults
 import com.nendo.argosy.ui.util.rememberHoverFocus
+import com.nendo.argosy.ui.util.isTvLayout
+import com.nendo.argosy.ui.theme.generated.ColorTokens
 
 @Composable
 fun GameCard(
@@ -620,6 +622,7 @@ fun GameCardWithNewBadge(
     val hoverScale = if (hover.isHovered && !isFocused) minOf(focusScale, ComponentDefaults.Focus.scaleFocused) else focusScale
     val isFocused = isFocused || hover.isHovered
     val showNewBadge = game.isNew && !downloadIndicator.isActive
+    val newAsDot = showNewBadge && isTvLayout && !isFocused
     val badgeWidthDp = ComponentDefaults.Carousel.newBadgeWidthDp.dp
     val badgeHeightDp = ComponentDefaults.Carousel.newBadgeHeightDp.dp
 
@@ -654,7 +657,13 @@ fun GameCardWithNewBadge(
                 alphaOverride = 1f,
                 modifier = Modifier
             )
-            if (showNewBadge) {
+            if (newAsDot) {
+                Box(
+                    modifier = Modifier
+                        .size(ComponentDefaults.TvLayout.newDotDp.dp)
+                        .background(ColorTokens.Domain.difficulty, CircleShape)
+                )
+            } else if (showNewBadge) {
                 NewBadge(
                     width = badgeWidthDp,
                     height = badgeHeightDp,
@@ -692,10 +701,18 @@ fun GameCardWithNewBadge(
 
         layout(cardPlaceable.width, layoutHeight) {
             cardPlaceable.placeRelative(0, topOverflow)
-            badgePlaceable?.placeRelative(
-                x = cardPlaceable.width - badgePlaceable.width,
-                y = topOverflow - (badgePlaceable.height / 2)
-            )
+            if (newAsDot) {
+                val inset = badgePlaceable?.height ?: 0
+                badgePlaceable?.placeRelative(
+                    x = cardPlaceable.width - badgePlaceable.width - inset,
+                    y = topOverflow + inset
+                )
+            } else {
+                badgePlaceable?.placeRelative(
+                    x = cardPlaceable.width - badgePlaceable.width,
+                    y = topOverflow - (badgePlaceable.height / 2)
+                )
+            }
         }
     }
 }

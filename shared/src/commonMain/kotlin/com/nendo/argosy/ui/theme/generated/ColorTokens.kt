@@ -68,6 +68,19 @@ object ColorTokens {
         }
         val ratingStar = Color(0xFFFFD700)
         val difficulty = Color(0xFFE53935)
+        object ControllerGlyph {
+            val xboxA = Color(0xFF107C10)
+            val xboxB = Color(0xFFD13438)
+            val xboxX = Color(0xFF0063B1)
+            val xboxY = Color(0xFFD9A400)
+            val psCross = Color(0xFF5A8FD8)
+            val psCircle = Color(0xFFE0525A)
+            val psSquare = Color(0xFFD36BA6)
+            val psTriangle = Color(0xFF3CB59A)
+            val neutral = Color(0xFF3A3D44)
+            val onGlyph = Color(0xFFFFFFFF)
+            val onLight = Color(0xFF111111)
+        }
         val trophyAmber = Color(0xFFFFB300)
         val favoriteStar = Color(0xFFFFC107)
         object AchievementTier {
