@@ -25,12 +25,14 @@ Plan (`DEVLOG.md`, Phase 5 plan): 1 wizard wording, 2 Close Argosy, 3 thumbnails
 - Emulators manager (desktop Settings > Managed Installers): every compatible emulator by platform, per-emulator submenu (status, package, EmuDeck, logs, data folder, Assign BIOS, install/uninstall).
 - GitHub AppImage installs fixed (`java.net.http` was missing from the jlink runtime; broken in every build including Beta 1).
 - Game Mode emulator launches: environment forwarding to `flatpak-spawn --host` plus `GameModeWindowTagger` (`STEAM_GAME` on emulator windows). Proven in nested Game Mode on the host with the Dolphin Flatpak: emulator in front, back to Argosy on close.
+- Desktop UI sounds (were a no-op): Ogg/WAV through `libvorbisfile` + `libpulse-simple`. Game Mode audio proven with Dolphin (video and audio) once Steam Game Recording is off; with it on, the nested setup stalls all PipeWire audio (DEVLOG, "desktop UI sounds").
 
 ## Step 4: open
 
 - Owner's Deck checks in real Game Mode (launch GameCube/Switch/PS and GBA games, exit from the Steam overlay, Steam keyboard), now on a build with the tagger.
 - Not verified: `HostGameProcess.stopAll` ending a Flatpak emulator on Argosy exit; EmuDeck detection on the owner's host; Assign BIOS with real RomM firmware; the folder picker's Back row on screen.
-- Snap emulators: tagged and focused but rendered black and cannot be signalled from outside snap confinement. Dolphin is silent on the owner's host even outside Argosy (its Cubeb backend opens no PipeWire stream): Dolphin configuration, not Argosy.
+- Snap emulators: tagged and focused but rendered black and cannot be signalled from outside snap confinement.
+- Check on the Deck whether Steam Game Recording stalls audio in real Game Mode (it does in nested gamescope on the owner's host; owner set recording Off in that Steam during the test).
 - Test Steam shortcut "Argosy Desktop (test)" stays in the owner's Steam library (backup of the original `shortcuts.vdf`: `build/gamemode/shortcuts.vdf.bak-20261108`; edit only with Steam closed).
 - Step 4 closes with `--step-close 5.4` (republish) after the Deck checks.
 
