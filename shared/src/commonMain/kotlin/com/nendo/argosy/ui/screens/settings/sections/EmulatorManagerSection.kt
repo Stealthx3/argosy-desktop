@@ -166,7 +166,6 @@ fun EmulatorManagerSection(uiState: SettingsUiState, viewModel: SettingsViewMode
         focusToListIndex = { index -> focusable.getOrNull(index)?.let { items.indexOf(it) } ?: 0 },
         itemKey = { it.key },
         isNavItem = { false },
-        isHeader = { it is EmulatorManagerItem.Platform },
         onSectionTap = {},
         modifier = Modifier.fillMaxSize().padding(Dimens.spacingMd),
         verticalArrangement = Arrangement.spacedBy(Dimens.spacingSm)
@@ -201,8 +200,9 @@ fun EmulatorManagerDetailSection(uiState: SettingsUiState, viewModel: SettingsVi
     val focusable = items.filter { it.isFocusable }
     val focusedItem = focusable.getOrNull(uiState.focusedIndex)
 
-    LaunchedEffect(installerBusy) {
+    LaunchedEffect(installerBusy, installers.failedId) {
         if (!installerBusy) viewModel.refreshEmulatorManager()
+        if (installers.failedId != null) viewModel.emulatorAppImageInstallFailed()
     }
 
     LaunchedEffect(focusable.size) {
@@ -226,6 +226,7 @@ fun EmulatorManagerDetailSection(uiState: SettingsUiState, viewModel: SettingsVi
                     installerBusy && installers.statusRes == R.string.settings_installers_status_downloading ->
                         stringResource(installers.statusRes, (installers.busyProgress * 100).toInt())
                     installerBusy && installers.statusRes != null -> stringResource(installers.statusRes)
+                    installers.failedId != null && installers.failedRes != null -> stringResource(installers.failedRes)
                     state.messageRes != null -> stringResource(state.messageRes)
                     else -> ""
                 }

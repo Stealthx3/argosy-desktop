@@ -62,6 +62,7 @@ compose.desktop {
                 "java.instrument",
                 "java.management",
                 "java.naming",
+                "java.net.http",
                 "java.sql",
                 "jdk.accessibility",
                 "jdk.charsets",

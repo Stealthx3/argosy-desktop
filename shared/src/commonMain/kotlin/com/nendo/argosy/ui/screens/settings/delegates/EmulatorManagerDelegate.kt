@@ -1,5 +1,8 @@
 package com.nendo.argosy.ui.screens.settings.delegates
 
+import com.nendo.argosy.core.notification.NotificationManager
+import com.nendo.argosy.core.notification.NotificationText
+import com.nendo.argosy.core.notification.NotificationType
 import com.nendo.argosy.data.emulator.EmulatorCatalog
 import com.nendo.argosy.data.installer.ManagedInstallerRepository
 import com.nendo.argosy.data.model.CatalogPackage
@@ -21,6 +24,9 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -29,8 +35,11 @@ import javax.inject.Inject
 class EmulatorManagerDelegate @Inject constructor(
     private val catalog: EmulatorCatalog,
     private val biosRepository: BiosRepository,
-    private val installerRepository: ManagedInstallerRepository
+    private val installerRepository: ManagedInstallerRepository,
+    private val notificationManager: NotificationManager
 ) {
+    private var announcing = false
+
     private val _state = MutableStateFlow(EmulatorManagerState(isSupported = catalog.isSupported))
     val state: StateFlow<EmulatorManagerState> = _state.asStateFlow()
 
@@ -42,10 +51,47 @@ class EmulatorManagerDelegate @Inject constructor(
 
     fun load(scope: CoroutineScope) {
         if (!catalog.isSupported) return
+        if (!announcing) {
+            announcing = true
+            scope.launch {
+                _state.map { it.messageRes }.distinctUntilChanged().filterNotNull().collect { announce(it) }
+            }
+        }
         _state.update { it.copy(loading = it.emulators.isEmpty()) }
         scope.launch {
             val entries = catalog.entries()
-            _state.update { it.copy(loading = false, emulators = entries) }
+            _state.update { current ->
+                val pending = current.messageRes == R.string.settings_emulator_manager_message_installing && !current.busy
+                val installed = entries.firstOrNull { it.id == current.selectedId }?.installed != null
+                current.copy(
+                    loading = false,
+                    emulators = entries,
+                    messageRes = if (pending && installed) R.string.settings_emulator_manager_message_installed else current.messageRes
+                )
+            }
+        }
+    }
+
+    private fun announce(messageRes: Int) {
+        val type = when (messageRes) {
+            R.string.settings_emulator_manager_message_installing,
+            R.string.settings_emulator_manager_message_uninstalling -> NotificationType.INFO
+            R.string.settings_emulator_manager_message_installed,
+            R.string.settings_emulator_manager_message_uninstalled,
+            R.string.settings_emulator_manager_message_bios_copied -> NotificationType.SUCCESS
+            else -> NotificationType.WARNING
+        }
+        val title = _state.value.selected?.displayName
+        notificationManager.show(
+            title = if (title != null) NotificationText.Raw(title) else NotificationText.Res(messageRes),
+            subtitle = if (title != null) NotificationText.Res(messageRes) else null,
+            type = type
+        )
+    }
+
+    fun appImageInstallFailed() {
+        if (_state.value.messageRes == R.string.settings_emulator_manager_message_installing && !_state.value.busy) {
+            _state.update { it.copy(messageRes = R.string.settings_emulator_manager_message_install_failed) }
         }
     }
 
@@ -96,6 +142,7 @@ class EmulatorManagerDelegate @Inject constructor(
                 }
             }
             PICKER_TOKEN_APPIMAGE -> scope.launch {
+                installerRepository.ensureSeeded()
                 val repo = selected.appImageRepo
                 val row = repo?.let { r ->
                     installerRepository.getAll().firstOrNull { "${it.repoOwner}/${it.repoName}".equals(r, ignoreCase = true) }

@@ -1633,6 +1633,7 @@ class SettingsViewModel @Inject constructor(
     val pickEmulatorBiosFile: SharedFlow<String> get() = emulatorManagerDelegate.pickBiosFile
     fun openEmulatorManager() = emulatorManagerDelegate.load(viewModelScope)
     fun refreshEmulatorManager() = emulatorManagerDelegate.load(viewModelScope)
+    fun emulatorAppImageInstallFailed() = emulatorManagerDelegate.appImageInstallFailed()
     fun openEmulatorDetail(id: String) {
         emulatorManagerDelegate.select(id)
         navigateToSection(SettingsSection.EMULATOR_MANAGER_DETAIL)

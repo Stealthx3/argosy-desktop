@@ -1,5 +1,6 @@
 package com.nendo.argosy.data.installer
 
+import com.nendo.argosy.util.Logger
 import com.nendo.argosy.data.local.entity.ManagedInstallerEntity
 import com.nendo.argosy.data.emulator.EmulatorDetector
 import com.nendo.argosy.data.emulator.EmulatorRegistry
@@ -142,7 +143,10 @@ actual class ManagedInstallerManager @Inject constructor(
         val file = File(dir, asset.name)
         val client = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NORMAL).build()
         val response = client.send(HttpRequest.newBuilder(URI(asset.downloadUrl)).GET().build(), HttpResponse.BodyHandlers.ofInputStream())
-        if (response.statusCode() != 200) return null
+        if (response.statusCode() != 200) {
+            Logger.warn(TAG, "Download of ${asset.name} answered ${response.statusCode()}")
+            return null
+        }
         val total = asset.size.coerceAtLeast(1)
         var read = 0L
         response.body().use { input ->
@@ -158,7 +162,7 @@ actual class ManagedInstallerManager @Inject constructor(
             }
         }
         file
-    }.getOrNull()
+    }.onFailure { Logger.error(TAG, "Download of ${asset.name} failed", it) }.getOrNull()
 
     private fun installedFlatpakRows(): List<ManagedInstallerEntity> =
         LinuxEmulators.all.mapNotNull { entry ->
@@ -188,6 +192,7 @@ actual class ManagedInstallerManager @Inject constructor(
         this is InstallerJobState.Idle || this is InstallerJobState.Failed
 
     private companion object {
+        const val TAG = "ManagedInstallerManager"
         const val BUFFER_SIZE = 64 * 1024
         const val FLATHUB_SORT_BASE = 100
     }
