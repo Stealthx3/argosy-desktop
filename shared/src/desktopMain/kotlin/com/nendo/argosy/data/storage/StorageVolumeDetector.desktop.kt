@@ -6,6 +6,7 @@ import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 
+private const val HOME_LABEL = "Home"
 private val REMOVABLE_MOUNT_ROOTS = listOf("/run/media/", "/media/", "/mnt/")
 
 /**
@@ -16,7 +17,7 @@ private val REMOVABLE_MOUNT_ROOTS = listOf("/run/media/", "/media/", "/mnt/")
 actual class StorageVolumeDetector @Inject constructor() {
     actual fun detectStorageVolumes(): List<AppStorageVolume> {
         val internalPath = System.getProperty("user.home")
-        val volumes = mutableListOf(createVolume(internalPath, "internal", "Internal", StorageVolumeType.INTERNAL))
+        val volumes = mutableListOf(createVolume(internalPath, "internal", HOME_LABEL, StorageVolumeType.INTERNAL))
         val addedPaths = mutableSetOf(internalPath)
         for (path in mountedVolumePaths()) {
             if (!addedPaths.add(path)) continue
@@ -35,7 +36,7 @@ actual class StorageVolumeDetector @Inject constructor() {
                 val parts = line.split(" ")
                 if (parts.size >= 2 && parts[0].startsWith("/dev/")) decodeMountPath(parts[1]) else null
             }
-            .filter { path -> REMOVABLE_MOUNT_ROOTS.any { path.startsWith(it) } }
+            .filter { path -> REMOVABLE_MOUNT_ROOTS.any { path.startsWith(it) && path.length > it.length } }
             .filter { File(it).canRead() }
             .distinct()
     } catch (_: Exception) {

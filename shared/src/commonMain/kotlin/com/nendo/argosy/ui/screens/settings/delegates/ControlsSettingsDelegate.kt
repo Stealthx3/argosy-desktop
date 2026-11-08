@@ -152,7 +152,11 @@ class ControlsSettingsDelegate @Inject constructor(
     }
 
     companion object {
-        val LAYOUT_OPTIONS = listOf("auto", "xbox", "nintendo")
+        val LAYOUT_OPTIONS = if (com.nendo.argosy.platform.PlatformFeatures.desktopWindow) {
+            listOf("auto", "xbox", "playstation", "nintendo", "steam")
+        } else {
+            listOf("auto", "xbox", "nintendo")
+        }
         val COMBO_OPTIONS = listOf("quick_menu", "quick_settings", "none")
 
         @StringRes
@@ -166,6 +170,8 @@ class ControlsSettingsDelegate @Inject constructor(
         fun layoutDisplayNameRes(value: String): Int = when (value) {
             "nintendo" -> R.string.settings_navigation_controller_layout_nintendo
             "xbox" -> R.string.settings_navigation_controller_layout_xbox
+            "playstation" -> R.string.settings_navigation_controller_layout_playstation
+            "steam" -> R.string.settings_navigation_controller_layout_steam
             else -> R.string.settings_navigation_controller_layout_auto
         }
     }

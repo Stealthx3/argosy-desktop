@@ -195,7 +195,7 @@ fun FooterHint(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        val tvKey = if (isTvLayout && !button.isComposite()) button.physicalKeyCode() else null
+        val tvKey = if (showsControllerGlyphs && !button.isComposite()) button.physicalKeyCode() else null
         if (button.isComposite()) {
             CompositeButtonIcon(button, iconColor)
         } else if (tvKey != null && ControllerButtonGlyph(tvKey, Dimens.iconSm + Dimens.borderMedium, footerTextStyle.fontSize * TV_GLYPH_TEXT_RATIO)) {
@@ -223,7 +223,7 @@ fun FooterHint(
 
 @Composable
 private fun CompositeButtonIcon(button: InputButton, iconColor: Color) {
-    if (isTvLayout) {
+    if (showsControllerGlyphs) {
         val keys = if (button == InputButton.LB_RB) {
             KeyEvent.KEYCODE_BUTTON_L1 to KeyEvent.KEYCODE_BUTTON_R1
         } else {

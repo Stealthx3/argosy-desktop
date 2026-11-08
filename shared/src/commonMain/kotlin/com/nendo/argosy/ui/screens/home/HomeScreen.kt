@@ -1874,9 +1874,9 @@ private fun HomeHeader(
         )
 
         if (tv) {
-            Spacer(modifier = Modifier.width(Dimens.spacingLg))
+            Spacer(modifier = Modifier.width(Dimens.spacingSm))
             com.nendo.argosy.ui.components.TopRowNavRingSlot()
-            Spacer(modifier = Modifier.width(Dimens.spacingLg))
+            Spacer(modifier = Modifier.width(Dimens.spacingSm))
         }
         if (statusVisible) SystemStatusBar()
     }

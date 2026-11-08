@@ -1672,3 +1672,9 @@ The owner's tests are the step 5 side-by-side checklist and the alpha 5.4 Game M
 **Owner:** "Yes, fix and commit" after the previews.
 **Action:** the hint bar now hides while the sidebar is open on TV (`ArgosyApp.kt`, both footer gates), so the sidebar's clock row shows. Home's header gives the platform selector the remaining width with spacers around the switcher.
 **Verified:** gate green apart from one `PushInstallCoordinatorTest` failure that passed on two `--rerun` runs (flake, unrelated). VM at 1080p under gamescope: sidebar fixed. Not fixed: Home's platform selector is still narrow; `SectionBreadcrumb` seems to cap its own width. Next unit.
+
+### 2026-11-08 — Step 4: setup folder picker, controller layout choices, Home top row
+
+**Owner requests:** volumes sidebar and a Back button in setup's folder step; all controller hint types selectable in Settings > Navigation with detection checked; proceed past the usage limit.
+**Action:** the Flatpak grants `/run/media`, `/media` and `/mnt` (both manifests), so mounted drives are visible; the detector labels the home folder "Home" and skips the mount roots themselves. The folder browser has a Back button bottom-left (B does the same). Controller Layout gains PlayStation and Steam on desktop (`LAYOUT_OPTIONS`); `ButtonGlyphRemap.layout` carries the choice, and `controllerFamily` uses it before the SDL GUID vendor (Sony 054c, Nintendo 057e, Valve 28de, else Xbox). The family glyphs now show on every desktop profile, not only TV (`showsControllerGlyphs`: a display profile is set). Home's switcher is compact on TV (no touch-size padding).
+**Verified:** gate green (desktop and Android). VM at 1080p under gamescope: the picker opens from Image Cache with "Home" in the sidebar and Back returning to Image Cache; Controller Layout shows the five choices; Home shows four platform names. Not checked: a real second drive; a real PlayStation or Nintendo pad.

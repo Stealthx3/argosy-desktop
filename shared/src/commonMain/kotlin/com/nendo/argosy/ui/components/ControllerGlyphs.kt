@@ -38,11 +38,22 @@ fun controllerFamily(guid: String?, nintendoLayout: Boolean): ControllerFamily {
     }
 }
 
+fun controllerFamily(layout: String, guid: String?, nintendoLayout: Boolean): ControllerFamily = when (layout) {
+    LAYOUT_XBOX -> ControllerFamily.XBOX
+    LAYOUT_PLAYSTATION -> ControllerFamily.PLAYSTATION
+    LAYOUT_NINTENDO -> ControllerFamily.NINTENDO
+    LAYOUT_STEAM -> ControllerFamily.STEAM
+    else -> controllerFamily(guid, nintendoLayout)
+}
+
 @Composable
 fun currentControllerFamily(): ControllerFamily {
     val remap = LocalButtonGlyphRemap.current
-    return controllerFamily(remap.controller, remap.nintendo)
+    return controllerFamily(remap.layout, remap.controller, remap.nintendo)
 }
+
+val showsControllerGlyphs: Boolean
+    @Composable get() = com.nendo.argosy.ui.util.LocalDisplayProfile.current != null
 
 /**
  * Draws the connected controller's own mark for the physical [keyCode]: a coloured letter or
@@ -169,6 +180,10 @@ private fun PlayStationShape(shape: PsShape, color: Color, size: Dp) {
     }
 }
 
+private const val LAYOUT_XBOX = "xbox"
+private const val LAYOUT_PLAYSTATION = "playstation"
+private const val LAYOUT_NINTENDO = "nintendo"
+private const val LAYOUT_STEAM = "steam"
 private const val VENDOR_START = 8
 private const val VENDOR_END = 12
 private const val SONY_VENDOR_LE = "4c05"
@@ -186,7 +201,7 @@ private val NINTENDO_SHOULDERS = listOf("L", "R", "ZL", "ZR")
 
 @Composable
 fun ShoulderGlyph(keyCode: Int, painter: androidx.compose.ui.graphics.painter.Painter, tint: Color, size: Dp, contentDescription: String?) {
-    if (com.nendo.argosy.ui.util.isTvLayout &&
+    if (showsControllerGlyphs &&
         ControllerButtonGlyph(keyCode, size, androidx.compose.material3.MaterialTheme.typography.labelSmall.fontSize)
     ) {
         return

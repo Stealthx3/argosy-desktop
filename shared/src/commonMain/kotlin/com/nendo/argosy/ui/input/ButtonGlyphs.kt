@@ -36,7 +36,8 @@ fun UserPreferences.buttonGlyphSwaps(detected: DetectedLayout?): ButtonGlyphSwap
 data class ButtonGlyphRemap(
     val controller: String? = null,
     val maps: NavigationButtonMaps = NavigationButtonMaps(),
-    val nintendo: Boolean = false
+    val nintendo: Boolean = false,
+    val layout: String = "auto"
 ) {
     fun physicalFor(keyCode: Int): Int = controller?.let { maps.physicalFor(it, keyCode) } ?: keyCode
 }
@@ -45,7 +46,8 @@ fun UserPreferences.buttonGlyphRemap(detected: DetectedLayout?, controller: Stri
     ButtonGlyphRemap(
         controller = controller,
         maps = navigationButtonMaps,
-        nintendo = ControllerDetector.isNintendoLayout(controllerLayout, detected)
+        nintendo = ControllerDetector.isNintendoLayout(controllerLayout, detected),
+        layout = controllerLayout
     )
 
 val LocalButtonGlyphRemap = staticCompositionLocalOf { ButtonGlyphRemap() }

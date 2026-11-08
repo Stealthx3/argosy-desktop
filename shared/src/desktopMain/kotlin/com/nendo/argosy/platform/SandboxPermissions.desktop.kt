@@ -39,6 +39,8 @@ actual class SandboxPermissions @Inject constructor() {
  * force for this run: the manifest merged with user and system overrides.
  */
 object FlatpakInfo {
+    val REMOVABLE_MEDIA_FOLDERS = listOf("/run/media", "/media", "/mnt")
+
     val EMULATOR_FOLDERS = listOf(
         "~/Emulation",
         "~/.var/app/org.libretro.RetroArch",

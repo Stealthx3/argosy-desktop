@@ -159,8 +159,13 @@ private fun NavBarDestination(
             )
             .clip(CircleShape)
             .clickableNoFocus(onClick = onClick)
-            .sizeIn(minWidth = minimumTouchTarget, minHeight = minimumTouchTarget)
-            .padding(Dimens.spacingSm),
+            .then(
+                if (com.nendo.argosy.ui.util.isTvLayout) {
+                    Modifier.padding(Dimens.spacingXs)
+                } else {
+                    Modifier.sizeIn(minWidth = minimumTouchTarget, minHeight = minimumTouchTarget).padding(Dimens.spacingSm)
+                }
+            ),
         contentAlignment = Alignment.Center
     ) {
         Icon(

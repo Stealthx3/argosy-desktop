@@ -22,7 +22,7 @@ fun InputGlyph(
     size: Dp = Dimens.iconSm,
     tint: Color? = null,
 ) {
-    val tvKey = if (isTvLayout) button.physicalKeyCode() else null
+    val tvKey = if (com.nendo.argosy.ui.components.showsControllerGlyphs) button.physicalKeyCode() else null
     if (tvKey != null && ControllerButtonGlyph(tvKey, size, MaterialTheme.typography.labelSmall.fontSize, modifier)) return
     val painter = button.toPainter() ?: return
     val effectiveTint = tint ?: LocalArgosyTheme.current.textDim

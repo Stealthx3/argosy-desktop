@@ -86,6 +86,7 @@ import com.nendo.argosy.ui.input.InputResult
 import com.nendo.argosy.ui.input.LocalInputDispatcher
 import com.nendo.argosy.ui.input.ModalInputEffect
 import com.nendo.argosy.ui.primitives.ModalActionButton
+import com.nendo.argosy.ui.primitives.ActionButton
 import androidx.compose.ui.graphics.lerp
 import com.nendo.argosy.ui.theme.Dimens
 import com.nendo.argosy.ui.theme.LocalArgosyTheme
@@ -197,6 +198,19 @@ fun FileBrowserScreen(
                             modifier = Modifier.weight(1f)
                         )
                     }
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = Dimens.spacingMd, vertical = Dimens.spacingSm),
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    ActionButton(
+                        label = stringResource(R.string.ui_file_browser_back),
+                        onClick = onDismiss,
+                        glyph = InputButton.B
+                    )
                 }
 
                 FileBrowserFooter(

@@ -74,7 +74,8 @@ class FlatpakInfoTest {
             .filter { it.startsWith("- --filesystem=") }
             .map { it.removePrefix("- --filesystem=") }
             .filterNot { it.startsWith("~/Games/Argosy") }
-        assertEquals(manifest, FlatpakInfo.EMULATOR_FOLDERS)
+        assertEquals(manifest - FlatpakInfo.REMOVABLE_MEDIA_FOLDERS.toSet(), FlatpakInfo.EMULATOR_FOLDERS)
+        assertTrue(manifest.containsAll(FlatpakInfo.REMOVABLE_MEDIA_FOLDERS))
     }
 
     @Test

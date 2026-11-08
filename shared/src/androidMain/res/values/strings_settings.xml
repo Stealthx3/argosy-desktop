@@ -431,6 +431,8 @@
     <string name="settings_navigation_controller_layout_auto">Auto</string>
     <!-- Value of that row. Brand name of a console maker, never translated. -->
     <string name="settings_navigation_controller_layout_xbox" translatable="false">Xbox</string>
+    <string name="settings_navigation_controller_layout_playstation" translatable="false">PlayStation</string>
+    <string name="settings_navigation_controller_layout_steam" translatable="false">Steam</string>
     <!-- Value of that row. Brand name of a console maker, never translated. -->
     <string name="settings_navigation_controller_layout_nintendo" translatable="false">Nintendo</string>
     <!-- Second line of that row when a pad was recognised and named. %1$s is the layout that was

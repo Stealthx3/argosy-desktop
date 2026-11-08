@@ -140,7 +140,7 @@ fun SectionBreadcrumb(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.End
             ) {
-                if (!(isTvLayout && ControllerButtonGlyph(AndroidKeyCodes.KEYCODE_BUTTON_L2, triggerPaintedHeight, MaterialTheme.typography.labelSmall.fontSize))) {
+                if (!(showsControllerGlyphs && ControllerButtonGlyph(AndroidKeyCodes.KEYCODE_BUTTON_L2, triggerPaintedHeight, MaterialTheme.typography.labelSmall.fontSize))) {
                     Icon(
                         painter = InputIcons.TriggerLeft,
                         contentDescription = null,
@@ -290,7 +290,7 @@ fun SectionBreadcrumb(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start
             ) {
-                if (!(isTvLayout && ControllerButtonGlyph(AndroidKeyCodes.KEYCODE_BUTTON_R2, triggerPaintedHeight, MaterialTheme.typography.labelSmall.fontSize))) {
+                if (!(showsControllerGlyphs && ControllerButtonGlyph(AndroidKeyCodes.KEYCODE_BUTTON_R2, triggerPaintedHeight, MaterialTheme.typography.labelSmall.fontSize))) {
                     Icon(
                         painter = InputIcons.TriggerRight,
                         contentDescription = null,

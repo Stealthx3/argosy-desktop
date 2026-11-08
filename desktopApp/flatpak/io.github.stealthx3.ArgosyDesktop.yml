@@ -14,6 +14,9 @@ finish-args:
   - --device=all
   - --socket=pulseaudio
   - --filesystem=~/Games/Argosy:create
+  - --filesystem=/run/media
+  - --filesystem=/media
+  - --filesystem=/mnt
   - --talk-name=org.freedesktop.Flatpak
   # Emulator save and state folders save sync reads and writes in place (HostSavePaths,
   # RetroArchHostLayout): EmuDeck links, each mapped emulator's Flatpak tree, then native folders.
