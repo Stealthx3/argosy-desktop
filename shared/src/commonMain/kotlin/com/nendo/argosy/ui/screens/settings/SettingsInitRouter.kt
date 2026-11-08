@@ -83,6 +83,14 @@ internal fun routeObserveDelegateStates(vm: SettingsViewModel) {
         vm._uiState.update { it.copy(managedInstallers = installers) }
     }.launchIn(vm.viewModelScope)
 
+    vm.emulatorManagerDelegate.state.onEach { manager ->
+        vm._uiState.update { it.copy(emulatorManager = manager) }
+    }.launchIn(vm.viewModelScope)
+
+    vm.emulatorManagerDelegate.installAppImage.onEach { rowId ->
+        vm.installManagedInstaller(rowId)
+    }.launchIn(vm.viewModelScope)
+
     vm.soundsDelegate.state.onEach { sounds ->
         vm._uiState.update { it.copy(sounds = sounds) }
     }.launchIn(vm.viewModelScope)

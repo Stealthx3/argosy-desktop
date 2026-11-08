@@ -177,7 +177,7 @@ fun ManagedInstallersSection(uiState: SettingsUiState, viewModel: SettingsViewMo
 }
 
 @Composable
-private fun ManagedInstallerModals(state: ManagedInstallersState, viewModel: SettingsViewModel) {
+internal fun ManagedInstallerModals(state: ManagedInstallersState, viewModel: SettingsViewModel) {
     if (state.showAddModal) {
         TextEntryModal(
             title = stringResource(R.string.settings_installers_add_modal_title),

@@ -754,6 +754,10 @@ fun SettingsScreen(
                         SettingsSection.NAVIGATION -> NavigationSection(uiState, viewModel)
                         SettingsSection.BUTTON_MAPPING -> ButtonMappingSection(uiState, viewModel)
                         SettingsSection.MANAGED_INSTALLERS -> ManagedInstallersSection(uiState, viewModel)
+                        SettingsSection.EMULATOR_MANAGER ->
+                            com.nendo.argosy.ui.screens.settings.sections.EmulatorManagerSection(uiState, viewModel)
+                        SettingsSection.EMULATOR_MANAGER_DETAIL ->
+                            com.nendo.argosy.ui.screens.settings.sections.EmulatorManagerDetailSection(uiState, viewModel)
                         SettingsSection.BUILTIN_EMULATOR -> BuiltinEmulatorSection(uiState, viewModel)
                         SettingsSection.PLATFORMS -> EmulatorsSection(
                             uiState = uiState,
@@ -1381,6 +1385,22 @@ fun SettingsScreen(
         )
     }
 
+    var emulatorBiosBrowserName by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(Unit) {
+        viewModel.pickEmulatorBiosFile.collect { name -> emulatorBiosBrowserName = name }
+    }
+    emulatorBiosBrowserName?.let { name ->
+        FileBrowserScreen(
+            mode = FileBrowserMode.FILE_SELECTION,
+            title = stringResource(R.string.settings_emulator_manager_filebrowser_bios_title, name),
+            onPathSelected = { path ->
+                emulatorBiosBrowserName = null
+                viewModel.assignEmulatorBiosFile(path)
+            },
+            onDismiss = { emulatorBiosBrowserName = null }
+        )
+    }
+
     if (showCertBrowser) {
         FileBrowserScreen(
             mode = FileBrowserMode.FILE_SELECTION,
@@ -1613,6 +1633,9 @@ private fun settingsSectionTitle(uiState: SettingsUiState): String = when (uiSta
     SettingsSection.NAVIGATION -> stringResource(R.string.settings_shell_header_navigation)
     SettingsSection.BUTTON_MAPPING -> stringResource(R.string.settings_shell_header_button_mapping)
     SettingsSection.MANAGED_INSTALLERS -> stringResource(R.string.settings_shell_header_installers)
+    SettingsSection.EMULATOR_MANAGER -> stringResource(R.string.settings_shell_header_emulator_manager)
+    SettingsSection.EMULATOR_MANAGER_DETAIL -> uiState.emulatorManager.selected?.displayName
+        ?: stringResource(R.string.settings_shell_header_emulator_manager)
     SettingsSection.PLATFORMS -> stringResource(R.string.settings_shell_header_platforms)
     SettingsSection.BUILTIN_EMULATOR -> stringResource(R.string.settings_shell_header_builtin_emulator)
     SettingsSection.PLATFORM_DETAIL -> {

@@ -2,7 +2,19 @@
 
 Rewritten (not appended) at the end of every work unit, so a fresh session can start from it alone. History and reasoning live in `DEVLOG.md`. Earlier phases: `phase-0.md` … `phase-4.md` (closed summaries).
 
-**Updated:** 2026-11-08 (desktop-only emulators tested in the VM). Steps 1–3 done; step 4 in progress.
+**Updated:** 2026-11-08 (parked for an owner reboot; see "Restart point"). Steps 1–3 done; step 4 in progress.
+
+## Before the next push to origin (owner request, 2026-11-08)
+
+At the owner's request, the documents were pushed ahead of the phase close from a cloud session: `origin/main` now has commit `6ddef138e` ("Docs: new README, Phase 5 records and the interim post-mortem") on top of `1a1e1c4dc`. It holds this workspace's copies of `README.md` (rewritten for GitHub), `PORT_PLAN.md`, `DEVLOG.md`, `CLAUDE.md`, the handoffs, `gotchas.md`, `flathub-plan.md`, `docs/desktop/emulators/`, `docs/postmortem/` and `scripts/postmortem.mjs`; no code. Local `main` has diverged from it. Before the next push: (1) commit those files locally as they are now (including the untracked `docs/postmortem/` and `scripts/postmortem.mjs`, or the merge refuses to overwrite them); (2) `git fetch origin` and `git merge origin/main` (merge, not rebase: identical content on both sides merges cleanly, a rebase would conflict on every DEVLOG commit); (3) on any conflict keep the local version, which is newer. The README rule above (README = full `PORT_PLAN.md`) is waiting on an owner decision: the new README links to `PORT_PLAN.md` instead of copying it, so do not rebuild it at the phase close without asking.
+
+## Restart point (2026-11-08, owner reboot)
+
+- Committed today: TV parts on every desktop profile and Game Mode → TV profile (d06f5d222); Emulators manager (this unit's commit). VMs shut off; the nested Game Mode session and Steam closed; the host Argosy is a local build of the uncommitted tree.
+- **Uncommitted, gate-green, needs an on-screen check** (details in `DEVLOG.md`, "Emulators manager"): Game Mode emulator launch fix (`GameSessionEnvironment`, `HostShell`, `HostGameProcess`), Back button in the folder picker's hint row (`FileBrowserScreen.kt`), nav bar glow clip fix (`FloatingNavBar.kt`).
+- **Next actions, in order:** (1) once the owner says Dolphin is reinstalled: nested Game Mode on the host (`gamescope -W 1920 -H 1080 -e -- steam -gamepadui`, launch the "Argosy Desktop (test)" shortcut with `steam steam://rungameid/<id>` from `build/gamemode/`, screenshots only with `GAMESCOPE_WAYLAND_DISPLAY=gamescope-0 gamescopectl screenshot <file>`, never full-desktop captures), Play Bust-A-Move 3000 (downloaded) and check Dolphin opens inside gamescope; check the nav glow; then commit those three. (2) Emulators manager checks still open: install-source picker (DuckStation), AppImage install, Assign BIOS (RomM and file), EmuDeck detection on the host. (3) Remove the test Steam shortcut when Game Mode testing ends (backup `build/gamemode/shortcuts.vdf.bak-20261108`; Steam must be closed while editing).
+- The SteamOS/Bazzite VM lab is closed by owner decision (Game Mode testing on the host); its images and uncommitted `scripts/desktop/vmlab` changes stay.
+- Never run two bundle builds at once (they collide in `desktopApp/build` and package a stale build).
 
 ## Scope and exit criterion
 

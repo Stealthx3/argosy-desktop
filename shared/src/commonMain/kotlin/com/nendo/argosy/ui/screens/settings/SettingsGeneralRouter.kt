@@ -188,6 +188,7 @@ private fun routeApplySectionEntry(vm: SettingsViewModel, section: SettingsSecti
         SettingsSection.DISPLAYS -> routeRefreshLaunchTargets(vm)
         SettingsSection.LAUNCH_TARGETS -> routeEnterLaunchTargets(vm)
         SettingsSection.MANAGED_INSTALLERS -> vm.openManagedInstallers()
+        SettingsSection.EMULATOR_MANAGER -> vm.openEmulatorManager()
         SettingsSection.BUTTON_MAPPING -> vm.controlsDelegate.refreshButtonMappingController()
         else -> {}
     }

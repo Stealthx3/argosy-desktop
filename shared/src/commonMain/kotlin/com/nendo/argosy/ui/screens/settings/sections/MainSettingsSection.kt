@@ -379,7 +379,7 @@ fun MainSettingsSection(uiState: SettingsUiState, viewModel: SettingsViewModel) 
         when (item) {
             is MainSettingsItem.Header -> Unit
             MainSettingsItem.ManagedInstallers ->
-                viewModel.navigateToSection(SettingsSection.MANAGED_INSTALLERS)
+                viewModel.navigateToSection(com.nendo.argosy.ui.screens.settings.managedInstallersDestination())
             MainSettingsItem.DeviceSettings -> context.startActivity(Intent(Settings.ACTION_SETTINGS))
             MainSettingsItem.RomM -> viewModel.navigateToSection(SettingsSection.ROMM)
             MainSettingsItem.Saves -> viewModel.navigateToSection(SettingsSection.SAVES)

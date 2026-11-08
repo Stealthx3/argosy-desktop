@@ -134,6 +134,8 @@ enum class SettingsSection {
     PERMISSIONS,
     DRIVERS,
     MANAGED_INSTALLERS,
+    EMULATOR_MANAGER,
+    EMULATOR_MANAGER_DETAIL,
     ABOUT
 }
 
@@ -1948,6 +1950,7 @@ data class SettingsUiState(
     val launchTargets: LaunchTargetsState = LaunchTargetsState(),
     val controls: ControlsState = ControlsState(),
     val managedInstallers: ManagedInstallersState = ManagedInstallersState(),
+    val emulatorManager: EmulatorManagerState = EmulatorManagerState(),
     val sounds: SoundState = SoundState(),
     val ambientAudio: AmbientAudioState = AmbientAudioState(),
     val emulators: EmulatorState = EmulatorState(),

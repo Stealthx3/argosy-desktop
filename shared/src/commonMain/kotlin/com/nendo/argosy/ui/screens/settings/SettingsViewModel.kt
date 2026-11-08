@@ -163,6 +163,7 @@ class SettingsViewModel @Inject constructor(
     val displayDelegate: DisplaySettingsDelegate,
     val controlsDelegate: ControlsSettingsDelegate,
     val installerDelegate: com.nendo.argosy.ui.screens.settings.delegates.ManagedInstallerSettingsDelegate,
+    val emulatorManagerDelegate: com.nendo.argosy.ui.screens.settings.delegates.EmulatorManagerDelegate,
     val soundsDelegate: SoundSettingsDelegate,
     val ambientAudioDelegate: AmbientAudioSettingsDelegate,
     val emulatorDelegate: EmulatorSettingsDelegate,
@@ -1629,6 +1630,26 @@ class SettingsViewModel @Inject constructor(
     fun refreshUsageStatsPermission() = controlsDelegate.refreshUsageStatsPermission()
     fun openUsageStatsSettings() = controlsDelegate.openUsageStatsSettings()
     fun openManagedInstallers() = installerDelegate.openScreen(viewModelScope)
+    val pickEmulatorBiosFile: SharedFlow<String> get() = emulatorManagerDelegate.pickBiosFile
+    fun openEmulatorManager() = emulatorManagerDelegate.load(viewModelScope)
+    fun refreshEmulatorManager() = emulatorManagerDelegate.load(viewModelScope)
+    fun openEmulatorDetail(id: String) {
+        emulatorManagerDelegate.select(id)
+        navigateToSection(SettingsSection.EMULATOR_MANAGER_DETAIL)
+    }
+    fun openGitHubInstallers() = navigateToSection(SettingsSection.MANAGED_INSTALLERS)
+    fun requestEmulatorInstall() = emulatorManagerDelegate.requestInstall(viewModelScope)
+    fun requestEmulatorUninstall() = emulatorManagerDelegate.requestUninstall()
+    fun confirmEmulatorUninstall() = emulatorManagerDelegate.confirmUninstall(viewModelScope)
+    fun dismissEmulatorUninstall() = emulatorManagerDelegate.dismissUninstall()
+    fun openEmulatorLogs() = emulatorManagerDelegate.openLogs()
+    fun openEmulatorDataFolder() = emulatorManagerDelegate.openDataFolder()
+    fun requestEmulatorBios() = emulatorManagerDelegate.requestBios()
+    fun moveEmulatorPicker(delta: Int) = emulatorManagerDelegate.movePicker(delta)
+    fun confirmEmulatorPicker() = emulatorManagerDelegate.confirmPicker(viewModelScope)
+    fun selectEmulatorPickerOption(index: Int) = emulatorManagerDelegate.pickerSelect(viewModelScope, index)
+    fun dismissEmulatorManagerPicker() = emulatorManagerDelegate.dismissPicker()
+    fun assignEmulatorBiosFile(path: String) = emulatorManagerDelegate.copyBios(viewModelScope, path)
     fun reconcileManagedInstall() = installerDelegate.reconcilePendingInstall()
     fun installManagedInstaller(rowId: Long) = installerDelegate.install(viewModelScope, rowId)
     fun openInstallerAddModal() = installerDelegate.openAddModal()

@@ -52,6 +52,7 @@ internal class ModalInputRouter(private val viewModel: SettingsViewModel) {
         interceptPlatformReorder(state, method)?.let { return it }
         interceptShaderPicker(method)?.let { return it }
         interceptScreenRoleModal(state, method)?.let { return it }
+        interceptEmulatorManagerPicker(state, method)?.let { return it }
         interceptInstallerVariantPicker(state, method)?.let { return it }
         interceptInstallerAddModal(state, method)?.let { return it }
 
@@ -81,6 +82,20 @@ internal class ModalInputRouter(private val viewModel: SettingsViewModel) {
             InputMethod.BACK -> {
                 viewModel.backNavRing()
                 InputResult.handled(if (holding) SoundType.SILENT else SoundType.CLOSE_MODAL)
+            }
+            else -> InputResult.HANDLED
+        }
+    }
+
+    private fun interceptEmulatorManagerPicker(state: SettingsUiState, method: InputMethod): InputResult? {
+        if (state.emulatorManager.picker == null) return null
+        return when (method) {
+            InputMethod.UP -> { viewModel.moveEmulatorPicker(-1); InputResult.HANDLED }
+            InputMethod.DOWN -> { viewModel.moveEmulatorPicker(1); InputResult.HANDLED }
+            InputMethod.CONFIRM -> { viewModel.confirmEmulatorPicker(); InputResult.HANDLED }
+            InputMethod.BACK -> {
+                viewModel.dismissEmulatorManagerPicker()
+                InputResult.handled(SoundType.CLOSE_MODAL)
             }
             else -> InputResult.HANDLED
         }

@@ -169,7 +169,7 @@ internal fun routeConfirm(vm: SettingsViewModel): InputResult {
             when (item) {
                 is MainSettingsItem.Header -> Unit
                 MainSettingsItem.ManagedInstallers ->
-                    vm.navigateToSection(SettingsSection.MANAGED_INSTALLERS)
+                    vm.navigateToSection(managedInstallersDestination())
                 MainSettingsItem.DeviceSettings -> vm.viewModelScope.launch { vm._openDeviceSettingsEvent.emit(Unit) }
                 MainSettingsItem.RomM -> vm.navigateToSection(SettingsSection.ROMM)
                 MainSettingsItem.Saves -> vm.navigateToSection(SettingsSection.SAVES)
@@ -323,6 +323,56 @@ internal fun routeConfirm(vm: SettingsViewModel): InputResult {
         SettingsSection.CORE_OPTIONS -> InputResult.HANDLED
         SettingsSection.SOCIAL -> vm.handleSocialConfirm(state)
         SettingsSection.MANAGED_INSTALLERS -> routeInstallersConfirm(vm, state)
+        SettingsSection.EMULATOR_MANAGER -> routeEmulatorManagerConfirm(vm, state)
+        SettingsSection.EMULATOR_MANAGER_DETAIL -> routeEmulatorDetailConfirm(vm, state)
+    }
+}
+
+internal fun managedInstallersDestination(): SettingsSection =
+    if (com.nendo.argosy.platform.PlatformFeatures.desktopWindow) SettingsSection.EMULATOR_MANAGER else SettingsSection.MANAGED_INSTALLERS
+
+private fun routeEmulatorManagerConfirm(vm: SettingsViewModel, state: SettingsUiState): InputResult =
+    when (val item = com.nendo.argosy.ui.screens.settings.sections.emulatorManagerItemAtFocusIndex(state.focusedIndex, state.emulatorManager)) {
+        is com.nendo.argosy.ui.screens.settings.sections.EmulatorManagerItem.Entry -> {
+            vm.openEmulatorDetail(item.emulator.id)
+            InputResult.handled(SoundType.SELECT)
+        }
+        com.nendo.argosy.ui.screens.settings.sections.EmulatorManagerItem.GitHubInstallers -> {
+            vm.openGitHubInstallers()
+            InputResult.handled(SoundType.SELECT)
+        }
+        else -> InputResult.HANDLED
+    }
+
+private fun routeEmulatorDetailConfirm(vm: SettingsViewModel, state: SettingsUiState): InputResult {
+    val manager = state.emulatorManager
+    val emulator = manager.selected ?: return InputResult.HANDLED
+    val installerBusy = state.managedInstallers.busyId != null
+    return when (com.nendo.argosy.ui.screens.settings.sections.emulatorDetailItemAtFocusIndex(state.focusedIndex, manager, installerBusy)) {
+        com.nendo.argosy.ui.screens.settings.sections.EmulatorDetailItem.Logs -> {
+            vm.openEmulatorLogs()
+            InputResult.handled(SoundType.SELECT)
+        }
+        com.nendo.argosy.ui.screens.settings.sections.EmulatorDetailItem.DataFolder -> {
+            vm.openEmulatorDataFolder()
+            InputResult.handled(SoundType.SELECT)
+        }
+        com.nendo.argosy.ui.screens.settings.sections.EmulatorDetailItem.Bios -> {
+            if (manager.busy) return InputResult.HANDLED
+            vm.requestEmulatorBios()
+            InputResult.handled(if (emulator.biosFolder != null) SoundType.OPEN_MODAL else SoundType.BOUNDARY)
+        }
+        com.nendo.argosy.ui.screens.settings.sections.EmulatorDetailItem.Install -> {
+            if (manager.busy || installerBusy || emulator.installOptions.isEmpty()) return InputResult.handled(SoundType.BOUNDARY)
+            vm.requestEmulatorInstall()
+            InputResult.handled(SoundType.SELECT)
+        }
+        com.nendo.argosy.ui.screens.settings.sections.EmulatorDetailItem.Uninstall -> {
+            if (manager.busy || emulator.installed == com.nendo.argosy.data.model.CatalogPackage.NATIVE) return InputResult.handled(SoundType.BOUNDARY)
+            vm.requestEmulatorUninstall()
+            InputResult.handled(SoundType.OPEN_MODAL)
+        }
+        else -> InputResult.HANDLED
     }
 }
 
@@ -1443,6 +1493,11 @@ private fun computeMaxFocusIndex(
     SettingsSection.NAVIGATION -> navigationMaxFocusIndex(state.controls)
     SettingsSection.BUTTON_MAPPING -> buttonMappingMaxFocusIndex(state.controls)
     SettingsSection.MANAGED_INSTALLERS -> installersMaxFocusIndex(state.managedInstallers)
+    SettingsSection.EMULATOR_MANAGER -> com.nendo.argosy.ui.screens.settings.sections.emulatorManagerMaxFocusIndex(state.emulatorManager)
+    SettingsSection.EMULATOR_MANAGER_DETAIL -> com.nendo.argosy.ui.screens.settings.sections.emulatorDetailMaxFocusIndex(
+        state.emulatorManager,
+        state.managedInstallers.busyId != null
+    )
     SettingsSection.PLATFORMS -> emulatorsMaxFocusIndex(state.emulators.platforms)
     SettingsSection.BUILTIN_EMULATOR -> when {
         !state.emulators.builtinLibretroEnabled -> BuiltinEmulatorItem.ENABLE.focusIndex
