@@ -38,6 +38,7 @@ object HostGameProcess {
                 .start()
             process = started
             _running.value = Session(packageName, command)
+            GameModeWindowTagger.start(System.getenv())
             Logger.info(TAG, "Started ${command.first()} for $packageName (pid ${started.pid()})")
             started.onExit().thenAccept { exited ->
                 Logger.info(TAG, "Game process exited with ${exited.exitValue()}")
@@ -48,6 +49,15 @@ object HostGameProcess {
             Logger.error(TAG, "Could not start ${command.first()}", e)
             Result.failure(e)
         }
+    }
+
+    @Synchronized
+    fun stopAll() {
+        process?.let { running ->
+            running.descendants().forEach { it.destroy() }
+            running.destroy()
+        }
+        GameModeWindowTagger.stop()
     }
 
     @Synchronized
@@ -62,6 +72,7 @@ object HostGameProcess {
     @Synchronized
     private fun finish(exited: Process) {
         if (process !== exited) return
+        GameModeWindowTagger.stop()
         process = null
         _running.value = null
     }

@@ -199,6 +199,9 @@ private fun shutDown(gamepadDispatcher: DesktopGamepadDispatcher) {
         Thread.sleep(SHUTDOWN_GRACE_MS)
         Runtime.getRuntime().halt(shellExitCode())
     }, "argosy-shutdown-watchdog").apply { isDaemon = true }.start()
+    if (com.nendo.argosy.platform.DesktopWindowMode.isGamescope(System.getenv())) {
+        com.nendo.argosy.platform.HostGameProcess.stopAll()
+    }
     gamepadDispatcher.stop()
 }
 
