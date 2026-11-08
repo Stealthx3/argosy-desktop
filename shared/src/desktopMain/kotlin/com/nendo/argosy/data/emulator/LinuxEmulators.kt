@@ -13,7 +13,8 @@ data class LinuxEmulator(
     val installPaths: List<String> = emptyList(),
     val launch: LinuxLaunchArgs? = null,
     val flathubId: String? = null,
-    val appImageRepo: String? = null
+    val appImageRepo: String? = null,
+    val platforms: Set<String> = emptySet()
 )
 
 data class LinuxLaunchArgs(val args: List<String>, val onlyTargetsContaining: String? = null)
@@ -34,6 +35,22 @@ data class HostInventory(
 
 object LinuxEmulators {
     val all: List<LinuxEmulator> get() = LinuxEmulatorDatabase.current.emulators
+
+    /**
+     * Registry entries for the database's desktop-only emulators, the ones with their own
+     * [LinuxEmulator.platforms].
+     */
+    fun desktopOnlyDefs(emulators: List<LinuxEmulator>): List<EmulatorDef> =
+        emulators.filter { it.platforms.isNotEmpty() }.map { linux ->
+            EmulatorDef(
+                id = linux.id,
+                packageName = DESKTOP_PACKAGE_PREFIX + linux.id,
+                displayName = linux.displayName,
+                supportedPlatforms = linux.platforms
+            )
+        }
+
+    private const val DESKTOP_PACKAGE_PREFIX = "linux."
 
     fun byId(id: String): LinuxEmulator? = all.firstOrNull { it.id == id }
 

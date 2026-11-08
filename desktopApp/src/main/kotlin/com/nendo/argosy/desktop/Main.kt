@@ -73,6 +73,7 @@ fun main(args: Array<String>) {
     FactoryResetWipe.runIfPending()
     val options = ShellOptions.parse(args)
     val app = DesktopApplication()
+    com.nendo.argosy.data.emulator.LinuxEmulatorDatabase.current
     installDesktopImageLoader(app.component.rommConnectionManager(), app.component.userCertStore())
     val viewModels = app.component.viewModelFactory()
     val keyDispatcher = app.component.keyDispatcher()

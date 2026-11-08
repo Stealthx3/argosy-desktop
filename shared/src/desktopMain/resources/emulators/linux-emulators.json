@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "emulators": [
     {
       "id": "retroarch",
@@ -336,6 +336,481 @@
         ]
       },
       "appImageRepo": "xemu-project/xemu"
+    },
+    {
+      "id": "linux_ares",
+      "name": "ares",
+      "platforms": [
+        "nes",
+        "fds",
+        "snes",
+        "n64",
+        "gb",
+        "gbc",
+        "gba",
+        "genesis",
+        "sms",
+        "gg",
+        "scd",
+        "32x",
+        "sg1000",
+        "tg16",
+        "tgcd",
+        "supergrafx",
+        "ngp",
+        "ngpc",
+        "wonderswan",
+        "wsc",
+        "msx",
+        "msx2",
+        "coleco",
+        "atari2600"
+      ],
+      "binaries": [
+        "ares"
+      ],
+      "launch": {
+        "args": [
+          "{rom}"
+        ]
+      },
+      "flathub": "dev.ares.ares",
+      "flatpakIds": [
+        "dev.ares.ares"
+      ]
+    },
+    {
+      "id": "linux_bsnes",
+      "name": "bsnes",
+      "platforms": [
+        "snes",
+        "satellaview"
+      ],
+      "binaries": [
+        "bsnes"
+      ],
+      "launch": {
+        "args": [
+          "{rom}"
+        ]
+      },
+      "flathub": "dev.bsnes.bsnes",
+      "flatpakIds": [
+        "dev.bsnes.bsnes"
+      ]
+    },
+    {
+      "id": "linux_mednafen",
+      "name": "Mednafen",
+      "platforms": [
+        "psx",
+        "saturn",
+        "genesis",
+        "sms",
+        "gg",
+        "nes",
+        "fds",
+        "snes",
+        "gb",
+        "gbc",
+        "gba",
+        "lynx",
+        "ngp",
+        "ngpc",
+        "pcfx",
+        "tg16",
+        "tgcd",
+        "supergrafx",
+        "vb",
+        "wonderswan",
+        "wsc"
+      ],
+      "binaries": [
+        "mednafen"
+      ],
+      "launch": {
+        "args": [
+          "{rom}"
+        ]
+      }
+    },
+    {
+      "id": "linux_mesen",
+      "name": "Mesen",
+      "platforms": [
+        "nes",
+        "fds",
+        "snes",
+        "gb",
+        "gbc",
+        "gba",
+        "tg16",
+        "tgcd",
+        "sms",
+        "gg",
+        "wonderswan",
+        "wsc"
+      ],
+      "binaries": [
+        "Mesen",
+        "mesen"
+      ],
+      "launch": {
+        "args": [
+          "{rom}"
+        ]
+      }
+    },
+    {
+      "id": "linux_nestopia",
+      "name": "Nestopia UE",
+      "platforms": [
+        "nes",
+        "fds"
+      ],
+      "binaries": [
+        "nestopia"
+      ],
+      "launch": {
+        "args": [
+          "{rom}"
+        ]
+      },
+      "flathub": "ca._0ldsk00l.Nestopia",
+      "flatpakIds": [
+        "ca._0ldsk00l.Nestopia"
+      ]
+    },
+    {
+      "id": "linux_punes",
+      "name": "puNES",
+      "platforms": [
+        "nes",
+        "fds"
+      ],
+      "binaries": [
+        "punes"
+      ],
+      "launch": {
+        "args": [
+          "{rom}"
+        ]
+      },
+      "flathub": "io.github.punesemu.puNES",
+      "flatpakIds": [
+        "io.github.punesemu.puNES"
+      ]
+    },
+    {
+      "id": "linux_sameboy",
+      "name": "SameBoy",
+      "platforms": [
+        "gb",
+        "gbc"
+      ],
+      "binaries": [
+        "sameboy"
+      ],
+      "launch": {
+        "args": [
+          "{rom}"
+        ]
+      },
+      "flathub": "io.github.sameboy.SameBoy",
+      "flatpakIds": [
+        "io.github.sameboy.SameBoy"
+      ]
+    },
+    {
+      "id": "linux_vbam",
+      "name": "VisualBoyAdvance-M",
+      "platforms": [
+        "gba",
+        "gb",
+        "gbc"
+      ],
+      "binaries": [
+        "visualboyadvance-m"
+      ],
+      "launch": {
+        "args": [
+          "{rom}"
+        ]
+      },
+      "flathub": "com.vba_m.visualboyadvance-m",
+      "flatpakIds": [
+        "com.vba_m.visualboyadvance-m"
+      ]
+    },
+    {
+      "id": "linux_desmume",
+      "name": "DeSmuME",
+      "platforms": [
+        "nds"
+      ],
+      "binaries": [
+        "desmume"
+      ],
+      "launch": {
+        "args": [
+          "{rom}"
+        ]
+      },
+      "flathub": "org.desmume.DeSmuME",
+      "flatpakIds": [
+        "org.desmume.DeSmuME"
+      ]
+    },
+    {
+      "id": "linux_gopher64",
+      "name": "gopher64",
+      "platforms": [
+        "n64"
+      ],
+      "binaries": [
+        "gopher64"
+      ],
+      "launch": {
+        "args": [
+          "{rom}"
+        ]
+      },
+      "flathub": "io.github.gopher64.gopher64",
+      "flatpakIds": [
+        "io.github.gopher64.gopher64"
+      ]
+    },
+    {
+      "id": "linux_rmg",
+      "name": "Rosalie's Mupen GUI",
+      "platforms": [
+        "n64"
+      ],
+      "binaries": [
+        "RMG"
+      ],
+      "launch": {
+        "args": [
+          "{rom}"
+        ]
+      },
+      "flathub": "com.github.Rosalie241.RMG",
+      "flatpakIds": [
+        "com.github.Rosalie241.RMG"
+      ]
+    },
+    {
+      "id": "linux_blastem",
+      "name": "BlastEm",
+      "platforms": [
+        "genesis"
+      ],
+      "binaries": [
+        "blastem"
+      ],
+      "launch": {
+        "args": [
+          "{rom}"
+        ]
+      },
+      "flathub": "com.retrodev.blastem",
+      "flatpakIds": [
+        "com.retrodev.blastem"
+      ]
+    },
+    {
+      "id": "linux_supermodel",
+      "name": "Supermodel",
+      "platforms": [
+        "model3"
+      ],
+      "binaries": [
+        "supermodel"
+      ],
+      "launch": {
+        "args": [
+          "{rom}"
+        ]
+      },
+      "flathub": "com.supermodel3.Supermodel",
+      "flatpakIds": [
+        "com.supermodel3.Supermodel"
+      ]
+    },
+    {
+      "id": "linux_play",
+      "name": "Play!",
+      "platforms": [
+        "ps2"
+      ],
+      "binaries": [
+        "Play"
+      ],
+      "launch": {
+        "args": [
+          "--disc",
+          "{rom}"
+        ]
+      },
+      "flathub": "org.purei.Play",
+      "flatpakIds": [
+        "org.purei.Play"
+      ]
+    },
+    {
+      "id": "linux_shadps4",
+      "name": "shadPS4",
+      "platforms": [
+        "ps4"
+      ],
+      "binaries": [
+        "shadps4"
+      ],
+      "launch": {
+        "args": [
+          "-g",
+          "{rom}"
+        ]
+      },
+      "flathub": "net.shadps4.shadPS4",
+      "flatpakIds": [
+        "net.shadps4.shadPS4"
+      ]
+    },
+    {
+      "id": "linux_stella",
+      "name": "Stella",
+      "platforms": [
+        "atari2600"
+      ],
+      "binaries": [
+        "stella"
+      ],
+      "launch": {
+        "args": [
+          "{rom}"
+        ]
+      },
+      "flathub": "io.github.stella_emu.Stella",
+      "flatpakIds": [
+        "io.github.stella_emu.Stella"
+      ]
+    },
+    {
+      "id": "linux_bigpemu",
+      "name": "BigPEmu",
+      "platforms": [
+        "jaguar",
+        "jaguarcd"
+      ],
+      "binaries": [
+        "bigpemu"
+      ],
+      "launch": {
+        "args": [
+          "{rom}"
+        ]
+      },
+      "flathub": "com.richwhitehouse.BigPEmu",
+      "flatpakIds": [
+        "com.richwhitehouse.BigPEmu"
+      ]
+    },
+    {
+      "id": "linux_hatari",
+      "name": "Hatari",
+      "platforms": [
+        "atarist"
+      ],
+      "binaries": [
+        "hatari"
+      ],
+      "launch": {
+        "args": [
+          "{rom}"
+        ]
+      },
+      "flathub": "org.tuxfamily.hatari",
+      "flatpakIds": [
+        "org.tuxfamily.hatari"
+      ]
+    },
+    {
+      "id": "linux_fsuae",
+      "name": "FS-UAE",
+      "platforms": [
+        "amiga"
+      ],
+      "binaries": [
+        "fs-uae"
+      ],
+      "launch": {
+        "args": [
+          "--floppy_drive_0={rom}"
+        ]
+      },
+      "flathub": "net.fsuae.FS-UAE",
+      "flatpakIds": [
+        "net.fsuae.FS-UAE"
+      ]
+    },
+    {
+      "id": "linux_vice",
+      "name": "VICE (C64)",
+      "platforms": [
+        "c64"
+      ],
+      "binaries": [
+        "x64sc"
+      ],
+      "launch": {
+        "args": [
+          "{rom}"
+        ]
+      },
+      "flathub": "net.sf.VICE",
+      "flatpakIds": [
+        "net.sf.VICE"
+      ]
+    },
+    {
+      "id": "linux_openmsx",
+      "name": "openMSX",
+      "platforms": [
+        "msx",
+        "msx2"
+      ],
+      "binaries": [
+        "openmsx"
+      ],
+      "launch": {
+        "args": [
+          "{rom}"
+        ]
+      },
+      "flathub": "org.openmsx.openMSX",
+      "flatpakIds": [
+        "org.openmsx.openMSX"
+      ]
+    },
+    {
+      "id": "linux_dosbox_staging",
+      "name": "DOSBox Staging",
+      "platforms": [
+        "dos"
+      ],
+      "binaries": [
+        "dosbox-staging"
+      ],
+      "launch": {
+        "args": [
+          "{rom}"
+        ]
+      },
+      "flathub": "io.github.dosbox-staging",
+      "flatpakIds": [
+        "io.github.dosbox-staging"
+      ]
     }
   ]
 }

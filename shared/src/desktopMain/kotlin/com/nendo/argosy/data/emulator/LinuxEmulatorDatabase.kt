@@ -29,7 +29,12 @@ object LinuxEmulatorDatabase {
     private var loaded: Database? = null
 
     val current: Database
-        get() = loaded ?: load().also { loaded = it }
+        get() = loaded ?: load().also { use(it) }
+
+    private fun use(database: Database) {
+        loaded = database
+        EmulatorRegistry.registerPlatformEmulators(LinuxEmulators.desktopOnlyDefs(database.emulators))
+    }
 
     fun bundled(): Database = parse(requireNotNull(javaClass.getResource(RESOURCE)).readText())
 
@@ -45,6 +50,7 @@ object LinuxEmulatorDatabase {
                 installPaths = entry.strings("installPaths"),
                 flathubId = entry.optString("flathub").takeIf { it.isNotEmpty() },
                 appImageRepo = entry.optString("appImageRepo").takeIf { it.contains('/') },
+                platforms = entry.strings("platforms").toSet(),
                 launch = entry.optJSONObject("launch")?.let { launch ->
                     LinuxLaunchArgs(
                         args = launch.strings("args"),
@@ -65,7 +71,7 @@ object LinuxEmulatorDatabase {
         val temp = File(cacheFile.parentFile, cacheFile.name + ".tmp")
         temp.writeText(text)
         if (!temp.renameTo(cacheFile)) return false
-        loaded = remote
+        use(remote)
         return true
     }
 

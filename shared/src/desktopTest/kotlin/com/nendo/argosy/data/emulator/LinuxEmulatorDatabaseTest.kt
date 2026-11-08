@@ -13,9 +13,44 @@ class LinuxEmulatorDatabaseTest {
     private val bundled = LinuxEmulatorDatabase.bundled()
 
     @Test
-    fun everyEntryIsAnUpstreamEmulatorId() {
-        assertEquals(20, bundled.emulators.size)
-        bundled.emulators.forEach { assertNotNull(EmulatorRegistry.getById(it.id), it.id) }
+    fun everyEntryIsAnUpstreamIdOrListsItsOwnPlatforms() {
+        assertEquals(42, bundled.emulators.size)
+        val upstream = bundled.emulators.filter { it.platforms.isEmpty() }
+        assertEquals(20, upstream.size)
+        upstream.forEach { assertNotNull(EmulatorRegistry.getById(it.id), it.id) }
+        bundled.emulators.filter { it.platforms.isNotEmpty() }.forEach { linux ->
+            assertTrue(linux.id.startsWith("linux_"), linux.id)
+            assertNotNull(linux.launch, linux.id)
+        }
+    }
+
+    @Test
+    fun desktopOnlyEntriesJoinTheRegistryForTheirPlatforms() {
+        EmulatorRegistry.registerPlatformEmulators(LinuxEmulators.desktopOnlyDefs(bundled.emulators))
+        val stella = EmulatorRegistry.getById("linux_stella")
+        assertNotNull(stella)
+        assertEquals(setOf("atari2600"), stella.supportedPlatforms)
+        assertTrue(EmulatorRegistry.getForPlatform("atari2600").any { it.id == "linux_stella" })
+        assertTrue(EmulatorRegistry.isKnownPackage(stella.packageName))
+        assertEquals("pcsx2", EmulatorRegistry.getById("pcsx2")?.id)
+    }
+
+    @Test
+    fun desktopOnlyLaunchArgumentsFollowEachEmulatorsCommandLine() {
+        val flatpak = { id: String -> LinuxInstall(LinuxInstallKind.FLATPAK, id, null) }
+        assertEquals(
+            listOf("flatpak", "run", "org.purei.Play", "--disc", "/g/p.iso"),
+            LinuxLaunch.standalone("linux_play", flatpak("org.purei.Play"), "/g/p.iso")
+        )
+        assertEquals(
+            listOf("flatpak", "run", "net.shadps4.shadPS4", "-g", "/g/e.bin"),
+            LinuxLaunch.standalone("linux_shadps4", flatpak("net.shadps4.shadPS4"), "/g/e.bin")
+        )
+        assertEquals(
+            listOf("flatpak", "run", "net.fsuae.FS-UAE", "--floppy_drive_0=/g/a.adf"),
+            LinuxLaunch.standalone("linux_fsuae", flatpak("net.fsuae.FS-UAE"), "/g/a.adf")
+        )
+        assertEquals(listOf("/usr/bin/mednafen", "/g/s.cue"), LinuxLaunch.standalone("linux_mednafen", LinuxInstall(LinuxInstallKind.NATIVE, "/usr/bin/mednafen", null), "/g/s.cue"))
     }
 
     @Test

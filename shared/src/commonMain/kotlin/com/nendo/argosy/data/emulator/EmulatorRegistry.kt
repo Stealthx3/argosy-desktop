@@ -1149,13 +1149,25 @@ object EmulatorRegistry {
     private val emulatorMap = emulators.associateBy { it.id }
     private val packageMap = emulators.associateBy { it.packageName }
 
-    fun getAll(): List<EmulatorDef> = emulators
+    @Volatile
+    private var platformExtras: List<EmulatorDef> = emptyList()
 
-    fun getById(id: String): EmulatorDef? = emulatorMap[id]
+    /**
+     * Adds emulators that exist only on the running platform, such as Linux emulators with no
+     * Android counterpart. Ids already in the registry are ignored.
+     */
+    fun registerPlatformEmulators(defs: List<EmulatorDef>) {
+        platformExtras = defs.filter { it.id !in emulatorMap && it.packageName !in packageMap }
+    }
 
-    fun getByPackage(packageName: String): EmulatorDef? = packageMap[packageName]
+    fun getAll(): List<EmulatorDef> = emulators + platformExtras
 
-    fun isKnownPackage(packageName: String): Boolean = packageMap.containsKey(packageName)
+    fun getById(id: String): EmulatorDef? = emulatorMap[id] ?: platformExtras.firstOrNull { it.id == id }
+
+    fun getByPackage(packageName: String): EmulatorDef? =
+        packageMap[packageName] ?: platformExtras.firstOrNull { it.packageName == packageName }
+
+    fun isKnownPackage(packageName: String): Boolean = getByPackage(packageName) != null
 
     /**
      * Synthesize an [EmulatorDef] for an ad-hoc app binding. The `id` is deterministic per
@@ -1175,13 +1187,13 @@ object EmulatorRegistry {
     )
 
     fun getAlternatives(packageName: String): List<EmulatorDef> =
-        emulators.filter { it.packageName == packageName }
+        getAll().filter { it.packageName == packageName }
 
     fun getUpdateCheckable(): List<EmulatorDef> = emulators.filter { it.releaseSource != null }
 
     fun getForPlatform(platformId: String): List<EmulatorDef> {
         val canonical = PlatformDefinitions.getCanonicalSlug(platformId)
-        return emulators.filter { canonical in it.supportedPlatforms }
+        return getAll().filter { canonical in it.supportedPlatforms }
     }
 
     fun getRecommendedEmulators(): Map<String, List<String>> = recommendedEmulators
