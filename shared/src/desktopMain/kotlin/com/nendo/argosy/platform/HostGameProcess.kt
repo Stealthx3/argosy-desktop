@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
  */
 object HostGameProcess {
     private const val TAG = "HostGameProcess"
+    private const val UNKNOWN_EMULATOR = "unknown"
 
     data class Session(val packageName: String?, val command: List<String>)
 
@@ -25,9 +26,12 @@ object HostGameProcess {
         if (process?.isAlive == true) {
             return Result.failure(IllegalStateException("A game is already running"))
         }
-        val log = DesktopDirectories.data.resolve("logs").apply { mkdirs() }.resolve("emulator.log")
+        val logName = packageName?.let { com.nendo.argosy.data.emulator.EmulatorRegistry.getByPackage(it)?.id ?: it } ?: UNKNOWN_EMULATOR
+        val log = DesktopDirectories.data.resolve(com.nendo.argosy.data.emulator.EmulatorCatalogRules.LOG_FOLDER)
+            .apply { mkdirs() }
+            .resolve("$logName.log")
         return try {
-            val started = ProcessBuilder(HostShell.hostCommand(command, workingDirectory))
+            val started = ProcessBuilder(HostShell.hostCommand(command, workingDirectory, GameSessionEnvironment.spawnOptions(System.getenv())))
                 .apply { if (workingDirectory != null && !HostShell.isSandboxed) directory(java.io.File(workingDirectory)) }
                 .redirectErrorStream(true)
                 .redirectOutput(ProcessBuilder.Redirect.to(log))

@@ -86,7 +86,6 @@ import com.nendo.argosy.ui.input.InputResult
 import com.nendo.argosy.ui.input.LocalInputDispatcher
 import com.nendo.argosy.ui.input.ModalInputEffect
 import com.nendo.argosy.ui.primitives.ModalActionButton
-import com.nendo.argosy.ui.primitives.ActionButton
 import androidx.compose.ui.graphics.lerp
 import com.nendo.argosy.ui.theme.Dimens
 import com.nendo.argosy.ui.theme.LocalArgosyTheme
@@ -200,22 +199,10 @@ fun FileBrowserScreen(
                     }
                 }
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = Dimens.spacingMd, vertical = Dimens.spacingSm),
-                    horizontalArrangement = Arrangement.Start
-                ) {
-                    ActionButton(
-                        label = stringResource(R.string.ui_file_browser_back),
-                        onClick = onDismiss,
-                        glyph = InputButton.B
-                    )
-                }
-
                 FileBrowserFooter(
                     actions = state.actions,
-                    onAction = { viewModel.performAction(it) }
+                    onAction = { viewModel.performAction(it) },
+                    onBack = onDismiss
                 )
             }
         }
@@ -742,11 +729,14 @@ private fun FileBrowserRow(
 @Composable
 private fun FileBrowserFooter(
     actions: List<FileBrowserAction>,
-    onAction: (FileBrowserAction) -> Unit
+    onAction: (FileBrowserAction) -> Unit,
+    onBack: () -> Unit
 ) {
+    val backHint = stringResource(R.string.ui_file_browser_back)
     val newFolderHint = stringResource(R.string.ui_file_browser_footer_new_folder)
     val useFolderHint = stringResource(R.string.ui_file_browser_footer_use_folder)
     val hints = buildList {
+        add(InputButton.B to backHint)
         if (FileBrowserAction.NEW_FOLDER in actions) add(InputButton.Y to newFolderHint)
         if (FileBrowserAction.USE_FOLDER in actions) add(InputButton.X to useFolderHint)
     }
@@ -757,6 +747,7 @@ private fun FileBrowserFooter(
             when (button) {
                 InputButton.Y -> onAction(FileBrowserAction.NEW_FOLDER)
                 InputButton.X -> onAction(FileBrowserAction.USE_FOLDER)
+                InputButton.B -> onBack()
                 else -> {}
             }
         }

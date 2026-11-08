@@ -15,11 +15,14 @@ object HostShell {
     fun hostCommand(args: List<String>): List<String> =
         if (isSandboxed) listOf("flatpak-spawn", "--host") + args else args
 
-    fun hostCommand(args: List<String>, workingDirectory: String?): List<String> =
-        if (workingDirectory != null && isSandboxed) {
-            listOf("flatpak-spawn", "--host", "--directory=$workingDirectory") + args
+    fun hostCommand(args: List<String>, workingDirectory: String?, spawnOptions: List<String> = emptyList()): List<String> =
+        if (isSandboxed) {
+            listOf("flatpak-spawn", "--host") +
+                listOfNotNull(workingDirectory?.let { "--directory=$it" }) +
+                spawnOptions +
+                args
         } else {
-            hostCommand(args)
+            args
         }
 
     fun runScript(script: String, args: List<String> = emptyList()): String? =
@@ -40,7 +43,7 @@ object HostShell {
     }
 
     fun spawn(args: List<String>, workingDirectory: String?) {
-        ProcessBuilder(hostCommand(args, workingDirectory))
+        ProcessBuilder(hostCommand(args, workingDirectory, GameSessionEnvironment.spawnOptions(System.getenv())))
             .apply { if (workingDirectory != null && !isSandboxed) directory(File(workingDirectory)) }
             .redirectOutput(ProcessBuilder.Redirect.DISCARD)
             .redirectError(ProcessBuilder.Redirect.DISCARD)

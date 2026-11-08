@@ -23,7 +23,8 @@
         "org.DolphinEmu.dolphin-emu"
       ],
       "binaries": [
-        "dolphin-emu"
+        "dolphin-emu",
+        "dolphin-emulator-kyu"
       ],
       "appImagePrefixes": [
         "Dolphin"

@@ -87,8 +87,11 @@ fun FloatingNavBar(
             state = listState,
             modifier = Modifier
                 .observeTouchDowns { _, _ -> onInteract() }
-                .frostedSurface(shape)
-                .padding(horizontal = Dimens.spacingSm, vertical = Dimens.spacingXs),
+                .frostedSurface(shape),
+            contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                horizontal = Dimens.spacingSm,
+                vertical = Dimens.spacingXs
+            ),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(Dimens.spacingXs)
         ) {
