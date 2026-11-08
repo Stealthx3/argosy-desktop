@@ -113,7 +113,7 @@ fun main(args: Array<String>) {
             },
         ) {
             val display by app.component.displayPreferences().preferences.collectAsState(initial = null)
-            val profile = DisplayProfile.effective(display?.displayProfile, detectedProfile)
+            val profile = DisplayProfile.effective(display?.displayProfile, detectedProfile, gamescope)
             val safeArea = DisplayProfile.effectiveSafeArea(display?.safeAreaPercent, profile)
             LaunchedEffect(window) {
                 window.background = AwtColor.BLACK

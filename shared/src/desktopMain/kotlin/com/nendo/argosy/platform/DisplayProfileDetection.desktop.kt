@@ -5,16 +5,20 @@ import java.io.File
 import kotlin.math.sqrt
 
 actual object DisplayProfileDetection {
+    private val gameMode: Boolean by lazy { DesktopWindowMode.isGamescope(System.getenv()) }
+
     private val detected: DisplayProfile by lazy {
         classify(
             productName = readLine(DMI_DIR, "product_name"),
             vendor = readLine(DMI_DIR, "sys_vendor"),
-            gamescope = DesktopWindowMode.isGamescope(System.getenv()),
+            gamescope = gameMode,
             largestDiagonalInches = connectedEdids().mapNotNull(::diagonalInches).maxOrNull(),
         )
     }
 
     actual fun detect(): DisplayProfile? = detected
+
+    actual fun inGameMode(): Boolean = gameMode
 
     fun classify(productName: String?, vendor: String?, gamescope: Boolean, largestDiagonalInches: Double?): DisplayProfile =
         when {

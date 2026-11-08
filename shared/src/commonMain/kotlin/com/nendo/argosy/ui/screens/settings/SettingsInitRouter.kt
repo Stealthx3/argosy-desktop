@@ -621,14 +621,16 @@ internal fun routeLoadSettings(vm: SettingsViewModel) {
             desktopWindow = com.nendo.argosy.platform.PlatformFeatures.desktopWindow,
             displayProfile = com.nendo.argosy.data.preferences.DisplayProfile.effective(
                 prefs.displayProfile,
-                com.nendo.argosy.platform.DisplayProfileDetection.detect()
+                com.nendo.argosy.platform.DisplayProfileDetection.detect(),
+                com.nendo.argosy.platform.DisplayProfileDetection.inGameMode()
             ),
             detectedDisplayProfile = com.nendo.argosy.platform.DisplayProfileDetection.detect(),
             safeAreaPercent = com.nendo.argosy.data.preferences.DisplayProfile.effectiveSafeArea(
                 prefs.safeAreaPercent,
                 com.nendo.argosy.data.preferences.DisplayProfile.effective(
                     prefs.displayProfile,
-                    com.nendo.argosy.platform.DisplayProfileDetection.detect()
+                    com.nendo.argosy.platform.DisplayProfileDetection.detect(),
+                    com.nendo.argosy.platform.DisplayProfileDetection.inGameMode()
                 )
             ),
             lockScreenArt = prefs.lockScreenArt,

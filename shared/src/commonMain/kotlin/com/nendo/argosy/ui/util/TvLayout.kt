@@ -33,6 +33,9 @@ val LocalDisplayProfile = staticCompositionLocalOf<DisplayProfile?> { null }
 val isTvLayout: Boolean
     @Composable @ReadOnlyComposable get() = LocalDisplayProfile.current == DisplayProfile.TV
 
+val hasDisplayProfile: Boolean
+    @Composable @ReadOnlyComposable get() = LocalDisplayProfile.current != null
+
 /**
  * The thinnest a divider or outline is drawn: [ComponentDefaults.TvLayout.lineMinDp] on the TV
  * layout, [width] elsewhere.
@@ -43,11 +46,11 @@ fun tvLineWidth(width: Dp): Dp =
     if (isTvLayout) maxOf(width, ComponentDefaults.TvLayout.lineMinDp.dp) else width
 
 /**
- * On the TV layout, an accent glow drawn out from behind the edges of [shape] while [focused];
- * nothing elsewhere.
+ * Under any display profile, an accent glow drawn out from behind the edges of [shape] while
+ * [focused]; nothing where Argosy has no display profiles.
  */
 fun Modifier.tvFocusGlow(focused: Boolean, shape: Shape, tint: Color? = null): Modifier = composed {
-    if (!isTvLayout) return@composed this
+    if (!hasDisplayProfile) return@composed this
     val accent = tint ?: LocalActiveGamePalette.current.firstOrNull() ?: LocalArgosyTheme.current.focusAccent
     val amount by animateFloatAsState(
         targetValue = if (focused) 1f else 0f,

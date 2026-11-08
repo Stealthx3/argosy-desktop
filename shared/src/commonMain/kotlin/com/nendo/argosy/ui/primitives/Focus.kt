@@ -1,6 +1,6 @@
 package com.nendo.argosy.ui.primitives
 
-import com.nendo.argosy.ui.util.isTvLayout
+import com.nendo.argosy.ui.util.hasDisplayProfile
 import com.nendo.argosy.ui.util.tvFocusGlow
 
 import androidx.compose.animation.core.animateDpAsState
@@ -107,8 +107,8 @@ fun Modifier.argosyFocusIndicators(
         label = "argosy-stripe-alpha",
     )
 
-    val tv = isTvLayout
-    var m: Modifier = if (tv && (indicators.fill || indicators.ring)) {
+    val profiled = hasDisplayProfile
+    var m: Modifier = if (profiled && (indicators.fill || indicators.ring)) {
         this.tvFocusGlow(focused, shape, effectiveTint)
     } else {
         this
@@ -146,7 +146,7 @@ fun Modifier.argosyFocusIndicators(
             drawFocusOutline(outline, effectiveTint.copy(alpha = fillAlphaAnim))
         }
     }
-    if (indicators.ring && ringAlpha > 0f && !tv) {
+    if (indicators.ring && ringAlpha > 0f && !profiled) {
         m = m.border(width = ringThickness, color = effectiveRingColor.copy(alpha = ringAlpha), shape = shape)
     }
     if (indicators.stripe && stripeAlphaAnim > 0f) {

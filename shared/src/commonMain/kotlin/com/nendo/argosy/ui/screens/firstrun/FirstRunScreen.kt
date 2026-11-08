@@ -264,7 +264,7 @@ fun FirstRunScreen(
                     onGetStarted = { viewModel.nextStep() }
                 )
                 FirstRunStep.DISPLAY_SETUP -> DisplaySetupStep(
-                    focused = DisplayProfile.entries[uiState.focusedIndex.coerceIn(0, DisplayProfile.entries.size - 1)],
+                    focused = displaySetupChoices().let { it[uiState.focusedIndex.coerceIn(0, it.size - 1)] },
                     recommended = uiState.detectedDisplayProfile,
                     onChoose = { viewModel.chooseDisplayProfile(it) }
                 )
@@ -484,7 +484,8 @@ private fun DisplaySetupStep(
             focused = focused,
             recommended = recommended,
             onChoose = onChoose,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            options = displaySetupChoices()
         )
     }
 }

@@ -21,7 +21,22 @@ enum class DisplayProfile {
 
         fun fromString(value: String?): DisplayProfile? = entries.find { it.name == value }
 
-        fun effective(stored: DisplayProfile?, detected: DisplayProfile?): DisplayProfile = stored ?: detected ?: DESKTOP
+        /**
+         * The profile in use: [stored] wins, except that under Steam Game Mode ([gameMode]) a stored
+         * [DESKTOP] gives way to [detected], or [TV] when nothing was detected.
+         */
+        fun effective(stored: DisplayProfile?, detected: DisplayProfile?, gameMode: Boolean = false): DisplayProfile =
+            if (gameMode && (stored == null || stored == DESKTOP)) {
+                detected?.takeIf { it != DESKTOP } ?: TV
+            } else {
+                stored ?: detected ?: DESKTOP
+            }
+
+        /**
+         * The profiles a person can pick: all of them, or all but [DESKTOP] under Steam Game Mode.
+         */
+        fun choices(gameMode: Boolean): List<DisplayProfile> =
+            if (gameMode) entries.filter { it != DESKTOP } else entries
 
         fun effectiveSafeArea(stored: Int?, profile: DisplayProfile): Int =
             (stored ?: profile.defaultSafeAreaPercent).coerceIn(0, MAX_SAFE_AREA_PERCENT)

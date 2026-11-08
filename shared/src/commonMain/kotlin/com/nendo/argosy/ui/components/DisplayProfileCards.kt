@@ -40,10 +40,11 @@ fun DisplayProfileCards(
     focused: DisplayProfile?,
     recommended: DisplayProfile?,
     onChoose: (DisplayProfile) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    options: List<DisplayProfile> = DisplayProfile.entries
 ) {
     Row(modifier = modifier, horizontalArrangement = Arrangement.spacedBy(Dimens.spacingMd)) {
-        DisplayProfile.entries.forEach { profile ->
+        options.forEach { profile ->
             DisplayProfileCard(
                 profile = profile,
                 isSelected = profile == selected,

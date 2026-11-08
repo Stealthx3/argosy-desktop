@@ -280,7 +280,10 @@ fun InterfaceSection(uiState: SettingsUiState, viewModel: SettingsViewModel) {
                         selected = display.displayProfile,
                         focused = if (isFocused(item)) display.displayProfile else null,
                         recommended = display.detectedDisplayProfile,
-                        onChoose = { viewModel.setDisplayProfile(it) }
+                        onChoose = { viewModel.setDisplayProfile(it) },
+                        options = com.nendo.argosy.data.preferences.DisplayProfile.choices(
+                            com.nendo.argosy.platform.DisplayProfileDetection.inGameMode()
+                        )
                     )
                 }
 

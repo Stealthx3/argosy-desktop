@@ -160,7 +160,7 @@ private fun NavBarDestination(
             .clip(CircleShape)
             .clickableNoFocus(onClick = onClick)
             .then(
-                if (com.nendo.argosy.ui.util.isTvLayout) {
+                if (com.nendo.argosy.ui.util.hasDisplayProfile) {
                     Modifier.padding(Dimens.spacingXs)
                 } else {
                     Modifier.sizeIn(minWidth = minimumTouchTarget, minHeight = minimumTouchTarget).padding(Dimens.spacingSm)

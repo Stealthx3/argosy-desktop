@@ -15,6 +15,22 @@ class DisplayProfileTest {
     }
 
     @Test
+    fun gameModeReplacesAStoredDesktopProfile() {
+        assertEquals(DisplayProfile.TV, DisplayProfile.effective(DisplayProfile.DESKTOP, DisplayProfile.TV, gameMode = true))
+        assertEquals(DisplayProfile.HANDHELD, DisplayProfile.effective(DisplayProfile.DESKTOP, DisplayProfile.HANDHELD, gameMode = true))
+        assertEquals(DisplayProfile.TV, DisplayProfile.effective(null, null, gameMode = true))
+        assertEquals(DisplayProfile.HANDHELD, DisplayProfile.effective(DisplayProfile.HANDHELD, DisplayProfile.TV, gameMode = true))
+        assertEquals(DisplayProfile.DESKTOP, DisplayProfile.effective(DisplayProfile.DESKTOP, DisplayProfile.TV, gameMode = false))
+    }
+
+    @Test
+    fun gameModeOffersNoDesktopChoice() {
+        assertEquals(listOf(DisplayProfile.HANDHELD, DisplayProfile.TV), DisplayProfile.choices(gameMode = true))
+        assertEquals(DisplayProfile.entries, DisplayProfile.choices(gameMode = false))
+        assertEquals(1, displaySetupFocus(DisplayProfile.TV, DisplayProfile.choices(gameMode = true)))
+    }
+
+    @Test
     fun safeAreaFollowsTheProfileUntilSet() {
         assertEquals(3, DisplayProfile.effectiveSafeArea(null, DisplayProfile.TV))
         assertEquals(0, DisplayProfile.effectiveSafeArea(null, DisplayProfile.DESKTOP))

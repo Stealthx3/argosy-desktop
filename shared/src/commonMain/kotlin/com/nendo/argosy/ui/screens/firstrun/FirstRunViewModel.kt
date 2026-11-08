@@ -85,8 +85,13 @@ data class CoreDownloadState(
     val errorMessage: String? = null
 )
 
-internal fun displaySetupFocus(detected: DisplayProfile?): Int =
-    (detected ?: DisplayProfile.DESKTOP).ordinal
+internal fun displaySetupFocus(
+    detected: DisplayProfile?,
+    choices: List<DisplayProfile> = DisplayProfile.entries
+): Int = choices.indexOf(detected ?: DisplayProfile.DESKTOP).coerceAtLeast(0)
+
+internal fun displaySetupChoices(): List<DisplayProfile> =
+    DisplayProfile.choices(DisplayProfileDetection.inGameMode())
 
 internal fun stepAfterPlatformSelect(builtInEmulation: Boolean = PlatformFeatures.builtInEmulation): FirstRunStep =
     if (builtInEmulation) FirstRunStep.CORE_PROMPT else FirstRunStep.COMPLETE
@@ -250,7 +255,7 @@ class FirstRunViewModel @Inject constructor(
             }
             val initialFocus = when (nextStep) {
                 FirstRunStep.IMAGE_CACHE -> 1
-                FirstRunStep.DISPLAY_SETUP -> displaySetupFocus(state.detectedDisplayProfile)
+                FirstRunStep.DISPLAY_SETUP -> displaySetupFocus(state.detectedDisplayProfile, displaySetupChoices())
                 else -> 0
             }
             state.copy(currentStep = nextStep, focusedIndex = initialFocus)
@@ -291,7 +296,7 @@ class FirstRunViewModel @Inject constructor(
             }
             val initialFocus = when (prevStep) {
                 FirstRunStep.IMAGE_CACHE -> 1
-                FirstRunStep.DISPLAY_SETUP -> displaySetupFocus(state.detectedDisplayProfile)
+                FirstRunStep.DISPLAY_SETUP -> displaySetupFocus(state.detectedDisplayProfile, displaySetupChoices())
                 else -> 0
             }
             state.copy(currentStep = prevStep, focusedIndex = initialFocus, rommUrlCommitted = false)
@@ -534,7 +539,7 @@ class FirstRunViewModel @Inject constructor(
         val state = _uiState.value
         return when (state.currentStep) {
             FirstRunStep.WELCOME -> 0
-            FirstRunStep.DISPLAY_SETUP -> DisplayProfile.entries.size - 1
+            FirstRunStep.DISPLAY_SETUP -> displaySetupChoices().size - 1
             FirstRunStep.ROMM_LOGIN -> when {
                 state.rommDevicePairing -> 2
                 !state.rommUrlCommitted -> 3
@@ -1074,7 +1079,7 @@ class FirstRunViewModel @Inject constructor(
         val state = _uiState.value
         when (state.currentStep) {
             FirstRunStep.WELCOME -> nextStep()
-            FirstRunStep.DISPLAY_SETUP -> chooseDisplayProfile(DisplayProfile.entries[state.focusedIndex])
+            FirstRunStep.DISPLAY_SETUP -> chooseDisplayProfile(displaySetupChoices()[state.focusedIndex.coerceIn(0, displaySetupChoices().size - 1)])
             FirstRunStep.ROMM_LOGIN -> {
                 when {
                     state.rommDevicePairing -> when (state.focusedIndex) {

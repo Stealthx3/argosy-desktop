@@ -1862,18 +1862,18 @@ private fun HomeHeader(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        val tv = com.nendo.argosy.ui.util.isTvLayout
+        val topRowNav = com.nendo.argosy.ui.util.hasDisplayProfile
         PlatformBreadcrumb(
             uiState = uiState,
             onPreviousRow = onPreviousRow,
             onNextRow = onNextRow,
             onSelectRow = onSelectRow,
-            fillAvailableWidth = !statusVisible || tv,
+            fillAvailableWidth = !statusVisible || topRowNav,
             onPillWidthChanged = onNavigationWidthChanged,
             modifier = Modifier.weight(1f)
         )
 
-        if (tv) {
+        if (topRowNav) {
             Spacer(modifier = Modifier.width(Dimens.spacingSm))
             com.nendo.argosy.ui.components.TopRowNavRingSlot()
             Spacer(modifier = Modifier.width(Dimens.spacingSm))

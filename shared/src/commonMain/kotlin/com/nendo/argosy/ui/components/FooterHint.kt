@@ -41,7 +41,6 @@ import com.nendo.argosy.ui.input.LocalXYIconsSwapped
 import com.nendo.argosy.ui.input.LocalSwapStartSelect
 import com.nendo.argosy.ui.input.LocalButtonGlyphRemap
 import com.nendo.argosy.core.input.AndroidKeyCodes as KeyEvent
-import com.nendo.argosy.ui.util.isTvLayout
 import com.nendo.argosy.platform.LocalPlatformConfiguration as LocalConfiguration
 import com.nendo.argosy.platform.orientation
 import com.nendo.argosy.platform.screenHeightDp

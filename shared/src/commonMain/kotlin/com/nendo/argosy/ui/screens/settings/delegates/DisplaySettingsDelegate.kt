@@ -581,8 +581,9 @@ class DisplaySettingsDelegate @Inject constructor(
     }
 
     fun cycleDisplayProfile(scope: CoroutineScope, direction: Int) {
-        val entries = DisplayProfile.entries
-        val next = entries[(_state.value.displayProfile.ordinal + direction).mod(entries.size)]
+        val choices = DisplayProfile.choices(com.nendo.argosy.platform.DisplayProfileDetection.inGameMode())
+        val current = choices.indexOf(_state.value.displayProfile).coerceAtLeast(0)
+        val next = choices[(current + direction).mod(choices.size)]
         setDisplayProfile(scope, next)
     }
 

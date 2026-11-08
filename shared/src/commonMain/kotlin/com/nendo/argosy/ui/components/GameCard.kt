@@ -107,7 +107,7 @@ import com.nendo.argosy.ui.theme.LocalLauncherTheme
 import com.nendo.argosy.ui.theme.Motion
 import com.nendo.argosy.ui.theme.generated.ComponentDefaults
 import com.nendo.argosy.ui.util.rememberHoverFocus
-import com.nendo.argosy.ui.util.isTvLayout
+import com.nendo.argosy.ui.util.hasDisplayProfile
 import com.nendo.argosy.ui.theme.generated.ColorTokens
 
 @Composable
@@ -622,7 +622,7 @@ fun GameCardWithNewBadge(
     val hoverScale = if (hover.isHovered && !isFocused) minOf(focusScale, ComponentDefaults.Focus.scaleFocused) else focusScale
     val isFocused = isFocused || hover.isHovered
     val showNewBadge = game.isNew && !downloadIndicator.isActive
-    val newAsDot = showNewBadge && isTvLayout && !isFocused
+    val newAsDot = showNewBadge && hasDisplayProfile && !isFocused
     val badgeWidthDp = ComponentDefaults.Carousel.newBadgeWidthDp.dp
     val badgeHeightDp = ComponentDefaults.Carousel.newBadgeHeightDp.dp
 

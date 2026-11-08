@@ -45,7 +45,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.nendo.argosy.ui.theme.generated.ComponentDefaults
-import com.nendo.argosy.ui.util.isTvLayout
+import com.nendo.argosy.ui.util.hasDisplayProfile
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -78,9 +78,9 @@ fun MainDrawer(
     onCloseApp: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val tv = isTvLayout
+    val profiled = hasDisplayProfile
     BoxWithConstraints {
-    val drawerWidth = if (tv && maxWidth != Dp.Infinity) {
+    val drawerWidth = if (profiled && maxWidth != Dp.Infinity) {
         minOf(Dimens.navDrawerWidth, maxWidth * ComponentDefaults.TvLayout.sidebarWidthRatio)
     } else {
         Dimens.navDrawerWidth
@@ -146,10 +146,10 @@ private fun NavigationContent(
         }
     }
 
-    val tv = isTvLayout
+    val profiled = hasDisplayProfile
     Column(modifier = modifier) {
         Row(modifier = Modifier.weight(1f)) {
-        if (tv) SpindleScrollIndicator(listState, Modifier.padding(start = Dimens.spacingXs))
+        if (profiled) SpindleScrollIndicator(listState, Modifier.padding(start = Dimens.spacingXs))
         LazyColumn(
             state = listState,
             modifier = Modifier.weight(1f)

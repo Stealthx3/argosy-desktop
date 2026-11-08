@@ -33,7 +33,7 @@ import com.nendo.argosy.ui.theme.Motion
 import com.nendo.argosy.ui.util.clickableNoFocus
 import com.nendo.argosy.ui.util.rememberHoverFocus
 import com.nendo.argosy.ui.util.tvFocusGlow
-import com.nendo.argosy.ui.util.isTvLayout
+import com.nendo.argosy.ui.util.hasDisplayProfile
 
 internal const val DRAWER_FOCUS_WASH_ALPHA = 0.15f
 private const val NAV_ROW_SELECTED_FILL_ALPHA = 0.5f
@@ -87,7 +87,7 @@ fun NavDrawerRow(
         Box(
             modifier = Modifier
                 .width(indicatorWidth)
-                .height(if (isTvLayout) Dimens.spacingXl else Dimens.spacingXxl)
+                .height(if (hasDisplayProfile) Dimens.spacingXl else Dimens.spacingXxl)
                 .background(MaterialTheme.colorScheme.primary)
         )
         Spacer(modifier = Modifier.width(if (isFocused) (Dimens.spacingLg - Dimens.spacingXs) else Dimens.spacingLg))

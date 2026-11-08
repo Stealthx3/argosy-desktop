@@ -4,4 +4,6 @@ import com.nendo.argosy.data.preferences.DisplayProfile
 
 actual object DisplayProfileDetection {
     actual fun detect(): DisplayProfile? = null
+
+    actual fun inGameMode(): Boolean = false
 }
