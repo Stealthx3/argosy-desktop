@@ -20,6 +20,7 @@ import java.awt.event.MouseEvent
 import java.awt.Toolkit
 import java.awt.Point
 import java.awt.Cursor
+import java.awt.Color as AwtColor
 import com.nendo.argosy.platform.DisplayProfileDetection
 import com.nendo.argosy.data.preferences.DisplayProfile
 import androidx.compose.ui.graphics.Color
@@ -99,6 +100,7 @@ fun main(args: Array<String>) {
             onCloseRequest = ::exitApplication,
             title = "Argosy",
             state = state,
+            undecorated = gamescope,
             onPreviewKeyEvent = { event ->
                 if (event.key == Key.F11) {
                     if (event.type == KeyEventType.KeyDown && !gamescope) state.toggleFullScreen()
@@ -111,6 +113,11 @@ fun main(args: Array<String>) {
             val display by app.component.displayPreferences().preferences.collectAsState(initial = null)
             val profile = DisplayProfile.effective(display?.displayProfile, detectedProfile)
             val safeArea = DisplayProfile.effectiveSafeArea(display?.safeAreaPercent, profile)
+            LaunchedEffect(window) {
+                window.background = AwtColor.BLACK
+                window.contentPane.background = AwtColor.BLACK
+                window.rootPane.background = AwtColor.BLACK
+            }
             LaunchedEffect(window, profile) {
                 window.cursor = Cursor.getDefaultCursor()
                 if (profile.hidesIdleCursor) gamepadDispatcher.padActivity.drop(1).collect { window.cursor = blankCursor }

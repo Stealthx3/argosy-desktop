@@ -2,7 +2,7 @@
 
 Rewritten (not appended) at the end of every work unit, so a fresh session can start from it alone. History and reasoning live in `DEVLOG.md`. Earlier phases: `phase-0.md` … `phase-4.md` (closed summaries).
 
-**Updated:** 2026-11-06 (Beta 1, 0.4.0, published to Pages). Steps 1–3 done; step 4 in progress.
+**Updated:** 2026-11-07 (edge fix committed; TV tweaks in mock-up review). Steps 1–3 done; step 4 in progress.
 
 ## Scope and exit criterion
 
@@ -40,6 +40,8 @@ Plan (`DEVLOG.md`, Phase 5 plan): 1 wizard wording, 2 Close Argosy, 3 thumbnails
 - Open findings: (1) fresh Flathub RetroArch has no cores (owner question 3); (2) the wizard walk still relies on waits (made longer; markers would be sturdier); (3) QR buttons move with Up/Down only; (4) one 5.7 s SIGTERM exit that did not reproduce; (5) Ubuntu VM has no browser.
 - Unit 5 done (2026-10-30): XWayland and HiDPI at 125% and 150% render correctly on KDE and GNOME (`scale.sh`; screens in `build/vmlab/<profile>/u5/`). GNOME at 125% opens a smaller window (cosmetic; fullscreen is fine). The desktop part of step 4 is covered.
 - **Beta 1 published (2026-11-06):** Pages serves 963973e6 (0.4.0, from 02494a9e3; `gh-pages` 7e0e20b, labelled "step 5.4 close" while step 4 stays open). Next action: step 4 closes only after the owner's Game Mode checks on the Deck (list above), now on Beta 1.
+
+- **TV work (2026-11-07):** grey edge strips under gamescope fixed and committed (undecorated window; `DEVLOG.md` 2026-11-07), verified in the VM only, not published (owner: no public rebuild yet). TV tweaks in owner review as mock-ups, no code yet. Approved: per-controller hint glyphs, minimum text 2.5% of height with lighter secondary text, NEW badge only on the focused card (dot elsewhere), 2 px lines. Revise and re-show: Home's LB/RB card navigator moved from the bottom edge to the top row between the platform selector and the system indicators, with controller glyphs each side, and the hint bar no longer auto-hides; sidebar at most 1/4 of the width with a left-side scroll indicator and tidier spacing; focus as an accent edge glow behind the item plus the existing dark fill. Preview in the VM: content ending above the hint bar. Deferred: 480 layouts until 720p, 1080p and 4K are done. Next action: identify the LB/RB card navigator in the VM, then show the revised mock-ups.
 
 ## Open owner questions (revisit after testing, owner decision 2026-10-27)
 
