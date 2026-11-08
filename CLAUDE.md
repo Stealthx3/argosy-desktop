@@ -1,6 +1,6 @@
 # Argosy Desktop — instructions for Claude Code
 
-This folder is the development workspace for **Argosy Desktop**: a faithful Linux desktop port of the Argosy Android launcher (`rommapp/argosy-launcher`), shipped as a Flatpak. Goal: a user of Argosy Desktop cannot tell it apart from the Android app by using it, except for the owner-approved desktop divergences listed in `PORT_PLAN.md` ("Desktop divergences", 2026-10-23).
+This folder is the development workspace for **Argosy Desktop**: a faithful Linux desktop port of the Argosy Android launcher (`rommapp/argosy-launcher`), shipped as a Flatpak. Goal: Argosy's features and feel on Linux, adapted to the Linux desktop and compatible with common setups (GNOME, KDE, SteamOS Game Mode). Owner decision 2026-10-27: Phase 5 aims at Linux adaptation and compatibility, not a 1:1 clone of the Android app; the approved desktop divergences are in `PORT_PLAN.md` ("Desktop divergences").
 
 ## Start here
 

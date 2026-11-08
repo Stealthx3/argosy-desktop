@@ -1,0 +1,1050 @@
+{
+ "Stella": {
+  "flathub": [
+   "io.github.stella_emu.Stella"
+  ],
+  "systems": [
+   "2600"
+  ],
+  "url": "https://stella-emu.github.io/"
+ },
+ "test7800": {
+  "flathub": [],
+  "systems": [
+   "7800"
+  ],
+  "url": "https://github.com/JetSetIlly/test7800"
+ },
+ "BigPEmu": {
+  "flathub": [
+   "com.richwhitehouse.BigPEmu"
+  ],
+  "systems": [
+   "Jaguar, Jaguar CD"
+  ],
+  "url": "https://www.richwhitehouse.com/jaguar/"
+ },
+ "DuckStation": {
+  "flathub": [],
+  "systems": [
+   "PS1"
+  ],
+  "url": "https://github.com/stenzek/duckstation"
+ },
+ "DuckStation - 3D Screenshot": {
+  "flathub": [],
+  "systems": [
+   "PS1"
+  ],
+  "url": "https://github.com/scurest/duckstation-3D-Screenshot"
+ },
+ "DuckStation - LightGun Edition": {
+  "flathub": [],
+  "systems": [
+   "PS1"
+  ],
+  "url": "https://github.com/nixxou/duckstation/"
+ },
+ "PCSX-Redux": {
+  "flathub": [],
+  "systems": [
+   "PS1"
+  ],
+  "url": "https://github.com/grumpycoders/pcsx-redux"
+ },
+ "PSXE": {
+  "flathub": [],
+  "systems": [
+   "PS1"
+  ],
+  "url": "https://github.com/allkern/psxe"
+ },
+ "ARMSX2": {
+  "flathub": [],
+  "systems": [
+   "PS2"
+  ],
+  "url": "https://armsx2.net/"
+ },
+ "PCSX2": {
+  "flathub": [
+   "net.pcsx2.PCSX2"
+  ],
+  "systems": [
+   "PS2"
+  ],
+  "url": "https://pcsx2.net/"
+ },
+ "Play!": {
+  "flathub": [
+   "org.purei.Play"
+  ],
+  "systems": [
+   "PS2"
+  ],
+  "url": "https://purei.org/"
+ },
+ "RPCS3": {
+  "flathub": [
+   "net.rpcs3.RPCS3"
+  ],
+  "systems": [
+   "PS3"
+  ],
+  "url": "https://rpcs3.net/"
+ },
+ "RPCSX": {
+  "flathub": [],
+  "systems": [
+   "PS4, PS5"
+  ],
+  "url": "https://github.com/RPCSX/rpcsx"
+ },
+ "shadPS4": {
+  "flathub": [
+   "net.shadps4.shadPS4"
+  ],
+  "systems": [
+   "PS4"
+  ],
+  "url": "https://github.com/shadps4-emu/shadPS4"
+ },
+ "shadPS4Plus": {
+  "flathub": [],
+  "systems": [
+   "PS4"
+  ],
+  "url": "https://github.com/AzaharPlus/shadPS4Plus/"
+ },
+ "3dSen": {
+  "flathub": [],
+  "systems": [
+   "NES"
+  ],
+  "url": "http://www.geodstudio.net/"
+ },
+ "FCEUX": {
+  "flathub": [],
+  "systems": [
+   "NES"
+  ],
+  "url": "https://fceux.com/web/home.html"
+ },
+ "Nestopia Undead Edition": {
+  "flathub": [],
+  "systems": [
+   "NES"
+  ],
+  "url": "https://github.com/0ldsk00l/nestopia"
+ },
+ "puNES": {
+  "flathub": [
+   "io.github.punesemu.puNES"
+  ],
+  "systems": [
+   "NES"
+  ],
+  "url": "https://github.com/punesemu/puNES"
+ },
+ "bsnes+": {
+  "flathub": [
+   "dev.bsnes.bsnes"
+  ],
+  "systems": [
+   "SNES"
+  ],
+  "url": "https://github.com/devinacker/bsnes-plus"
+ },
+ "bsnes-hd": {
+  "flathub": [],
+  "systems": [
+   "SNES"
+  ],
+  "url": "https://github.com/DerKoun/bsnes-hd/"
+ },
+ "SNES9x": {
+  "flathub": [
+   "com.snes9x.Snes9x"
+  ],
+  "systems": [
+   "SNES"
+  ],
+  "url": "https://github.com/snes9xgit/snes9x"
+ },
+ "DaedalusX64": {
+  "flathub": [],
+  "systems": [
+   "N64"
+  ],
+  "url": "https://github.com/DaedalusX64/daedalus"
+ },
+ "DaedalusX64-vitaGL": {
+  "flathub": [],
+  "systems": [
+   "N64"
+  ],
+  "url": "https://github.com/Rinnegatamante/DaedalusX64-vitaGL"
+ },
+ "dgb-n64": {
+  "flathub": [],
+  "systems": [
+   "N64"
+  ],
+  "url": "https://github.com/Dillonb/n64"
+ },
+ "gopher64": {
+  "flathub": [
+   "io.github.gopher64.gopher64"
+  ],
+  "systems": [
+   "N64"
+  ],
+  "url": "https://github.com/gopher64/gopher64"
+ },
+ "Kaizen (previously Gadolinium)": {
+  "flathub": [],
+  "systems": [
+   "N64"
+  ],
+  "url": "https://github.com/SimoneN64/Kaizen"
+ },
+ "Mupen64Plus": {
+  "flathub": [],
+  "systems": [
+   "N64"
+  ],
+  "url": "https://github.com/mupen64plus"
+ },
+ "Mupen-MPN": {
+  "flathub": [],
+  "systems": [
+   "N64"
+  ],
+  "url": "https://github.com/MarioPartyNetplay/Mupen-MPN"
+ },
+ "Mupen64Plus-qt": {
+  "flathub": [],
+  "systems": [
+   "N64"
+  ],
+  "url": "https://github.com/dh4/mupen64plus-qt"
+ },
+ "Parallel Launcher (GUI for both RetroArch N64 cores)": {
+  "flathub": [
+   "ca.parallel_launcher.ParallelLauncher"
+  ],
+  "systems": [
+   "N64"
+  ],
+  "url": "https://parallel-launcher.ca/"
+ },
+ "Rosalie's Mupen GUI": {
+  "flathub": [],
+  "systems": [
+   "N64"
+  ],
+  "url": "https://github.com/Rosalie241/RMG"
+ },
+ "Dolphin": {
+  "flathub": [
+   "org.DolphinEmu.dolphin-emu",
+   "org.kde.dolphin"
+  ],
+  "systems": [
+   "NGC, Wii"
+  ],
+  "url": "https://dolphin-emu.org/"
+ },
+ "Ishiiruka-Dolphin": {
+  "flathub": [],
+  "systems": [
+   "NGC, Wii"
+  ],
+  "url": "https://github.com/Tinob/Ishiiruka"
+ },
+ "Cemu": {
+  "flathub": [
+   "info.cemu.Cemu"
+  ],
+  "systems": [
+   "Wii U"
+  ],
+  "url": "https://cemu.info/"
+ },
+ "BlastEm": {
+  "flathub": [
+   "com.retrodev.blastem"
+  ],
+  "systems": [
+   "Genesis/Megadrive"
+  ],
+  "url": "https://www.retrodev.com/blastem/"
+ },
+ "Cega": {
+  "flathub": [],
+  "systems": [
+   "Genesis/Megadrive, Master System, Game Gear, SG-1000"
+  ],
+  "url": "https://gitlab.com/jgemu/cega"
+ },
+ "Genesis-Plus-GX": {
+  "flathub": [],
+  "systems": [
+   "Genesis/Megadrive, Sega CD, 32X, Master System, Game Gear, SG-1000"
+  ],
+  "url": "https://github.com/ekeeke/Genesis-Plus-GX"
+ },
+ "jgenesis": {
+  "flathub": [],
+  "systems": [
+   "Genesis, Sega CD, SNES, Master System, Game Gear"
+  ],
+  "url": "https://github.com/jsgroth/jgenesis"
+ },
+ "Kronos": {
+  "flathub": [],
+  "systems": [
+   "Saturn"
+  ],
+  "url": "https://github.com/FCare/Kronos"
+ },
+ "Yaba Sanshiro 2 (formerly uoYabause)": {
+  "flathub": [],
+  "systems": [
+   "Saturn"
+  ],
+  "url": "https://www.uoyabause.org/"
+ },
+ "Deecy": {
+  "flathub": [],
+  "systems": [
+   "Dreamcast"
+  ],
+  "url": "https://github.com/Senryoku/Deecy/"
+ },
+ "Flycast Dojo": {
+  "flathub": [],
+  "systems": [
+   "Dreamcast"
+  ],
+  "url": "https://github.com/blueminder/flycast-dojo"
+ },
+ "Flycast": {
+  "flathub": [
+   "org.flycast.Flycast"
+  ],
+  "systems": [
+   "Dreamcast"
+  ],
+  "url": "https://github.com/flyinghead/flycast"
+ },
+ "ReDream": {
+  "flathub": [],
+  "systems": [
+   "Dreamcast"
+  ],
+  "url": "https://redream.io/"
+ },
+ "Xemu": {
+  "flathub": [
+   "app.xemu.xemu"
+  ],
+  "systems": [
+   "Xbox"
+  ],
+  "url": "https://xemu.app/"
+ },
+ "Xenia": {
+  "flathub": [],
+  "systems": [
+   "360"
+  ],
+  "url": "https://xenia.jp"
+ },
+ "Xenia Canary": {
+  "flathub": [],
+  "systems": [
+   "360"
+  ],
+  "url": "https://github.com/xenia-canary/xenia-canary-releases"
+ },
+ "geolith": {
+  "flathub": [],
+  "systems": [
+   "Neo Geo AES/MVS"
+  ],
+  "url": "https://gitlab.com/jgemu/geolith"
+ },
+ "CeDImu": {
+  "flathub": [],
+  "systems": [
+   "CD-i"
+  ],
+  "url": "https://github.com/Stovent/CeDImu"
+ },
+ "Vecx JG": {
+  "flathub": [],
+  "systems": [
+   "Vectrex"
+  ],
+  "url": "https://gitlab.com/jgemu/vecx"
+ },
+ "SheepShaver": {
+  "flathub": [],
+  "systems": [
+   "Apple/Bandai Pippin"
+  ],
+  "url": "https://github.com/cebix/macemu"
+ },
+ "SheepShaver (community maintained fork)": {
+  "flathub": [],
+  "systems": [
+   "Apple/Bandai Pippin"
+  ],
+  "url": "https://github.com/kanjitalk755/macemu"
+ },
+ "FreeIntv": {
+  "flathub": [],
+  "systems": [
+   "Intellivision"
+  ],
+  "url": "https://github.com/libretro/FreeIntv"
+ },
+ "CoolCV": {
+  "flathub": [],
+  "systems": [
+   "ColecoVision"
+  ],
+  "url": "http://atariage.com/forums/topic/240800-coolcv-emulator-for-mac-os-x-linux-windows-and-raspberry/"
+ },
+ "jollycv": {
+  "flathub": [],
+  "systems": [
+   "ColecoVision"
+  ],
+  "url": "https://gitlab.com/jgemu/jollycv"
+ },
+ "GameRoy": {
+  "flathub": [],
+  "systems": [
+   "GB"
+  ],
+  "url": "https://github.com/Rodrigodd/gameroy"
+ },
+ "GBCC": {
+  "flathub": [],
+  "systems": [
+   "GB, GBC"
+  ],
+  "url": "https://gbcc.dev/"
+ },
+ "Gearboy": {
+  "flathub": [],
+  "systems": [
+   "GB, GBC"
+  ],
+  "url": "https://github.com/drhelius/Gearboy"
+ },
+ "guac": {
+  "flathub": [],
+  "systems": [
+   "GB, GBC"
+  ],
+  "url": "https://github.com/aabalke/guac"
+ },
+ "SameBoy": {
+  "flathub": [
+   "io.github.sameboy.SameBoy"
+  ],
+  "systems": [
+   "GB, GBC, Super Game Boy"
+  ],
+  "url": "https://github.com/LIJI32/SameBoy"
+ },
+ "VGB (AKA Virtual Game Boy)": {
+  "flathub": [],
+  "systems": [
+   "GB, GBC, Super Game Boy"
+  ],
+  "url": "https://fms.komkon.org/VGB/"
+ },
+ "Hades": {
+  "flathub": [],
+  "systems": [
+   "GBA"
+  ],
+  "url": "https://hades-emu.org/"
+ },
+ "mGBA": {
+  "flathub": [
+   "io.mgba.mGBA"
+  ],
+  "systems": [
+   "GB, GBC, GBA"
+  ],
+  "url": "https://mgba.io/"
+ },
+ "NanoBoyAdvance": {
+  "flathub": [],
+  "systems": [
+   "GB, GBC, GBA"
+  ],
+  "url": "https://github.com/nba-emu/NanoBoyAdvance"
+ },
+ "SkyEmu": {
+  "flathub": [],
+  "systems": [
+   "GB, GBC, GBA"
+  ],
+  "url": "https://github.com/skylersaleh/SkyEmu"
+ },
+ "VBA-M": {
+  "flathub": [],
+  "systems": [
+   "GB, GBC, GBA"
+  ],
+  "url": "https://github.com/visualboyadvance-m/visualboyadvance-m/"
+ },
+ "DeSmuME": {
+  "flathub": [
+   "org.desmume.DeSmuME"
+  ],
+  "systems": [
+   "DS"
+  ],
+  "url": "https://desmume.org/"
+ },
+ "melonDS": {
+  "flathub": [
+   "net.kuribo64.melonDS"
+  ],
+  "systems": [
+   "DS"
+  ],
+  "url": "https://melonds.kuribo64.net/"
+ },
+ "melonDS-launcher": {
+  "flathub": [],
+  "systems": [
+   "DS"
+  ],
+  "url": "https://github.com/LeviChen1126/melonDS-launcher"
+ },
+ "Azahar": {
+  "flathub": [
+   "org.azahar_emu.Azahar"
+  ],
+  "systems": [
+   "3DS"
+  ],
+  "url": "https://github.com/azahar-emu/azahar"
+ },
+ "Lime3DS": {
+  "flathub": [],
+  "systems": [
+   "3DS"
+  ],
+  "url": "https://lime3ds.github.io/"
+ },
+ "Mandarine": {
+  "flathub": [],
+  "systems": [
+   "3DS"
+  ],
+  "url": "https://github.com/mandarine3ds/mandarine"
+ },
+ "PabloMK7's Citra": {
+  "flathub": [],
+  "systems": [
+   "3DS"
+  ],
+  "url": "https://github.com/PabloMK7/citra"
+ },
+ "Gearsystem": {
+  "flathub": [],
+  "systems": [
+   "Mark III/Master System, Game Gear, SG-1000, Othello Multivision"
+  ],
+  "url": "https://github.com/drhelius/Gearsystem/"
+ },
+ "MasterGear": {
+  "flathub": [],
+  "systems": [
+   "Mark III/Master System, Game Gear, SG-1000, SC-3000, SF-7000"
+  ],
+  "url": "https://fms.komkon.org/MG/"
+ },
+ "PPSSPP": {
+  "flathub": [
+   "org.ppsspp.PPSSPP"
+  ],
+  "systems": [
+   "PSP"
+  ],
+  "url": "https://ppsspp.org/"
+ },
+ "Vita3K": {
+  "flathub": [],
+  "systems": [
+   "Vita"
+  ],
+  "url": "https://vita3k.org/"
+ },
+ "touchHLE": {
+  "flathub": [],
+  "systems": [
+   "iOS"
+  ],
+  "url": "https://github.com/hikari-no-yume/touchHLE"
+ },
+ "EKLA21": {
+  "flathub": [],
+  "systems": [
+   "Symbian OS/N-Gage"
+  ],
+  "url": "https://github.com/EKA2L1/EKA2L1/"
+ },
+ "FreeJ2ME": {
+  "flathub": [],
+  "systems": [
+   "J2ME"
+  ],
+  "url": "https://github.com/hex007/freej2me/"
+ },
+ "FreeJ2ME-Plus": {
+  "flathub": [],
+  "systems": [
+   "J2ME"
+  ],
+  "url": "https://github.com/TASEmulators/freej2me-plus"
+ },
+ "Xcpc": {
+  "flathub": [],
+  "systems": [
+   "CPC"
+  ],
+  "url": "https://www.xcpc-emulator.net/"
+ },
+ "DOSBox-Pure": {
+  "flathub": [],
+  "systems": [
+   "DOS"
+  ],
+  "url": "https://github.com/schellingb/dosbox-pure/"
+ },
+ "DOSBox-Staging": {
+  "flathub": [
+   "io.github.dosbox-staging"
+  ],
+  "systems": [
+   "DOS"
+  ],
+  "url": "https://dosbox-staging.github.io/"
+ },
+ "DOSBox-X": {
+  "flathub": [
+   "com.dosbox_x.DOSBox-X"
+  ],
+  "systems": [
+   "DOS"
+  ],
+  "url": "https://github.com/joncampbell123/dosbox-x/"
+ },
+ "86Box": {
+  "flathub": [
+   "net._86box._86Box"
+  ],
+  "systems": [
+   "x86"
+  ],
+  "url": "https://github.com/86Box/86Box/"
+ },
+ "Bochs": {
+  "flathub": [],
+  "systems": [
+   "x86"
+  ],
+  "url": "https://github.com/bochs-emu/Bochs"
+ },
+ "FEX-Emu": {
+  "flathub": [],
+  "systems": [
+   "x86"
+  ],
+  "url": "https://github.com/FEX-Emu/FEX"
+ },
+ "PCBox": {
+  "flathub": [],
+  "systems": [
+   "x86"
+  ],
+  "url": "https://github.com/PCBox/PCBox/"
+ },
+ "QEMU": {
+  "flathub": [],
+  "systems": [
+   "x86, ARM, MIPS, RISC-V, PowerPC, more"
+  ],
+  "url": "https://www.qemu.org/"
+ },
+ "VirtualXT": {
+  "flathub": [
+   "org.virtualxt.VirtualXT"
+  ],
+  "systems": [
+   "x86"
+  ],
+  "url": "https://github.com/andreas-jonsson/virtualxt"
+ },
+ "Basilisk II (community fork with updates)": {
+  "flathub": [],
+  "systems": [
+   "Apple computers"
+  ],
+  "url": "https://github.com/kanjitalk755/macemu/"
+ },
+ "LisaEm (fork with some small additions)": {
+  "flathub": [],
+  "systems": [
+   "Apple computers"
+  ],
+  "url": "https://github.com/arcanebyte/lisaem"
+ },
+ "Mini vMac": {
+  "flathub": [],
+  "systems": [
+   "Apple computers"
+  ],
+  "url": "https://www.gryphel.com/c/minivmac/index.html"
+ },
+ "SheepShaver (community fork with updates)": {
+  "flathub": [],
+  "systems": [
+   "Apple computers"
+  ],
+  "url": "https://github.com/kanjitalk755/macemu/"
+ },
+ "Previous": {
+  "flathub": [],
+  "systems": [
+   "NeXT computers"
+  ],
+  "url": "http://previous.alternative-system.com/"
+ },
+ "Open SIMH simulators": {
+  "flathub": [],
+  "systems": [
+   "SIMH computers"
+  ],
+  "url": "https://opensimh.org/simulators/"
+ },
+ "VICE": {
+  "flathub": [
+   "io.github.mmp.Vice",
+   "net.sf.VICE"
+  ],
+  "systems": [
+   "PET, VIC20, PLUS4, CBM, C64, 64DTV, 128"
+  ],
+  "url": "https://vice-emu.sourceforge.io/"
+ },
+ "FS-UAE": {
+  "flathub": [
+   "net.fsuae.FS-UAE"
+  ],
+  "systems": [
+   "Amiga, Amiga CD32"
+  ],
+  "url": "https://fs-uae.net/"
+ },
+ "Atari800": {
+  "flathub": [],
+  "systems": [
+   "Atari computers",
+   "[List of supported systems](https://atari800.github.io/features.html)"
+  ],
+  "url": "https://github.com/atari800/atari800"
+ },
+ "Fujisan": {
+  "flathub": [],
+  "systems": [
+   "Atari computers"
+  ],
+  "url": "https://github.com/pedgarcia/fujisan"
+ },
+ "Hatari": {
+  "flathub": [
+   "org.tuxfamily.hatari"
+  ],
+  "systems": [
+   "Atari computers"
+  ],
+  "url": "https://hatari.tuxfamily.org/"
+ },
+ "Steem SSE": {
+  "flathub": [],
+  "systems": [
+   "Atari computers"
+  ],
+  "url": "https://sourceforge.net/projects/steemsse/"
+ },
+ "Xpeccy": {
+  "flathub": [],
+  "systems": [
+   "Atari computers"
+  ],
+  "url": "https://github.com/samstyle/Xpeccy"
+ },
+ "Speccy": {
+  "flathub": [],
+  "systems": [
+   "Sinclair ZX Spectrum"
+  ],
+  "url": "https://fms.komkon.org/Speccy/"
+ },
+ "ZXPoly": {
+  "flathub": [],
+  "systems": [
+   "Sinclair ZX Spectrum"
+  ],
+  "url": "https://github.com/raydac/zxpoly"
+ },
+ "PC6001VX": {
+  "flathub": [],
+  "systems": [
+   "NEC 6000 computers"
+  ],
+  "url": "http://eighttails.seesaa.net/"
+ },
+ "PC6001V": {
+  "flathub": [],
+  "systems": [
+   "NEC 6000 computers"
+  ],
+  "url": "http://papicom.net/p6v/index.html"
+ },
+ "openMSX": {
+  "flathub": [
+   "org.openmsx.openMSX"
+  ],
+  "systems": [
+   "MSX computers"
+  ],
+  "url": "https://github.com/openMSX/openMSX/"
+ },
+ "VirtualBox": {
+  "flathub": [],
+  "systems": [
+   "x86 and AMD64/Intel64"
+  ],
+  "url": "https://www.virtualbox.org/"
+ },
+ "VMWare": {
+  "flathub": [],
+  "systems": [
+   "x86 and AMD64/Intel64"
+  ],
+  "url": "https://www.vmware.com/"
+ },
+ "ScummVM": {
+  "flathub": [
+   "org.scummvm.ScummVM"
+  ],
+  "systems": [
+   "[Supported games](https://www.scummvm.org/compatibility/)"
+  ],
+  "url": "https://www.scummvm.org/"
+ },
+ "Lightspark": {
+  "flathub": [],
+  "systems": [
+   "Adobe Flash"
+  ],
+  "url": "https://github.com/lightspark/lightspark"
+ },
+ "Ruffle": {
+  "flathub": [
+   "rs.ruffle.Ruffle"
+  ],
+  "systems": [
+   "Adobe Flash"
+  ],
+  "url": "https://github.com/ruffle-rs/ruffle"
+ },
+ "Flashpoint Archive": {
+  "flathub": [],
+  "systems": [
+   "Adobe Flash"
+  ],
+  "url": "https://flashpointarchive.org/"
+ },
+ "EasyRPG": {
+  "flathub": [],
+  "systems": [
+   "RPG Maker"
+  ],
+  "url": "https://easyrpg.org/"
+ },
+ "MKXP": {
+  "flathub": [],
+  "systems": [
+   "Ruby Game Scripting System"
+  ],
+  "url": "https://github.com/Ancurio/mkxp"
+ },
+ "OpenGMK": {
+  "flathub": [],
+  "systems": [
+   "Game Maker"
+  ],
+  "url": "https://github.com/OpenGMK/OpenGMK"
+ },
+ "ONScripter-EN (English support)": {
+  "flathub": [],
+  "systems": [
+   "NScripter"
+  ],
+  "url": "https://github.com/Galladite27/ONScripter-en"
+ },
+ "ONScripterYuri (Enhancement version, based on Jh)": {
+  "flathub": [],
+  "systems": [
+   "NScripter"
+  ],
+  "url": "https://github.com/YuriSizuku/OnscripterYuri"
+ },
+ "Goldberg Steam Emulator": {
+  "flathub": [],
+  "systems": [
+   "Steam"
+  ],
+  "url": "https://gitlab.com/Mr_Goldberg/goldberg_emulator"
+ },
+ "Final Burn Alpha Neo": {
+  "flathub": [],
+  "systems": [
+   "Multiple arcade systems"
+  ],
+  "url": "https://github.com/finalburnneo/FBNeo/"
+ },
+ "MAME (Multiple Arcade Machine Emulator)": {
+  "flathub": [
+   "org.mamedev.MAME"
+  ],
+  "systems": [
+   "Many systems"
+  ],
+  "url": "https://mamedev.org/"
+ },
+ "Supermodel": {
+  "flathub": [
+   "com.supermodel3.Supermodel"
+  ],
+  "systems": [
+   "Sega Model 3"
+  ],
+  "url": "https://supermodel3.com/Download.html"
+ },
+ "pfeMAME": {
+  "flathub": [],
+  "systems": [
+   "Multiple arcade systems"
+  ],
+  "url": "https://sourceforge.net/projects/pfemame/files/"
+ },
+ "PinMAME": {
+  "flathub": [],
+  "systems": [
+   "Check [README](https://github.com/vpinball/pinmame#what-is-it)"
+  ],
+  "url": "https://github.com/vpinball/pinmame/"
+ },
+ "ares": {
+  "flathub": [
+   "dev.ares.ares"
+  ],
+  "systems": [
+   "[Emulated systems](https://ares-emu.net/compatibility)"
+  ],
+  "url": "https://ares-emu.net/"
+ },
+ "BizHawk": {
+  "flathub": [],
+  "systems": [
+   "[List of cores](https://github.com/TASEmulators/BizHawk#cores)"
+  ],
+  "url": "https://tasvideos.org/BizHawk"
+ },
+ "Mednafen": {
+  "flathub": [],
+  "systems": [
+   "[List of supported systems](https://mednafen.github.io/)"
+  ],
+  "url": "https://mednafen.github.io/"
+ },
+ "Mesen (continuation of Mesen project)": {
+  "flathub": [],
+  "systems": [
+   "NES, SNES, Game Boy, and PC-Engine/TurboGrafx-16, Sega Master System/Game Gear, WonderSwan"
+  ],
+  "url": "https://github.com/SourMesen/Mesen2"
+ },
+ "GBE+": {
+  "flathub": [],
+  "systems": [
+   "Game Boy, Game Boy Color, Game Boy Advance, Nintendo DS, Pokemon Mini"
+  ],
+  "url": "https://github.com/shonumi/gbe-plus"
+ },
+ "Clock Signal (CLK)": {
+  "flathub": [],
+  "systems": [
+   "[List of supported systems](https://github.com/TomHarte/CLK)"
+  ],
+  "url": "https://github.com/TomHarte/CLK"
+ },
+ "Meka": {
+  "flathub": [],
+  "systems": [
+   "[List of supported systems](https://github.com/ocornut/meka)"
+  ],
+  "url": "https://github.com/ocornut/meka"
+ },
+ "ZEsarUX": {
+  "flathub": [],
+  "systems": [
+   "[List of supported systems]((<https://github.com/chernandezba/zesarux>)"
+  ],
+  "url": "https://github.com/chernandezba/zesarux"
+ },
+ "Attract-Mode Plus": {
+  "flathub": [],
+  "systems": [
+   ":heavy_check_mark:"
+  ],
+  "url": "https://github.com/oomek/attractplus"
+ },
+ "Emuze": {
+  "flathub": [],
+  "systems": [
+   ":heavy_check_mark:"
+  ],
+  "url": "https://github.com/bmsuseluda/emuze"
+ },
+ "Retrom": {
+  "flathub": [
+   "io.github.jmberesford.Retrom"
+  ],
+  "systems": [
+   ":heavy_check_mark:"
+  ],
+  "url": "https://github.com/JMBeresford/retrom"
+ },
+ "RetroQUEST": {
+  "flathub": [],
+  "systems": [
+   ":heavy_check_mark:"
+  ],
+  "url": "https://github.com/RetroDECK/RetroQUEST"
+ }
+}

@@ -1298,5 +1298,405 @@ Mapped ids: retroarch, dolphin, cemu, azahar, ryujinx (Ryubing), eden, melonds, 
 
 ## Phase 5 · Beta and Flathub
 
-(Not started: waiting for the owner at the phase gate.)
+### 2026-10-24 — Phase 5 started; pre-beta fixes first (owner request)
 
+**Reasoning:** the owner asked for four fixes before the beta work (side-by-side checks, desktop environment testing, Flathub). They become the first four steps.
+
+**Phase 5 plan:**
+
+1. **Wizard emulator step wording.** The desktop first-run step listing emulator Flatpaks is titled and described as "Emulators Argosy should manage" instead of permissions.
+2. **Close Argosy in Quick Settings.** A desktop-only "Close Argosy" entry that asks for confirmation and then shuts the app down gracefully (input, sync and players stopped, window closed).
+3. **Game thumbnails from sync.** Cover art for games on Home and the platform selection screens is fetched and cached during the library sync on desktop (the desktop image cache is a stub today).
+4. **Linux desktop and Steam Game Mode compatibility.** Gamescope sessions: emulator and game launches from Argosy, and a clean exit when closed from the Steam overlay (fixes shipped in alpha 5.4). GNOME, KDE and SteamOS: install, wizard, sync, downloads, launches, save sync and a clean exit on each (VM test lab for Fedora GNOME, Fedora KDE and Ubuntu GNOME; the owner's Deck for Game Mode).
+5. **Flathub submission.** Lint clean (folder grants, `flatpak-spawn`, screenshots, app id), offline from-source build in CI for x86_64 and aarch64, Flathub PR.
+
+### 2026-10-24 — Step 1: wizard emulator step wording; step closed
+
+**Action:** the desktop first-run emulator step (`EmulatorFolderAccessStep`) uses new labels `firstrun_emulators_title` ("Emulators Argosy should manage") and `firstrun_emulators_intro` in all eight locales; Android's Permissions step keeps its strings.
+**Verification:** gate `:shared:desktopTest` 131 + `:app:testDebugUnitTest` 4,426, 0 failures; translation check clean; fresh-data wizard walk `build/desktop-check/fresh-p5s1/emulators.png` shows the new title and intro above the emulator cards. Android untouched (desktop-only composable).
+**Step 1 closed.** Alpha republished (`--step-close 5.1`).
+
+### 2026-10-24 — Step 2: Close Argosy in Quick Settings; step closed
+
+**Action:** `QuickSettingsItem.CloseApp` (Quick page, after the controls, desktop only through `PlatformFeatures.desktopWindow`) renders a "Close Argosy" row with a Close button; A or a click opens an `ArgosyConfirmModal` ("Close Argosy?", Cancel / Close, Close focused) drawn on top of the panel; while it is open the Quick Settings input handler only moves between the two buttons, A chooses, B cancels. Confirm sets the shared `AppShutdown` request; `Main.kt` observes it and calls `exitApplication()`; after the application loop returns, the shell releases key and pad state and ends the process with `exitProcess(0)`, so no leftover thread can keep it alive (relevant to the Game Mode hang in step 4). 4 labels in all eight locales.
+**Verification:** gate 131 + 4,426, 0 failures; translation check clean. Desktop walk `build/desktop-check/p5s2/`: R3 opens Quick Settings, the row is the ninth focusable item (menus wrap: `DOWN*8`), A shows the dialog above the panel, B cancels, A then A closes Argosy and the run exits on its own (Gradle `run` succeeds instead of being killed). A first walk showed the dialog behind the panel; it is now emitted after the panel content. Android: the row is hidden (`desktopWindow` false), `AppShutdown` is never requested.
+**Found along the way:** desktop throws an uncaught `UnsatisfiedLinkError: no sigil-jni` from `TitleIdDownloadObserver` → `TitleIdExtractor` → `Sigil` (no libsigil-jni on the desktop); recorded in the handoff for step 4.
+**Step 2 closed.** Alpha republished (`--step-close 5.2`).
+
+
+### 2026-10-24 — Step 3: game thumbnails on desktop; step closed
+
+**Action:** the desktop `ImageCacheManager` was a full stub (empty art model, no caching), so Home and the Library showed placeholder tiles even though sync already records each game's art URLs in `game_art` (shared `ArtSourceRecorder`). The desktop actual now builds the same art model as Android (`gameArt` from `gameArtDao.observeRowCount()` → `getAll().toResolvedArtByGame()`, `artFor`, `loadArt`, `observeArt`), and its background-cache calls (`queueBackgroundCache*`, `queueCoverCache`, `queueArtIfStale`) prefetch the HTTP URLs through Coil's singleton loader. `installDesktopImageLoader` gains a 512 MB Coil disk cache under `DesktopDirectories.cache/image_cache`, so covers fetched during sync stay on disk and later screens load them offline. Divergence from Android: Android writes covers to its own files and stores `cachedPath`; desktop leaves `cachedPath` empty and relies on Coil's disk cache keyed by URL (same display, no extra file bookkeeping).
+**Verification:** gate `:shared:desktopTest` 131 + `:app:testDebugUnitTest` 4,426, 0 failures; smell check clean. Testbed games have no covers, so the walk `build/desktop-check/fresh-p5s3/` inserted COVER rows pointing at a local PNG server: `home-before` shows text tiles, `home-after` shows the covers on the Home rows, `library-all` shows them in the Library grid. Not checked against real RomM/IGDB covers (the owner's library has them; for the owner to check on the alpha).
+**Step 3 closed.** Alpha republished (`--step-close 5.3`).
+
+### 2026-10-26 — Step 4: Steam Game Mode (launch crash, clean exit); step closed
+
+**Finding:** the desktop never shipped Sigil's JNI library, so the first title-id lookup (`TitleIdDownloadObserver` → `TitleIdExtractor` → `Sigil.<clinit>`) threw `UnsatisfiedLinkError` on the main thread. That happens when a game launches on a platform that uses title ids (the 2026-10-24 log shows it on a GameCube launch through Dolphin), and the uncaught error ended the app. This plausibly explains "no games launch" in Game Mode, but it is a desktop-wide bug, not specific to gamescope.
+**Action:**
+- `libsigil-jni` is built from the vendored `sigil/` with its own CMake (`-DSIGIL_BUILD_JNI_HOST=ON`), following the Phase 1 plan:
+  - Dev runs: a `:desktopApp:sigilJni` task builds it on the host, and the `run` task adds its folder through a JVM argument provider (Compose resets `jvmArgs` in its own `doFirst`, so plain `jvmArgs` were lost).
+  - Flatpak: a `sigil-jni` module compiles it inside the 25.08 SDK, so it links against the runtime's glibc, not the host's 2.43. `build-alpha.sh` stages the JDK's JNI headers, and FindJNI's library paths are set to dummies because they are never linked. The module installs into the app directory, and the packaged launcher gets `-Djava.library.path=$APPDIR`.
+- Shutdown: `DesktopGamepadDispatcher.stop()` closes every gamepad and quits SDL on its own thread. A JVM shutdown hook in `Main.kt` calls it on every way out: Close Argosy, the window close button, and SIGTERM (Steam's overlay "Exit game", logout). The hook also starts a 3 s watchdog that halts the JVM if any shutdown work hangs, so the process cannot linger. An SDL3-mode Argosy holds a Deck's controller through HIDAPI, and on SIGTERM that hold was never released.
+
+**Verification:**
+- Gate `:shared:desktopTest` 131 + `:app:testDebugUnitTest` 4,426, 0 failures; smell check clean.
+- `Class.forName("com.nendo.sigil.Sigil")` initialises against the built library (jshell).
+- The dev run's JVM reports `java.library.path` = the sigil build folder.
+- Local alpha: `libsigil-jni.so` is in `/app/lib/argosy-desktop/lib/app`, `ldd` inside the sandbox resolves only the runtime's libc, and the launcher cfg carries `-Djava.library.path=$APPDIR`.
+- SIGTERM to a running dev instance: exit in 417 ms.
+
+**Not verified here:** real Steam Game Mode. A nested-gamescope SIGTERM test was blocked by the session's permission classifier (its process match was too broad). A GameCube launch walk did not reach the game. Live Game Mode checks (launch, overlay exit) move to the owner and step 6 (SteamOS testing), with `argosy-run.log` requested from the owner.
+
+**Step 4 closed.** Alpha republished (`--step-close 5.4`).
+
+### 2026-10-26 — Step 5, unit 1: side-by-side tooling, first automated pass, dual-screen leftover
+
+**Action:**
+- `docs/desktop/side-by-side-checklist.md` is the testers' sheet: the approved divergences that do not count, then 17 areas to compare in both apps against the same RomM account.
+- `scripts/desktop/check/side-by-side.sh` walks the same screens on the check AVD and on fresh desktop data (never the owner's data, and no A on setting rows, so nothing is toggled). It tiles each pair into `<out>/pairs-*.png`. The screens are Home, drawer, Collections, Library, Downloads, Quick Settings, and Settings top and lower.
+- First pass (`build/desktop-check/p5s5/`): layouts, rows, empty states and footers match. These differences are data, not code:
+  - Theme and accent (AVD Auto/orange, desktop data Dark/default).
+  - The Home "Picks" row (`GenerateRecommendationsUseCase` needs played games, and the fresh desktop data has none).
+  - Download counts.
+- Real differences found:
+  - Desktop Displays still offered "Enable Dual-screen Mode", and its subtitle read "Dimmer, dual-screen, LED" (a carried-forward item). Fixed: a `PlatformFeatures.dualScreen` capability (Android true, desktop false) gates the row and the Displays header and spacer. The header and spacer stay visible when a physical secondary display or an ambient LED exists. Desktop shows a new label, `settings_main_displays_subtitle_single_screen` ("Screen dimmer", eight locales). Dual-screen is an approved removal, so this is a capability gate, not a ghost setting.
+  - Quick Settings has no Brightness row on desktop. It is hidden by `screenBrightnessAvailable` (the desktop cannot set the panel brightness). This is not in the approved divergence list, so it is left for the owner to approve or ask for (backlight control through logind on laptops and the Deck).
+
+**Verification:** gate `:shared:desktopTest` 131 (now also asserts `dualScreen` false) + `:app:testDebugUnitTest` 4,426, 0 failures; translation check complete in all locales; smell check clean. Desktop walk `build/desktop-check/fresh-p5s3/settings-main.png` and `displays.png`: the subtitle reads "Screen dimmer", and Displays shows only Screen Safety. Android: same values as before (`dualScreen` true).
+
+### 2026-10-26 — Step 5, unit 2: second automated pass (details, five Settings sections)
+
+**Action:** `side-by-side.sh` also opens game details from Home (X) and the Theme, Interface, Navigation, Audio and Displays sections (A on the section row, then B). Run: `build/desktop-check/p5s5b/`.
+**Result:** no new real differences. Each difference found is an approved divergence or a data difference:
+- Details: Android's footer "New Game" needs a built-in-emulator game (`canShowPlayOptions`). Its save row, play time and completion come from the AVD's history.
+- Interface: desktop swaps "Hide System Navigation/Status Bar" for Display Profile, Safe Area and Start Full Screen (`desktopWindow` gates).
+- Navigation: desktop adds Input Mode and Button Mapping. Vibration Strength sits below the fold on both.
+- Displays: desktop has no section rail, since only Screen Safety remains after unit 1.
+- Theme and Audio: same rows and order.
+
+### 2026-10-26 — Step 5, unit 3: remaining Settings sections; About's APK updater off on desktop
+
+**Action:** `side-by-side.sh <out> <fresh> settings2` opens the Settings sections after Displays by name. The two apps order them differently: Android 6–20 includes Built-in Emulator, Steam, Jellyfin, Social and Device Settings, while desktop 5–15 does not. Run: `build/desktop-check/p5s5c/`.
+
+**Result:** Saves, RetroAchievements, BIOS and RomM match. These differences are approved divergences or data:
+- Platforms: Android lists its Android row, and desktop names the external emulator instead of "Built-in".
+- GPU Drivers: shows host GPU info on desktop.
+- Permissions: Flatpak folder access on desktop.
+- Managed Installers: Linux emulators on desktop.
+- Play Time: the "most played on" device name.
+- Storage: volumes and sizes.
+
+**Real difference, fixed:** About on desktop offered upstream's Android APK ("Update Available v2.26.1 → Download"), the beta-update switch and the What's New preview. It also showed the System App section (root systemize helper; Restart does nothing on desktop). This was the carried-forward "About → upstream APK update" item.
+- New capabilities `PlatformFeatures.selfUpdate` and `systemApp`: Android true, desktop false. They hide Beta Updates, the What's New preview, and the System App header, spacer and rows.
+- `routeCheckForUpdates` and `routeDownloadAndInstallUpdate` return early without `selfUpdate`, so no path reaches the updater. Android's `UpdateCheckWorker` never runs on desktop.
+- The Check for Updates row stays, following upstream's debug-build pattern: Check is disabled and the subtitle reads "Flatpak keeps Argosy Desktop up to date" (`settings_about_update_subtitle_flatpak`, eight locales). This keeps the Version section, so the version number stays on screen, and keeps the gamepad route to Changelog. A first try hid the row, which emptied the Version section, so the list opened scrolled past the version number.
+- The `PlatformFeatures` KDoc was cut to two lines (smell rule).
+
+**Verification:** gate 131 (asserts `selfUpdate` and `systemApp` false) + 4,426, 0 failures; translations complete (6,372 keys); smell check clean. Desktop walk `build/desktop-check/p5s5c/about-desktop-small.png`.
+
+### 2026-10-26 — Step 5, unit 4: Collections create; automated pass complete
+
+**Action:** `side-by-side.sh <out> <fresh> collections` opens Collections and the New Collection dialog (`build/desktop-check/p5s5d/`). The standalone Search screen (`Screen.Search`) has no navigation entry in either app; search is reached inside collection and category browsers, so it is not a separate row.
+**Result:** the dialog, fields, buttons, focus order and footer match. One platform difference: Android raises the system on-screen keyboard for the name field, and the desktop has none of its own. A physical keyboard types directly, and in Steam Game Mode text entry depends on Steam's on-screen keyboard (Steam + X). This is added to the owner's Game Mode checks. No code change.
+**Automated pass complete:** every main screen, game details, all Settings sections, Quick Settings and New Collection have been compared. Fixed along the way: the dual-screen row and subtitle (unit 1), and About's APK updater and system-app tools (unit 3). Step 5 now waits for the owner's checklist (`docs/desktop/side-by-side-checklist.md`) and the Brightness decision.
+
+### 2026-10-27 — Step 7 groundwork, unit 1: lint pass and the Flathub plan (owner OK, step 5 stays open)
+
+**Owner decision (2026-10-27):** while step 5 waits for the checklist, start the Flathub groundwork (lint fixes, offline from-source build) and keep step 5 open.
+**Action:**
+- `docs/desktop/flathub-plan.md` covers the lint status, the `flatpak-spawn` exception justification, and six steps for the offline build. The core of it: a `-Pargosy.desktopOnly=true` Gradle switch that leaves the Android modules and targets out, because the Flathub sandbox has no Android SDK.
+- Fixed `finish-args-contains-both-x11-and-wayland` by dropping `--socket=wayland`. AWT on JDK 21 is X11-only and runs through XWayland under Wayland and gamescope. Gamescope detection reads an environment variable, not the socket.
+
+**Verification:** local `build-alpha.sh` passes, and lint now reports only `appid-url-not-reachable`, `finish-args-flatpak-spawn-access`, `metainfo-missing-screenshots` (errors) and the screenshot-mirror warning. The Flatpak starts and renders Home (`build/desktop-check/p7a/home.png`). Not published, because step 7 is open.
+**Owner decisions recorded in the plan:**
+- app-id rename to `io.github.Stealthx3.argosy_desktop` (moves the data folder; alpha users reinstall);
+- installing `org.freedesktop.Sdk.Extension.openjdk21` for local offline builds;
+- screenshots from the owner's library;
+- the Flathub PR itself.
+
+### 2026-10-27 — Step 7 groundwork, unit 2: desktop build with no Android SDK
+
+**Action:** I tested from a clean copy of the tracked files (no `local.properties`) to find what an SDK-less build needs:
+- With no SDK at all, `:libretrodroid` stops at configure ("SDK location not found").
+- With `ANDROID_HOME` pointing at an empty folder, the plugin's existence check passes. `:libretrodroid`, and then `:sigil`, stop asking for NDK 27.
+- Result: `settings.gradle.kts` includes `:sigil` and `:libretrodroid` only without `-Pargosy.desktopOnly=true`. `shared`'s androidMain and `app` reference them through `findProject`, so the default build is unchanged. `:app` stays included because `shared` reads its Android config at configure time; it needs only the SDK folder, not the NDK.
+
+**Verification:**
+- `ANDROID_HOME=<empty> ./gradlew -Pargosy.desktopOnly=true :desktopApp:createDistributable` builds from the clean copy (4 m 23 s, 125 files in `lib/app`).
+- Default gate: `:app:assembleDebug` and `:desktopApp:assemble` rebuild with both modules; tests were up to date (131 + 4,426, 0 failures).
+
+**Next (plan step 3):** list every artifact the desktop-only build resolves and turn it into flatpak sources for an `--offline` build. This needs the openjdk21 SDK extension for a local `flatpak-builder` test (owner OK pending).
+
+### 2026-10-27 — Step 7 groundwork, unit 3: offline Gradle sources and the from-source manifest
+
+**Action:**
+- A fresh desktop-only build (empty Gradle home, empty `ANDROID_HOME`, `--debug`) logged every download: 1,809 GETs, all from `dl.google.com` and `repo.maven.apache.org`, 1.2 GB.
+- `scripts/desktop/flatpak/gradle-sources.py` turns them into `desktopApp/flatpak/generated/gradle-sources.json`. It writes 1,448 flatpak `file` sources laid out as one Maven repository, with each sha256 taken from Gradle's cache. 404s and `maven-metadata.xml` are skipped; none were present.
+- `regen-gradle-sources.sh` repeats the whole thing.
+- `desktopApp/flatpak/offline.init.gradle.kts` points plugins and dependencies at that repository, plus the in-tree `libs/maven`.
+- New `io.github.stealthx3.ArgosyDesktop.flathub.yml`:
+  - same finish-args and native modules as the alpha manifest;
+  - `sdk-extensions: openjdk21`;
+  - `sigil-jni` takes JNI headers from the extension instead of the staged host headers;
+  - `argosy-desktop` builds from a git source with the Gradle 8.9 distribution (published sha256) and the generated sources, `--offline`.
+
+**Verification:** a host-side offline proof. The repository was laid out from the sources (checksums: 0 mismatches), then `--offline` with a fresh Gradle home and only that repository built the full distributable (125 files in `lib/app`). The Flathub manifest parses, but has not been run, because that needs `org.freedesktop.Sdk.Extension.openjdk21//25.08` (owner OK pending).
+**Gotcha:** the git sources use `path: ../..` for local tests. On Flathub they become the release tag and commit. Recursive submodules bring in libretrodroid's too, which is harmless but larger.
+
+### 2026-10-27 — Step 7 groundwork, unit 4: Flatpak CI workflow draft
+
+**Action:** the openjdk21 extension is still waiting on the owner's OK, so I drafted plan step 5 instead. `.github/workflows/flatpak.yml` has:
+- a build job for x86_64 and aarch64 in `ghcr.io/flathub-infra/flatpak-github-actions:freedesktop-25.08`, using `flatpak/flatpak-github-actions/flatpak-builder@v6` (aarch64 through `docker/setup-qemu-action`, as that action's README sets it up);
+- a recursive-submodule checkout;
+- a cache key on `gradle-sources.json`;
+- a lint job that runs `flatpak-builder-lint` from `org.flatpak.Builder` on the Flathub manifest.
+
+It is limited to `Stealthx3/argosy-desktop` and triggers on pushes to `main` that touch the desktop build, or on demand. No untrusted event fields are used in `run:` steps.
+**Verification:** the YAML parses (jobs `build` and `lint`). Not run: pushes happen only at phase close, and `actionlint` is not installed here. The first real run is the Phase 5 close push, or a manual dispatch after it.
+
+### 2026-10-27 — Step 7 groundwork, unit 5: the Flathub manifest builds offline
+
+**Owner OK (2026-10-27):** install `org.freedesktop.Sdk.Extension.openjdk21//25.08` (user) and test the Flathub manifest. Installed: JDK 21.0.13, 817 MB.
+**Result:**
+- `flatpak-builder` on `io.github.stealthx3.ArgosyDesktop.flathub.yml` (scratch state and repo, no install, so the alpha is untouched) builds every module from source, Gradle offline (`BUILD SUCCESSFUL in 4m 59s`).
+- Manifest lint: info only (the local git sources have no URL; runtime 26.08 is available).
+- Repo lint: the known three, all owner-gated (app id, `flatpak-spawn` exception, screenshots).
+- Smoke run: `flatpak-builder --run` needs rofiles-fuse, which fails here, so I used `flatpak build` with scratch `XDG_*`. The app stays up for 45 s and initialises its database on the scratch data.
+**Open item:** that run prints `pure virtual method called` / `terminate called without an active exception` at startup, while the app keeps running. The alpha build dir run the same way does not, and the line still appears when the run is ended with SIGKILL, so it happens at startup. Suspect: the extension JDK's jpackage launcher (21.0.13, against the alpha's host 21.0.12). Details and next checks are in `docs/desktop/flathub-plan.md`. I did not chase it further this unit (weekly usage near the cap).
+
+### 2026-10-27 — Remaining issues deferred until the owner's testing is done (owner decision)
+
+**Owner decision (2026-10-27):** "revisit the remaining issues after completing testing." The open items wait until the owner's tests come back:
+- the Flathub build's startup abort;
+- the app-id rename;
+- the screenshots;
+- the Quick Settings Brightness decision.
+
+The owner's tests are the step 5 side-by-side checklist and the alpha 5.4 Game Mode checks. Work pauses (pacer `waiting-owner`).
+
+### 2026-10-27 — VM test lab approved for the testing phase (owner decision)
+
+**Owner decision (2026-10-27):** build a KVM test lab for automated testing of common Linux setups: Fedora GNOME, Fedora KDE and Ubuntu GNOME. The downloads (about 10 GB: cloud images and desktop packages) are approved. Images go on `/mnt/FileDrive`. Work starts after the weekly usage reset (2026-10-29 05:00 UTC).
+**Survey:**
+- `/dev/kvm` is usable, and the user is in `libvirt`.
+- qemu, virsh, virt-install, virt-customize, guestfish and xorriso are present. cloud-localds, sshpass and VNC tools are not.
+- 16 cores, 125 GB RAM, `/mnt/FileDrive` 257 GB free (`/home` only 38 GB).
+- The RomM testbed listens on 0.0.0.0:8093, so guests reach it at 192.168.122.1.
+- The owner's own VMs (`debian13`, the Windows VMs) are not to be touched.
+**Design:**
+- Official cloud images, plus a desktop and autologin through `virt-customize`.
+- Drive the guests from the host through qemu-guest-agent (`guest-exec`) and `virsh screenshot`.
+- Argosy input through its `--key-pipe`.
+- A clean snapshot per run.
+- Per desktop: install from the alpha repo, wizard, sign-in and sync, covers, download and launch in Flathub RetroArch, Close Argosy, SIGTERM exit, XWayland and HiDPI.
+- Game Mode is out of scope for VMs (no Vulkan GPU). An optional Bazzite VM is only a session-start check; launch and overlay exit stay on the owner's Deck.
+
+### 2026-10-27 — Phase 5 re-planned: Linux compatibility, no Android side-by-side (owner decision)
+
+**Owner decision (2026-10-27):** "Merge the Steam Game Mode compatibility step, and the GNOME, KDE, and SteamOS testing step into a single step, and remove the side-by-side checks against android. At this point in development, the goal should be linux adaptation and compatibility, not a 1:1 clone of the android app."
+**Action:**
+- The Phase 5 plan has five steps now. The old step 4 (Steam Game Mode) and step 6 (GNOME, KDE and SteamOS testing) become step 4, "Linux desktop and Steam Game Mode compatibility". The old step 5 (side-by-side against Android) is dropped. Flathub submission moves from step 7 to step 5.
+- Step 4 reopens: its Game Mode fixes stay (alpha 5.4), and it closes when the VM lab runs and the owner's Game Mode checks pass. It republishes with `--step-close 5.4`.
+- Removed `docs/desktop/side-by-side-checklist.md` and `scripts/desktop/check/side-by-side.sh`. The fixes the side-by-side pass produced stay: dual-screen gated off, About without the APK updater and System section, Flatpak update wording.
+- Phase 5 exit criterion (`PORT_PLAN.md`) and the Roadmap scope now name Linux compatibility instead of parity with Android. The `CLAUDE.md` goal line says the same.
+**Reasoning:** the owner's tests no longer include the side-by-side checklist, so the pause waits only on the Game Mode checks; the VM lab supplies the desktop-environment results. The Brightness question stays open as a Linux feature question (backlight control on desktops and handhelds), not as an Android difference.
+
+### 2026-10-28 — Step 4, VM lab unit 1: lab scripts, Fedora GNOME VM proven
+
+**Owner decision (2026-10-28):** "Begin testing", and start now rather than wait for the weekly reset (weekly usage was at 54%). The owner also asked for the lab VMs to be visible in Virtual Machine Manager to watch the work live.
+**Action:**
+- `scripts/desktop/vmlab/`: `lab.sh` (shared settings), `user-data.sh` (cloud-init per profile), `build.sh <profile>`, `exec.sh <profile> [--user] '<cmd>'` (qemu-guest-agent guest-exec), `shot.sh <profile> <png>` (`virsh screenshot`), `reset.sh <profile>` (revert to `clean` and boot).
+- Images in `/mnt/FileDrive/VMs/argosy-lab/images/`: Fedora Cloud Base 44-1.7 and Ubuntu 26.04 server cloud image, both checked against the published SHA256 sums.
+- `build.sh` puts a 40 GB qcow2 overlay on the cloud image and runs `virt-install --import --cloud-init`. cloud-init installs the desktop, qemu-guest-agent and Flatpak with Flathub, and sets up an autologin user `tester`, then powers off. The display is set to virtio at 1920x1080, then the internal snapshot `clean` is taken.
+- `argosy-lab-fedora-gnome` built and proven: autologin into GNOME on Wayland at 1920x1080, guest-exec as root, `virsh screenshot`, the guest reaches RomM at `http://10.0.2.2:8093` (heartbeat 200), Flathub remote present.
+- Fedora KDE and Ubuntu GNOME builds started with the fixed script.
+**Deviations from the approved design, and why:**
+- **Session libvirt** (`qemu:///session`), not `qemu:///system`: `/mnt/FileDrive` is mode 0700, so the system `libvirt-qemu` user cannot open disks there. Changing the drive's permissions was not needed. Session mode also keeps the lab apart from the owner's system VMs. Guests use user-mode networking and reach the host at 10.0.2.2. virt-manager shows them under "QEMU/KVM User session" (connection added to virt-manager's settings; it needs a restart to pick it up).
+- **cloud-init instead of `virt-customize`:** libguestfs' supermin appliance fails on this host (it cannot read the host kernel without root), so all guest setup runs inside the guest on first boot.
+**Fixes found on the way:**
+- Fedora's SELinux confines qemu-ga (`virt_qemu_ga_t`), so guest-exec ran as root but could not read most files. The Fedora profiles now install `policycoreutils-python-utils` and make that domain permissive (lab VMs only). The first VM got the change through a second cloud-init seed with a new instance id.
+- virt-install with `--cloud-init` boots the VM again after the setup power-off, so the first `clean` snapshot was live. `build.sh` now passes `--noreboot`, waits for "shut off" and only then snapshots.
+- **Paused by the owner (2026-10-28, "pause all further development")** mid-unit. State at the pause:
+  - Fedora GNOME: built, `clean` retaken with the lab settings (no sleep, no idle blank or lock); a detached `app.sh fedora-gnome install` of the public alpha was running.
+  - Fedora KDE and Ubuntu GNOME: `build.sh` still in first boot, built with the user-data before the no-sleep settings, so each needs `apply.sh <profile>` once built.
+  - Found and fixed: GNOME's idle lock and suspend broke the agent channel (lab settings in `user-data.sh`, `apply.sh` re-applies them to a built VM). `qemu-ga` aborted (core dump, 615 MB peak) after ~20 min of a captured `flatpak install`, so `exec.sh --long` runs long commands detached with a guest log and checks an exit-code file every 10 s.
+  - New scripts not yet run end to end: `app.sh` (install, start with key pipe, term, kill, status) and `walk.sh` (key-pipe steps and VM screenshots).
+
+### 2026-10-29 — Step 4, VM lab unit 1 resumed: first Flatpak run and wizard on Fedora GNOME
+
+**Owner decision (2026-10-29):** "resume".
+**Action:**
+- `apply.sh` ran on Fedora KDE and Ubuntu GNOME, then a probe showed both boot to a text console with no desktop: their first boot ended at 19:55 on 2026-10-28, a minute after the owner's pause, and `build.sh` took any power-off as the end of cloud-init. Both domains and overlay disks were removed (failed builds only; the base images stay; the old logs are kept as `*.build.interrupted.log`) and rebuilt.
+- The rebuilt VMs passed a `graphical.target` check but still had no desktop, which exposed three build faults, now fixed in `user-data.sh` and repaired in place on both VMs (then `clean` retaken):
+  - Ubuntu 26.04: the `firefox` transitional deb's preinst installs a snap, which fails under cloud-init and aborts the whole `apt-get`, leaving `gdm3` unconfigured. The install now leaves out `firefox` and passes `--force-confold` (the lab's `custom.conf` is written before `gdm3` configures). Ubuntu's welcome runs as the user service `gnome-initial-setup-upgrade-login`, masked for `tester`.
+  - Fedora 44 KDE: the display manager is `plasmalogin`, not SDDM, and `plasma-setup.service` (first-boot wizard) takes seat0. Autologin now goes in `/etc/plasmalogin.conf.d/`, `plasma-setup` is disabled, and the Welcome Center autostart is hidden for `tester`.
+- `build.sh` now boots the finished VM once and requires `tester`'s session on seat0 before it takes `clean` (`graphical.target` is active without a desktop), so an interrupted or broken build fails instead of passing.
+- All three proven from `clean`: autologin desktop at 1920x1080 (GNOME Wayland, Plasma Wayland, Ubuntu GNOME), guest-exec, screenshots, RomM heartbeat 200 from the guest, Flathub remote.
+- Fedora GNOME (Wayland, app on XWayland): the public alpha (0.3.0) installed from the `.flatpakref` with the Flathub runtime; first run shows the welcome screen; the wizard paired with the testbed RomM at `http://10.0.2.2:8093` by pairing code, synced 17 games on 5 platforms, and reached Home and the Library. SIGTERM exit: 497 ms.
+**Fixes found on the way:**
+- `reset.sh` returned as soon as the agent answered, before the guest's network was up, so the next Pages fetch failed to resolve. It now also waits for DNS.
+- `app.sh status|term` looked for `java.*key-pipe`, which never matched the app (the jpackage launcher shows as `argosy-desktop`) but did match its own shell. Both now match `^/app/lib/argosy-desktop/bin/argosy-desktop`.
+- The testbed RomM hit its limit of 25 client tokens per user, mostly abandoned pairings. `pair-code.py` now drops its own never-used `argosy-desktop-*` tokens older than ten minutes before minting; tokens that were ever used stay.
+- The Flatpak wizard recipe in `gotchas.md` predated the display-setup step and used keyboard `A`, which does not choose a card there. Replaced by a pad recipe that runs end to end.
+**Findings to report (not fixed; shared code, owner's call):**
+- QR pairing screen: the "Sign in on this device" and "Use a pairing code" buttons sit side by side, but only Up/Down moves between them (`moveButtonFocus` ignores the ROMM_LOGIN step).
+- "Sign in on this device" in the Flatpak on GNOME opened no browser and showed no "no browser" message (to retest with a browser present and check the portal call).
+- skiko logs `Cannot create Linux GL context` in the VM and falls back to the next render API (expected without 3D in the guest; rendering is fine).
+- GNOME left the new window in the Overview because a guest-exec launch has no activation token; a launch from the dash does not do this.
+**Reasoning:** the lab has to fail loudly when a VM is not what its snapshot claims, or every later desktop result is suspect. The wizard and pairing flow is the first thing every user sees, so it was walked by hand before scripting the per-desktop test.
+
+### 2026-10-29 — Step 4, VM lab unit 2: `desktop-test.sh` on all three desktops; Flatpak "Sign in on this device" fixed
+- New `scripts/desktop/vmlab/desktop-test.sh <profile> <out>`: reset to `clean`, alpha install from the Pages `.flatpakref`, optional `LAB_BUNDLE` install of a local build over it, session check, first run, wizard walk against `http://10.0.2.2:8093` (pairing code), a "Sign in on this device" browser check, Home/Library screenshot, log error count (skiko's GL fallback excluded), SIGTERM timing; one PASS/FAIL line per check in `report.txt`. `app.sh bundle <file>` serves a bundle from the host (127.0.0.1:8765, reached as 10.0.2.2) and installs it with `--reinstall`.
+- Found by the first run: on Fedora GNOME with Firefox installed and set as default, "Sign in on this device" opened nothing and logged nothing. `startActivity` used AWT `Desktop.browse`, wrapped in `runCatching`; inside the sandbox neither it nor the portal `xdg-open` opened a browser from this launch, while the host `xdg-open` did. Fix (`PlatformBundle.desktop.kt`): open http(s) links with `HostShell.spawn(listOf("xdg-open", uri))`, the route `HostAppLaunch.openStorePage` already uses (host `xdg-open` through `flatpak-spawn --host` in the sandbox, plain `xdg-open` in a dev run). The unit-1 note "the VM has no browser" was wrong for Fedora GNOME.
+- Results with the fixed build (local commit f684db1a, signed with the alpha key and installed as a bundle; not yet published): Fedora GNOME, Fedora KDE and Ubuntu GNOME all PASS. Wayland sessions on all three; 17 games synced; browser opened from the pairing screen on both Fedora VMs (Ubuntu has no browser, check skipped); SIGTERM exits 461–536 ms. One Fedora GNOME exit took 5.7 s (sync running, a browser just launched); four later exits took 417–523 ms, so it did not reproduce. Watch for it in later runs (the 3 s halt watchdog should cap it).
+- On Ubuntu with no browser, the host `xdg-open` opened the RomM pair page's HTML in Text Editor. That is the guest's handler fallback, not Argosy; a real Ubuntu desktop ships a browser.
+- The wizard recipe now goes through the QR "Scan to pair" step (`DPAD_DOWN`, then choose "Use a pairing code"); `gotchas.md` updated with the bundle-signing step (the guest remote verifies GPG).
+**Reasoning:** the per-desktop test has to be one command so every later change can be checked on all three desktops the same way; the pairing-screen browser is part of first run for anyone without a phone, so it was fixed in this unit rather than parked.
+
+### 2026-10-29 — Step 4, VM lab unit 3: download, RetroArch launch and Close Argosy in `desktop-test.sh`
+- `desktop-test.sh` now also installs `org.libretro.RetroArch` from Flathub in the guest with the `fceumm`, `mgba` and `gambatte` cores from the libretro buildbot (what RetroArch's Core Downloader fetches), waits for the first library sync, presses A on Home (download) and A again (launch), ends RetroArch, checks the session end, and closes Argosy from Quick Settings; then restarts and checks SIGTERM. Waits are log-driven (`log_wait` polls the guest log through guest-exec).
+- Fedora KDE: everything PASSES (download to `~/Games/Argosy/nes`, RetroArch 1.22.2 started with `fceumm`, session end, Close Argosy within 1 s, SIGTERM 510 ms).
+- Fedora GNOME and Ubuntu: Close Argosy, log and SIGTERM checks PASS; download and launch FAIL because A on Home hit "View All" (see findings).
+- Findings:
+  - **No RetroArch cores on a fresh Flathub RetroArch.** Launch fails with "No core available for nes: fceumm_libretro.so is not installed in RetroArch" until the user downloads cores inside RetroArch. The message is accurate, but first launch fails for every new user. Owner question: should Argosy install the needed core into `~/.var/app/org.libretro.RetroArch/config/retroarch/cores` (it already has `LibretroBuildbot`), or point the user to RetroArch's Core Downloader?
+  - **Home may not refresh after the first sync.** On Ubuntu the Home NES row still showed only "View All" 10 s after `syncLibrary returned - added=17`; on KDE the row had the games. To investigate (HomeViewModel's row source after a first sync), not yet confirmed as a bug.
+  - With RetroArch installed, the wizard's "Emulators Argosy should manage" step focuses the RetroArch row (A toggles it); Continue needs `DPAD_DOWN` first.
+  - Close Argosy is `R3`, `DPAD_DOWN*8`, A (opens the confirmation), A.
+  - A session under the minimum length logs `SessionEnd: short session (14s), cancelling without backup` and no `endSession result` line (expected).
+  - The wizard walk still uses fixed sleeps; one Fedora GNOME run drifted (Games Path reached before pairing, so nothing synced). Replace the remaining sleeps with log or screen markers.
+**Reasoning:** download and launch are the core loop, so they go into the per-desktop test even before every desktop passes; the two failures are timing on the test side and a possible Home refresh gap, which need an investigation, not more reruns.
+
+### 2026-10-30 — Step 4, VM lab unit 4: Home refreshes after a library sync it did not start; all three desktops pass
+- Cause of the unit-3 finding: Home loads a platform row once, and `observePlatformChanges` returns early when the platform list is unchanged (`HomePlatformUi` carries no game count). Home's own startup sync refreshes only Recent when it ends, and when another sync is already running (the wizard's first sync) it starts none and hooks nothing. So a Home opened during the first sync kept an empty platform row ("View All" only) until something else reloaded it. Shared code: Android behaves the same way after its first-run sync.
+- Fix: `HomeSyncDelegate.observeLibrarySyncEnd` collects `PlatformSyncQueue.isLibraryBusy` (the flow Settings and the Sync Monitor already use) and, on busy to idle, `HomeViewModel` reloads Recent and the current row through `refreshCurrentRowInternal`. Any library sync now refreshes Home, whoever started it.
+- Check: `:shared:compileKotlinDesktop :app:assembleDebug :app:testDebugUnitTest` green (no Home view-model tests exist). Not checked on the Android emulator (the A/B and save-proof gate was not run; the change adds a refresh and touches no save path).
+- `desktop-test.sh` on build e68b1170 (signed local bundle): every product check PASSES on Fedora GNOME (`test-u4`), Ubuntu GNOME (`test-u4d`) and Fedora KDE (`test-u4f`): wizard and pairing, the first sync (17 games), ROM download, RetroArch launch with the buildbot core, session end, Close Argosy (within 1 s), SIGTERM (403–432 ms), no error lines.
+- Lab fixes found on the way: the testbed RomM hit its 25-token cap again because every successful lab pairing leaves a used token. `pair-code.py --vmlab` now mints `argosy-vmlab-*` tokens and prunes them after ten minutes, used or not (lab VMs are always reverted); the 11 dead lab tokens from 2026-10-29/30 were deleted (older tokens, which may belong to dev or emulator installs, were kept). `exec.sh` agent calls time out after 60 s and long-mode polling retries (two Ubuntu runs hung for an hour in the install). The walk now waits for `Device registered` instead of 15 s, and the wizard waits are longer (KDE pairing can take over 15 s; one KDE run skipped the server step).
+**Reasoning:** the Home gap is what a new user sees first on a slow first sync, so it was fixed in shared code at the delegate that already owns sync for Home, using the queue's existing state flow rather than a new callback.
+
+### 2026-10-30 — Step 4, VM lab unit 5: XWayland and HiDPI at 125% and 150%
+- New `scripts/desktop/vmlab/scale.sh <profile> <scale>`: KDE through `kscreen-doctor output.Virtual-1.scale.<s>`, GNOME through `gdctl set --logical-monitor --primary --monitor Virtual-1 --scale <s>` with mutter's `scale-monitor-framebuffer` and `xwayland-native-scaling` enabled (the fractional-scaling setting a GNOME user turns on).
+- The Flatpak has no Wayland socket (dropped for the Flathub lint), so on every desktop it runs under XWayland. Build e68b1170 on the paired lab VMs (screens in `build/vmlab/<profile>/u5/`):
+  - Fedora KDE 125% (logical 1536x864) and 150% (1280x720): Home renders sharp and correctly laid out, window decorations by KWin, SIGTERM 511 ms.
+  - Fedora GNOME 125% and 150%: Home renders sharp and correctly laid out, SIGTERM 408 and 511 ms. At 125% the window opens smaller than at 150%: with native XWayland scaling the app sees physical pixels and keeps its default window size, so it is not enlarged. The layout scales with the window height (TV density rule), so nothing is cut off; fullscreen is unaffected. Cosmetic; noted, not changed.
+- Not covered: a native Wayland run (needs the Wayland socket back; a Flathub-lint decision).
+**Reasoning:** HiDPI is the most common desktop-specific failure for a JVM app on XWayland (blur or tiny UI). Both compositors' fractional paths render it sharp, so no code change is needed now.
+
+### 2026-10-30 — Step 5 groundwork: the Flathub build's startup abort diagnosed
+- Rebuilt the `.flathub.yml` manifest from source in `build/flathub-scratch/` (separate state and repo, nothing installed; `flatpak run --filesystem=<repo> org.flatpak.Builder`, since there is no host `flatpak-builder` and the Builder Flatpak has a private `/tmp`). Gradle offline build green in 6m 37s.
+- `strace -f -e trace=process,write` on a `flatpak build` run with scratch `XDG_*`: the jpackage launcher (sandbox pid 2) forks a helper (pid 3) that probes `rpm` and `dpkg` for package ownership (both absent, exit 127), writes the launch data, including the `libjli.so` path, to its parent through a pipe, and then dies with `pure virtual method called` and SIGABRT on exit. The parent then starts the JVM, so the app runs. The JVM is not involved.
+- Cost to users: systemd-coredump records a SIGABRT core for `/app/lib/argosy-desktop/bin/argosy-desktop` at every launch (confirmed with `coredumpctl`), which can also trigger the desktop's crash reporter. It must be fixed before the Flathub submission.
+- Cause: known OpenJDK bug JDK-8348560 (jpackage launcher, dynamically linked libstdc++, a destructor run at library unload; not seen in 22.0.2 and later). The openjdk21 SDK extension (21.0.13) links libstdc++ dynamically; the alpha's host JDK (21.0.12) does not show it.
+- Fix plan (next unit): in the Flathub manifest, stop using the jpackage native launcher. Install the extension's JRE into `/app/jre` (`/usr/lib/sdk/openjdk21/install.sh`, the usual Flathub Java layout) and make `/app/bin/argosy-desktop` a shell script that runs `/app/jre/bin/java` with the classpath, main class and `java-options` from the generated `argosy-desktop.cfg`. Then rerun the smoke run (no abort, no core dump) and the manifest and repo lint.
+**Reasoning:** the abort is in a helper process, so the app works, but a core dump at every launch is a visible crash report on Fedora and Ubuntu and a likely Flathub review question. Replacing the launcher avoids the bug without waiting for a JDK backport.
+
+### 2026-10-30 — Step 5 groundwork: Flathub build starts from `/app/jre`; the abort is gone
+- `io.github.stealthx3.ArgosyDesktop.flathub.yml` (commit e42cb0efe): after copying the Compose distributable, it removes the jpackage native launcher and its jlink runtime (`bin/`, `lib/runtime`), runs the extension's `install.sh` (JRE into `/app/jre`), and installs `desktopApp/flatpak/argosy-desktop-jre.sh` as `/app/bin/argosy-desktop`. The script reads `app.classpath` (121 jars), `app.mainclass` and the `java-options` from the generated `lib/app/argosy-desktop.cfg` (with `$APPDIR` resolved) and execs `/app/jre/bin/java`, so the launch arguments still come from the Gradle build. The alpha manifest is unchanged (its host JDK 21.0.12 launcher does not abort).
+- Rebuilt in `build/flathub-scratch/` (offline Gradle green, 7m 6s). Smoke run with scratch `XDG_*`: up for the full 45 s until the timeout's SIGTERM, no `pure virtual method called`, no exceptions, database initialised, and no new entry in `coredumpctl`.
+- Lint: manifest and repo show only the known owner-gated errors (screenshots, the app-id URL) and the `flatpak-spawn` and runtime-26.08 warnings.
+- Size: the full JRE is 196 MB in place of the trimmed jlink runtime.
+- The script has to be committed before a build, because the manifest builds from the repo's git HEAD.
+**Reasoning:** an extension JRE plus a script is the standard Flathub layout for Java apps and avoids the JDK-8348560 launcher bug, instead of waiting for a JDK backport. Reading the cfg keeps the Gradle build as the single source of the launch arguments.
+
+### 2026-11-04 — Step 4: Close Argosy moved to the left drawer, second exit in Settings
+
+**Owner report:** the exit button seemed to be missing from "quick settings"; the owner meant the left drawer (Home, Library, Settings), and asked for a second exit as the final row of the Settings page.
+**Finding:** the step 2 row was in the alpha (`QuickSettingsItem$CloseApp` in the installed jar), but as the last row of the Quick Settings list only a sliver of its button showed until the list scrolled (`build/vmlab/fedora-kde/qs-check/06-fresh-open.png`).
+**Action:** the Quick Settings row and its dialog state are gone. `AppShutdown` now owns the dialog state (`confirmOpen`, `requestConfirm`, `dismissConfirm`), and `ArgosyApp` hosts one `ArgosyConfirmModalHost` for both entry points. `MainDrawer` draws a "Close Argosy" row below the scrolling list, directly under Settings, so it never scrolls out of view; it is the last drawer focus stop. `MainSettingsItem.CloseApp` is the last row of the System section. All are desktop only through `PlatformFeatures.desktopWindow`. Strings: `ui_quick_settings_close_app_*` renamed to `ui_drawer_close_app` and `ui_close_app_confirm_*`; new `settings_main_close_app_title` and `_subtitle`, in all eight locales.
+**Reasoning:** one dialog for two entry points, so input capture and the shutdown path cannot differ. The shared host starts on Cancel, where the step 2 dialog started on Close; the walk is now `A RIGHT A`.
+**Verification:** gate `:shared:compileKotlinDesktop :shared:desktopTest :app:assembleDebug :app:testDebugUnitTest` passes, including the new `MainSettingsCloseRowTest`. Signed local bundle on Fedora KDE with the gamepad (`build/vmlab/fedora-kde/close-check/`): drawer row visible and focusable, dialog over the drawer, B cancels; Settings last row opens the same dialog, Close exits the app. Not run: mouse clicks on the two rows, the updated `desktop-test.sh` end to end, GNOME, an Android device. Android hides both rows through `desktopWindow`. Not on the alpha repo: step 4 is still open.
+
+**Alpha published early (owner go-ahead, 2026-11-04):** the owner approved publishing this build before step 4 closes, so the Deck checks run on it. Built from 996687dd8 and pushed with `push-pages.sh --step-close 5.4`, the script's only step-level flag, so the `gh-pages` commit message (b0e1c150) says "step 5.4 close" although **step 4 is still open**. The repo serves flatpak commit f99eb770; all four URLs answer 200. The step's real close republishes.
+
+### 2026-11-04 — Step 4: accent hover highlight on the Desktop display profile
+
+**Owner request:** a mouse-highlight animation on interactive objects in the Desktop layout, in the theme's accent colour.
+**Action:** `LocalHoverHighlight` (null by default) holds an `IndicationNodeFactory` that fades a `focusAccent` wash and ring in and out over `Motion.durationContent`. `clickableNoFocus` passes it as the click indication, so every control using it gets the highlight; `Main.kt` provides it only when the effective profile is `DESKTOP`, so Handheld, TV and Android draw nothing. Token: `components.hoverHighlight` (`fillAlpha`, `ringAlpha`). New `clickableSurfaceNoFocus` for click areas that are not controls (modal scrims, tap-swallowing panels, screenshot tap zones), which never highlight; 42 sites moved to it.
+**Verification:** gate passes. On Fedora KDE with a real pointer through QMP (`scripts/desktop/vmlab/mouse.sh`, screens in `build/vmlab/fedora-kde/hover-check/`): Desktop profile highlights the Home "View All" tile and drawer rows; Handheld profile draws nothing; mouse clicks reach drawer rows.
+**Known gaps:** Material `IconButton`, `Switch`, `Slider` and `TextField` keep their own hover behaviour; rows drawn with their own pointer handling (for example the UI Scale row) have no row-level highlight. Clicking a Display Profile card only moves focus to the row (seen in the VM, not changed here).
+
+### 2026-11-04 — Step 4: platform Reset to Defaults and Factory Reset
+
+**Owner request:** a "reset to defaults" on the platform configuration screen that returns every platform to Not configured; a "factory reset" in the System section, with a warning and a sanity check, that removes all data Argosy created, returns settings to defaults and restarts into the setup wizard.
+**Action, platforms:** `EmulatorsItem.ResetPlatforms` opens one confirmation; `DatabaseAdminRepository.resetPlatformConfigurations` clears platform rows of `emulator_configs`, plus `emulator_save_config`, `emulator_launch_args`, `platform_libretro_settings` and `platforms.customRomPath`, in one transaction. Per-game overrides, sync toggles, games and saves stay.
+**Action, factory reset:** `MainSettingsItem.FactoryReset` sits above Close Argosy. Warning, then "Are you absolutely sure?", both starting on Cancel; the warning adds the count of saves not yet uploaded. A running session or download blocks it, reusing the hard reset's blockers and messages. On confirm: delete the game files whose `fileOrigin.deletedOnReset` is true, with their extra files and discs; prune the folders that leaves empty; remove AppImages installed by Managed Installers; `AppShutdown.requestFactoryReset`. `Main.kt` writes a marker beside the data folder and exits with code 75. The launcher scripts (`argosy-desktop.sh`, `argosy-desktop-jre.sh`) restart the app on 75, and the new JVM's first step, `FactoryResetWipe.runIfPending`, deletes the data and cache folders before anything opens them.
+**Reasoning:** unsaved uploads warn rather than block, unlike the existing hard reset, so an offline user or a dead server cannot make the app impossible to reset. Wiping in a new process means no live thread can write settings back over the wipe. A wrapper loop keeps the main process alive across the restart, which Flatpak and Steam Game Mode both need. Files Argosy adopted, emulator-owned saves and server data are not Argosy's and stay; so do BIOS copies placed into emulator folders. The RomM client token stays on the server.
+**Found and fixed:** `application {}` defaults to `exitProcessOnExit = true`, so everything after it in `main` never ran, including the step 2 cleanup. It now passes `false`.
+**Verification:** gate passes with new `FactoryResetWipeTest` and `FactoryResetFilesTest`. On Fedora KDE, gamepad, with a seeded database (`build/vmlab/fedora-kde/reset-check/`): platform reset took `emulator_configs` 2 to 1 (the per-game row), the other tables and `customRomPath` to 0, with 17 games kept. Factory reset deleted the downloaded ROM, kept a user file beside it and a RetroArch save, restarted in 2 s with a new PID, and came up in the wizard with 0 games, 0 accounts and no `reset_records`. Normal Close Argosy still exits without restarting or wiping; SIGTERM still ends the app through the wrapper. Not run: Managed Installer removal, the prune of an emptied default folder in the VM (unit tested), Game Mode, the Flathub launcher script, GNOME, an Android device. Android hides all these rows through `desktopWindow`.
+
+### 2026-11-05 — Step 4: hover and both resets tested on GNOME and under gamescope
+
+**Owner request:** test these in VMs for Game Mode and GNOME; skip Android.
+**Action:** `reset-test.sh` drives hover, platform reset and factory reset on a VM left by `desktop-test.sh`. `gamescope-test.sh` runs the Flatpak under headless gamescope with software rendering: wizard, pairing, drawer Close, then factory reset.
+**Results:** Fedora GNOME and Ubuntu GNOME pass all of `desktop-test.sh` and `reset-test.sh`: both exits, hover on Desktop, platform reset `1 1 1 1 1 1` to `0 1 0 0 0 0` (per-game row kept), factory reset restarting in 2 s into the wizard with 0 games, user ROM and RetroArch save kept, SIGTERM about 0.4 s. Under gamescope: `XDG_CURRENT_DESKTOP=gamescope` seen, wizard recommends TV, Close Argosy ends the session with exit 0, factory reset restarts in 2 s with the gamescope PID unchanged.
+**Reasoning:** every failure along the way was the lab, not the app, so scripts changed and the product did not: dash could not parse multi-line commands, one check had a quoting bug, Fedora's Overview lost keys, gamescope's capture and process name differ. Ubuntu's RetroArch install hung twice after a reset, cause not found (run by hand it took 6 min), so the passing Ubuntu pair ran with `LAB_KEEP=1` on the same VM and the same build; an earlier run from `clean` passed `desktop-test.sh` with that build too.
+**Not covered:** real Steam (overlay, Steam keyboard), a real GPU, mouse clicks on the new rows, Managed Installer removal, the Flathub launcher script. Also recorded: the second early publish (Pages 7b68c15f from 87824d162, `gh-pages` 10ab2ded).
+
+### 2026-11-06 — Step 4: mouse hover shows the gamepad focus look
+
+**Owner request:** the Desktop profile's mouse highlight should look and animate like gamepad focus. Owner choice after a question: hover draws the focus look without moving the selection; controls with no focus look get a background change on the Desktop profile. The owner approved a mockup before the build.
+**Action:** `HoverFocus` / `rememberHoverFocus()` (`ui/util/HoverHighlight.kt`) and a `clickableNoFocus(hover, ...)` overload let a component OR hover into its own `isFocused`. Wired: preference rows (`PreferenceItem.kt`, through a `preferenceModifier(hover, ...)` overload; the old overload tracks hover for the background on its own), `RowButton`, `ActionButton`, `NavDrawerRow`, `GameCard` and `GameCardWithNewBadge`. Card click areas on Home, the grids, the carousel and Game Detail use `clickableSurfaceNoFocus`, so cards show only their own look. The fallback wash for everything else now matches the focus fill (palette tint, `hoverHighlight.fillAlpha` 0.18, the tier focus spring, drawn behind the content, no outline). A hovered card grows to at most `Focus.scaleFocused` (1.1); the Home row's own focus scale (about 2x) covered the title and neighbours. `LocalPointerInWindow`, fed by an AWT listener in `Main.kt`, clears every hover look when the pointer leaves the window.
+**Verification:** gate passes (one rerun of the full gate failed `DownloadManagerPlatformFolderTest` once with an `IllegalStateException` in setup; the class passes three forced reruns and the change does not touch downloads). Fedora KDE VM with a real pointer through QMP (`build/vmlab/fedora-kde/hover-v3..v5`): cards lift and glow at 1.1x, drawer rows, settings rows and profile cards take their focus look, footer buttons get the wash, gamepad focus stays where it was. Jumping out of the window clears hover (Compose alone left it on).
+**Known gap:** in the VM, gliding out across the window's side edge sends Java no exit event at all (logged), so the last hover stays until the pointer returns. Not reproduced on real hardware yet.
+
+### 2026-11-06 — Beta 1: version 0.4.0, README and plan
+
+**Owner request:** treat the current build as the first beta; install instructions near the top of the README; README and plan updated to the project so far, with a closing section of ideas for where to go next.
+**Action:** `packageVersion` 0.4.0 and a 0.4.0 release entry in the metainfo (validates). `PORT_PLAN.md`: a Beta 1 progress note, a status line under the Roadmap, the open Phase 5 owner decisions, and "Where to go from here" (ten ideas). `README.md` rebuilt: intro, "Install the beta" (install, run, first RetroArch, Steam Deck, updates, uninstall), status, the full plan, the upstream link.
+**Not done:** the Pages repository still serves 7b68c15f (0.3.0); publishing Beta 1 needs the owner's go-ahead. Pushing the README to GitHub waits for the phase close.
+
+### 2026-11-06 — Beta 1 published
+
+**Owner request:** "Yes, publish Beta 1".
+**Action:** the Pages index heading and the remote's comment say "beta" (`push-pages.sh`, `publish-repo.sh`). `build-alpha.sh` from 02494a9e3 → `publish-repo.sh` → `push-pages.sh --step-close 5.4` (the script's only step-level flag; step 4 itself stays open until the owner's Deck checks).
+**Result:** Pages serves flatpak commit 963973e6 (version 0.4.0), `gh-pages` 7e0e20b; index, summary, summary.sig, `.flatpakref` and `.flatpakrepo` answer 200. A clean Fedora KDE VM installed it from the public `.flatpakref`: version 0.4.0, commit 963973e6.
+
+### 2026-11-07 — Step 4: grey strips on the edges under gamescope
+
+**Owner report:** a white border on the bottom and right of the screen in Steam Game Mode on a 4K TV.
+**Cause:** under gamescope there is no window manager, but the window was still decorated. AWT reserves its guessed frame insets (5 px left and right, 25 px top, 5 px bottom), so the Compose canvas ends 10 px short of the right edge and 30 px short of the bottom, and the window's default Swing background (#EEEEEE) shows in the gap. Measured in the Fedora KDE VM under headless gamescope at 640×480, 1280×720, 1920×1080 and 3840×2160: the same strip at every size, so it is not a scaling issue.
+**Action:** `Main.kt` opens the window undecorated under gamescope (`undecorated = gamescope`), and paints the window, content pane and root pane black, so any gap left is black. A first idea, pinning `sun.java2d.uiScale=1`, was dropped: the strip does not depend on the scale.
+**Verified:** local signed bundle 3549db4c in the VM under gamescope at 720p, 1080p and 4K: no #EEEEEE pixels, even margins on all four sides (`build/vmlab/fedora-kde/edgefix/`). Not published (owner: no rebuild of the public repo yet). Not checked on the owner's Deck and TV.
+**Also this session:** a TV-profile audit at 480, 720p, 1080p and 4K (`build/vmlab/fedora-kde/tv*/`), and mock-ups of TV tweaks for owner approval. Owner answers so far: hint glyphs per controller, minimum text size and contrast, quieter NEW badges and 2 px lines approved; Home's LB/RB card navigator moves to the top row with controller glyphs and the hint bar stops auto-hiding; sidebar at most a quarter of the screen with a left scroll indicator; focus as an accent edge glow behind the item; content-above-the-bar to be previewed in the VM; 480 deferred until 720p, 1080p and 4K are done.
+
+### 2026-11-07 — Step 4: TV-layout tweaks built for owner preview (uncommitted)
+
+**Owner request:** apply the approved TV tweaks and preview them in the VM before committing.
+**Action:** TV profile only, via `LocalDisplayProfile`/`isTvLayout` (provided by `Main.kt`): nav ring moved into each screen's top row (`TopRowNavRingSlot`, Home, Library and Settings headers) with bumper glyphs, bottom bar off and the hint bar no longer yielding; per-controller face and shoulder glyphs (`ControllerGlyphs.kt`, family from the SDL GUID vendor: Sony, Nintendo, Valve, else Xbox); sidebar capped at 25% width, tighter rows, `SpindleScrollIndicator`; desktop battery hidden when there is none (`BatteryState.present`, all profiles); 14 sp text floor and lighter `onSurfaceVariant`; `tvFocusGlow` behind focused rows in place of the ring; NEW badge as a dot except on the focused card; `Dimens.borderThin` and Library/drawer dividers at least 2 dp. Tokens: `components.tvLayout`, `color.domain.controllerGlyph`.
+**Verified:** full gate green; preview bundle in the Fedora KDE VM under gamescope at 720p, 1080p and 4K. Faults seen: hint bar over the open sidebar; Home's platform selector squeezed. Not committed, pending the owner's review. Under Steam Input every pad reports Valve's vendor id, so Game Mode will show Steam-style glyphs; settings override is a queued owner request.
+**Paused** for usage pacing (5-hour window at 46%).
+
+### 2026-11-07 — Step 4: TV-layout tweaks committed
+
+**Owner:** "Yes, fix and commit" after the previews.
+**Action:** the hint bar now hides while the sidebar is open on TV (`ArgosyApp.kt`, both footer gates), so the sidebar's clock row shows. Home's header gives the platform selector the remaining width with spacers around the switcher.
+**Verified:** gate green apart from one `PushInstallCoordinatorTest` failure that passed on two `--rerun` runs (flake, unrelated). VM at 1080p under gamescope: sidebar fixed. Not fixed: Home's platform selector is still narrow; `SectionBreadcrumb` seems to cap its own width. Next unit.
+
+### 2026-11-08 — Step 4: setup folder picker, controller layout choices, Home top row
+
+**Owner requests:** volumes sidebar and a Back button in setup's folder step; all controller hint types selectable in Settings > Navigation with detection checked; proceed past the usage limit.
+**Action:** the Flatpak grants `/run/media`, `/media` and `/mnt` (both manifests), so mounted drives are visible; the detector labels the home folder "Home" and skips the mount roots themselves. The folder browser has a Back button bottom-left (B does the same). Controller Layout gains PlayStation and Steam on desktop (`LAYOUT_OPTIONS`); `ButtonGlyphRemap.layout` carries the choice, and `controllerFamily` uses it before the SDL GUID vendor (Sony 054c, Nintendo 057e, Valve 28de, else Xbox). The family glyphs now show on every desktop profile, not only TV (`showsControllerGlyphs`: a display profile is set). Home's switcher is compact on TV (no touch-size padding).
+**Verified:** gate green (desktop and Android). VM at 1080p under gamescope: the picker opens from Image Cache with "Home" in the sidebar and Back returning to Image Cache; Controller Layout shows the five choices; Home shows four platform names. Not checked: a real second drive; a real PlayStation or Nintendo pad.
+
+### 2026-11-08 — Step 4: desktop-only Linux emulators from awesome-emulators
+
+**Owner request:** a fuller Linux emulator database from github.com/DerekTurtleRoe/awesome-emulators, Linux options only; owner chose a desktop-only list (Android untouched).
+**Action:** of the list's 139 recommended, active Linux emulators, 36 are on Flathub (`docs/desktop/emulators/awesome-linux-candidates.json`). 22 new entries (`linux_*` ids, database version 2): ares, bsnes, Mednafen, Mesen, Nestopia UE, puNES, SameBoy, VisualBoyAdvance-M, DeSmuME, gopher64, RMG, BlastEm, Supermodel, Play!, shadPS4, Stella, BigPEmu, Hatari, FS-UAE, VICE (C64), openMSX, DOSBox Staging. Each lists its own `platforms`; `LinuxEmulators.desktopOnlyDefs` turns them into registry entries, and `EmulatorRegistry.registerPlatformEmulators` (new, never called on Android) adds them to every lookup. Left out: 86Box and VirtualXT (machine configs, not game files), Ruffle (no Flash platform), Retrom and Parallel Launcher (frontends), MAME/Dolphin/PCSX2 etc. (already present). Launch forms checked against upstream sources: Play! `--disc`, shadPS4 `-g`, FS-UAE `--floppy_drive_0=`, VICE through `net.sf.VICE` (command `x64sc`); the rest take the game file as the last argument.
+**Verified:** gate green; unit tests for registration and command lines. Not yet run in the VM (needs the owner's OK for the Flatpak downloads).
+
+### 2026-11-08 — Step 4: VM test of the 22 desktop-only emulators
+
+**Action:** with the owner's OK for the downloads, installed the 20 Flathub emulators in the Fedora KDE VM (`--user`, about 4 GB). Mednafen and Mesen have no Flatpak and were not tested. Each was started with the exact command Argosy builds (`flatpak run <id> <args> <rom>`), and the script recorded whether it was still running after 14 s and took a screenshot (`build/vmlab/emutest/`, log `build/vmlab/emutest.log`). ROMs: the testbed's homebrew NES/GB/GBA files, plus self-made looping ROMs for SNES, Genesis, Atari 2600, MSX, C64 and DOS. Platforms with no ROM got placeholder files, so those runs show only that the emulator starts and reads its argument.
+- **Running with a game:** ares, bsnes, Nestopia UE, puNES, SameBoy, BlastEm, Stella, VICE, openMSX and DOSBox Staging.
+- **Running, placeholder or blank media:** RMG, Play!, BigPEmu, FS-UAE, Hatari and DeSmuME.
+- **Reads the file and rejects the placeholder:** gopher64 ("Could not read ROM file") and Supermodel.
+- **Fix: shadPS4.** The Flathub app's default command is the Qt launcher, which needs `-d` (default emulator version) before `-g`. The entry is now `-d -g {rom}`, limited to the Flatpak (`onlyTargetsContaining`), since a native `shadps4` binary is the core and takes only `-g`. The core itself stops in the VM ("CPU doesn't support invariant TSC", a VM CPU limit), so it needs real hardware.
+- **Finding: VBA-M** crashes in this VM even with no arguments (wxWidgets cannot create a GtkMessageDialog). That is an emulator/VM problem, not Argosy's command; untested on real hardware.
+- **Folder access:** Hatari, gopher64, RMG and DeSmuME have no home-folder access in their manifests. Argosy's existing Permissions step (`HostFolderAccess.emulators`) walks `LinuxEmulators.all` through the registry, so it already lists them and grants the games folder with `flatpak override`. After the same override, Hatari and DeSmuME ran.
+- **End to end through Argosy:** with the new bundle, Rope and Anchor (NES) defaulted to ares; the per-game picker listed ares, Nestopia UE [1.53.2] and puNES [v0.111]. Choosing Nestopia UE and pressing Play started `nestopia "/home/tester/Games/Argosy/nes/Rope and Anchor (Homebrew).nes"` and the game ran (`build/vmlab/emue2e/`).
+- Gate: `:shared:desktopTest` green (added a check that a native shadPS4 install gets no command).
+
+### 2026-11-08 — Step 4: VBA-M removed from the emulator database (owner request)
+
+**Action:** removed `linux_vbam` (VisualBoyAdvance-M) from `linux-emulators.json`; the database now has 41 entries, 21 of them desktop-only. **Reason:** the owner asked to drop it for now after the VM test, where the Flatpak crashed even with no arguments. GB/GBC/GBA stay covered by ares, SameBoy, Mednafen and Mesen. `:shared:desktopTest` green.

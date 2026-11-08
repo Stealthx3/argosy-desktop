@@ -1,0 +1,209 @@
+{
+  "standard": "POST-MORTEM-STANDARD v1",
+  "generated": "2026-11-07T01:04:38.915Z",
+  "root": "/home/claude/argosy-desktop",
+  "since": "2026-10-16",
+  "transcriptDirs": [
+    "/tmp/claude-0/-home-claude/0d4f3396-1a2e-5c20-9961-f4b574bac0b4/scratchpad/pm/transcripts"
+  ],
+  "totals": {
+    "tokens": {
+      "input": 76,
+      "output": 39999,
+      "cacheRead": 11999071,
+      "cacheWrite": 285129
+    },
+    "calls": 106,
+    "errors": 4,
+    "interrupts": 1,
+    "userMsgs": 4,
+    "sessions": 1,
+    "subagentSessions": 0,
+    "start": 1792139421137,
+    "end": 1792171595624
+  },
+  "tools": {
+    "mcp__memory__memory_read": {
+      "calls": 2,
+      "errors": 0
+    },
+    "WebSearch": {
+      "calls": 7,
+      "errors": 0
+    },
+    "WebFetch": {
+      "calls": 2,
+      "errors": 0
+    },
+    "mcp__Claude_Docs__guide": {
+      "calls": 4,
+      "errors": 0
+    },
+    "mcp__Claude_Docs__batch": {
+      "calls": 4,
+      "errors": 0
+    },
+    "Artifact": {
+      "calls": 1,
+      "errors": 0
+    },
+    "mcp__Claude_Docs__update": {
+      "calls": 23,
+      "errors": 2
+    },
+    "mcp__Claude_Docs__read": {
+      "calls": 8,
+      "errors": 1
+    },
+    "ToolSearch": {
+      "calls": 5,
+      "errors": 0
+    },
+    "Bash": {
+      "calls": 27,
+      "errors": 1
+    },
+    "mcp__claude-code-remote__add_repo": {
+      "calls": 1,
+      "errors": 0
+    },
+    "mcp__remote-devices__get_device_info": {
+      "calls": 1,
+      "errors": 0
+    },
+    "mcp__remote-devices__device_request_folder_access": {
+      "calls": 1,
+      "errors": 0
+    },
+    "mcp__remote-devices__device_list_dir": {
+      "calls": 2,
+      "errors": 0
+    },
+    "TaskCreate": {
+      "calls": 5,
+      "errors": 0
+    },
+    "TaskUpdate": {
+      "calls": 3,
+      "errors": 0
+    },
+    "AskUserQuestion": {
+      "calls": 1,
+      "errors": 0
+    },
+    "mcp__Claude_Docs__export": {
+      "calls": 1,
+      "errors": 0
+    },
+    "Write": {
+      "calls": 5,
+      "errors": 0
+    },
+    "mcp__remote-devices__device_commit_files": {
+      "calls": 2,
+      "errors": 0
+    },
+    "Edit": {
+      "calls": 1,
+      "errors": 0
+    }
+  },
+  "git": {
+    "commits": 224,
+    "first": "2026-10-16T18:18:08-07:00",
+    "last": "2026-10-24T14:11:17-07:00",
+    "reverts": [],
+    "fixes": 1,
+    "topChurn": [
+      {
+        "file": "scripts/desktop/restructure/moves.txt",
+        "lines": 1841
+      },
+      {
+        "file": "DEVLOG.md",
+        "lines": 1039
+      },
+      {
+        "file": "scripts/desktop/restructure/slices.py",
+        "lines": 992
+      },
+      {
+        "file": "shared/src/desktopMain/kotlin/com/nendo/argosy/data/storage/StorageAttributionRepository.desktop.kt",
+        "lines": 979
+      },
+      {
+        "file": "scripts/desktop/restructure/movable.py",
+        "lines": 799
+      },
+      {
+        "file": "scripts/desktop/restructure/rewrite_imports.py",
+        "lines": 614
+      },
+      {
+        "file": "docs/desktop/handoff/phase-3.md",
+        "lines": 575
+      },
+      {
+        "file": "shared/src/desktopMain/kotlin/com/nendo/argosy/data/emulator/PlaySessionTracker.desktop.kt",
+        "lines": 569
+      },
+      {
+        "file": "docs/desktop/handoff/phase-2.md",
+        "lines": 560
+      },
+      {
+        "file": "shared/src/desktopMain/kotlin/com/nendo/argosy/DualScreenManager.desktop.kt",
+        "lines": 418
+      }
+    ]
+  },
+  "plan": null,
+  "journal": null,
+  "sessions": [
+    {
+      "id": "383d8d2b-6c22-532d-9c74-c1d4e7c83ff9",
+      "surface": "claude-code",
+      "subagent": false,
+      "start": "2026-10-16T08:30:21.137Z",
+      "end": "2026-10-16T17:26:35.624Z",
+      "minutes": 536,
+      "models": [
+        "claude-sonnet-4-6",
+        "claude-opus-5-5"
+      ],
+      "tokens": {
+        "input": 76,
+        "output": 39999,
+        "cacheRead": 11999071,
+        "cacheWrite": 285129
+      },
+      "toolCalls": 106,
+      "toolErrors": 4,
+      "interrupts": 1,
+      "userMsgs": 4
+    }
+  ],
+  "signals": [
+    {
+      "kind": "idle-gap",
+      "weight": 8,
+      "detail": "Idle 504 min mid-session (prompt cache expired) at 2026-10-16T08:46:43.470Z",
+      "session": "383d8d2b-6c22-532d-9c74-c1d4e7c83ff9",
+      "id": "S-001"
+    },
+    {
+      "kind": "no-journal",
+      "weight": 5,
+      "detail": "docs/postmortem/JOURNAL.md missing: session history for non-Claude-Code work must be reconstructed",
+      "session": null,
+      "id": "S-002"
+    },
+    {
+      "kind": "interrupt",
+      "weight": 2,
+      "detail": "User interrupted 1× (possible wrong direction)",
+      "session": "383d8d2b-6c22-532d-9c74-c1d4e7c83ff9",
+      "id": "S-003"
+    }
+  ]
+}
