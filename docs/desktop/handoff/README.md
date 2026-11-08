@@ -7,6 +7,8 @@ forward, where the details are) and the next phase's file is created from it.
 
 **Current phase: 5** → [phase-5.md](phase-5.md)
 
+**Paused 2026-11-08** for a Claude Cowork repo reorganization and documentation rework: [cowork-brief.md](cowork-brief.md).
+
 | Phase | File | Status |
 | --- | --- | --- |
 | 0 · Discovery and spikes | [phase-0.md](phase-0.md) | Closed 2026-10-16 |
