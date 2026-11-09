@@ -9,7 +9,7 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 - **Development is paused.** The owner asked to hand the repo to Claude Cowork for a reorganization and documentation rework. Do not resume step 4 until the owner says so. Pacer state: `waiting-owner`.
 - **Git:** everything from this session is committed on local `main` (last: 308d74c2e). Local `main` and `origin/main` have **diverged**: origin has one docs-only commit, 6ddef138e ("Docs: new README, Phase 5 records and the interim post-mortem"), pushed early from a cloud session at the owner's request; local has 48 code commits not on origin. The working tree's `README.md` equals 6ddef138e's README; `docs/postmortem/` and `scripts/postmortem.mjs` are untracked here but in 6ddef138e. Reconcile (merge or rebase onto origin) before the next push; the owner decides when.
 - **Other sessions' uncommitted files:** `scripts/desktop/vmlab/lab.sh` (modified), `scripts/desktop/vmlab/gm-define.sh`, `scripts/desktop/vmlab/qemu-venus.sh` (SteamOS/Bazzite lab, closed by owner decision: Game Mode testing moved to the host).
-- **Nothing published** to the alpha Pages repo since Beta 1 (2026-11-06).
+- **Early alpha publish (2026-11-08, owner request):** Pages serves app commit 490fc8d3 (from 5b7792191; `gh-pages` c76ce45, labelled "step 5.4 close" while step 4 stays open). `main` itself is not pushed.
 
 ## Scope and exit criterion
 
