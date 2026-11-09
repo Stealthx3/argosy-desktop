@@ -14,7 +14,11 @@ import com.nendo.argosy.platform.AppShutdown
 import com.nendo.argosy.platform.FactoryResetWipe
 import com.nendo.argosy.ui.input.DesktopGamepadDispatcher
 import com.nendo.argosy.platform.mpv.MpvProbe
+import com.nendo.argosy.platform.HostGameProcess
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
 import java.awt.image.BufferedImage
 import java.awt.event.MouseMotionAdapter
 import java.awt.event.MouseEvent
@@ -148,6 +152,12 @@ fun main(args: Array<String>) {
                     AWTEvent.MOUSE_EVENT_MASK or AWTEvent.MOUSE_MOTION_EVENT_MASK
                 )
                 onDispose { Toolkit.getDefaultToolkit().removeAWTEventListener(pointerListener) }
+            }
+            LaunchedEffect(window) {
+                HostGameProcess.running.map { it != null }.distinctUntilChanged().drop(1).filter { !it }.collect {
+                    window.toFront()
+                    window.requestFocus()
+                }
             }
             DisposableEffect(window) {
                 keyPipe?.attach(window)

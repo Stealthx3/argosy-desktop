@@ -16,6 +16,7 @@ import com.nendo.argosy.platform.PlatformMotionEvent
 import com.nendo.argosy.platform.SOURCE_DPAD
 import com.nendo.argosy.platform.SOURCE_GAMEPAD
 import com.nendo.argosy.platform.SOURCE_JOYSTICK
+import com.nendo.argosy.platform.HostGameProcess
 import com.nendo.argosy.platform.action
 import com.nendo.argosy.platform.keyCode
 import com.nendo.argosy.platform.sdl.Sdl3
@@ -59,6 +60,7 @@ class DesktopGamepadDispatcher @Inject constructor(
     private var repeating: RepeatingKey? = null
     private val connectedIds = LinkedHashSet<Int>()
     private val scope = SafeCoroutineScope(Dispatchers.Default, TAG)
+    private val gameGate = GameInputGate()
 
     @Volatile
     private var source: SdlGamepadSource? = null
@@ -80,6 +82,11 @@ class DesktopGamepadDispatcher @Inject constructor(
         val modes = controlsPreferences.preferences.map { it.controllerInputMode }.distinctUntilChanged()
         launchSource(sdl, runBlocking { modes.first() })
         scope.launch { modes.drop(1).collect { restart(sdl, it) } }
+        scope.launch {
+            HostGameProcess.running.map { it != null }.distinctUntilChanged().collect { running ->
+                EventQueue.invokeLater { gameRunningChanged(running) }
+            }
+        }
         return true
     }
 
@@ -115,7 +122,18 @@ class DesktopGamepadDispatcher @Inject constructor(
         source?.stopAndJoin(STOP_TIMEOUT_MS)
     }
 
+    private fun gameRunningChanged(running: Boolean) {
+        if (running) {
+            gameGate.gameStarted()
+            stopRepeat()
+            pressed.clear()
+        } else {
+            gameGate.gameEnded(System.currentTimeMillis())
+        }
+    }
+
     internal fun handle(event: SdlPadEvent) {
+        if (!gameGate.accept(event, System.currentTimeMillis())) return
         val deviceId = SdlGamepadMapping.deviceId(event.instanceId)
         if (event is SdlPadEvent.Button || event is SdlPadEvent.Axis) _padActivity.value = System.currentTimeMillis()
         when (event) {

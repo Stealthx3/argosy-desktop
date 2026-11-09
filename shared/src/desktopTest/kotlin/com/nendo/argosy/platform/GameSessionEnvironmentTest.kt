@@ -35,4 +35,34 @@ class GameSessionEnvironmentTest {
         val env = mapOf("XDG_CURRENT_DESKTOP" to "gamescope", "WAYLAND_DISPLAY" to "gamescope-0")
         assertEquals(listOf("--env=WAYLAND_DISPLAY=gamescope-0"), GameSessionEnvironment.spawnOptions(env))
     }
+
+    @Test
+    fun steamControllerVariablesReachTheGame() {
+        val env = mapOf(
+            "XDG_CURRENT_DESKTOP" to "gamescope",
+            "WAYLAND_DISPLAY" to "gamescope-0",
+            "SteamGameId" to "1",
+            "SDL_GAMECONTROLLER_ALLOW_STEAM_VIRTUAL_GAMEPAD" to "1",
+            "SDL_GAMECONTROLLER_IGNORE_DEVICES" to "0x28de/0x1205",
+            "SteamVirtualGamepadInfo" to "/tmp/gamepad.info",
+            "SDL_VIDEODRIVER" to "x11"
+        )
+        assertEquals(
+            listOf(
+                "--env=WAYLAND_DISPLAY=gamescope-0",
+                "--env=SteamGameId=1",
+                "--env=SteamVirtualGamepadInfo=/tmp/gamepad.info",
+                "--env=SDL_GAMECONTROLLER_ALLOW_STEAM_VIRTUAL_GAMEPAD=1",
+                "--env=SDL_GAMECONTROLLER_IGNORE_DEVICES=0x28de/0x1205"
+            ),
+            GameSessionEnvironment.spawnOptions(env)
+        )
+    }
+
+    @Test
+    fun steamControllerVariablesAlsoOutsideGameModeButOnlyUnderSteam() {
+        val steam = mapOf("SteamGameId" to "1", "SDL_GAMECONTROLLER_IGNORE_DEVICES" to "0x28de/0x1205")
+        assertEquals(listOf("--env=SDL_GAMECONTROLLER_IGNORE_DEVICES=0x28de/0x1205"), GameSessionEnvironment.spawnOptions(steam))
+        assertEquals(emptyList(), GameSessionEnvironment.spawnOptions(mapOf("SDL_GAMECONTROLLER_IGNORE_DEVICES" to "x")))
+    }
 }

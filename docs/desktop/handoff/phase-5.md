@@ -30,7 +30,7 @@ Plan (`DEVLOG.md`, Phase 5 plan): 1 wizard wording, 2 Close Argosy, 3 thumbnails
 
 ## Step 4: open
 
-- Not in the published alpha yet: the wizard and Menu-hint changes (republish needs the owner's OK).
+- Published 2026-11-08 (Pages app commit 3d10438a): wizard and Menu-hint changes. Not published yet: Steam controller variables forwarded to emulators (owner's Deck report: no RetroArch input in Game Mode) and the quiet return from a game (`GameInputGate`, window raise); both need the Deck to confirm.
 - Owner's Deck checks in real Game Mode (launch GameCube/Switch/PS and GBA games, exit from the Steam overlay, Steam keyboard), now on a build with the tagger.
 - Not verified: `HostGameProcess.stopAll` ending a Flatpak emulator on Argosy exit; EmuDeck detection on the owner's host; Assign BIOS with real RomM firmware; the folder picker's Back row on screen.
 - Snap emulators: tagged and focused but rendered black and cannot be signalled from outside snap confinement.
