@@ -2,7 +2,7 @@
 
 A Linux port of the [Argosy launcher](https://github.com/rommapp/argosy-launcher), shipped as a Flatpak. It runs Argosy's own interface on the Linux desktop and connects to a [RomM](https://github.com/rommapp/romm) server for your library, downloads and save sync. Play with a gamepad, a mouse and keyboard, or from the couch.
 
-> **Status: Beta 1 (0.4.0).** Tested on Fedora GNOME, Fedora KDE, Ubuntu GNOME and under gamescope. Steam Deck Game Mode checks and the Flathub submission are in progress.
+> **Status: Beta (0.4.0).** Tested on Fedora GNOME, Fedora KDE, Ubuntu GNOME and under gamescope. Steam Deck Game Mode checks and the Flathub submission are in progress.
 
 An independent fork of `rommapp/argosy-launcher`, licensed GPL-3.0 like upstream. Not an official rommapp release.
 
@@ -103,7 +103,7 @@ Without the Android SDK: `ANDROID_HOME=$(mktemp -d) ./gradlew -Pargosy.desktopOn
 
 ## Roadmap
 
-Phases 0–4 (discovery, multiplatform restructure, desktop UI, Linux services and alpha Flatpak, Linux adaptation) are done. Phase 5, Beta and Flathub, is in progress: Beta 1 is out; Steam Deck Game Mode checks, then the Flathub submission. Post-1.0 ideas are in [`PORT_PLAN.md`](PORT_PLAN.md), "Where to go from here".
+Phases 0–4 (discovery, multiplatform restructure, desktop UI, Linux services and alpha Flatpak, Linux adaptation) are done. Phase 5, Beta and Flathub, is in progress: the beta (0.4.0) is out; Steam Deck Game Mode checks, then the Flathub submission. Post-1.0 ideas are in [`PORT_PLAN.md`](PORT_PLAN.md), "Where to go from here".
 
 ## Credits and license
 

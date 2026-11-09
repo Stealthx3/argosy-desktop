@@ -14,7 +14,7 @@
       from a RomM server, launches them in the emulators installed on your system, and keeps
       saves, play time and achievements in sync with RomM.
     </p>
-    <p>This is an alpha build.</p>
+    <p>This is a beta build.</p>
   </description>
   <launchable type="desktop-id">io.github.stealthx3.ArgosyDesktop.desktop</launchable>
   <url type="homepage">https://github.com/Stealthx3/argosy-desktop</url>
@@ -28,9 +28,9 @@
   </supports>
   <content_rating type="oars-1.1"/>
   <releases>
-    <release version="0.4.0" date="2026-11-06" type="development">
+    <release version="0.4.0" date="2026-11-08" type="development">
       <description>
-        <p>Beta 1: Close Argosy in the drawer and Settings, mouse hover that matches gamepad focus, platform Reset to Defaults and Factory Reset, cover art cached during sync, and Steam Game Mode fixes.</p>
+        <p>Beta: Close Argosy in the drawer and Settings, mouse hover that matches gamepad focus, Reset to Defaults and Factory Reset, cover art cached during sync, an Emulators manager, desktop UI sounds, a setup wizard with Start as Next and Display options, the left menu in place of the shoulder-button switcher, and Steam Game Mode fixes (emulator windows and controllers).</p>
       </description>
     </release>
     <release version="0.3.0" date="2026-10-23" type="development">

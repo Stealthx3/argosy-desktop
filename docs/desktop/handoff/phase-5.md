@@ -9,7 +9,7 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 - **Development is paused.** The owner asked to hand the repo to Claude Cowork for a reorganization and documentation rework. Do not resume step 4 until the owner says so. Pacer state: `waiting-owner`.
 - **Git:** everything from this session is committed on local `main`. Local `main` and `origin/main` have **diverged**: origin has one docs-only commit, 6ddef138e ("Docs: new README, Phase 5 records and the interim post-mortem"), pushed early from a cloud session at the owner's request; local has 48 code commits not on origin. The working tree's `README.md` equals 6ddef138e's README; `docs/postmortem/` and `scripts/postmortem.mjs` are untracked here but in 6ddef138e. Reconcile (merge or rebase onto origin) before the next push; the owner decides when.
 - **Other sessions' uncommitted files:** `scripts/desktop/vmlab/lab.sh` (modified), `scripts/desktop/vmlab/gm-define.sh`, `scripts/desktop/vmlab/qemu-venus.sh` (SteamOS/Bazzite lab, closed by owner decision: Game Mode testing moved to the host).
-- **Early alpha publish (2026-11-08, owner request):** Pages serves app commit 490fc8d3 (from 5b7792191; `gh-pages` c76ce45, labelled "step 5.4 close" while step 4 stays open). `main` itself is not pushed.
+- **Current beta (owner decision, 2026-11-09):** the build Pages serves, app commit 663022ed (0.4.0, `gh-pages` c1e4d43), is the current beta release; labels say beta, not alpha. Earlier publish of 2026-11-08: app commit 490fc8d3. `main` itself is not pushed.
 
 ## Scope and exit criterion
 
@@ -17,7 +17,7 @@ Owner decision 2026-10-27: Linux adaptation and compatibility, not a 1:1 clone. 
 
 Plan (`DEVLOG.md`, Phase 5 plan): 1 wizard wording, 2 Close Argosy, 3 thumbnails (done); 4 Linux desktop and Steam Game Mode compatibility (in progress); 5 Flathub submission.
 
-## Step 4: done since Beta 1 (all committed, none published)
+## Step 4: done since the first beta build (all in the current beta, 663022ed)
 
 - TV layout tweaks; grey edge strips under gamescope fixed; TV navigation and focus parts now on every desktop profile; Game Mode picks the TV profile over a saved Desktop one.
 - Setup folder picker: Home plus mounted drives, Back in the hint row. Controller Layout choices (Auto, Xbox, PlayStation, Nintendo, Steam) and per-controller glyphs.
@@ -58,4 +58,4 @@ Plan (`DEVLOG.md`, Phase 5 plan): 1 wizard wording, 2 Close Argosy, 3 thumbnails
 
 - Desktop code `shared/src/desktopMain`, app `desktopApp/`, Flatpak `desktopApp/flatpak/`, scripts `scripts/desktop/` (VM lab `vmlab/`, walks `check/`); JDK `JAVA_HOME=~/.jdks/jdk-21.0.12.1+1`.
 - Desktop data `~/.local/share/argosy-desktop` (never delete without the owner); Flatpak data `~/.var/app/io.github.stealthx3.ArgosyDesktop`.
-- Alpha republish at a step close: `build-alpha.sh` → `publish-repo.sh` → `push-pages.sh --step-close 5.<n>`.
+- Beta republish at a step close: `build-alpha.sh` → `publish-repo.sh` → `push-pages.sh --step-close 5.<n>`.

@@ -1,4 +1,4 @@
-# Alpha manifest: packages the jlink distributable that `./gradlew :desktopApp:createDistributable`
+# Beta manifest: packages the jlink distributable that `./gradlew :desktopApp:createDistributable`
 # builds on the host (scripts/desktop/flatpak/build-alpha.sh). The offline, from-source build
 # Flathub needs is Phase 5. SDL3, libdbus and libsecret come from the 25.08 runtime.
 app-id: io.github.stealthx3.ArgosyDesktop
