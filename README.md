@@ -1,12 +1,32 @@
 # Argosy Desktop
 
-A Linux port of the [Argosy launcher](https://github.com/rommapp/argosy-launcher), shipped as a Flatpak. It runs Argosy's own interface on the Linux desktop and connects to a [RomM](https://github.com/rommapp/romm) server for your library, downloads and save sync. Play with a gamepad, a mouse and keyboard, or from the couch.
+A Linux port of the [Argosy launcher](https://github.com/rommapp/argosy-launcher), shipped as a Flatpak. It runs Argosy's own interface on the Linux desktop and connects to a [RomM](https://github.com/rommapp/romm) server for your library, downloads and save sync. Play from a PC handheld, a mouse and keyboard, or from the couch.
 
-> **Status: Beta (0.4.0).** Tested on Fedora GNOME, Fedora KDE, Ubuntu GNOME and under gamescope. Steam Deck Game Mode checks and the Flathub submission are in progress.
+> **Status: Beta (0.4.0).** Current version is considered feature-complete. Testing in production is now the current status, and if all goes well this app will be submitted to flathub by November 15th. 
 
 An independent fork of `rommapp/argosy-launcher`, licensed GPL-3.0 like upstream. Not an official rommapp release.
 
 ## At a glance
+
+### Desktop features
+
+- **Display profiles:** Handheld, Desktop and TV, detected automatically and chosen in setup. TV adds couch-scale text, a safe-area margin and a focus glow.
+- **Windows:** title bar when windowed, F11 or a setting for full screen, `--windowed` / `--fullscreen`, full screen under gamescope.
+- **Input:** Steam Input or SDL3 controllers, per-controller button mapping, Xbox/PlayStation/Nintendo/Steam glyphs, mouse hover and click, Start as Next in setup.
+- **Emulators:** a Linux compatibility database, consented Flathub installs, AppImage and Flathub updates, and 21 desktop-only emulators.
+- **Save sync** for RetroArch and standalone emulators, in place, including EmuDeck layouts.
+- **Linux screens:** Flatpak Permissions, a read-only host GPU page, an Apps tab for desktop applications, Quick Settings for volume and rumble.
+- **Steam Game Mode:** emulator windows join Argosy's Steam launch, and Steam's controller settings reach the emulators.
+- **Close Argosy** in the left menu and Settings; Factory Reset restarts into setup.
+
+### How it differs from Android
+
+The desktop app aims at Linux adaptation, not a 1:1 copy. Every difference is a desktop-only switch; the Android app is unchanged.
+
+- **Removed:** Steam library import, Jellyfin, Argosy Social, the Android Settings row.
+- **Not yet:** built-in libretro emulation and netplay (games run in external emulators), dual-screen, YouTube trailers.
+- **Replaced:** Play Store suggestions → Flathub; APK installers → AppImage and Flathub management; GPU driver downloads → a host GPU page; Android permissions → Flatpak permissions.
+Details and dates: [`PORT_PLAN.md`](PORT_PLAN.md), "Desktop divergences".
 
 | GNOME | KDE Plasma |
 | --- | --- |
@@ -45,27 +65,6 @@ flatpak install --user flathub org.libretro.RetroArch
 
 This is a beta: back up emulator saves before turning on Save Sync, and attach `argosy-run.log` from `~/.var/app/io.github.stealthx3.ArgosyDesktop` to bug reports.
 
-## Desktop features
-
-- **Display profiles:** Handheld, Desktop and TV, detected automatically and chosen in setup. TV adds couch-scale text, a safe-area margin and a focus glow.
-- **Windows:** title bar when windowed, F11 or a setting for full screen, `--windowed` / `--fullscreen`, full screen under gamescope.
-- **Input:** Steam Input or SDL3 controllers, per-controller button mapping, Xbox/PlayStation/Nintendo/Steam glyphs, mouse hover and click, Start as Next in setup.
-- **Emulators:** a Linux compatibility database, consented Flathub installs, AppImage and Flathub updates, and 21 desktop-only emulators.
-- **Save sync** for RetroArch and standalone emulators, in place, including EmuDeck layouts.
-- **Linux screens:** Flatpak Permissions, a read-only host GPU page, an Apps tab for desktop applications, Quick Settings for volume and rumble.
-- **Steam Game Mode:** emulator windows join Argosy's Steam launch, and Steam's controller settings reach the emulators.
-- **Close Argosy** in the left menu and Settings; Factory Reset restarts into setup.
-
-## How it differs from Android
-
-The desktop app aims at Linux adaptation, not a 1:1 copy (owner decision, 2026-10-27). Every difference is a desktop-only switch; the Android app is unchanged.
-
-- **Removed:** Steam library import, Jellyfin, Argosy Social, the Android Settings row.
-- **Not yet:** built-in libretro emulation and netplay (games run in external emulators), dual-screen, YouTube trailers.
-- **Replaced:** Play Store suggestions → Flathub; APK installers → AppImage and Flathub management; GPU driver downloads → a host GPU page; Android permissions → Flatpak permissions.
-
-Details and dates: [`PORT_PLAN.md`](PORT_PLAN.md), "Desktop divergences".
-
 ## How it works
 
 Argosy's single Android module was restructured into a Kotlin Multiplatform `shared` module. `commonMain` holds about 1,700 of Argosy's files (UI, view models, domain, RomM data layer); thin `androidMain` and `desktopMain` layers supply the platform services:
@@ -100,10 +99,6 @@ Without the Android SDK: `ANDROID_HOME=$(mktemp -d) ./gradlew -Pargosy.desktopOn
 | `scripts/desktop/` | Restructure tooling, walks, VM lab, Flatpak publishing |
 | `docs/desktop/` | Phase handoffs, runbooks, Flathub plan, screenshots |
 | `PORT_PLAN.md`, `DEVLOG.md` | Full port plan; action-and-reasoning log |
-
-## Roadmap
-
-Phases 0–4 (discovery, multiplatform restructure, desktop UI, Linux services and alpha Flatpak, Linux adaptation) are done. Phase 5, Beta and Flathub, is in progress: the beta (0.4.0) is out; Steam Deck Game Mode checks, then the Flathub submission. Post-1.0 ideas are in [`PORT_PLAN.md`](PORT_PLAN.md), "Where to go from here".
 
 ## Credits and license
 
