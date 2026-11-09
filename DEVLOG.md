@@ -1778,3 +1778,7 @@ The owner's tests are the step 5 side-by-side checklist and the alpha 5.4 Game M
 
 - **Action:** Relabelled the build Pages serves (0.4.0, app commit 663022ed) as the current beta release: metainfo description and 0.4.0 release notes (date 2026-11-08, notes cover the work since 2026-11-06), manifest header, README status, `PORT_PLAN.md` status lines, the phase-5 handoff and CLAUDE.md's repo rule now say beta, not alpha or "Beta 1". Historical mentions of the alpha (Phase 3, 0.3.0) stay. Script names (`build-alpha.sh`) are unchanged so existing references keep working. Merged `origin/main` (6ddef138e, the docs-only commit) into local `main` and pushed.
 - **Reasoning:** Owner request: commit and push now, and treat the current release as the current beta. The push happens mid-phase by the owner's explicit instruction. The metainfo change reaches installed apps only with the next republish.
+
+### 2026-11-09 — Beta republished with the beta labels (owner: "Republish")
+
+- **Action:** `build-alpha.sh` → `publish-repo.sh` (signed) → `push-pages.sh --step-close 5.4`. Pages serves app commit 72eee22e (`gh-pages` b548dc6), checked through a throwaway `FLATPAK_USER_DIR` after the CDN cache turned over. Same code as 663022ed; the metainfo now says beta and carries the updated 0.4.0 release notes. Step 4 stays open for the Deck checks.

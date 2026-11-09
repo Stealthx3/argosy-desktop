@@ -9,7 +9,7 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 - **Development is paused.** The owner asked to hand the repo to Claude Cowork for a reorganization and documentation rework. Do not resume step 4 until the owner says so. Pacer state: `waiting-owner`.
 - **Git:** local `main` merged `origin/main` (6ddef138e, docs only; local versions of the shared docs kept) and was pushed on 2026-11-09 at the owner's request, mid-phase. `docs/postmortem/` and `scripts/postmortem.mjs` are now tracked.
 - **Other sessions' uncommitted files:** `scripts/desktop/vmlab/lab.sh` (modified), `scripts/desktop/vmlab/gm-define.sh`, `scripts/desktop/vmlab/qemu-venus.sh` (SteamOS/Bazzite lab, closed by owner decision: Game Mode testing moved to the host).
-- **Current beta (owner decision, 2026-11-09):** the build Pages serves, app commit 663022ed (0.4.0, `gh-pages` c1e4d43), is the current beta release; labels say beta, not alpha. Earlier publish of 2026-11-08: app commit 490fc8d3. `main` itself is not pushed.
+- **Current beta (owner decision, 2026-11-09):** the build Pages serves is the current beta release (0.4.0); labels say beta, not alpha. Republished 2026-11-09 with the beta metainfo: app commit 72eee22e, `gh-pages` b548dc6 (code as 663022ed). Earlier publish of 2026-11-08: app commit 490fc8d3. `main` itself is not pushed.
 
 ## Scope and exit criterion
 
