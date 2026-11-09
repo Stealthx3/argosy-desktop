@@ -35,6 +35,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.foundation.focusable
@@ -87,8 +88,6 @@ import com.nendo.argosy.ui.components.FooterHostController
 import com.nendo.argosy.ui.components.LocalFooterHost
 import com.nendo.argosy.ui.components.LocalFooterHostVisible
 import com.nendo.argosy.ui.components.isBarVisible
-import com.nendo.argosy.ui.components.LocalTopRowNavRing
-import com.nendo.argosy.ui.components.TopRowNavRing
 import com.nendo.argosy.ui.util.hasDisplayProfile
 import com.nendo.argosy.ui.components.LocalNavBarClearance
 import com.nendo.argosy.ui.components.LocalFrostedBackdrop
@@ -940,6 +939,7 @@ fun ArgosyApp(
 
     // Collect gamepad events (Menu toggles drawer, L3 toggles quick menu, R3 toggles quick settings)
     val inputLifecycle = androidx.lifecycle.compose.LocalLifecycleOwner.current.lifecycle
+    val bumpersSwitchSections by rememberUpdatedState(!hasDisplayProfile)
     LaunchedEffect(inputLifecycle) {
         viewModel.gamepadInputHandler.eventFlow().flowWithLifecycle(inputLifecycle).collect { input ->            val result = inputDispatcher.dispatch(input)
             val event = input.event
@@ -950,6 +950,7 @@ fun ArgosyApp(
                     GamepadEvent.PrevSection, GamepadEvent.NextSection -> {
                         val delta = if (event == GamepadEvent.PrevSection) -1 else 1
                         val target = if (
+                            bumpersSwitchSections &&
                             !input.isRepeat &&
                             !uiState.isFirstRun &&
                             !isDrawerOpen &&
@@ -1318,17 +1319,7 @@ fun ArgosyApp(
                                 !presentationShowsHints && navBarAllowed && navRingState.isBarVisible
                             ),
                         LocalFrostedBackdrop provides screenFrostedBackdrop,
-                        LocalNavBarClearance provides (if (topRowNav) 0.dp else navBarClearance),
-                        LocalTopRowNavRing provides if (topRowNav && navBarAllowed && !uiState.isFirstRun) {
-                            TopRowNavRing(
-                                destinations = navRingState.destinations,
-                                currentRoute = currentRoute,
-                                onNavigate = { route -> navigateFromDrawer(route) },
-                                badgeFor = drawerUiState::badgeCountFor
-                            )
-                        } else {
-                            null
-                        }
+                        LocalNavBarClearance provides (if (topRowNav) 0.dp else navBarClearance)
                     ) {
                         NavGraph(
                             navController = navController,
@@ -1548,6 +1539,13 @@ fun ArgosyApp(
                     com.nendo.argosy.DualScreenManagerHolder.instance?.publishControlHints(relayed)
                 }
             } else {
+                val menuHintShown = hasDisplayProfile && !uiState.isFirstRun && !hasCapturingOverlay &&
+                    !isDrawerOpen && !isQuickSettingsOpen && !quickMenuState.isVisible
+                val openDrawerFromHint by rememberUpdatedState(openDrawer)
+                val drawerHintAction = remember { { openDrawerFromHint() } }
+                SideEffect {
+                    footerHostController.menuAction = drawerHintAction.takeIf { menuHintShown }
+                }
                 AnimatedVisibility(
                     visible = (!navRingState.footerYieldsToBar || hasDisplayProfile) && !(hasDisplayProfile && isDrawerOpen),
                     enter = slideInVertically(tween(Motion.durationSlide)) { it },

@@ -7,7 +7,7 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 ## Paused state (read first)
 
 - **Development is paused.** The owner asked to hand the repo to Claude Cowork for a reorganization and documentation rework. Do not resume step 4 until the owner says so. Pacer state: `waiting-owner`.
-- **Git:** everything from this session is committed on local `main` (last: 308d74c2e). Local `main` and `origin/main` have **diverged**: origin has one docs-only commit, 6ddef138e ("Docs: new README, Phase 5 records and the interim post-mortem"), pushed early from a cloud session at the owner's request; local has 48 code commits not on origin. The working tree's `README.md` equals 6ddef138e's README; `docs/postmortem/` and `scripts/postmortem.mjs` are untracked here but in 6ddef138e. Reconcile (merge or rebase onto origin) before the next push; the owner decides when.
+- **Git:** everything from this session is committed on local `main`. Local `main` and `origin/main` have **diverged**: origin has one docs-only commit, 6ddef138e ("Docs: new README, Phase 5 records and the interim post-mortem"), pushed early from a cloud session at the owner's request; local has 48 code commits not on origin. The working tree's `README.md` equals 6ddef138e's README; `docs/postmortem/` and `scripts/postmortem.mjs` are untracked here but in 6ddef138e. Reconcile (merge or rebase onto origin) before the next push; the owner decides when.
 - **Other sessions' uncommitted files:** `scripts/desktop/vmlab/lab.sh` (modified), `scripts/desktop/vmlab/gm-define.sh`, `scripts/desktop/vmlab/qemu-venus.sh` (SteamOS/Bazzite lab, closed by owner decision: Game Mode testing moved to the host).
 - **Early alpha publish (2026-11-08, owner request):** Pages serves app commit 490fc8d3 (from 5b7792191; `gh-pages` c76ce45, labelled "step 5.4 close" while step 4 stays open). `main` itself is not pushed.
 
@@ -25,10 +25,12 @@ Plan (`DEVLOG.md`, Phase 5 plan): 1 wizard wording, 2 Close Argosy, 3 thumbnails
 - Emulators manager (desktop Settings > Managed Installers): every compatible emulator by platform, per-emulator submenu (status, package, EmuDeck, logs, data folder, Assign BIOS, install/uninstall).
 - GitHub AppImage installs fixed (`java.net.http` was missing from the jlink runtime; broken in every build including Beta 1).
 - Game Mode emulator launches: environment forwarding to `flatpak-spawn --host` plus `GameModeWindowTagger` (`STEAM_GAME` on emulator windows). Proven in nested Game Mode on the host with the Dolphin Flatpak: emulator in front, back to Argosy on close.
+- Setup wizard: Start presses Next, a clickable hint bar on every step, Display step rows (Full Screen, Safe Area with TV, UI Scale) and layout selection that no longer advances; emulator list scroll indicator. The LB/RB top-row switcher is gone on desktop; a clickable "Menu" hint at the left of the hint bar opens the left menu (DEVLOG, "Start is Next").
 - Desktop UI sounds (were a no-op): Ogg/WAV through `libvorbisfile` + `libpulse-simple`. Game Mode audio proven with Dolphin (video and audio) once Steam Game Recording is off; with it on, the nested setup stalls all PipeWire audio (DEVLOG, "desktop UI sounds").
 
 ## Step 4: open
 
+- Not in the published alpha yet: the wizard and Menu-hint changes (republish needs the owner's OK).
 - Owner's Deck checks in real Game Mode (launch GameCube/Switch/PS and GBA games, exit from the Steam overlay, Steam keyboard), now on a build with the tagger.
 - Not verified: `HostGameProcess.stopAll` ending a Flatpak emulator on Argosy exit; EmuDeck detection on the owner's host; Assign BIOS with real RomM firmware; the folder picker's Back row on screen.
 - Snap emulators: tagged and focused but rendered black and cannot be signalled from outside snap confinement.

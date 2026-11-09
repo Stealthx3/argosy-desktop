@@ -1712,7 +1712,6 @@ private fun SettingsHeader(
                 color = MaterialTheme.colorScheme.onSurface
             )
         }
-        com.nendo.argosy.ui.components.TopRowNavRingSlot()
         rightContent?.invoke() ?: Spacer(modifier = Modifier.width(Dimens.spacingXs))
     }
 }

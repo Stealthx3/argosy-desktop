@@ -1,5 +1,6 @@
 package com.nendo.argosy.ui.screens.firstrun
 
+import com.nendo.argosy.core.input.SoundType
 import com.nendo.argosy.ui.input.InputHandler
 import com.nendo.argosy.ui.input.InputResult
 
@@ -87,7 +88,9 @@ class FirstRunInputHandler(
         return InputResult.HANDLED
     }
 
-    override fun onMenu() = InputResult.HANDLED
+    override fun onMenu(): InputResult =
+        if (viewModel.startNext(onComplete)) InputResult.HANDLED else InputResult.handled(SoundType.BOUNDARY)
+
     override fun onSelect() = InputResult.HANDLED
     override fun onSecondaryAction() = InputResult.HANDLED
     override fun onPrevSection() = InputResult.HANDLED

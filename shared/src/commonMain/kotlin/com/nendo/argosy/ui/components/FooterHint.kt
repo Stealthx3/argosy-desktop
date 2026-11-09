@@ -48,6 +48,8 @@ import com.nendo.argosy.platform.screenWidthDp
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextOverflow
+import com.nendo.argosy.res.ArgosyR as R
+import com.nendo.argosy.res.stringResource
 import com.nendo.argosy.ui.theme.Dimens
 import com.nendo.argosy.ui.theme.LocalUiScale
 import com.nendo.argosy.ui.theme.Motion
@@ -479,13 +481,16 @@ fun FooterBarWithState(
     modifier: Modifier = Modifier,
     onHintClick: ((InputButton) -> Unit)? = null,
     trailingContent: @Composable (() -> Unit)? = null,
-    forceVisible: Boolean = false
+    forceVisible: Boolean = false,
+    onMenuClick: (() -> Unit)? = null
 ) {
     val backgroundColor = footerSurfaceColor()
     var measuredWidth by remember { mutableIntStateOf(0) }
     var trailingWidth by remember { mutableIntStateOf(0) }
+    var menuWidth by remember { mutableIntStateOf(0) }
+    val menuLabel = stringResource(R.string.common_footer_menu)
 
-    val quiet = !forceVisible && hints.all { isObviousHint(it.button) }
+    val quiet = !forceVisible && onMenuClick == null && hints.all { isObviousHint(it.button) }
     var displayHints by remember { mutableStateOf(hints) }
     if (!quiet) displayHints = hints
     val collapseProgress = footerCollapseProgress(quiet)
@@ -493,7 +498,8 @@ fun FooterBarWithState(
     val filteredHints = filterHintsByWidth(
         displayHints,
         measuredWidth = measuredWidth,
-        trailingWidth = if (trailingContent != null) trailingWidth else 0,
+        trailingWidth = (if (trailingContent != null) trailingWidth else 0) +
+            (if (onMenuClick != null) menuWidth else 0),
         tappable = onHintClick != null,
         buttonOf = { it.button },
         labelOf = { it.action },
@@ -520,6 +526,11 @@ fun FooterBarWithState(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Row(horizontalArrangement = Arrangement.spacedBy(Dimens.spacingLg)) {
+            if (onMenuClick != null) {
+                Box(Modifier.onSizeChanged { menuWidth = it.width }) {
+                    TappableFooterHint(InputButton.START, menuLabel, { onMenuClick() })
+                }
+            }
             dpadHints.forEach { hint ->
                 TappableFooterHint(hint.button, hint.action, onHintClick, hint.enabled)
             }
@@ -581,10 +592,13 @@ private fun TappableFooterHint(
 fun SubtleFooterBar(
     hints: List<Pair<InputButton, String>>,
     modifier: Modifier = Modifier,
-    onHintClick: ((InputButton) -> Unit)? = null
+    onHintClick: ((InputButton) -> Unit)? = null,
+    onMenuClick: (() -> Unit)? = null
 ) {
     var measuredWidth by remember { mutableIntStateOf(0) }
-    val quiet = hints.all { isObviousHint(it.first) }
+    var menuWidth by remember { mutableIntStateOf(0) }
+    val menuLabel = stringResource(R.string.common_footer_menu)
+    val quiet = onMenuClick == null && hints.all { isObviousHint(it.first) }
     var displayHints by remember { mutableStateOf(hints) }
     if (!quiet) displayHints = hints
     val collapseProgress = footerCollapseProgress(quiet)
@@ -592,6 +606,7 @@ fun SubtleFooterBar(
     val filteredHints = filterHintsByWidth(
         displayHints,
         measuredWidth = measuredWidth,
+        trailingWidth = if (onMenuClick != null) menuWidth else 0,
         tappable = onHintClick != null,
         buttonOf = { it.first },
         labelOf = { it.second },
@@ -618,6 +633,11 @@ fun SubtleFooterBar(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Row(horizontalArrangement = Arrangement.spacedBy(Dimens.spacingLg)) {
+            if (onMenuClick != null) {
+                Box(Modifier.onSizeChanged { menuWidth = it.width }) {
+                    TappableFooterHint(InputButton.START, menuLabel, { onMenuClick() })
+                }
+            }
             dpadHints.forEach { (button, action) ->
                 TappableFooterHint(button, action, onHintClick)
             }

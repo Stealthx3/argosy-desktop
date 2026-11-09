@@ -85,6 +85,67 @@ data class CoreDownloadState(
     val errorMessage: String? = null
 )
 
+enum class FirstRunNext {
+    ADVANCE,
+    CHOOSE_DISPLAY,
+    COMMIT_URL,
+    CONNECT,
+    PERMISSIONS,
+    ROM_PATH,
+    IMAGE_CACHE,
+    DEFAULT_IMAGE_CACHE,
+    PLATFORMS,
+    COMPLETE
+}
+
+enum class DisplaySetupRow { FULL_SCREEN, SAFE_AREA, UI_SCALE }
+
+const val DEFAULT_UI_SCALE = 100
+const val UI_SCALE_MIN = 50
+const val UI_SCALE_MAX = 150
+const val UI_SCALE_STEP = 5
+
+internal fun displaySetupSelected(state: FirstRunUiState): DisplayProfile {
+    val choices = displaySetupChoices()
+    return choices[state.displaySelectedIndex.coerceIn(0, choices.size - 1)]
+}
+
+internal fun displaySetupSafeArea(state: FirstRunUiState): Int =
+    DisplayProfile.effectiveSafeArea(state.safeAreaOverride, displaySetupSelected(state))
+
+internal fun displaySetupRows(state: FirstRunUiState): List<DisplaySetupRow> = buildList {
+    add(DisplaySetupRow.FULL_SCREEN)
+    if (displaySetupSelected(state) == DisplayProfile.TV) add(DisplaySetupRow.SAFE_AREA)
+    add(DisplaySetupRow.UI_SCALE)
+}
+
+internal fun focusedDisplayRow(state: FirstRunUiState): DisplaySetupRow? =
+    state.displayRowFocus?.let { displaySetupRows(state).getOrNull(it) }
+
+internal fun firstRunNextAction(state: FirstRunUiState): FirstRunNext? = when (state.currentStep) {
+    FirstRunStep.WELCOME, FirstRunStep.ROMM_SUCCESS, FirstRunStep.CORE_PROMPT -> FirstRunNext.ADVANCE
+    FirstRunStep.DISPLAY_SETUP -> FirstRunNext.CHOOSE_DISPLAY
+    FirstRunStep.ROMM_LOGIN -> when {
+        state.rommDevicePairing || state.isConnecting -> null
+        !state.rommUrlCommitted -> FirstRunNext.COMMIT_URL.takeIf { state.rommUrl.isNotBlank() }
+        else -> FirstRunNext.CONNECT.takeIf { canConnect(state) }
+    }
+    FirstRunStep.PERMISSIONS -> FirstRunNext.PERMISSIONS.takeIf { state.hasStoragePermission }
+    FirstRunStep.ROM_PATH -> FirstRunNext.ROM_PATH.takeIf { state.folderSelected }
+    FirstRunStep.IMAGE_CACHE ->
+        if (state.imageCacheFolderSelected) FirstRunNext.IMAGE_CACHE else FirstRunNext.DEFAULT_IMAGE_CACHE
+    FirstRunStep.PLATFORM_SELECT ->
+        FirstRunNext.PLATFORMS.takeIf { !state.platformSortMenuOpen && !state.platformSearchActive }
+    FirstRunStep.CORE_DOWNLOAD -> FirstRunNext.ADVANCE.takeIf { state.coreDownloadComplete }
+    FirstRunStep.COMPLETE -> FirstRunNext.COMPLETE
+}
+
+internal fun canConnect(state: FirstRunUiState): Boolean {
+    if (state.rommAuthMethod == RomMAuthMethod.DEVICE) return state.rommUrl.isNotBlank()
+    val normalized = state.rommPairingCode.replace("-", "").replace(" ", "")
+    return state.rommUrl.isNotBlank() && normalized.length == 8
+}
+
 internal fun displaySetupFocus(
     detected: DisplayProfile?,
     choices: List<DisplayProfile> = DisplayProfile.entries
@@ -165,6 +226,11 @@ data class FirstRunUiState(
     val hostFolderAccessSupported: Boolean = false,
     val displaySetupSupported: Boolean = false,
     val detectedDisplayProfile: DisplayProfile? = null,
+    val displayRowFocus: Int? = null,
+    val displaySelectedIndex: Int = 0,
+    val startFullScreen: Boolean = false,
+    val safeAreaOverride: Int? = null,
+    val uiScale: Int = DEFAULT_UI_SCALE,
     val gamesFolder: String = "",
     val emulatorFolderAccess: List<EmulatorFolderAccess> = emptyList(),
     val rommFocusField: Int? = null,
@@ -258,9 +324,10 @@ class FirstRunViewModel @Inject constructor(
                 FirstRunStep.DISPLAY_SETUP -> displaySetupFocus(state.detectedDisplayProfile, displaySetupChoices())
                 else -> 0
             }
-            state.copy(currentStep = nextStep, focusedIndex = initialFocus)
+            state.copy(currentStep = nextStep, focusedIndex = initialFocus, displaySelectedIndex = initialFocus)
         }
         when (_uiState.value.currentStep) {
+            FirstRunStep.DISPLAY_SETUP -> loadDisplaySettings()
             FirstRunStep.PLATFORM_SELECT -> loadPlatformsForSelection()
             FirstRunStep.CORE_PROMPT -> checkMissingCores()
             FirstRunStep.CORE_DOWNLOAD -> prepareCoreDownloads()
@@ -299,8 +366,14 @@ class FirstRunViewModel @Inject constructor(
                 FirstRunStep.DISPLAY_SETUP -> displaySetupFocus(state.detectedDisplayProfile, displaySetupChoices())
                 else -> 0
             }
-            state.copy(currentStep = prevStep, focusedIndex = initialFocus, rommUrlCommitted = false)
+            state.copy(
+                currentStep = prevStep,
+                focusedIndex = initialFocus,
+                displaySelectedIndex = initialFocus,
+                rommUrlCommitted = false
+            )
         }
+        if (_uiState.value.currentStep == FirstRunStep.DISPLAY_SETUP) loadDisplaySettings()
     }
 
     private fun loadPlatformsForSelection() {
@@ -324,9 +397,106 @@ class FirstRunViewModel @Inject constructor(
         }
     }
 
-    fun chooseDisplayProfile(profile: DisplayProfile) {
+    private fun loadDisplaySettings() {
+        viewModelScope.launch {
+            val prefs = preferencesRepository.userPreferences.first()
+            _uiState.update {
+                it.copy(
+                    startFullScreen = prefs.startFullScreen,
+                    safeAreaOverride = prefs.safeAreaPercent,
+                    uiScale = prefs.uiScale,
+                    displayRowFocus = null
+                )
+            }
+        }
+    }
+
+    private fun moveDisplayRow(delta: Int): Boolean {
+        val current = _uiState.value.displayRowFocus
+        if (current == null && delta <= 0) {
+            hapticManager.vibrate(HapticPattern.BOUNDARY_HIT)
+            return false
+        }
+        val next = when {
+            current == null -> 0
+            current + delta < 0 -> null
+            current + delta >= displaySetupRows(_uiState.value).size -> {
+                hapticManager.vibrate(HapticPattern.BOUNDARY_HIT)
+                return false
+            }
+            else -> current + delta
+        }
+        _uiState.update { it.copy(displayRowFocus = next) }
+        return true
+    }
+
+    private fun adjustDisplayRow(delta: Int): Boolean {
+        val state = _uiState.value
+        when (focusedDisplayRow(state)) {
+            null -> {
+                val newIndex = (state.focusedIndex + delta).coerceIn(0, displaySetupChoices().size - 1)
+                if (newIndex == state.focusedIndex) {
+                    hapticManager.vibrate(HapticPattern.BOUNDARY_HIT)
+                    return false
+                }
+                _uiState.update { it.copy(focusedIndex = newIndex) }
+            }
+            DisplaySetupRow.FULL_SCREEN -> setWizardStartFullScreen(delta > 0)
+            DisplaySetupRow.SAFE_AREA -> {
+                val current = displaySetupSafeArea(state)
+                val next = (current + delta).coerceIn(0, DisplayProfile.MAX_SAFE_AREA_PERCENT)
+                if (next == current) {
+                    hapticManager.vibrate(HapticPattern.BOUNDARY_HIT)
+                    return false
+                }
+                _uiState.update { it.copy(safeAreaOverride = next) }
+            }
+            DisplaySetupRow.UI_SCALE -> {
+                val next = (state.uiScale + delta * UI_SCALE_STEP).coerceIn(UI_SCALE_MIN, UI_SCALE_MAX)
+                if (next == state.uiScale) {
+                    hapticManager.vibrate(HapticPattern.BOUNDARY_HIT)
+                    return false
+                }
+                _uiState.update { it.copy(uiScale = next) }
+                viewModelScope.launch { preferencesRepository.setUiScale(next) }
+            }
+        }
+        return true
+    }
+
+    fun setWizardStartFullScreen(fullScreen: Boolean) {
+        _uiState.update { it.copy(startFullScreen = fullScreen) }
+        viewModelScope.launch { preferencesRepository.setStartFullScreen(fullScreen) }
+    }
+
+    fun adjustWizardSafeArea(delta: Int) {
+        focusDisplayRow(DisplaySetupRow.SAFE_AREA)
+        adjustDisplayRow(delta)
+    }
+
+    fun adjustWizardUiScale(delta: Int) {
+        focusDisplayRow(DisplaySetupRow.UI_SCALE)
+        adjustDisplayRow(delta / UI_SCALE_STEP)
+    }
+
+    fun focusDisplayRow(row: DisplaySetupRow) {
+        _uiState.update { state ->
+            state.copy(displayRowFocus = displaySetupRows(state).indexOf(row).takeIf { it >= 0 })
+        }
+    }
+
+    fun selectDisplayProfile(profile: DisplayProfile) {
+        val index = displaySetupChoices().indexOf(profile)
+        if (index < 0) return
+        _uiState.update { it.copy(focusedIndex = index, displaySelectedIndex = index, displayRowFocus = null) }
+    }
+
+    fun confirmDisplaySetup() {
+        val state = _uiState.value
+        val profile = displaySetupSelected(state)
         viewModelScope.launch {
             preferencesRepository.setDisplayProfile(profile)
+            if (profile == DisplayProfile.TV) state.safeAreaOverride?.let { preferencesRepository.setSafeAreaPercent(it) }
             nextStep()
         }
     }
@@ -560,6 +730,7 @@ class FirstRunViewModel @Inject constructor(
 
     fun moveFocus(delta: Int): Boolean {
         val state = _uiState.value
+        if (state.currentStep == FirstRunStep.DISPLAY_SETUP) return moveDisplayRow(delta)
         if (state.currentStep == FirstRunStep.PLATFORM_SELECT) {
             when {
                 state.platformSortMenuOpen -> {
@@ -595,7 +766,7 @@ class FirstRunViewModel @Inject constructor(
 
     fun moveButtonFocus(delta: Int): Boolean {
         val state = _uiState.value
-        if (state.currentStep == FirstRunStep.DISPLAY_SETUP) return moveFocus(delta)
+        if (state.currentStep == FirstRunStep.DISPLAY_SETUP) return adjustDisplayRow(delta)
         if (state.currentStep != FirstRunStep.PLATFORM_SELECT) return false
         if (state.platformHeaderFocused && !state.platformSortMenuOpen && !state.platformSearchActive) {
             _uiState.update { it.copy(platformHeaderIndex = (it.platformHeaderIndex + delta).mod(PLATFORM_HEADER_COUNT)) }
@@ -1079,7 +1250,11 @@ class FirstRunViewModel @Inject constructor(
         val state = _uiState.value
         when (state.currentStep) {
             FirstRunStep.WELCOME -> nextStep()
-            FirstRunStep.DISPLAY_SETUP -> chooseDisplayProfile(displaySetupChoices()[state.focusedIndex.coerceIn(0, displaySetupChoices().size - 1)])
+            FirstRunStep.DISPLAY_SETUP -> when (focusedDisplayRow(state)) {
+                null -> selectDisplayProfile(displaySetupChoices()[state.focusedIndex.coerceIn(0, displaySetupChoices().size - 1)])
+                DisplaySetupRow.FULL_SCREEN -> setWizardStartFullScreen(!state.startFullScreen)
+                else -> {}
+            }
             FirstRunStep.ROMM_LOGIN -> {
                 when {
                     state.rommDevicePairing -> when (state.focusedIndex) {
@@ -1182,10 +1357,21 @@ class FirstRunViewModel @Inject constructor(
         }
     }
 
-    private fun canConnect(state: FirstRunUiState): Boolean {
-        if (state.rommAuthMethod == RomMAuthMethod.DEVICE) return state.rommUrl.isNotBlank()
-        val normalized = state.rommPairingCode.replace("-", "").replace(" ", "")
-        return state.rommUrl.isNotBlank() && normalized.length == 8
+    fun startNext(onComplete: () -> Unit): Boolean {
+        val state = _uiState.value
+        when (firstRunNextAction(state) ?: return false) {
+            FirstRunNext.ADVANCE -> nextStep()
+            FirstRunNext.CHOOSE_DISPLAY -> confirmDisplaySetup()
+            FirstRunNext.COMMIT_URL -> commitUrl()
+            FirstRunNext.CONNECT -> connectToRomm()
+            FirstRunNext.PERMISSIONS -> proceedFromPermissions()
+            FirstRunNext.ROM_PATH -> proceedFromRomPath()
+            FirstRunNext.IMAGE_CACHE -> proceedFromImageCache()
+            FirstRunNext.DEFAULT_IMAGE_CACHE -> skipImageCachePath()
+            FirstRunNext.PLATFORMS -> proceedFromPlatformSelect()
+            FirstRunNext.COMPLETE -> completeSetup(onDone = onComplete)
+        }
+        return true
     }
 
     fun proceedFromPlatformSelect() {

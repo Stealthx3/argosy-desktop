@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# usage: [DRIVE_TARGET=flatpak] desktop-drive.sh <out-dir> <settle-s> <step>... [-- WxH]; step = shot:<name> | wait:<s> | <AWT VK name>[*n] | PAD:<SDL button>[*n] | PAD:<axis>=<value> | TYPE:<text> | TYPEFILE:<path> (types the file's first line, not echoed) | RUN:<command> (host command, run to completion)
+# usage: [DRIVE_TARGET=flatpak] desktop-drive.sh <out-dir> <settle-s> <step>... [-- WxH]; step = shot:<name> | wait:<s> | CLICK:<x>,<y> (content-area point) | <AWT VK name>[*n] | PAD:<SDL button>[*n] | PAD:<axis>=<value> | TYPE:<text> | TYPEFILE:<path> (types the file's first line, not echoed) | RUN:<command> (host command, run to completion)
 set -u
 outdir=$1
 settle=$2

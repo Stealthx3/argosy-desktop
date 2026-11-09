@@ -142,7 +142,6 @@ import com.nendo.argosy.ui.components.FooterHint
 import androidx.compose.ui.text.style.TextAlign
 import com.nendo.argosy.ui.components.AlphabetSidebar
 import com.nendo.argosy.ui.components.ShoulderGlyph
-import com.nendo.argosy.ui.components.TopRowNavRingSlot
 import com.nendo.argosy.core.input.AndroidKeyCodes
 import com.nendo.argosy.ui.components.AlphabetSidebarWidth
 import com.nendo.argosy.ui.components.CollectionItem
@@ -931,8 +930,6 @@ private fun LibraryHeader(
                         )
                     }
                 }
-
-                TopRowNavRingSlot()
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,

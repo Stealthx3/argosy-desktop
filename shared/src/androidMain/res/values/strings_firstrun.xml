@@ -357,4 +357,19 @@
     <string name="firstrun_complete_hint">Sync your library from Collection settings to get started.</string>
     <!-- Button that closes the wizard and opens the app. Verb phrase, imperative. -->
     <string name="firstrun_complete_button_start">Start Playing</string>
+    <string name="firstrun_footer_move">Move</string>
+    <string name="firstrun_footer_select">Select</string>
+    <string name="firstrun_footer_back">Back</string>
+    <string name="firstrun_footer_cancel">Cancel</string>
+    <string name="firstrun_footer_close">Close</string>
+    <!-- B on the platform list: leaves the list and moves to the next setup step -->
+    <string name="firstrun_footer_continue">Continue</string>
+    <string name="firstrun_footer_toggle_all">Toggle all</string>
+    <!-- Start button: goes to the next setup step -->
+    <string name="firstrun_footer_next">Next</string>
+    <string name="firstrun_display_setup_full_screen_title">Start in Full Screen</string>
+    <string name="firstrun_display_setup_full_screen_subtitle">Open Argosy full screen instead of in a window. F11 switches at any time.</string>
+    <!-- Margin kept clear around the screen edges, for TVs that crop the picture -->
+    <string name="firstrun_display_setup_safe_area_title">Safe Area</string>
+    <string name="firstrun_display_setup_ui_scale_title">UI Scale</string>
 </resources>

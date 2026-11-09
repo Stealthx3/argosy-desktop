@@ -2067,4 +2067,6 @@
     <string name="gamelist_row_genre_quiz">Quiz</string>
     <!-- Short game genre name on a narrow tab in the game list row. Full genre: "Simulator" (simulation games). -->
     <string name="gamelist_row_genre_sim">Sim</string>
+    <!-- Hint bar: the button that opens the left-side menu -->
+    <string name="common_footer_menu">Menu</string>
 </resources>

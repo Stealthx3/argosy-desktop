@@ -46,6 +46,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
@@ -131,8 +132,14 @@ import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.data.local.entity.PlatformEntity
 import com.nendo.argosy.ui.common.rememberStorageAccessRequest
 import com.nendo.argosy.data.model.EmulatorFolderAccess
+import com.nendo.argosy.ui.components.FooterHints
+import com.nendo.argosy.ui.components.FooterSpacer
+import com.nendo.argosy.ui.components.InputButton
 import com.nendo.argosy.ui.components.PermissionCard
+import com.nendo.argosy.ui.components.SpindleScrollIndicator
+import com.nendo.argosy.ui.util.hasDisplayProfile
 import com.nendo.argosy.ui.components.PlatformFilterHeader
+import com.nendo.argosy.ui.components.SliderPreference
 import com.nendo.argosy.ui.components.SwitchPreference
 import com.nendo.argosy.ui.filebrowser.FileBrowserMode
 import com.nendo.argosy.ui.filebrowser.FileBrowserScreen
@@ -246,161 +253,187 @@ fun FirstRunScreen(
         viewModel.refreshAllPermissions()
     }
 
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        AnimatedContent(
-            targetState = uiState.currentStep,
-            modifier = Modifier.fillMaxSize(),
-            transitionSpec = {
-                fadeIn(animationSpec = tween(150)) togetherWith fadeOut(animationSpec = tween(150))
-            },
-            label = "wizard_step"
-        ) { step ->
-            when (step) {
-                FirstRunStep.WELCOME -> WelcomeStep(
-                    isFocused = true,
-                    onGetStarted = { viewModel.nextStep() }
-                )
-                FirstRunStep.DISPLAY_SETUP -> DisplaySetupStep(
-                    focused = displaySetupChoices().let { it[uiState.focusedIndex.coerceIn(0, it.size - 1)] },
-                    recommended = uiState.detectedDisplayProfile,
-                    onChoose = { viewModel.chooseDisplayProfile(it) }
-                )
-                FirstRunStep.ROMM_LOGIN -> if (uiState.rommShowScanner) {
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        com.nendo.argosy.ui.components.QrScannerWithPermission(
-                            onResult = { result ->
-                                viewModel.handleScanResult(result.origin, result.code)
-                            },
-                            onDismiss = { viewModel.dismissScanner() }
-                        )
-                    }
-                } else RommLoginStep(
-                    url = uiState.rommUrl,
-                    urlCommitted = uiState.rommUrlCommitted,
-                    pairingCode = uiState.rommPairingCode,
-                    devicePairing = uiState.rommDevicePairing,
-                    deviceUserCode = uiState.rommDeviceUserCode,
-                    deviceVerificationUrl = uiState.rommDeviceVerificationUrl,
-                    supportsDeviceAuth = uiState.rommSupportsDeviceAuth,
-                    browserMissing = uiState.rommBrowserMissing,
-                    hasCamera = uiState.rommHasCamera,
-                    isConnecting = uiState.isConnecting,
-                    error = firstRunErrorText(uiState.connectionError),
-                    focusedIndex = uiState.focusedIndex,
-                    rommFocusField = uiState.rommFocusField,
-                    importedCertCount = uiState.importedCertCount,
-                    onAddCertificate = { showCertBrowser = true },
-                    onUrlChange = viewModel::setRommUrl,
-                    onPairingCodeChange = viewModel::setRommPairingCode,
-                    onClearPairingCode = { viewModel.clearRommPairingCode() },
-                    onCodeComplete = { viewModel.setFocusedIndex(1) },
-                    onCommitUrl = { viewModel.commitUrl() },
-                    onEditUrl = { viewModel.editUrl() },
-                    onConnect = { viewModel.connectToRomm() },
-                    onScan = { viewModel.showScanner() },
-                    onCancelPairing = { viewModel.cancelDevicePairing() },
-                    onOpenVerificationUrl = openVerificationUrl,
-                    onUseManualCode = { viewModel.useManualPairingCode() },
-                    onUseDevicePairing = { viewModel.useDevicePairing() },
-                    onBack = { viewModel.previousStep() },
-                    onClearFocusField = { viewModel.clearRommFocusField() }
-                )
-                FirstRunStep.ROMM_SUCCESS -> RommSuccessStep(
-                    serverName = uiState.rommUrl,
-                    gameCount = uiState.rommGameCount,
-                    platformCount = uiState.rommPlatformCount,
-                    isFocused = true,
-                    onContinue = { viewModel.nextStep() }
-                )
-                FirstRunStep.PERMISSIONS -> if (uiState.hostFolderAccessSupported) {
-                    EmulatorFolderAccessStep(
-                        emulators = uiState.emulatorFolderAccess,
-                        gamesFolder = uiState.gamesFolder,
-                        focusedIndex = uiState.focusedIndex,
-                        onGrant = { viewModel.grantEmulatorFolderAccess(it) },
-                        onContinue = { viewModel.proceedFromPermissions() }
-                    )
-                } else {
-                    PermissionsStep(
-                        hasStorage = uiState.hasStoragePermission,
-                        hasNotifications = uiState.hasNotificationPermission,
-                        hasOverlay = uiState.hasOverlayPermission,
-                        hasUsageStats = uiState.hasUsageStatsPermission,
-                        focusedIndex = uiState.focusedIndex,
-                        onRequestStorage = requestStorage,
-                        onRequestNotifications = requestNotifications,
-                        onRequestOverlay = requestOverlay,
-                        onRequestUsageStats = requestUsageStats,
-                        onContinue = { viewModel.proceedFromPermissions() }
-                    )
-                }
-                FirstRunStep.ROM_PATH -> RomPathStep(
-                    currentPath = uiState.romStoragePath,
-                    folderSelected = uiState.folderSelected,
-                    focusedIndex = uiState.focusedIndex,
-                    onChooseFolder = chooseFolder,
-                    onContinue = { viewModel.proceedFromRomPath() }
-                )
-                FirstRunStep.IMAGE_CACHE -> ImageCacheStep(
-                    currentPath = uiState.imageCachePath,
-                    folderSelected = uiState.imageCacheFolderSelected,
-                    focusedIndex = uiState.focusedIndex,
-                    onChooseFolder = chooseImageCacheFolder,
-                    onContinue = { viewModel.proceedFromImageCache() },
-                    onSkip = { viewModel.skipImageCachePath() }
-                )
-                FirstRunStep.PLATFORM_SELECT -> PlatformSelectStep(
-                    platforms = uiState.platforms,
-                    filterMode = uiState.platformFilterMode,
-                    searchQuery = uiState.platformFilterSearchQuery,
-                    focusedIndex = uiState.focusedIndex,
-                    buttonFocusIndex = uiState.platformButtonFocus,
-                    headerFocused = uiState.platformHeaderFocused,
-                    headerIndex = uiState.platformHeaderIndex,
-                    searchActive = uiState.platformSearchActive,
-                    sortMenuOpen = uiState.platformSortMenuOpen,
-                    sortMenuIndex = uiState.platformSortMenuIndex,
-                    onToggle = viewModel::togglePlatform,
-                    onToggleAll = viewModel::toggleAllPlatforms,
-                    onSortModeChange = {
-                        viewModel.setPlatformFilterSortMode(it)
-                        viewModel.closePlatformSortMenu()
-                    },
-                    onFilterModeChange = { viewModel.cyclePlatformFilterMode() },
-                    onSearchQueryChange = viewModel::setPlatformFilterSearchQuery,
-                    onOpenSearch = viewModel::openPlatformSearch,
-                    onCloseSearch = viewModel::closePlatformSearch,
-                    onOpenSortMenu = viewModel::openPlatformSortMenu,
-                    onCloseSortMenu = viewModel::closePlatformSortMenu,
-                    onContinue = viewModel::proceedFromPlatformSelect
-                )
-                FirstRunStep.CORE_PROMPT -> CorePromptStep(
-                    missingCoreCount = uiState.missingCoreCount,
-                    focusedIndex = uiState.focusedIndex,
-                    onDownload = { viewModel.nextStep() },
-                    onSkip = { viewModel.skipCorePrompt() }
-                )
-                FirstRunStep.CORE_DOWNLOAD -> CoreDownloadStep(
-                    coreDownloads = uiState.coreDownloads,
-                    isComplete = uiState.coreDownloadComplete,
-                    focusedIndex = uiState.focusedIndex,
-                    onRetry = { viewModel.retryCoreDownload(it) },
-                    onContinue = { viewModel.nextStep() },
-                    onSkip = { viewModel.skipCoreDownloads() }
-                )
-                FirstRunStep.COMPLETE -> CompleteStep(
-                    gameCount = uiState.rommGameCount,
-                    platformCount = uiState.rommPlatformCount,
-                    isFocused = true,
-                    onStart = {
-                        viewModel.completeSetup(onDone = onComplete)
-                    }
-                )
+    FirstRunFooterHints(
+        state = uiState,
+        canMove = viewModel.getMaxFocusIndex() > 0,
+        onHintClick = { button ->
+            when (button) {
+                InputButton.A -> inputHandler.onConfirm()
+                InputButton.B -> inputHandler.onBack()
+                InputButton.X -> inputHandler.onContextMenu()
+                InputButton.START -> inputHandler.onMenu()
+                else -> Unit
             }
         }
+    )
+
+    Column(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier.fillMaxWidth().weight(1f),
+            contentAlignment = Alignment.Center
+        ) {
+            AnimatedContent(
+                targetState = uiState.currentStep,
+                modifier = Modifier.fillMaxSize(),
+                transitionSpec = {
+                    fadeIn(animationSpec = tween(150)) togetherWith fadeOut(animationSpec = tween(150))
+                },
+                label = "wizard_step"
+            ) { step ->
+                when (step) {
+                    FirstRunStep.WELCOME -> WelcomeStep(
+                        isFocused = true,
+                        onGetStarted = { viewModel.nextStep() }
+                    )
+                    FirstRunStep.DISPLAY_SETUP -> DisplaySetupStep(
+                        focused = displaySetupChoices().let { it[uiState.focusedIndex.coerceIn(0, it.size - 1)] },
+                        selected = displaySetupSelected(uiState),
+                        rows = displaySetupRows(uiState),
+                        focusedRow = focusedDisplayRow(uiState),
+                        recommended = uiState.detectedDisplayProfile,
+                        startFullScreen = uiState.startFullScreen,
+                        safeAreaPercent = displaySetupSafeArea(uiState),
+                        uiScale = uiState.uiScale,
+                        onChoose = viewModel::selectDisplayProfile,
+                        onStartFullScreen = viewModel::setWizardStartFullScreen,
+                        onAdjustSafeArea = viewModel::adjustWizardSafeArea,
+                        onAdjustUiScale = viewModel::adjustWizardUiScale
+                    )
+                    FirstRunStep.ROMM_LOGIN -> if (uiState.rommShowScanner) {
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            com.nendo.argosy.ui.components.QrScannerWithPermission(
+                                onResult = { result ->
+                                    viewModel.handleScanResult(result.origin, result.code)
+                                },
+                                onDismiss = { viewModel.dismissScanner() }
+                            )
+                        }
+                    } else RommLoginStep(
+                        url = uiState.rommUrl,
+                        urlCommitted = uiState.rommUrlCommitted,
+                        pairingCode = uiState.rommPairingCode,
+                        devicePairing = uiState.rommDevicePairing,
+                        deviceUserCode = uiState.rommDeviceUserCode,
+                        deviceVerificationUrl = uiState.rommDeviceVerificationUrl,
+                        supportsDeviceAuth = uiState.rommSupportsDeviceAuth,
+                        browserMissing = uiState.rommBrowserMissing,
+                        hasCamera = uiState.rommHasCamera,
+                        isConnecting = uiState.isConnecting,
+                        error = firstRunErrorText(uiState.connectionError),
+                        focusedIndex = uiState.focusedIndex,
+                        rommFocusField = uiState.rommFocusField,
+                        importedCertCount = uiState.importedCertCount,
+                        onAddCertificate = { showCertBrowser = true },
+                        onUrlChange = viewModel::setRommUrl,
+                        onPairingCodeChange = viewModel::setRommPairingCode,
+                        onClearPairingCode = { viewModel.clearRommPairingCode() },
+                        onCodeComplete = { viewModel.setFocusedIndex(1) },
+                        onCommitUrl = { viewModel.commitUrl() },
+                        onEditUrl = { viewModel.editUrl() },
+                        onConnect = { viewModel.connectToRomm() },
+                        onScan = { viewModel.showScanner() },
+                        onCancelPairing = { viewModel.cancelDevicePairing() },
+                        onOpenVerificationUrl = openVerificationUrl,
+                        onUseManualCode = { viewModel.useManualPairingCode() },
+                        onUseDevicePairing = { viewModel.useDevicePairing() },
+                        onBack = { viewModel.previousStep() },
+                        onClearFocusField = { viewModel.clearRommFocusField() }
+                    )
+                    FirstRunStep.ROMM_SUCCESS -> RommSuccessStep(
+                        serverName = uiState.rommUrl,
+                        gameCount = uiState.rommGameCount,
+                        platformCount = uiState.rommPlatformCount,
+                        isFocused = true,
+                        onContinue = { viewModel.nextStep() }
+                    )
+                    FirstRunStep.PERMISSIONS -> if (uiState.hostFolderAccessSupported) {
+                        EmulatorFolderAccessStep(
+                            emulators = uiState.emulatorFolderAccess,
+                            gamesFolder = uiState.gamesFolder,
+                            focusedIndex = uiState.focusedIndex,
+                            onGrant = { viewModel.grantEmulatorFolderAccess(it) },
+                            onContinue = { viewModel.proceedFromPermissions() }
+                        )
+                    } else {
+                        PermissionsStep(
+                            hasStorage = uiState.hasStoragePermission,
+                            hasNotifications = uiState.hasNotificationPermission,
+                            hasOverlay = uiState.hasOverlayPermission,
+                            hasUsageStats = uiState.hasUsageStatsPermission,
+                            focusedIndex = uiState.focusedIndex,
+                            onRequestStorage = requestStorage,
+                            onRequestNotifications = requestNotifications,
+                            onRequestOverlay = requestOverlay,
+                            onRequestUsageStats = requestUsageStats,
+                            onContinue = { viewModel.proceedFromPermissions() }
+                        )
+                    }
+                    FirstRunStep.ROM_PATH -> RomPathStep(
+                        currentPath = uiState.romStoragePath,
+                        folderSelected = uiState.folderSelected,
+                        focusedIndex = uiState.focusedIndex,
+                        onChooseFolder = chooseFolder,
+                        onContinue = { viewModel.proceedFromRomPath() }
+                    )
+                    FirstRunStep.IMAGE_CACHE -> ImageCacheStep(
+                        currentPath = uiState.imageCachePath,
+                        folderSelected = uiState.imageCacheFolderSelected,
+                        focusedIndex = uiState.focusedIndex,
+                        onChooseFolder = chooseImageCacheFolder,
+                        onContinue = { viewModel.proceedFromImageCache() },
+                        onSkip = { viewModel.skipImageCachePath() }
+                    )
+                    FirstRunStep.PLATFORM_SELECT -> PlatformSelectStep(
+                        platforms = uiState.platforms,
+                        filterMode = uiState.platformFilterMode,
+                        searchQuery = uiState.platformFilterSearchQuery,
+                        focusedIndex = uiState.focusedIndex,
+                        buttonFocusIndex = uiState.platformButtonFocus,
+                        headerFocused = uiState.platformHeaderFocused,
+                        headerIndex = uiState.platformHeaderIndex,
+                        searchActive = uiState.platformSearchActive,
+                        sortMenuOpen = uiState.platformSortMenuOpen,
+                        sortMenuIndex = uiState.platformSortMenuIndex,
+                        onToggle = viewModel::togglePlatform,
+                        onToggleAll = viewModel::toggleAllPlatforms,
+                        onSortModeChange = {
+                            viewModel.setPlatformFilterSortMode(it)
+                            viewModel.closePlatformSortMenu()
+                        },
+                        onFilterModeChange = { viewModel.cyclePlatformFilterMode() },
+                        onSearchQueryChange = viewModel::setPlatformFilterSearchQuery,
+                        onOpenSearch = viewModel::openPlatformSearch,
+                        onCloseSearch = viewModel::closePlatformSearch,
+                        onOpenSortMenu = viewModel::openPlatformSortMenu,
+                        onCloseSortMenu = viewModel::closePlatformSortMenu,
+                        onContinue = viewModel::proceedFromPlatformSelect
+                    )
+                    FirstRunStep.CORE_PROMPT -> CorePromptStep(
+                        missingCoreCount = uiState.missingCoreCount,
+                        focusedIndex = uiState.focusedIndex,
+                        onDownload = { viewModel.nextStep() },
+                        onSkip = { viewModel.skipCorePrompt() }
+                    )
+                    FirstRunStep.CORE_DOWNLOAD -> CoreDownloadStep(
+                        coreDownloads = uiState.coreDownloads,
+                        isComplete = uiState.coreDownloadComplete,
+                        focusedIndex = uiState.focusedIndex,
+                        onRetry = { viewModel.retryCoreDownload(it) },
+                        onContinue = { viewModel.nextStep() },
+                        onSkip = { viewModel.skipCoreDownloads() }
+                    )
+                    FirstRunStep.COMPLETE -> CompleteStep(
+                        gameCount = uiState.rommGameCount,
+                        platformCount = uiState.rommPlatformCount,
+                        isFocused = true,
+                        onStart = {
+                            viewModel.completeSetup(onDone = onComplete)
+                        }
+                    )
+                }
+            }
+        }
+        FooterSpacer()
     }
 
     if (showFileBrowser) {
@@ -445,6 +478,38 @@ fun FirstRunScreen(
 }
 
 @Composable
+private fun FirstRunFooterHints(
+    state: FirstRunUiState,
+    canMove: Boolean,
+    onHintClick: (InputButton) -> Unit
+) {
+    val step = state.currentStep
+    val platformMenuOpen = step == FirstRunStep.PLATFORM_SELECT &&
+        (state.platformSortMenuOpen || state.platformSearchActive)
+    val moveLabel = stringResource(R.string.firstrun_footer_move)
+    val selectLabel = stringResource(R.string.firstrun_footer_select)
+    val backLabel = stringResource(
+        when {
+            platformMenuOpen -> R.string.firstrun_footer_close
+            step == FirstRunStep.PLATFORM_SELECT -> R.string.firstrun_footer_continue
+            step == FirstRunStep.ROMM_LOGIN && state.rommDevicePairing -> R.string.firstrun_footer_cancel
+            else -> R.string.firstrun_footer_back
+        }
+    )
+    val toggleAllLabel = stringResource(R.string.firstrun_footer_toggle_all)
+    val nextLabel = stringResource(R.string.firstrun_footer_next)
+    val hasNext = firstRunNextAction(state) != null
+    val hints = buildList {
+        if (canMove || step == FirstRunStep.PLATFORM_SELECT) add(InputButton.DPAD to moveLabel)
+        add(InputButton.A to selectLabel)
+        if (step != FirstRunStep.WELCOME) add(InputButton.B to backLabel)
+        if (step == FirstRunStep.PLATFORM_SELECT && !platformMenuOpen) add(InputButton.X to toggleAllLabel)
+        if (hasNext) add(InputButton.START to nextLabel)
+    }
+    FooterHints(hints = hints, onHintClick = onHintClick, forced = true)
+}
+
+@Composable
 private fun StepColumn(
     modifier: Modifier = Modifier,
     horizontalAlignment: Alignment.Horizontal = Alignment.CenterHorizontally,
@@ -463,10 +528,29 @@ private fun StepColumn(
 @Composable
 private fun DisplaySetupStep(
     focused: DisplayProfile,
+    selected: DisplayProfile,
+    rows: List<DisplaySetupRow>,
+    focusedRow: DisplaySetupRow?,
     recommended: DisplayProfile?,
-    onChoose: (DisplayProfile) -> Unit
+    startFullScreen: Boolean,
+    safeAreaPercent: Int,
+    uiScale: Int,
+    onChoose: (DisplayProfile) -> Unit,
+    onStartFullScreen: (Boolean) -> Unit,
+    onAdjustSafeArea: (Int) -> Unit,
+    onAdjustUiScale: (Int) -> Unit
 ) {
-    StepColumn {
+    val listState = rememberLazyListState()
+    LaunchedEffect(focusedRow, rows.size) {
+        val target = focusedRow?.let { rows.indexOf(it) + 1 } ?: 0
+        listState.animateScrollToItem(target)
+    }
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = Dimens.spacingXl, vertical = Dimens.spacingMd)
+    ) {
         Text(
             text = stringResource(R.string.firstrun_display_setup_title),
             style = MaterialTheme.typography.headlineSmall
@@ -479,14 +563,61 @@ private fun DisplaySetupStep(
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Spacer(modifier = Modifier.height(Dimens.spacingLg))
-        DisplayProfileCards(
-            selected = null,
-            focused = focused,
-            recommended = recommended,
-            onChoose = onChoose,
-            modifier = Modifier.fillMaxWidth(),
-            options = displaySetupChoices()
-        )
+        Row(modifier = Modifier.fillMaxWidth().weight(1f)) {
+            if (hasDisplayProfile) {
+                SpindleScrollIndicator(listState, Modifier.padding(end = Dimens.spacingXs))
+            }
+            LazyColumn(
+                state = listState,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(Dimens.spacingXs),
+                modifier = Modifier.weight(1f)
+            ) {
+                item(key = "cards") {
+                    DisplayProfileCards(
+                        selected = selected,
+                        focused = if (focusedRow == null) focused else null,
+                        recommended = recommended,
+                        onChoose = onChoose,
+                        modifier = Modifier.fillMaxWidth().padding(bottom = Dimens.spacingMd),
+                        options = displaySetupChoices()
+                    )
+                }
+                items(rows, key = { it.name }) { row ->
+                    Box(modifier = Modifier.fillMaxWidth(0.9f)) {
+                        when (row) {
+                            DisplaySetupRow.FULL_SCREEN -> SwitchPreference(
+                                title = stringResource(R.string.firstrun_display_setup_full_screen_title),
+                                subtitle = stringResource(R.string.firstrun_display_setup_full_screen_subtitle),
+                                isEnabled = startFullScreen,
+                                isFocused = focusedRow == row,
+                                onToggle = onStartFullScreen
+                            )
+                            DisplaySetupRow.SAFE_AREA -> SliderPreference(
+                                title = stringResource(R.string.firstrun_display_setup_safe_area_title),
+                                value = safeAreaPercent,
+                                minValue = 0,
+                                maxValue = DisplayProfile.MAX_SAFE_AREA_PERCENT,
+                                isFocused = focusedRow == row,
+                                step = 1,
+                                suffix = "%",
+                                onAdjust = onAdjustSafeArea
+                            )
+                            DisplaySetupRow.UI_SCALE -> SliderPreference(
+                                title = stringResource(R.string.firstrun_display_setup_ui_scale_title),
+                                value = uiScale,
+                                minValue = UI_SCALE_MIN,
+                                maxValue = UI_SCALE_MAX,
+                                isFocused = focusedRow == row,
+                                step = UI_SCALE_STEP,
+                                suffix = "%",
+                                onAdjust = onAdjustUiScale
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -1037,7 +1168,20 @@ private fun EmulatorFolderAccessStep(
     onGrant: (Int) -> Unit,
     onContinue: () -> Unit
 ) {
-    StepColumn {
+    val listState = rememberLazyListState()
+
+    LaunchedEffect(focusedIndex, emulators.size) {
+        if (focusedIndex in emulators.indices) {
+            listState.animateScrollToItem(focusedIndex)
+        }
+    }
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = Dimens.spacingXl, vertical = Dimens.spacingMd)
+    ) {
         StepHeader(title = stringResource(R.string.firstrun_emulators_title))
         Spacer(modifier = Modifier.height(Dimens.spacingSm))
         Text(
@@ -1049,28 +1193,40 @@ private fun EmulatorFolderAccessStep(
         )
         Spacer(modifier = Modifier.height(Dimens.spacingMd))
 
-        Column(
-            verticalArrangement = Arrangement.spacedBy(Dimens.spacingSm),
-            modifier = Modifier.fillMaxWidth(0.9f)
-        ) {
-            if (emulators.isEmpty()) {
-                Text(
-                    text = stringResource(R.string.firstrun_permissions_no_flatpak_emulators),
-                    style = MaterialTheme.typography.bodySmall,
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-            emulators.forEachIndexed { index, emulator ->
-                PermissionCard(
-                    icon = Icons.Default.Folder,
-                    title = emulator.displayName,
-                    description = stringResource(R.string.firstrun_permissions_folder_description, gamesFolder),
-                    isGranted = emulator.granted,
-                    isFocused = focusedIndex == index,
-                    onClick = { onGrant(index) }
-                )
+        if (emulators.isEmpty()) {
+            Text(
+                text = stringResource(R.string.firstrun_permissions_no_flatpak_emulators),
+                style = MaterialTheme.typography.bodySmall,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.fillMaxWidth(0.9f)
+            )
+            Spacer(modifier = Modifier.weight(1f))
+        } else {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(0.9f)
+                    .weight(1f)
+            ) {
+                if (hasDisplayProfile) {
+                    SpindleScrollIndicator(listState, Modifier.padding(end = Dimens.spacingXs))
+                }
+                LazyColumn(
+                    state = listState,
+                    verticalArrangement = Arrangement.spacedBy(Dimens.spacingSm),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    itemsIndexed(emulators, key = { _, e -> e.appId }) { index, emulator ->
+                        PermissionCard(
+                            icon = Icons.Default.Folder,
+                            title = emulator.displayName,
+                            description = stringResource(R.string.firstrun_permissions_folder_description, gamesFolder),
+                            isGranted = emulator.granted,
+                            isFocused = focusedIndex == index,
+                            onClick = { onGrant(index) }
+                        )
+                    }
+                }
             }
         }
 

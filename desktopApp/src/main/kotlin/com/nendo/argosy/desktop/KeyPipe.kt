@@ -6,7 +6,10 @@ import com.nendo.argosy.ui.input.DesktopGamepadDispatcher
 import java.awt.Component
 import java.awt.Container
 import java.awt.Window
+import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
+import java.awt.event.MouseEvent
+import javax.swing.JFrame
 import java.io.File
 import javax.swing.SwingUtilities
 
@@ -18,6 +21,7 @@ import javax.swing.SwingUtilities
  * SDL virtual gamepad (`PAD:SOUTH`, `PAD:DPAD_DOWN`) and `PAD:<axis>=<value>` holds an axis
  * (`PAD:LEFTY=32767`, back to rest with `=0`), through the app's real SDL gamepad path. A line
  * `TYPE:<text>` types the text as it stands (case kept), one press, typed and release per character.
+ * A line `CLICK:<x>,<y>` clicks the left mouse button at that point of the window's content area.
  */
 class KeyPipe(private val pipe: File, private val gamepads: DesktopGamepadDispatcher) {
     @Volatile
@@ -45,6 +49,10 @@ class KeyPipe(private val pipe: File, private val gamepads: DesktopGamepadDispat
         }
         val name = line.trim().uppercase()
         if (name.isEmpty()) return
+        if (name.startsWith(CLICK_PREFIX)) {
+            click(name.removePrefix(CLICK_PREFIX))
+            return
+        }
         if (name.startsWith(PAD_PREFIX)) {
             padInput(name.removePrefix(PAD_PREFIX))
             return
@@ -90,6 +98,27 @@ class KeyPipe(private val pipe: File, private val gamepads: DesktopGamepadDispat
         target.setButton(button, false)
     }
 
+    private fun click(command: String) {
+        val x = command.substringBefore(',').trim().toIntOrNull()
+        val y = command.substringAfter(',', "").trim().toIntOrNull()
+        if (x == null || y == null) {
+            System.err.println("key-pipe: bad click $command")
+            return
+        }
+        listOf(MouseEvent.MOUSE_PRESSED, MouseEvent.MOUSE_RELEASED, MouseEvent.MOUSE_CLICKED).forEach { id ->
+            SwingUtilities.invokeAndWait {
+                val root = (window as? JFrame)?.contentPane ?: window ?: return@invokeAndWait
+                val target = SwingUtilities.getDeepestComponentAt(root, x, y) ?: return@invokeAndWait
+                val point = SwingUtilities.convertPoint(root, x, y, target)
+                val modifiers = if (id == MouseEvent.MOUSE_RELEASED || id == MouseEvent.MOUSE_CLICKED) 0 else InputEvent.BUTTON1_DOWN_MASK
+                target.dispatchEvent(
+                    MouseEvent(target, id, System.currentTimeMillis(), modifiers, point.x, point.y, 1, false, MouseEvent.BUTTON1)
+                )
+            }
+            if (id == MouseEvent.MOUSE_PRESSED) Thread.sleep(HOLD_MS)
+        }
+    }
+
     private fun virtualPad(): SdlVirtualPad? {
         pad?.takeIf { padGeneration == gamepads.sourceGeneration }?.let { return it }
         if (!gamepads.awaitReady(PAD_READY_MS)) {
@@ -124,6 +153,7 @@ class KeyPipe(private val pipe: File, private val gamepads: DesktopGamepadDispat
     private companion object {
         const val HOLD_MS = 80L
         const val PAD_PREFIX = "PAD:"
+        const val CLICK_PREFIX = "CLICK:"
         const val TYPE_PREFIX = "TYPE:"
         const val TYPE_GAP_MS = 20L
         const val PAD_READY_MS = 5_000L

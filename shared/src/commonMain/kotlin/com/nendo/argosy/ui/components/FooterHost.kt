@@ -8,6 +8,8 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.foundation.layout.Spacer
@@ -50,6 +52,8 @@ class FooterHostController {
     }
 
     val top: FooterEntry? get() = stack.lastOrNull()?.second
+
+    var menuAction: (() -> Unit)? by mutableStateOf(null)
 
     private val tappableHints = mutableMapOf<Any, LayoutCoordinates>()
 
@@ -120,6 +124,7 @@ fun FooterHost(
     modifier: Modifier = Modifier
 ) {
     val entry = controller.top
+    val menuClick = controller.menuAction?.takeIf { entry?.hints.orEmpty().none { it.button == InputButton.START } }
     CompositionLocalProvider(
         LocalFooterStyle provides (entry?.style ?: FooterStyleConfig()),
         LocalFooterHintTracker provides controller
@@ -128,21 +133,23 @@ fun FooterHost(
             FooterVariant.SUBTLE -> SubtleFooterBar(
                 hints = entry.hints.map { it.button to it.action },
                 modifier = modifier,
-                onHintClick = entry.onHintClick
+                onHintClick = entry.onHintClick,
+                onMenuClick = menuClick
             )
             else -> FooterBarWithState(
                 hints = entry?.hints ?: emptyList(),
                 modifier = modifier,
                 onHintClick = entry?.onHintClick,
                 trailingContent = entry?.trailingContent,
-                forceVisible = entry?.forced == true
+                forceVisible = entry?.forced == true,
+                onMenuClick = menuClick
             )
         }
     }
 }
 
 val FooterHostController.isBarVisible: Boolean
-    get() = top?.let { entry ->
+    get() = (menuAction != null && top?.hints.orEmpty().none { it.button == InputButton.START }) || top?.let { entry ->
         entry.forced || entry.hints.any { !isObviousHint(it.button) }
     } == true
 

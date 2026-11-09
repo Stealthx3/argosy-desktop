@@ -11,7 +11,6 @@ import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -185,36 +184,5 @@ private fun NavBarDestination(
                     .background(theme.focusAccent, CircleShape)
             )
         }
-    }
-}
-
-class TopRowNavRing(
-    val destinations: List<DrawerItem>,
-    val currentRoute: String?,
-    val onNavigate: (String) -> Unit,
-    val badgeFor: (String) -> Int?
-)
-
-val LocalTopRowNavRing = androidx.compose.runtime.compositionLocalOf<TopRowNavRing?> { null }
-
-@Composable
-fun TopRowNavRingSlot(modifier: Modifier = Modifier) {
-    val ring = LocalTopRowNavRing.current ?: return
-    if (ring.destinations.size < 2) return
-    Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(Dimens.spacingXs)
-    ) {
-        ControllerButtonGlyph(com.nendo.argosy.core.input.AndroidKeyCodes.KEYCODE_BUTTON_L1, Dimens.iconSm, MaterialTheme.typography.labelSmall.fontSize)
-        FloatingNavBar(
-            visible = true,
-            destinations = ring.destinations,
-            currentRoute = ring.currentRoute,
-            onNavigate = ring.onNavigate,
-            onInteract = {},
-            badgeFor = ring.badgeFor
-        )
-        ControllerButtonGlyph(com.nendo.argosy.core.input.AndroidKeyCodes.KEYCODE_BUTTON_R1, Dimens.iconSm, MaterialTheme.typography.labelSmall.fontSize)
     }
 }
