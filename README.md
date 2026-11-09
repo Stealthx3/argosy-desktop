@@ -13,7 +13,7 @@ An independent fork of `rommapp/argosy-launcher`, licensed GPL-3.0 like upstream
 - **Display profiles:** Handheld, Desktop and TV, detected automatically and chosen in setup. TV adds couch-scale text, a safe-area margin and a focus glow.
 - **Windows:** title bar when windowed, F11 or a setting for full screen, `--windowed` / `--fullscreen`, full screen under gamescope.
 - **Input:** Steam Input or SDL3 controllers, per-controller button mapping, Xbox/PlayStation/Nintendo/Steam glyphs, mouse hover and click, Start as Next in setup.
-- **Emulators:** a Linux compatibility database, consented Flathub installs, AppImage and Flathub updates, and 21 desktop-only emulators.
+- **Emulators:** a Linux compatibility database, consented Flathub installs, AppImage and Flathub updates, Emudeck co-existence, and 21 desktop-only emulators.
 - **Save sync** for RetroArch and standalone emulators, in place, including EmuDeck layouts.
 - **Linux screens:** Flatpak Permissions, a read-only host GPU page, an Apps tab for desktop applications, Quick Settings for volume and rumble.
 - **Steam Game Mode:** emulator windows join Argosy's Steam launch, and Steam's controller settings reach the emulators.
