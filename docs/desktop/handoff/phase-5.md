@@ -7,7 +7,7 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 ## Paused state (read first)
 
 - **Development is paused.** The owner asked to hand the repo to Claude Cowork for a reorganization and documentation rework. Do not resume step 4 until the owner says so. Pacer state: `waiting-owner`.
-- **Git:** everything from this session is committed on local `main`. Local `main` and `origin/main` have **diverged**: origin has one docs-only commit, 6ddef138e ("Docs: new README, Phase 5 records and the interim post-mortem"), pushed early from a cloud session at the owner's request; local has 48 code commits not on origin. The working tree's `README.md` equals 6ddef138e's README; `docs/postmortem/` and `scripts/postmortem.mjs` are untracked here but in 6ddef138e. Reconcile (merge or rebase onto origin) before the next push; the owner decides when.
+- **Git:** local `main` merged `origin/main` (6ddef138e, docs only; local versions of the shared docs kept) and was pushed on 2026-11-09 at the owner's request, mid-phase. `docs/postmortem/` and `scripts/postmortem.mjs` are now tracked.
 - **Other sessions' uncommitted files:** `scripts/desktop/vmlab/lab.sh` (modified), `scripts/desktop/vmlab/gm-define.sh`, `scripts/desktop/vmlab/qemu-venus.sh` (SteamOS/Bazzite lab, closed by owner decision: Game Mode testing moved to the host).
 - **Current beta (owner decision, 2026-11-09):** the build Pages serves, app commit 663022ed (0.4.0, `gh-pages` c1e4d43), is the current beta release; labels say beta, not alpha. Earlier publish of 2026-11-08: app commit 490fc8d3. `main` itself is not pushed.
 
