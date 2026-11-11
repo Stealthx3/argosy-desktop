@@ -1782,3 +1782,15 @@ The owner's tests are the step 5 side-by-side checklist and the alpha 5.4 Game M
 ### 2026-11-09 — Beta republished with the beta labels (owner: "Republish")
 
 - **Action:** `build-alpha.sh` → `publish-repo.sh` (signed) → `push-pages.sh --step-close 5.4`. Pages serves app commit 72eee22e (`gh-pages` b548dc6), checked through a throwaway `FLATPAK_USER_DIR` after the CDN cache turned over. Same code as 663022ed; the metainfo now says beta and carries the updated 0.4.0 release notes. Step 4 stays open for the Deck checks.
+
+### 2026-11-10 — GitHub pre-release v0.4.0-beta; README bug-report line fixed (owner request)
+
+- **Action:** the owner turned on Issues for the repo. Created GitHub pre-release `v0.4.0-beta` on `ef46945bd` (code unchanged since d360fa16b). It carries:
+  - a single-file bundle, `ArgosyDesktop-0.4.0-beta-x86_64.flatpak`, from `build/flatpak/repo` (Flatpak commit 72eee22e, the build Pages serves), made with `flatpak build-bundle --repo-url=<Pages repo> --runtime-repo=<Flathub> --gpg-keys=<the repo key>`
+  - its `.sha256`
+  - the Pages `.flatpakref`
+  
+  The notes give install steps for both the repo and the bundle.
+- **Reasoning:** a bundle with `--repo-url` and the repo key installs as remote `argosydesktop-origin`, which points at Pages. That way `flatpak update` works the same for both install paths.
+- **Checks:** I test-installed the bundle into a scratch `FLATPAK_USER_DIR` (version 0.4.0, commit 72eee22e). I downloaded the uploaded asset and its `.sha256` back from GitHub, and `sha256sum -c` passes. The first `.sha256` held an absolute scratchpad path and was replaced.
+- **README:** the bug-report line pointed at an `argosy-run.log` under `~/.var/app/…`. The app never writes that file; it is the terminal output of `flatpak run … > ~/argosy-run.log 2>&1`. The README now gives that command and links Issues and Releases.

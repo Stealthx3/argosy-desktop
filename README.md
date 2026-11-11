@@ -63,7 +63,13 @@ flatpak install --user flathub org.libretro.RetroArch
 - **Updates:** `flatpak update` (the repository is signed; your data stays).
 - **Uninstall:** `flatpak uninstall --user io.github.stealthx3.ArgosyDesktop` (add `--delete-data` to remove settings; games in `~/Games/Argosy` stay).
 
-This is a beta: back up emulator saves before turning on Save Sync, and attach `argosy-run.log` from `~/.var/app/io.github.stealthx3.ArgosyDesktop` to bug reports.
+This is a beta: back up emulator saves before turning on Save Sync. Report bugs in [Issues](https://github.com/Stealthx3/argosy-desktop/issues) with a log of a run that shows the problem:
+
+```bash
+flatpak run io.github.stealthx3.ArgosyDesktop > ~/argosy-run.log 2>&1
+```
+
+Releases, including a single-file `.flatpak` bundle, are on the [Releases page](https://github.com/Stealthx3/argosy-desktop/releases).
 
 ## How it works
 
