@@ -23,6 +23,7 @@ fun installDesktopImageLoader(rommConnectionManager: RomMConnectionManager, user
     SingletonImageLoader.setSafe { context ->
         ImageLoader.Builder(context)
             .components {
+                add(SmoothImageDecoder.Factory())
                 add(AndroidAssetFetcher.Factory())
                 add(HostAppIconFetcher.Factory())
                 add(OkHttpNetworkFetcherFactory(callFactory = { okHttpClient }))

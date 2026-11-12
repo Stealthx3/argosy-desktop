@@ -1830,3 +1830,17 @@ The owner's tests are the step 5 side-by-side checklist and the alpha 5.4 Game M
   - real gameplay
   - each emulator's own first-run wizard (DuckStation, PCSX2), which shows once before the first boot
   - RPCS3, MAME, ScummVM and Vita3K, which are still without a launch entry, as the audit proposes
+
+### 2026-11-12 — Smooth cover downscaling on desktop (issue #2)
+- **Problem:** covers on the Steam Deck looked jagged next to the Android build, even though the cached source was RomM's full 1238×2000 `big.png`.
+- **Cause:** on desktop, Coil 3 (`SkiaImageDecoder` → `Bitmap.makeFromImage`) shrinks the source to the card size with `drawImageRect` and the default sampling, which is nearest-neighbour. A 4–6× shrink then skips most source pixels, so lettering and outlines alias. Coil 3.6.3, the latest, still does this, so a library upgrade does not help. Android's Coil 2 decodes with a power-of-two `inSampleSize` and leaves the rest to bilinear drawing, which is why the Thor looks clean.
+- **Fix:**
+  - New `SmoothImageDecoder` (desktopMain), registered first in `installDesktopImageLoader`.
+  - It shrinks with trilinear mipmap sampling.
+  - For inexact requests (the default) it keeps a power-of-two sample at least as large as the card, the same as Android. The 1.1× focus zoom therefore has detail to spare.
+  - SVGs are left to Coil's SVG decoder.
+- **Verification:**
+  - `SmoothImageDecoderTest` covers the size math and a 1-px stripe pattern that must average to grey instead of aliasing.
+  - `:shared:desktopTest` and `testDebugUnitTest` pass.
+  - A before/after made from a cached cover shows the jagged edges gone.
+- **Not covered:** not yet checked on a Deck. The fix ships only with a new Flatpak build, since it is code, not catalog.
