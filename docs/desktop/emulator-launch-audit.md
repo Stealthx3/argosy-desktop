@@ -6,6 +6,22 @@ The catalog is `shared/src/desktopMain/resources/emulators/linux-emulators.json`
 
 Phase 2 left these entries out on purpose (DEVLOG line ~850): their `--help` couldn't be printed on this host. Every command line below was instead checked in the emulator's own current source code, as the upstream mandate requires. None has been run on this host yet.
 
+## Status (2026-11-12, later): catalog version 4 shipped
+
+The seven catalog-only entries below, plus `linux_rmg` with `--quit-after-emulation`, went out in catalog version 4. Each was run in the Fedora KDE VM with its Flathub build, through `flatpak run`, with Argosy's folder grant (`flatpak override --user --filesystem=~/Games/Argosy`). The test file was a placeholder of random bytes in `~/Games/Argosy/emutest/` with spaces and brackets in its name. No real games or BIOS files were used, so these runs prove the emulator parses the command line and tries to open the file. They do not prove gameplay.
+
+| Entry | What the run showed |
+| --- | --- |
+| DuckStation 0.1-9482 | Its log says `Boot Path: …/Test Game (duckstation).bin`, then a BIOS search; then `-batch` exits by itself |
+| PCSX2 v2.8.2 | Autoboot started and stopped at "requires a PlayStation 2 BIOS". In `-batch` mode it then aborts (exit 134), which is PCSX2's own behaviour with no BIOS |
+| Azahar 2126.2 | Opened the file: "Invalid application format" |
+| Flycast v2.7 | `E[BOOT]: Invalid CDI file …/Test Game (flycast).cdi`, then exits |
+| RMG v0.9.1 | Opened the file: `CoreOpenRom … INPUT_INVALID`. Without the folder grant it was "No such file", so the grant matters |
+| melonDS 1.1 | Crashes on the junk file (exit 139); starts normally without one, so the file was read. Source-checked |
+| Ryujinx 1.3.3 | Stops at "Keys not found" before it loads anything. Source-checked only |
+
+**First-run wizards:** DuckStation and PCSX2 show a setup wizard on their first start, before booting the game. After the player finishes it once, the next launch from Argosy boots straight away. Worth noting in the release notes.
+
 ## Fixable with a catalog change only (no app rebuild)
 
 Each of these takes a single `{rom}` path, which is all `LinuxLaunch` supports today.

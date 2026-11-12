@@ -84,7 +84,26 @@ class LinuxEmulatorDatabaseTest {
         assertEquals(listOf("flatpak", "run", "app.xemu.xemu", "-dvd_path", "/g/x.iso"), LinuxLaunch.standalone("hakux", flatpak("app.xemu.xemu"), "/g/x.iso"))
         assertNotNull(LinuxLaunch.standalone("dosbox_turbo", flatpak("com.dosbox_x.DOSBox-X"), "/g/d.zip"))
         assertNull(LinuxLaunch.standalone("dosbox_turbo", flatpak("io.github.dosbox-staging"), "/g/d.zip"))
-        assertNull(LinuxLaunch.standalone("duckstation", flatpak("org.duckstation.DuckStation"), "/g/p.chd"))
+        assertEquals(
+            listOf("flatpak", "run", "org.duckstation.DuckStation", "-batch", "--", "/g/p.chd"),
+            LinuxLaunch.standalone("duckstation", flatpak("org.duckstation.DuckStation"), "/g/p.chd")
+        )
+        assertEquals(
+            listOf("flatpak", "run", "net.pcsx2.PCSX2", "-batch", "--", "/g/q.iso"),
+            LinuxLaunch.standalone("pcsx2", flatpak("net.pcsx2.PCSX2"), "/g/q.iso")
+        )
+        assertEquals(listOf("flatpak", "run", "io.github.ryubing.Ryujinx", "/g/r.nsp"), LinuxLaunch.standalone("ryujinx", flatpak("io.github.ryubing.Ryujinx"), "/g/r.nsp"))
+        assertEquals(listOf("flatpak", "run", "org.azahar_emu.Azahar", "/g/t.3ds"), LinuxLaunch.standalone("azahar", flatpak("org.azahar_emu.Azahar"), "/g/t.3ds"))
+        assertEquals(listOf("flatpak", "run", "net.kuribo64.melonDS", "/g/n.nds"), LinuxLaunch.standalone("melonds", flatpak("net.kuribo64.melonDS"), "/g/n.nds"))
+        assertEquals(listOf("flatpak", "run", "org.flycast.Flycast", "/g/f.cdi"), LinuxLaunch.standalone("flycast", flatpak("org.flycast.Flycast"), "/g/f.cdi"))
+        listOf("mupen64plus_fz", "linux_rmg").forEach { id ->
+            assertEquals(
+                listOf("flatpak", "run", "com.github.Rosalie241.RMG", "--quit-after-emulation", "/g/m.z64"),
+                LinuxLaunch.standalone(id, flatpak("com.github.Rosalie241.RMG"), "/g/m.z64"),
+                id
+            )
+        }
+        assertNull(LinuxLaunch.standalone("vita3k", LinuxInstall(LinuxInstallKind.APPIMAGE, "/a/Vita3K.AppImage", null), "/g/v.vpk"))
     }
 
     @Test

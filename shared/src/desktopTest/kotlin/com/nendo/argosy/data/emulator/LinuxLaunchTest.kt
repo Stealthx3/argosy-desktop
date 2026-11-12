@@ -49,8 +49,10 @@ class LinuxLaunchTest {
     fun unverifiedEmulatorsHaveNoCommand() {
         val staging = LinuxInstall(LinuxInstallKind.FLATPAK, "io.github.dosbox-staging", null)
         assertNull(LinuxLaunch.standalone("dosbox_turbo", staging, "/roms/d.zip"))
-        val duck = LinuxInstall(LinuxInstallKind.APPIMAGE, "$home/Applications/DuckStation.AppImage", null)
-        assertNull(LinuxLaunch.standalone("duckstation", duck, "/roms/p.chd"))
+        val vita = LinuxInstall(LinuxInstallKind.APPIMAGE, "$home/Applications/Vita3K.AppImage", null)
+        assertNull(LinuxLaunch.standalone("vita3k", vita, "/roms/v.vpk"))
+        val scumm = LinuxInstall(LinuxInstallKind.FLATPAK, "org.scummvm.ScummVM", null)
+        assertNull(LinuxLaunch.standalone("scummvm", scumm, "/roms/s.zip"))
     }
 
     @Test

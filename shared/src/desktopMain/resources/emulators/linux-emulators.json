@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "emulators": [
     {
       "id": "retroarch",
@@ -72,7 +72,12 @@
       "appImagePrefixes": [
         "azahar"
       ],
-      "appImageRepo": "azahar-emu/azahar"
+      "appImageRepo": "azahar-emu/azahar",
+      "launch": {
+        "args": [
+          "{rom}"
+        ]
+      }
     },
     {
       "id": "ryujinx",
@@ -90,7 +95,12 @@
       ],
       "installPaths": [
         "publish/Ryujinx"
-      ]
+      ],
+      "launch": {
+        "args": [
+          "{rom}"
+        ]
+      }
     },
     {
       "id": "eden",
@@ -124,7 +134,12 @@
       ],
       "appImagePrefixes": [
         "melonDS"
-      ]
+      ],
+      "launch": {
+        "args": [
+          "{rom}"
+        ]
+      }
     },
     {
       "id": "duckstation",
@@ -139,7 +154,14 @@
       "appImagePrefixes": [
         "DuckStation"
       ],
-      "appImageRepo": "stenzek/duckstation"
+      "appImageRepo": "stenzek/duckstation",
+      "launch": {
+        "args": [
+          "-batch",
+          "--",
+          "{rom}"
+        ]
+      }
     },
     {
       "id": "pcsx2",
@@ -154,7 +176,14 @@
       "appImagePrefixes": [
         "pcsx2"
       ],
-      "appImageRepo": "PCSX2/pcsx2"
+      "appImageRepo": "PCSX2/pcsx2",
+      "launch": {
+        "args": [
+          "-batch",
+          "--",
+          "{rom}"
+        ]
+      }
     },
     {
       "id": "ppsspp",
@@ -206,7 +235,12 @@
       "appImagePrefixes": [
         "flycast"
       ],
-      "appImageRepo": "flyinghead/flycast"
+      "appImageRepo": "flyinghead/flycast",
+      "launch": {
+        "args": [
+          "{rom}"
+        ]
+      }
     },
     {
       "id": "scummvm",
@@ -280,7 +314,13 @@
       ],
       "appImagePrefixes": [
         "RMG"
-      ]
+      ],
+      "launch": {
+        "args": [
+          "--quit-after-emulation",
+          "{rom}"
+        ]
+      }
     },
     {
       "id": "linkboy",
@@ -577,6 +617,7 @@
       ],
       "launch": {
         "args": [
+          "--quit-after-emulation",
           "{rom}"
         ]
       },

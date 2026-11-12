@@ -1809,3 +1809,24 @@ The owner's tests are the step 5 side-by-side checklist and the alpha 5.4 Game M
   - The reporter confirmed the same arguments end to end on a Deck: launching worked, and save upload matched by SHA-256.
   - Not run on this host: Eden is not installed here.
 - **Carry forward:** eleven more catalog entries have no `launch` entry: ryujinx, azahar, melonds, duckstation, pcsx2, vita3k, flycast, scummvm, mame4droid, aps3e and mupen64plus_fz. The evaluation is in `docs/desktop/emulator-launch-audit.md`.
+
+### 2026-11-12 — Catalog version 4: seven more emulators launch (owner: "Yes, test and add")
+
+- **Action:** added `launch` to seven entries in `linux-emulators.json`:
+  - duckstation and pcsx2: `-batch -- {rom}`
+  - ryujinx, azahar, melonds and flycast: `{rom}`
+  - mupen64plus_fz: `--quit-after-emulation {rom}`
+  
+  `linux_rmg` gained `--quit-after-emulation`. The catalog version is now 4. Tests:
+  - `LinuxEmulatorDatabaseTest` asserts every new command line.
+  - `LinuxLaunchTest.unverifiedEmulatorsHaveNoCommand` now covers vita3k and scummvm (it used to cover duckstation).
+- **Reasoning:** every form was taken from the emulator's own current source; see `docs/desktop/emulator-launch-audit.md` for the file and parser for each. For Ryujinx and Azahar, `-g` means something else (graphics backend, GDB port), so Eden's form was not copied to them.
+- **Verification:**
+  - Each emulator was run in the Fedora KDE VM with its Flathub build and Argosy's folder grant, using a junk placeholder file. All of them parsed the arguments and tried to open that exact path. The results table is in the audit.
+  - Ryujinx is blocked by missing keys, so it is source-checked only.
+  - No real games or BIOS files were used.
+  - `:shared:desktopTest` and `testDebugUnitTest` pass.
+- **Not covered:**
+  - real gameplay
+  - each emulator's own first-run wizard (DuckStation, PCSX2), which shows once before the first boot
+  - RPCS3, MAME, ScummVM and Vita3K, which are still without a launch entry, as the audit proposes
