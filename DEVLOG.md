@@ -1844,3 +1844,7 @@ The owner's tests are the step 5 side-by-side checklist and the alpha 5.4 Game M
   - `:shared:desktopTest` and `testDebugUnitTest` pass.
   - A before/after made from a cached cover shows the jagged edges gone.
 - **Not covered:** not yet checked on a Deck. The fix ships only with a new Flatpak build, since it is code, not catalog.
+- **Beta publish (owner: "Do the flatpak build", then "Do a walk afterwards on the host and publish the result to the repo once the fix is confirmed"):**
+  - `build-alpha.sh` from c9ce669b8; the installed jar contains `SmoothImageDecoder`.
+  - Host walk with `pad-walk.sh flatpak` (`build/walk-issue2/`): Home covers render cleanly, focused and unfocused, with no errors in the run log.
+  - Then `publish-repo.sh` (signed) → `push-pages.sh --step-close 5.4`, the same label as earlier owner-requested publishes (`gh-pages` b875a5c, app commit 9f559ced).
