@@ -77,6 +77,10 @@ class LinuxEmulatorDatabaseTest {
             LinuxLaunch.standalone("dolphin", flatpak("org.DolphinEmu.dolphin-emu"), "/g/a.iso")
         )
         assertEquals(listOf("/usr/bin/cemu", "-g", "/g/b.wua"), LinuxLaunch.standalone("cemu", LinuxInstall(LinuxInstallKind.NATIVE, "/usr/bin/cemu", null), "/g/b.wua"))
+        assertEquals(
+            listOf("/home/deck/Applications/Eden.AppImage", "-g", "/g/s.nsp"),
+            LinuxLaunch.standalone("eden", LinuxInstall(LinuxInstallKind.APPIMAGE, "/home/deck/Applications/Eden.AppImage", null), "/g/s.nsp")
+        )
         assertEquals(listOf("flatpak", "run", "app.xemu.xemu", "-dvd_path", "/g/x.iso"), LinuxLaunch.standalone("hakux", flatpak("app.xemu.xemu"), "/g/x.iso"))
         assertNotNull(LinuxLaunch.standalone("dosbox_turbo", flatpak("com.dosbox_x.DOSBox-X"), "/g/d.zip"))
         assertNull(LinuxLaunch.standalone("dosbox_turbo", flatpak("io.github.dosbox-staging"), "/g/d.zip"))

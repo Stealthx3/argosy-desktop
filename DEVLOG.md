@@ -1794,3 +1794,18 @@ The owner's tests are the step 5 side-by-side checklist and the alpha 5.4 Game M
 - **Reasoning:** a bundle with `--repo-url` and the repo key installs as remote `argosydesktop-origin`, which points at Pages. That way `flatpak update` works the same for both install paths.
 - **Checks:** I test-installed the bundle into a scratch `FLATPAK_USER_DIR` (version 0.4.0, commit 72eee22e). I downloaded the uploaded asset and its `.sha256` back from GitHub, and `sha256sum -c` passes. The first `.sha256` held an absolute scratchpad path and was replaced.
 - **README:** the bug-report line pointed at an `argosy-run.log` under `~/.var/app/…`. The app never writes that file; it is the terminal output of `flatpak run … > ~/argosy-run.log 2>&1`. The README now gives that command and links Issues and Releases.
+
+### 2026-11-12 — Eden launches: catalog version 3 (issue #1, owner: "Fix Eden and push")
+
+- **Report:** [issue #1](https://github.com/Stealthx3/argosy-desktop/issues/1), from a tester on a Steam Deck. Eden (an EmuDeck AppImage) was detected, but every Switch launch failed with `no verified command line for eden (APPIMAGE)`.
+- **Cause:** the Eden entry in `linux-emulators.json` had detection fields but no `launch` object, so `LinuxLaunch.standalone()` returned null.
+- **Action:**
+  - Added `"launch": {"args": ["-g", "{rom}"]}` to the Eden entry. This was checked against Eden's own `docs/user/CommandLine.md` (`--game/-g <path>`), which the upstream mandate requires.
+  - Raised the catalog `version` from 2 to 3.
+  - Added an Eden AppImage case to `LinuxEmulatorDatabaseTest.launchArgumentsComeFromTheDatabase`.
+- **Reasoning:** installs fetch the catalog from `main` and take it when its version is higher than theirs (`LinuxEmulatorDatabase.refresh`). Pushing the version-3 file therefore fixes existing installs without a Flatpak rebuild.
+- **Verification:**
+  - `:shared:desktopTest` and `testDebugUnitTest` pass.
+  - The reporter confirmed the same arguments end to end on a Deck: launching worked, and save upload matched by SHA-256.
+  - Not run on this host: Eden is not installed here.
+- **Carry forward:** eleven more catalog entries have no `launch` entry: ryujinx, azahar, melonds, duckstation, pcsx2, vita3k, flycast, scummvm, mame4droid, aps3e and mupen64plus_fz. The evaluation is in `docs/desktop/emulator-launch-audit.md`.
