@@ -1,5 +1,9 @@
 package com.nendo.argosy.ui.screens.settings.delegates
 
+import com.nendo.argosy.data.social.uploader.UNASSIGNED_PLAY_DEVICE_ID
+import com.nendo.argosy.di.ApplicationContext
+import com.nendo.argosy.platform.PlatformContext as Context
+import com.nendo.argosy.platform.getString
 import com.nendo.argosy.res.ArgosyR as R
 import com.nendo.argosy.data.model.PlayTimeSnapshot
 import com.nendo.argosy.data.repository.GameRepository
@@ -27,6 +31,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class PlayTimeSettingsDelegate @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val playStatsRepository: PlayStatsRepository,
     private val platformRepository: PlatformRepository,
     private val gameRepository: GameRepository,
@@ -114,9 +119,12 @@ class PlayTimeSettingsDelegate @Inject constructor(
         platformNames: Map<String, String>,
         coverPaths: Map<Long, String>
     ): PlayTimeState {
-        val deviceNames = snapshot.devices.associate { it.deviceId to "${it.deviceManufacturer} ${it.deviceModel}".trim() }
+        val removedDevice = context.getString(R.string.settings_play_time_removed_device)
+        fun storedName(deviceId: String, manufacturer: String, model: String): String =
+            if (deviceId == UNASSIGNED_PLAY_DEVICE_ID) removedDevice else "$manufacturer $model".trim()
+        val deviceNames = snapshot.devices.associate { it.deviceId to storedName(it.deviceId, it.deviceManufacturer, it.deviceModel) }
         fun deviceName(deviceId: String, manufacturer: String, model: String): String =
-            deviceNames[deviceId] ?: "$manufacturer $model".trim()
+            deviceNames[deviceId] ?: storedName(deviceId, manufacturer, model)
         return copy(
             isLoading = false,
             hasLoaded = true,

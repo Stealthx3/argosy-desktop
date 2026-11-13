@@ -10,19 +10,33 @@ import com.nendo.argosy.data.remote.romm.RomMPlaySession
 import com.nendo.argosy.util.Logger
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import java.time.Duration
 import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
 
 private const val TAG = "PlaySessionPull"
 private const val PAGE_SIZE = 200
+private val FULL_PULL_INTERVAL: Duration = Duration.ofHours(24)
+
+const val UNASSIGNED_PLAY_DEVICE_ID = "romm-unassigned"
+private val UNASSIGNED_DEVICE = RomMDevice(
+    id = UNASSIGNED_PLAY_DEVICE_ID,
+    name = "",
+    platform = null,
+    client = null,
+    clientVersion = null
+)
 
 /**
  * Copies down the play sessions RomM holds for the account's other devices, so hours played
  * elsewhere count here. This device is skipped: its sessions originate locally, and a row the
- * ingest acknowledged as a duplicate carries no server id to match on. Runs after the
- * first-connect backfill, after each upload, on the [PlaySessionPullScheduler] cadence, and on
- * demand from the Play Time hub.
+ * ingest acknowledged as a duplicate carries no server id to match on. A full account pass,
+ * which also takes sessions whose device was removed, runs until one completes and then once
+ * per [FULL_PULL_INTERVAL]; runs in between ask each device only for sessions newer than the
+ * latest one held. A pulled session whose game and start time are already held is skipped.
+ * Runs after the first-connect backfill, after each upload, on the [PlaySessionPullScheduler]
+ * cadence, and on demand from the Play Time hub.
  */
 @Singleton
 class PlaySessionPull @Inject constructor(
@@ -49,6 +63,9 @@ class PlaySessionPull @Inject constructor(
         val ownerUserId = syncPreferencesRepository.getRommUserId() ?: return Summary(0, 0, "No account")
         val thisDeviceId = connectionManager.getDeviceId()
 
+        val relinked = playSessionDao.relinkPulledByRommId(ownerUserId)
+        if (relinked > 0) Logger.info(TAG, "run: relinked $relinked pulled sessions by rom id")
+
         val devices = try {
             val response = api.getDevices()
             if (!response.isSuccessful) return Summary(0, 0, "Devices returned ${response.code()}")
@@ -59,6 +76,64 @@ class PlaySessionPull @Inject constructor(
         }
 
         val romCache = HashMap<Long, PulledGameRef>()
+        val resolve: suspend (Long) -> PulledGameRef = { romId -> romCache.getOrPut(romId) { resolveGame(api, romId) } }
+        val now = Instant.now()
+        val lastFull = syncPreferencesRepository.getRommPlaySessionFullPull()
+        val summary = if (lastFull == null || Duration.between(lastFull, now) >= FULL_PULL_INTERVAL) {
+            pullAccount(api, devices, thisDeviceId, ownerUserId, resolve)
+        } else {
+            pullDevices(api, devices, thisDeviceId, ownerUserId, resolve)
+        }
+        if (summary.stoppedBy != null) return Summary(summary.added, summary.devices, summary.stoppedBy)
+        if (summary.full) syncPreferencesRepository.setRommPlaySessionFullPull(now)
+        syncPreferencesRepository.setRommPlaySessionLastPull(now)
+        Logger.info(TAG, "run: added=${summary.added} devices=${summary.devices} full=${summary.full}")
+        Summary(summary.added, summary.devices)
+    }
+
+    private data class PassResult(
+        val added: Int,
+        val devices: Int,
+        val full: Boolean,
+        val stoppedBy: String? = null
+    )
+
+    private suspend fun pullAccount(
+        api: RomMApi,
+        devices: List<RomMDevice>,
+        thisDeviceId: String?,
+        ownerUserId: Long,
+        resolve: suspend (Long) -> PulledGameRef
+    ): PassResult {
+        val byId = devices.associateBy { it.id }
+        val others = devices.count { it.id != thisDeviceId }
+        var added = 0
+        var offset = 0
+        while (true) {
+            val page = when (val result = fetchPage(api, null, null, offset)) {
+                is PageResult.Page -> result.sessions
+                is PageResult.Stopped -> return PassResult(added, others, full = false, stoppedBy = result.reason)
+            }
+            if (page.isEmpty()) break
+            page.filter { it.deviceId != thisDeviceId }
+                .groupBy { it.deviceId }
+                .forEach { (deviceId, sessions) ->
+                    val device = deviceId?.let { byId[it] ?: unknownDevice(it) } ?: UNASSIGNED_DEVICE
+                    added += insertMissing(sessions, device, ownerUserId, resolve)
+                }
+            if (page.size < PAGE_SIZE) break
+            offset += page.size
+        }
+        return PassResult(added, others, full = true)
+    }
+
+    private suspend fun pullDevices(
+        api: RomMApi,
+        devices: List<RomMDevice>,
+        thisDeviceId: String?,
+        ownerUserId: Long,
+        resolve: suspend (Long) -> PulledGameRef
+    ): PassResult {
         var added = 0
         var devicesDone = 0
         for (device in devices) {
@@ -66,34 +141,44 @@ class PlaySessionPull @Inject constructor(
             val since = playSessionDao.getLatestRommStartForDevice(device.id, ownerUserId)
             var offset = 0
             while (true) {
-                val page = try {
-                    val response = api.getPlaySessions(
-                        deviceId = device.id,
-                        startAfter = since?.toString(),
-                        limit = PAGE_SIZE,
-                        offset = offset
-                    )
-                    if (!response.isSuccessful) {
-                        return Summary(added, devicesDone, "Play sessions returned ${response.code()}")
-                    }
-                    response.body().orEmpty()
-                } catch (e: Exception) {
-                    Logger.error(TAG, "run: page failed | device=${device.id} offset=$offset", e)
-                    return Summary(added, devicesDone, e.message ?: "Network failure")
+                val page = when (val result = fetchPage(api, device.id, since, offset)) {
+                    is PageResult.Page -> result.sessions
+                    is PageResult.Stopped -> return PassResult(added, devicesDone, full = false, stoppedBy = result.reason)
                 }
                 if (page.isEmpty()) break
-                added += insertMissing(page, device, ownerUserId) { romId ->
-                    romCache.getOrPut(romId) { resolveGame(api, romId) }
-                }
+                added += insertMissing(page, device, ownerUserId, resolve)
                 if (page.size < PAGE_SIZE) break
                 offset += page.size
             }
             devicesDone++
         }
-        syncPreferencesRepository.setRommPlaySessionLastPull(Instant.now())
-        Logger.info(TAG, "run: added=$added devices=$devicesDone")
-        Summary(added, devicesDone)
+        return PassResult(added, devicesDone, full = false)
     }
+
+    private sealed interface PageResult {
+        data class Page(val sessions: List<RomMPlaySession>) : PageResult
+        data class Stopped(val reason: String) : PageResult
+    }
+
+    private suspend fun fetchPage(api: RomMApi, deviceId: String?, since: Instant?, offset: Int): PageResult =
+        try {
+            val response = api.getPlaySessions(
+                deviceId = deviceId,
+                startAfter = since?.toString(),
+                limit = PAGE_SIZE,
+                offset = offset
+            )
+            if (response.isSuccessful) {
+                PageResult.Page(response.body().orEmpty())
+            } else {
+                PageResult.Stopped("Play sessions returned ${response.code()}")
+            }
+        } catch (e: Exception) {
+            Logger.error(TAG, "run: page failed | device=$deviceId offset=$offset", e)
+            PageResult.Stopped(e.message ?: "Network failure")
+        }
+
+    private fun unknownDevice(id: String) = RomMDevice(id = id, name = null, platform = null, client = null, clientVersion = null)
 
     /**
      * Inserts every session in [page] whose server id is not already held, filed under the
@@ -110,6 +195,7 @@ class PlaySessionPull @Inject constructor(
         var alreadyHeld = 0
         var noRom = 0
         var unmappable = 0
+        var sameStart = 0
         for (remote in page) {
             if (remote.id in held) {
                 alreadyHeld++
@@ -125,6 +211,10 @@ class PlaySessionPull @Inject constructor(
                 unmappable++
                 continue
             }
+            if (playSessionDao.existsForOwnerByGameAndStart(ownerUserId, entity.gameId, entity.startTime)) {
+                sameStart++
+                continue
+            }
             playSessionDao.insert(entity)
             added++
         }
@@ -132,7 +222,7 @@ class PlaySessionPull @Inject constructor(
             Logger.info(
                 TAG,
                 "insertMissing: device=${device.id} page=${page.size} added=$added held=$alreadyHeld " +
-                    "noRom=$noRom unmappable=$unmappable sample=${page.firstOrNull()?.startTime}"
+                    "noRom=$noRom unmappable=$unmappable sameStart=$sameStart sample=${page.firstOrNull()?.startTime}"
             )
         }
         return added

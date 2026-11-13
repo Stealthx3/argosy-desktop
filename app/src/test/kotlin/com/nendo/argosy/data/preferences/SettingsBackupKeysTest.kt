@@ -40,7 +40,7 @@ class SettingsBackupKeysTest {
         "last_romm_sync", "last_romm_full_sync", "last_favorites_sync", "last_favorites_check", "last_negotiate_at",
         "last_state_validation", "sync_resume_completed", "sync_resume_generation",
         "social_last_play_session_sync", "emulator_update_last_check",
-        "romm_play_session_last_upload", "romm_play_session_last_pull"
+        "romm_play_session_last_upload", "romm_play_session_last_pull", "romm_play_session_full_pull"
     )
 
     private val oneShotAndVersionMarkers = setOf(

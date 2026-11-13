@@ -26,6 +26,8 @@ class PlaySessionPullTest {
     private val playSessionDao: PlaySessionDao = mockk {
         coEvery { insert(any()) } returns 1L
         coEvery { getLatestRommStartForDevice(any(), any()) } returns null
+        coEvery { relinkPulledByRommId(any()) } returns 0
+        coEvery { existsForOwnerByGameAndStart(any(), any(), any()) } returns false
     }
     private val gameDao: GameDao = mockk {
         coEvery { getByRommId(any()) } returns null
@@ -33,6 +35,8 @@ class PlaySessionPullTest {
     private val syncPreferencesRepository: SyncPreferencesRepository = mockk {
         coEvery { getRommUserId() } returns 7L
         coEvery { setRommPlaySessionLastPull(any()) } returns Unit
+        coEvery { getRommPlaySessionFullPull() } returns Instant.now()
+        coEvery { setRommPlaySessionFullPull(any()) } returns Unit
     }
     private val api: RomMApi = mockk()
     private val connectionManager: RomMConnectionManager = mockk {
@@ -147,6 +151,73 @@ class PlaySessionPullTest {
 
         assertEquals("Play sessions returned 500", summary.stoppedBy)
         coVerify(exactly = 0) { syncPreferencesRepository.setRommPlaySessionLastPull(any()) }
+    }
+
+    @Test
+    fun `without a completed full pass the whole account is paged, removed-device sessions included`() = runTest {
+        coEvery { syncPreferencesRepository.getRommPlaySessionFullPull() } returns null
+        coEvery { api.getDevices() } returns Response.success(listOf(otherDevice.copy(id = "dev-this"), otherDevice))
+        val firstPage = (1L..199L).map { remote(it) } + remote(200L).copy(deviceId = "dev-this")
+        val secondPage = listOf(remote(201L).copy(deviceId = null), remote(202L).copy(deviceId = null))
+        coEvery { api.getPlaySessions(null, null, null, null, 200, 0) } returns Response.success(firstPage)
+        coEvery { api.getPlaySessions(null, null, null, null, 200, 200) } returns Response.success(secondPage)
+        coEvery { playSessionDao.getHeldRommSessionIds(any()) } returns emptyList()
+        coEvery { api.getRom(99L) } returns Response.error(404, okhttp3.ResponseBody.create(null, ""))
+        val inserted = mutableListOf<PlaySessionEntity>()
+        coEvery { playSessionDao.insert(capture(inserted)) } returns 1L
+
+        val summary = pull.run()
+
+        assertEquals(PlaySessionPull.Summary(added = 201, devices = 1), summary)
+        assertEquals(199, inserted.count { it.deviceId == "dev-other" })
+        val removed = inserted.filter { it.deviceId == UNASSIGNED_PLAY_DEVICE_ID }
+        assertEquals(listOf(201L, 202L), removed.map { it.rommSessionId })
+        assertEquals("", removed.first().deviceModel)
+        coVerify(exactly = 0) { api.getPlaySessions(any(), "dev-other", any(), any(), any(), any()) }
+        coVerify(exactly = 1) { syncPreferencesRepository.setRommPlaySessionFullPull(any()) }
+        coVerify(exactly = 1) { playSessionDao.relinkPulledByRommId(7L) }
+    }
+
+    @Test
+    fun `a full pass that stops early is not recorded, so the next run pages the account again`() = runTest {
+        coEvery { syncPreferencesRepository.getRommPlaySessionFullPull() } returns null
+        coEvery { api.getDevices() } returns Response.success(listOf(otherDevice))
+        coEvery { api.getPlaySessions(null, null, null, null, 200, 0) } returns
+            Response.success((1L..200L).map { remote(it) })
+        coEvery { api.getPlaySessions(null, null, null, null, 200, 200) } returns
+            Response.error(502, okhttp3.ResponseBody.create(null, ""))
+        coEvery { playSessionDao.getHeldRommSessionIds(any()) } returns emptyList()
+        coEvery { api.getRom(99L) } returns Response.error(404, okhttp3.ResponseBody.create(null, ""))
+
+        val summary = pull.run()
+
+        assertEquals("Play sessions returned 502", summary.stoppedBy)
+        assertEquals(200, summary.added)
+        coVerify(exactly = 0) { syncPreferencesRepository.setRommPlaySessionFullPull(any()) }
+        coVerify(exactly = 0) { syncPreferencesRepository.setRommPlaySessionLastPull(any()) }
+    }
+
+    @Test
+    fun `a full pass older than a day runs again`() = runTest {
+        coEvery { syncPreferencesRepository.getRommPlaySessionFullPull() } returns Instant.now().minusSeconds(25 * 3600)
+        coEvery { api.getDevices() } returns Response.success(listOf(otherDevice))
+        coEvery { api.getPlaySessions(null, null, null, null, 200, 0) } returns Response.success(emptyList())
+
+        pull.run()
+
+        coVerify(exactly = 1) { api.getPlaySessions(null, null, null, null, 200, 0) }
+        coVerify(exactly = 1) { syncPreferencesRepository.setRommPlaySessionFullPull(any()) }
+    }
+
+    @Test
+    fun `a session whose game and start time are already held is skipped`() = runTest {
+        coEvery { playSessionDao.getHeldRommSessionIds(any()) } returns emptyList()
+        coEvery { playSessionDao.existsForOwnerByGameAndStart(7L, -99L, Instant.parse("2026-05-15T12:00:00Z")) } returns true
+
+        val added = pull.insertMissing(listOf(remote(9)), otherDevice, 7L, unresolved)
+
+        assertEquals(0, added)
+        coVerify(exactly = 0) { playSessionDao.insert(any()) }
     }
 
     @Test

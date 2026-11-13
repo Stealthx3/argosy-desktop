@@ -5121,6 +5121,8 @@
     <string name="settings_play_time_entry_last_played">Last played %s</string>
     <!-- Badge in the device legend for the device the launcher is running on. -->
     <string name="settings_play_time_this_device">This device</string>
+    <!-- Device name shown for play sessions RomM holds without a device, after their device was removed from RomM -->
+    <string name="settings_play_time_removed_device">Removed device</string>
     <!-- Name shown for a session whose game could not be identified. -->
     <string name="settings_play_time_unknown_game">Unknown game</string>
 

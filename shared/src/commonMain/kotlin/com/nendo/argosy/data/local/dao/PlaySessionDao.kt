@@ -154,6 +154,25 @@ interface PlaySessionDao {
     """)
     suspend fun relinkOrphans(ownerUserId: Long?): Int
 
+    @Query("""
+        UPDATE play_sessions SET gameId = (
+            SELECT g.id FROM games g WHERE g.rommId = -play_sessions.gameId
+        )
+        WHERE ownerUserId IS :ownerUserId
+          AND rommSessionId IS NOT NULL
+          AND gameId < 0
+          AND (SELECT COUNT(*) FROM games g WHERE g.rommId = -play_sessions.gameId) = 1
+    """)
+    suspend fun relinkPulledByRommId(ownerUserId: Long?): Int
+
+    @Query("""
+        SELECT EXISTS(
+            SELECT 1 FROM play_sessions
+            WHERE ownerUserId IS :ownerUserId AND gameId = :gameId AND startTime = :startTime
+        )
+    """)
+    suspend fun existsForOwnerByGameAndStart(ownerUserId: Long?, gameId: Long, startTime: Instant): Boolean
+
     @Query("DELETE FROM play_sessions WHERE ownerUserId = :ownerUserId")
     suspend fun deleteByOwner(ownerUserId: Long)
 

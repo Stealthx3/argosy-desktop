@@ -1848,3 +1848,28 @@ The owner's tests are the step 5 side-by-side checklist and the alpha 5.4 Game M
   - `build-alpha.sh` from c9ce669b8; the installed jar contains `SmoothImageDecoder`.
   - Host walk with `pad-walk.sh flatpak` (`build/walk-issue2/`): Home covers render cleanly, focused and unfocused, with no errors in the run log.
   - Then `publish-repo.sh` (signed) → `push-pages.sh --step-close 5.4`, the same label as earlier owner-requested publishes (`gh-pages` b875a5c, app commit 9f559ced).
+
+### 2026-11-13 — Play-session pull: full account pass, removed-device sessions, relink by RomM id (issue #3, owner: "Fix the pull now")
+- **Problem:**
+  - A Deck held 8 of the 83 Metroid sessions RomM keeps for the Thor.
+  - Sessions RomM keeps with no device (their device was deleted, and the column is `ON DELETE SET NULL`) were never pulled.
+- **Causes (shared code, identical in upstream's `PlaySessionPull`):**
+  - Each device was paged from the newest session start already held. RomM lists newest first, so a first pull that stopped partway left the older history unfetched for good.
+  - The pull asked device by device, and a `device_id` filter cannot express NULL.
+  - Rows pulled before their game was in the library were filed under `-romId`. `relinkOrphans` only moved them by IGDB id plus platform.
+- **Fix:**
+  - `PlaySessionPull` pages the whole account (no `device_id`) until one pass reaches the end, then again every 24 h. The time of the last complete pass is the DataStore key `romm_play_session_full_pull`, which is cleared on account change and sign-out.
+  - Runs in between keep the per-device incremental pull.
+  - Sessions with no device are filed under the token `romm-unassigned`, and the Play Time hub names it "Removed device" (`settings_play_time_removed_device`).
+  - A pulled session whose game and start time the owner already holds is skipped (`existsForOwnerByGameAndStart`). This stops the same session counting twice when a re-registered device uploaded it again.
+  - Each run first relinks pulled `-romId` rows to the library game with that `rommId` (`relinkPulledByRommId`).
+- **Not changed:** the per-game counter still counts only this device's play, as in upstream. Showing an account-wide total is on the next-release list.
+- **Verification:**
+  - `PlaySessionPullTest` has new cases: full account pass, removed-device rows, an interrupted pass not recorded, the 24 h repeat, and the same-start skip. `SettingsBackupKeysTest` classifies the new key.
+  - RomM 5.1.0 testbed contract check (scratch script, everything it created was removed afterwards):
+    - deleting a device leaves its sessions with `device_id` null;
+    - only the account-wide list returns them, newest first;
+    - `limit`/`offset` are honoured;
+    - the `device_id` filter misses them.
+  - `:shared:desktopTest` and `testDebugUnitTest` pass.
+- **Not covered:** the app has not been run end to end against a server holding removed-device history, and it has not been checked on the reporter's Deck. Android shares this code but was not run.
