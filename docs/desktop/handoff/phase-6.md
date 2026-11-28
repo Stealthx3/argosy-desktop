@@ -19,7 +19,7 @@ Owner decisions: new ID, repo renamed to `Stealthx3/icebreaker-client`, name sta
 - **Tag** `icebreaker-v1.0.1` at `cd3ee5457`; `main` pushed to the renamed repo.
 - **Published:** Pages `https://stealthx3.github.io/icebreaker-client/` (1.0.1; a fresh throwaway install works); the old address `https://stealthx3.github.io/IceBreaker/` is the user-site folder `IceBreaker/` with the end-of-life rebase (`flatpak update` on a throwaway 1.0.0 install rebased it to 1.0.1); GitHub Release `icebreaker-v1.0.1` (x86_64 bundle from the local build; CI's x86_64 and aarch64 bundles replace it when the CI run finishes).
 - **Not verified:** a real start of 1.0.1 (it would move the owner's real data out of the old ID's folder); the Steam re-add on a real Steam; the data move after a real rebase on a machine.
-- **Open (owner):** icesuite-test still serves 0.5.0 under the old ID (catalog `catalog/icebreaker.json`); moving those users needs an end-of-life build published there, which is outside "only on the IceBreaker page".
+- **icesuite-test (owner: "Yes, publish it"):** catalog PR #7 merged (`app_id` now the new ID); `gh-pages` `8f56a153b8d3`: `io.github.stealthx3.IceBreaker` end-of-life with the rebase, `io.github.stealthx3.icebreaker-client` 1.0.1 added; 516.6 MB of 950. A throwaway 0.5.0 install from icesuite-test rebased to 1.0.1 on `flatpak update`. Published on `lab-icefin-qa2` (lent by IceFin QA, with a QA walk running: fresh site clone, low priority, their `~/icesuite-site` untouched); IceFin QA told to sync.
 
 ## Phase 6 plan (proposed)
 
