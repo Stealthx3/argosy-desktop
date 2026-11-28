@@ -11,6 +11,21 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 - **Other sessions' uncommitted files:** `docs/desktop/flathub-plan.md`, `docs/desktop/upstream-2.31-triage.md`, `scripts/desktop/vmlab/lab.sh`, `gm-define.sh`, `qemu-venus.sh`. Leave them alone.
 - **Lab VMs** are shut down (owner pause, 2026-11-27). Start only what a step needs; the IceFin guests are shared.
 
+## Before the gate: app ID change to `io.github.stealthx3.icebreaker-client` (1.0.1)
+
+Owner decisions 2026-11-28 (after the Phase 5 close, before Phase 6): new app ID `io.github.stealthx3.icebreaker-client`; repo renamed `Stealthx3/IceBreaker` → `Stealthx3/icebreaker-client` (Flathub checks `github.com/stealthx3/icebreaker-client` for `io.github.` IDs; a dash is allowed only in the last component); display name stays **IceBreaker**; existing installs move by **end-of-life rebase**; ships **now as 1.0.1** with a new tag. Reason: Flathub already has `org.mattdm.icebreaker`. **Not started** beyond the inventory (weekly usage at 48%).
+
+Inventory (2026-11-28): 90 references in ~31 tracked files (outside DEVLOG and handoffs); 14 files named after the ID (manifests `.yml`/`.flathub.yml`, `.desktop`, metainfo, 8 PNG icons, 2 SVG icons); code: `SandboxPermission.APP_ID`, `AppsRepository.desktop.kt` (`ARGOSY_DESKTOP_ID`), tests `BrandRelocationTest`, `FlatpakInfoTest`; `.github/workflows` (2), `scripts/desktop` (9), `packaging/steam` (1), docs.
+
+Order:
+1. **Rename in code:** IDs, file names, `X-Flatpak-RenamedFrom` (add the IceBreaker `.desktop`), metainfo `<id>`, `<provides>`/replaces for both old IDs, screenshots URLs, version 1.0.1 and its release entry.
+2. **Data move:** extend `BrandRelocation` so data under `~/.var/app/io.github.stealthx3.IceBreaker` moves to the new ID (chained after the Argosy Desktop step); test with `BrandRelocationTest`.
+3. **Steam:** `steam-shortcut.json` and the helper config for the new ID; existing shortcuts run the old ID, so the first start refreshes them (Add to Steam's refresh path).
+4. **Gate:** `:shared:desktopTest`, `testDebugUnitTest`, `flatpak-builder-lint`, a Flatpak build and start; then tag `icebreaker-v1.0.1`.
+5. **Repo rename** on GitHub (`gh repo rename icebreaker-client`), update `origin`, links and the `catalog`.
+6. **Publish:** new Pages repo at `/icebreaker-client/`; an end-of-life rebase build for `io.github.stealthx3.IceBreaker` served where the old `/IceBreaker/` address lives (user site folder `IceBreaker/`, like `argosy-desktop/`), and for icesuite-test's 0.5.0 users (needs the owner's OK to publish there); the GitHub Release 1.0.1 with bundles.
+7. **Docs:** guide, disclosure, README notice, `CLAUDE.md`, `DECISIONS.md`.
+
 ## Phase 6 plan (proposed)
 
 1. **Flathub follow-through.** The owner writes the manifest, runs the generator on `icebreaker-v1.0.0` and opens the PR. Claude fixes app-side review findings in this repo only; never on the PR, never in the manifest.
