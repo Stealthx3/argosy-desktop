@@ -30,7 +30,7 @@ copy() {
 copy "$new_repo" "app/$new_id/x86_64/master" --end-of-life="$bridge_reason"
 copy "$new_repo" "runtime/$new_id.Debug/x86_64/master" --end-of-life="$bridge_reason"
 copy "$old_repo" "app/$old_id/x86_64/master" --end-of-life="$reason" --end-of-life-rebase="$old_id=$new_id"
-copy "$old_repo" "runtime/$old_id.Debug/x86_64/master" --end-of-life="$reason" --end-of-life-rebase="$old_id.Debug=$new_id.Debug"
+copy "$old_repo" "runtime/$old_id.Debug/x86_64/master" --end-of-life="$reason"
 flatpak build-update-repo "${sign[@]}" --generate-static-deltas --prune --title="IceBreaker (retired ID)" "$out/repo"
 
 gpg_line=""

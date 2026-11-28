@@ -6,29 +6,24 @@ Rewritten (not appended) at the end of every work unit, so a fresh session can s
 
 ## State
 
-- **Pacer:** `phase-gate`. It never resumes from there; wait for the owner.
-- **Git:** `main` was pushed at the Phase 5 close (normal push, no rewrite). Tags `icebreaker-v1.0.0` (at `6e7234b8b`) and `icebreaker-v0.5.0` unchanged.
+- **Pacer:** `phase-gate`. It never resumes from there; wait for the owner. Usage limits are suspended for this project (owner, 2026-11-28).
+- **Git:** remote `git@github.com:Stealthx3/icebreaker-client.git` (renamed 2026-11-28). Tags `icebreaker-v1.0.1` (at `cd3ee5457`), `icebreaker-v1.0.0`, `icebreaker-v0.5.0`. No history rewrite.
 - **Other sessions' uncommitted files:** `docs/desktop/flathub-plan.md`, `docs/desktop/upstream-2.31-triage.md`, `scripts/desktop/vmlab/lab.sh`, `gm-define.sh`, `qemu-venus.sh`. Leave them alone.
 - **Lab VMs** are shut down (owner pause, 2026-11-27). Start only what a step needs; the IceFin guests are shared.
 
-## Before the gate: app ID change to `io.github.stealthx3.icebreaker-client` (1.0.1)
+## Done before the gate: app ID `io.github.stealthx3.icebreaker-client` (1.0.1, 2026-11-28)
 
-Owner decisions 2026-11-28 (after the Phase 5 close, before Phase 6): new app ID `io.github.stealthx3.icebreaker-client`; repo renamed `Stealthx3/IceBreaker` → `Stealthx3/icebreaker-client` (Flathub checks `github.com/stealthx3/icebreaker-client` for `io.github.` IDs; a dash is allowed only in the last component); display name stays **IceBreaker**; existing installs move by **end-of-life rebase**; ships **now as 1.0.1** with a new tag. Reason: Flathub already has `org.mattdm.icebreaker`. **Not started** beyond the inventory (weekly usage at 48%).
+Owner decisions: new ID, repo renamed to `Stealthx3/icebreaker-client`, name stays IceBreaker, existing installs move by end-of-life rebase, shipped as 1.0.1; usage limits ignored for this project until the owner says otherwise.
 
-Inventory (2026-11-28): 90 references in ~31 tracked files (outside DEVLOG and handoffs); 14 files named after the ID (manifests `.yml`/`.flathub.yml`, `.desktop`, metainfo, 8 PNG icons, 2 SVG icons); code: `SandboxPermission.APP_ID`, `AppsRepository.desktop.kt` (`ARGOSY_DESKTOP_ID`), tests `BrandRelocationTest`, `FlatpakInfoTest`; `.github/workflows` (2), `scripts/desktop` (9), `packaging/steam` (1), docs.
-
-Order:
-1. **Rename in code:** IDs, file names, `X-Flatpak-RenamedFrom` (add the IceBreaker `.desktop`), metainfo `<id>`, `<provides>`/replaces for both old IDs, screenshots URLs, version 1.0.1 and its release entry.
-2. **Data move:** extend `BrandRelocation` so data under `~/.var/app/io.github.stealthx3.IceBreaker` moves to the new ID (chained after the Argosy Desktop step); test with `BrandRelocationTest`.
-3. **Steam:** `steam-shortcut.json` and the helper config for the new ID; existing shortcuts run the old ID, so the first start refreshes them (Add to Steam's refresh path).
-4. **Gate:** `:shared:desktopTest`, `testDebugUnitTest`, `flatpak-builder-lint`, a Flatpak build and start; then tag `icebreaker-v1.0.1`.
-5. **Repo rename** on GitHub (`gh repo rename icebreaker-client`), update `origin`, links and the `catalog`.
-6. **Publish:** new Pages repo at `/icebreaker-client/`; an end-of-life rebase build for `io.github.stealthx3.IceBreaker` served where the old `/IceBreaker/` address lives (user site folder `IceBreaker/`, like `argosy-desktop/`), and for icesuite-test's 0.5.0 users (needs the owner's OK to publish there); the GitHub Release 1.0.1 with bundles.
-7. **Docs:** guide, disclosure, README notice, `CLAUDE.md`, `DECISIONS.md`.
+- **Code:** ID, file names, URLs; `BrandRelocation` moves data from either earlier Flatpak ID (marker version 2); a version-1 marker sets `.steam-shortcut-stale`, so the Steam screen offers Add, which updates the old shortcut in place. `:shared:desktopTest` 186/186. Not run locally: `testDebugUnitTest` (CI Build covers it).
+- **Tag** `icebreaker-v1.0.1` at `cd3ee5457`; `main` pushed to the renamed repo.
+- **Published:** Pages `https://stealthx3.github.io/icebreaker-client/` (1.0.1; a fresh throwaway install works); the old address `https://stealthx3.github.io/IceBreaker/` is the user-site folder `IceBreaker/` with the end-of-life rebase (`flatpak update` on a throwaway 1.0.0 install rebased it to 1.0.1); GitHub Release `icebreaker-v1.0.1` (x86_64 bundle from the local build; CI's x86_64 and aarch64 bundles replace it when the CI run finishes).
+- **Not verified:** a real start of 1.0.1 (it would move the owner's real data out of the old ID's folder); the Steam re-add on a real Steam; the data move after a real rebase on a machine.
+- **Open (owner):** icesuite-test still serves 0.5.0 under the old ID (catalog `catalog/icebreaker.json`); moving those users needs an end-of-life build published there, which is outside "only on the IceBreaker page".
 
 ## Phase 6 plan (proposed)
 
-1. **Flathub follow-through.** The owner writes the manifest, runs the generator on `icebreaker-v1.0.0` and opens the PR. Claude fixes app-side review findings in this repo only; never on the PR, never in the manifest.
+1. **Flathub follow-through.** The owner writes the manifest, runs the generator on `icebreaker-v1.0.1` and opens the PR. Claude fixes app-side review findings in this repo only; never on the PR, never in the manifest.
 2. **Catalog and Eden (5c).** Vita3K, ScummVM, PICO-8, xemu; Flycast VMU, Azahar and PPSSPP save paths; m3u multi-disc launch; Eden keys and firmware.
 3. **RetroArch core installs (5d).** Fetch a missing core from the libretro buildbot into the RetroArch Flatpak's `cores/`.
 4. **Screenshot upload (5e).** Watch each emulator's screenshot folder during the session; hand off to upstream's upload queue.
@@ -47,7 +42,7 @@ Order:
 
 ## Publishing (owner decision 2026-11-28)
 
-Stable releases go to IceBreaker's own Pages Flatpak repo (`https://stealthx3.github.io/IceBreaker/`) and to a GitHub Release with `.flatpak` bundles. The recipe is in `docs/desktop/gotchas.md`.
+Stable releases go to IceBreaker's own Pages Flatpak repo (`https://stealthx3.github.io/icebreaker-client/`) and to a GitHub Release with `.flatpak` bundles. The recipe is in `docs/desktop/gotchas.md`.
 
 ## Gotchas
 

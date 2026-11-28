@@ -53,12 +53,12 @@ guide as "AI-assisted". So:
 | License declared | ✅ | `GPL-3.0-only` in the metainfo; `LICENSE` is the GPL v3 text. |
 | License files installed for every module | ⚠️ | The 26.08 test build installs libass's, libplacebo's and IceBreaker's. mpv, sigil (MPL-2.0) and the Steam helper install none. Your manifest must install each one under `/app/share/licenses/io.github.stealthx3.icebreaker-client/<module>`. |
 | Metainfo passes validation | ✅ | `flatpak-builder-lint appstream` and `appstreamcli validate --pedantic` both pass. The only pedantic note is the capital letters in the ID, which is normal for GitHub IDs. |
-| Screenshots | ✅ | 4 screenshots with captions, pinned to the tag `icebreaker-v1.0.0` (pushed 2026-11-27; all four links load). |
+| Screenshots | ✅ | 4 screenshots with captions, pinned to the tag `icebreaker-v1.0.1` (pushed 2026-11-28). |
 | Desktop file | ✅ | `desktop-file-validate` passes. |
 | Icons | ✅ | Scalable SVG, PNGs up to 512×512, and a symbolic icon. |
-| Name and icon are distinct; no implied affiliation | ⚠️ | The description credits Argosy and the RomM team and says IceBreaker isn't affiliated with or endorsed by rommapp.  **Found 2026-11-28:** Flathub already has a game named "icebreaker" (`org.mattdm.icebreaker`). The app IDs differ, but reviewers may ask about the shared name; decide before you submit whether to keep "IceBreaker" or give the store name a qualifier, and mention it in your PR. |
+| Name and icon are distinct; no implied affiliation | ⚠️ | The description credits Argosy and the RomM team and says IceBreaker isn't affiliated with or endorsed by rommapp. Flathub already has a game named "icebreaker" (`org.mattdm.icebreaker`). **Decided 2026-11-28:** the app ID is now `io.github.stealthx3.icebreaker-client` (repo `Stealthx3/icebreaker-client`), and the name stays "IceBreaker" (your choice). Mention the existing game in your PR, in case a reviewer asks about the shared name. |
 | Metadata lives in the app's own repo | ✅ | `desktopApp/flatpak/` (desktop file, metainfo, icons). |
-| Stable release | ✅ | 1.0.0 (owner, 2026-11-27) is a stable release in the metainfo, and the beta line is gone. Earlier releases stay marked `development`, as they were. |
+| Stable release | ✅ | 1.0.1 (2026-11-28, the app ID change on top of 1.0.0) is a stable release in the metainfo, and the beta line is gone. Earlier releases stay marked `development`, as they were. |
 | Localisation | ⚠️ | Flathub bars machine-generated and mixed translations. 157 of the port's strings were translated by Claude into each of 6 languages, and Brazilian Portuguese shows those 157 in English. **Owner decision 2026-11-27: keep them and disclose them** (`AI-DISCLOSURE.md` names them). Risk: this rule is worded as a ban, not left to reviewers' discretion. If a reviewer objects, the fallback is an English-only desktop build, which Claude can make. |
 
 ### Build and packaging
@@ -74,9 +74,9 @@ guide as "AI-assisted". So:
 
 ## Decide these before you write anything
 
-1. **Release version and status: done.** You chose 1.0.0. The version, the stable metainfo release and
-   the pinned screenshots are in the repo. The tag `icebreaker-v1.0.0` is pushed (2026-11-27, at
-   `6e7234b8b`, the commit CI built on both architectures); point your manifest at that tag.
+1. **Release version and status: done.** 1.0.1, the first release under the new app ID
+   `io.github.stealthx3.icebreaker-client` (2026-11-28). The tag `icebreaker-v1.0.1` is pushed (at
+   `cd3ee5457`); point your manifest at that tag and its commit.
    `icebreaker-v0.5.0` doesn't have the aarch64 fix.
 2. **Translations: decided.** You chose to keep them and disclose them. Mention them in your PR; if a
    reviewer asks, the options are native-speaker review or an English-only desktop build.
@@ -172,7 +172,7 @@ Run it yourself on the release you submit, so the list in your PR is one you pro
    changes included, so don't run it in a working copy with changes.
 
    ```bash
-   git clone --recurse-submodules --branch icebreaker-v1.0.0 https://github.com/Stealthx3/icebreaker-client.git ~/icebreaker-release
+   git clone --recurse-submodules --branch icebreaker-v1.0.1 https://github.com/Stealthx3/icebreaker-client.git ~/icebreaker-release
    ```
 
 2. Run the generator from that copy. Give it a new folder for its scratch work; it deletes and
