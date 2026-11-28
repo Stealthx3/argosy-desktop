@@ -1,0 +1,11 @@
+[Flatpak Ref]
+Title=IceBreaker
+Name=io.github.stealthx3.icebreaker-client
+Branch=master
+Url=https://stealthx3.github.io/icebreaker-client/repo/
+SuggestRemoteName=icebreaker
+Homepage=https://github.com/Stealthx3/icebreaker-client
+Icon=https://raw.githubusercontent.com/Stealthx3/icebreaker-client/main/desktopApp/flatpak/icons/hicolor/scalable/apps/io.github.stealthx3.icebreaker-client.svg
+IsRuntime=false
+RuntimeRepo=https://dl.flathub.org/repo/flathub.flatpakrepo
+GPGKey=mDMEatu0rRYJKwYBBAHaRw8BAQdAcH5J+GkRCbmsIU5ETY7y7ZiJXb7+PByVP5Zepl2lP2O0L0FyZ29zeSBEZXNrdG9wIEZsYXRwYWsgcmVwbyAoYWxwaGEgc2lnbmluZyBrZXkpiJAEExYKADgWIQRcyIxWO8vNT3HQlid93uWWrrXxhgUCatu0rQIbAwULCQgHAgYVCgkICwIEFgIDAQIeAQIXgAAKCRB93uWWrrXxhv6GAQD8hG7wX8VvgcMHnN2hzhmaFhm+EfUXBuuPYVSTBSNN8gEAslNhXMtXJjDisMDUYcs1PTYErHKZJp88cffP++SeDQs=
