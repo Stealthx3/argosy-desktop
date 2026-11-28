@@ -2,6 +2,7 @@ package com.nendo.argosy.data.repository
 
 import com.nendo.argosy.data.apps.HostAppLaunch
 import com.nendo.argosy.data.apps.HostApplications
+import com.nendo.argosy.data.model.SandboxPermission
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
@@ -49,12 +50,12 @@ actual class AppsRepository @Inject constructor() {
     actual fun getAppLabel(packageName: String): String? = HostApplications.find(packageName)?.name
 
     actual fun isArgosy(packageName: String): Boolean =
-        packageName == ARGOSY_DESKTOP_ID || packageName.startsWith("$ARGOSY_DESKTOP_ID.")
+        ARGOSY_DESKTOP_IDS.any { packageName == it || packageName.startsWith("$it.") }
 
     actual fun isPackageUpdating(packageName: String): Boolean = false
 
     actual fun isPackageMissing(packageName: String): Boolean = false
 }
 
-private const val ARGOSY_DESKTOP_ID = "io.github.stealthx3.IceBreaker"
+private val ARGOSY_DESKTOP_IDS = listOf(SandboxPermission.APP_ID, "io.github.stealthx3.IceBreaker", "io.github.stealthx3.ArgosyDesktop")
 private const val CHANGE_POLL_MS = 10_000L

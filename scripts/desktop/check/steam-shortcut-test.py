@@ -85,12 +85,12 @@ def main():
         code, out = helper("add", root, "--yes")
         results.append(check("add exits 0", code == 0))
         d = load(vdf)["shortcuts"]
-        ours = [e for e in d.values() if e.get("FlatpakAppID") == "io.github.stealthx3.IceBreaker"]
+        ours = [e for e in d.values() if e.get("FlatpakAppID") == "io.github.stealthx3.icebreaker-client"]
         results.append(check("one IceBreaker entry", len(ours) == 1))
         results.append(check("other game unchanged", d["0"] == other))
         e = ours[0]
         results.append(check("name, exe and launch options", e["AppName"] == "IceBreaker" and e["Exe"] == "\"/usr/bin/flatpak\""
-                             and e["LaunchOptions"].startswith("run io.github.stealthx3.IceBreaker")))
+                             and e["LaunchOptions"].startswith("run io.github.stealthx3.icebreaker-client")))
         results.append(check("IceSuite tag", "IceSuite" in e["tags"].values()))
         sid = e["appid"] & 0xFFFFFFFF
         grid = os.path.join(cfg, "grid")

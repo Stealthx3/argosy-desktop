@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Builds the Argosy Desktop alpha Flatpak and installs it for the current user, beside the
-# Gradle dev run (the Flatpak keeps its data under ~/.var/app/io.github.stealthx3.IceBreaker).
+# Gradle dev run (the Flatpak keeps its data under ~/.var/app/io.github.stealthx3.icebreaker-client).
 # Steps: jlink distributable from Gradle, flatpak-builder into build/flatpak/repo (the repo the
 # alpha is published from), user install, then flatpak-builder-lint on the manifest and repo.
 #
@@ -8,7 +8,7 @@
 set -euo pipefail
 root="$(cd "$(dirname "$0")/../../.." && pwd)"
 cd "$root"
-app_id=io.github.stealthx3.IceBreaker
+app_id=io.github.stealthx3.icebreaker-client
 manifest=desktopApp/flatpak/$app_id.yml
 out=build/flatpak
 mkdir -p "$out"

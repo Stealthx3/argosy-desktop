@@ -20,7 +20,7 @@ object LinuxEmulatorDatabase {
     data class Database(val version: Int, val emulators: List<LinuxEmulator>)
 
     const val REMOTE_URL =
-        "https://raw.githubusercontent.com/Stealthx3/IceBreaker/main/shared/src/desktopMain/resources/emulators/linux-emulators.json"
+        "https://raw.githubusercontent.com/Stealthx3/icebreaker-client/main/shared/src/desktopMain/resources/emulators/linux-emulators.json"
     private const val RESOURCE = "/emulators/linux-emulators.json"
     private const val CACHE_NAME = "linux-emulators.json"
     private const val TIMEOUT_SECONDS = 15L

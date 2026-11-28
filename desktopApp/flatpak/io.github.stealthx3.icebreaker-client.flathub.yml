@@ -1,10 +1,13 @@
-# Beta manifest: packages the jlink distributable that `./gradlew :desktopApp:createDistributable`
-# builds on the host (scripts/desktop/flatpak/build-alpha.sh). The offline, from-source build
-# Flathub needs is Phase 5. SDL3, libdbus and libsecret come from the 26.08 runtime.
-app-id: io.github.stealthx3.IceBreaker
+# Flathub manifest: builds IceBreaker from source with no network. Gradle runs --offline against
+# offline-repository/, laid out from generated/gradle-sources.json (scripts/desktop/flatpak/
+# gradle-sources.py); -Pargosy.desktopOnly=true with an empty ANDROID_HOME skips everything Android.
+# For Flathub, the two git sources take the release tag and commit instead of path: ../..
+app-id: io.github.stealthx3.icebreaker-client
 runtime: org.freedesktop.Platform
 runtime-version: '26.08'
 sdk: org.freedesktop.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.openjdk21
 command: icebreaker
 finish-args:
   - --share=network
@@ -106,17 +109,18 @@ modules:
     buildsystem: simple
     build-commands:
       - cmake -S sigil -B build -DSIGIL_BUILD_JNI_HOST=ON -DCMAKE_BUILD_TYPE=Release
-          -DJAVA_INCLUDE_PATH=$PWD/jni-include -DJAVA_INCLUDE_PATH2=$PWD/jni-include/linux
-          -DJAVA_AWT_INCLUDE_PATH=$PWD/jni-include -DJAVA_AWT_LIBRARY=unused -DJAVA_JVM_LIBRARY=unused
+          -DJAVA_INCLUDE_PATH=$JDK/include -DJAVA_INCLUDE_PATH2=$JDK/include/linux
+          -DJAVA_AWT_INCLUDE_PATH=$JDK/include -DJAVA_AWT_LIBRARY=unused -DJAVA_JVM_LIBRARY=unused
       - cmake --build build --target sigil_jni_host -j $FLATPAK_BUILDER_N_JOBS
       - install -Dm755 build/bindings/libsigil-jni.so -t /app/lib/icebreaker/lib/app
+    build-options:
+      env:
+        JDK: /usr/lib/sdk/openjdk21/jvm/openjdk-21
     sources:
-      - type: dir
+      - type: git
         path: ../../sigil
+        branch: HEAD
         dest: sigil
-      - type: dir
-        path: ../build/jni-include
-        dest: jni-include
   - name: steam-shortcut
     buildsystem: simple
     build-commands:
@@ -128,23 +132,32 @@ modules:
         path: ../../packaging/steam
   - name: icebreaker
     buildsystem: simple
+    build-options:
+      append-path: /usr/lib/sdk/openjdk21/bin
+      env:
+        JAVA_HOME: /usr/lib/sdk/openjdk21/jvm/openjdk-21
+        GRADLE_USER_HOME: /run/build/icebreaker/gradle-home
+        ANDROID_HOME: /run/build/icebreaker/empty-sdk
+        ARGOSY_OFFLINE_REPOSITORY: /run/build/icebreaker/offline-repository
     build-commands:
+      - mkdir -p empty-sdk
+      - gradle-dist/bin/gradle --no-daemon --offline --console=plain
+          --init-script desktopApp/flatpak/offline.init.gradle.kts
+          -Pargosy.desktopOnly=true :desktopApp:createDistributable
       - mkdir -p /app/lib/icebreaker
-      - cp -a distributable/. /app/lib/icebreaker/
-      - install -Dm755 icebreaker.sh /app/bin/icebreaker
-      - install -Dm644 io.github.stealthx3.IceBreaker.desktop -t /app/share/applications
-      - install -Dm644 io.github.stealthx3.IceBreaker.metainfo.xml -t /app/share/metainfo
-      - mkdir -p /app/share/icons && cp -r icons/hicolor /app/share/icons/
+      - cp -a desktopApp/build/compose/binaries/main/app/icebreaker/. /app/lib/icebreaker/
+      - rm -rf /app/lib/icebreaker/bin /app/lib/icebreaker/lib/runtime
+      - /usr/lib/sdk/openjdk21/install.sh
+      - install -Dm755 desktopApp/flatpak/icebreaker-jre.sh /app/bin/icebreaker
+      - install -Dm644 desktopApp/flatpak/io.github.stealthx3.icebreaker-client.desktop -t /app/share/applications
+      - install -Dm644 desktopApp/flatpak/io.github.stealthx3.icebreaker-client.metainfo.xml -t /app/share/metainfo
+      - mkdir -p /app/share/icons && cp -r desktopApp/flatpak/icons/hicolor /app/share/icons/
     sources:
-      - type: dir
-        path: ../build/compose/binaries/main/app/icebreaker
-        dest: distributable
-      - type: file
-        path: icebreaker.sh
-      - type: file
-        path: io.github.stealthx3.IceBreaker.desktop
-      - type: file
-        path: io.github.stealthx3.IceBreaker.metainfo.xml
-      - type: dir
-        path: icons
-        dest: icons
+      - type: git
+        path: ../..
+        branch: HEAD
+      - type: archive
+        url: https://services.gradle.org/distributions/gradle-8.9-bin.zip
+        sha256: d725d707bfabd4dfdc958c624003b3c80accc03f7037b5122c4b1d0ef15cecab
+        dest: gradle-dist
+      - generated/gradle-sources.json

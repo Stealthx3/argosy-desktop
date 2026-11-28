@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Writes the Flathub submission files for one release: <out>/io.github.stealthx3.IceBreaker.yml and
-<out>/generated/gradle-sources.json, from desktopApp/flatpak/io.github.stealthx3.IceBreaker.flathub.yml
+Writes the Flathub submission files for one release: <out>/io.github.stealthx3.icebreaker-client.yml and
+<out>/generated/gradle-sources.json, from desktopApp/flatpak/io.github.stealthx3.icebreaker-client.flathub.yml
 with its local git and dir sources replaced by GitHub URLs pinned to the release tag and commit.
 
 usage: python3 -I scripts/desktop/flatpak/flathub-submission.py <tag> <commit> <out-dir>
@@ -11,8 +11,8 @@ import subprocess
 import sys
 from pathlib import Path
 
-APP_ID = "io.github.stealthx3.IceBreaker"
-APP_URL = "https://github.com/Stealthx3/IceBreaker.git"
+APP_ID = "io.github.stealthx3.icebreaker-client"
+APP_URL = "https://github.com/Stealthx3/icebreaker-client.git"
 SIGIL_URL = "https://github.com/rommapp/argosy-sigil.git"
 SRC = Path(f"desktopApp/flatpak/{APP_ID}.flathub.yml")
 

@@ -48,7 +48,7 @@ class BrandRelocationTest {
         oldLibrary.resolve("gb/b.gb").writeText("b")
         library.resolve("nes").mkdirs()
 
-        val dataHome = home.resolve(".var/app/io.github.stealthx3.IceBreaker/data")
+        val dataHome = home.resolve(".var/app/io.github.stealthx3.icebreaker-client/data")
         val oldData = home.resolve(".var/app/io.github.stealthx3.ArgosyDesktop/data/argosy-desktop")
         val oldDataPath = oldData.path
         oldData.resolve("datastore").mkdirs()
@@ -99,6 +99,37 @@ class BrandRelocationTest {
         assertEquals("new", library.resolve("nes/a.nes").readText())
         assertEquals("old", oldLibrary.resolve("nes/a.nes").readText())
         assertEquals(listOf("${library.path}/nes/a.nes"), readDatabase(data.resolve("alauncher.db")))
+    }
+
+    @Test
+    fun movesTheIceBreakerFlatpakDataToTheNewAppIdAndFlagsTheSteamShortcut() {
+        val dataHome = home.resolve(".var/app/io.github.stealthx3.icebreaker-client/data")
+        val oldData = home.resolve(".var/app/io.github.stealthx3.IceBreaker/data/icebreaker")
+        writeDatabase(oldData.resolve("alauncher.db"), listOf("${oldData.path}/external/downloads/gb/c.gb", "/elsewhere/d.gb"))
+        oldData.resolve(".brand-relocation").writeText("1")
+
+        relocation(dataHome, sandboxed = true).run()
+
+        val data = dataHome.resolve("icebreaker")
+        assertFalse(oldData.exists())
+        assertEquals(
+            listOf("${data.path}/external/downloads/gb/c.gb", "/elsewhere/d.gb"),
+            readDatabase(data.resolve("alauncher.db")),
+        )
+        assertEquals("2", data.resolve(".brand-relocation").readText())
+        assertTrue(data.resolve(BrandRelocation.STEAM_SHORTCUT_STALE).isFile)
+    }
+
+    @Test
+    fun aFreshInstallDoesNotFlagTheSteamShortcut() {
+        val dataHome = home.resolve(".local/share")
+        val data = dataHome.resolve("icebreaker").apply { mkdirs() }
+        writeDatabase(data.resolve("alauncher.db"), listOf("/elsewhere/d.gb"))
+
+        relocation(dataHome, sandboxed = false).run()
+
+        assertEquals("2", data.resolve(".brand-relocation").readText())
+        assertFalse(data.resolve(BrandRelocation.STEAM_SHORTCUT_STALE).exists())
     }
 
     @Test

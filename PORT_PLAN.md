@@ -336,7 +336,7 @@ Four decisions shape everything after Phase 0; settle them in the first two week
 Owner decisions in Phase 5 (2026-11-21):
 
 - **RetroArch cores.** Decided: the launcher installs the core a launch needs from the libretro buildbot into the RetroArch Flatpak's core folder.
-- **App id and store listing.** Decided: the app is renamed to IceBreaker in the Flathub submission step with app id `io.github.stealthx3.IceBreaker` and the repo renamed to `Stealthx3/IceBreaker`; the store screenshots are taken after the rename. IceBreaker adds itself to Steam with its art (Steam Shortcut Standard, `docs/standards/`).
+- **App id and store listing.** Decided: the app is renamed to IceBreaker in the Flathub submission step with app id `io.github.stealthx3.icebreaker-client` and the repo renamed to `Stealthx3/IceBreaker`; the store screenshots are taken after the rename. IceBreaker adds itself to Steam with its art (Steam Shortcut Standard, `docs/standards/`). **Changed 2026-11-28 (owner):** app id `io.github.stealthx3.icebreaker-client`, repo `Stealthx3/icebreaker-client`, name still IceBreaker, from 1.0.1; Flathub already lists `org.mattdm.icebreaker`.
 - **Brightness.** Decided: left out on desktop.
 - **Upstream merge.** Decided: upstream v2.31.0 is merged in step 5 with the Linux adaptations listed in `DEVLOG.md` (2026-11-21); v3.0 waits for its stable release.
 

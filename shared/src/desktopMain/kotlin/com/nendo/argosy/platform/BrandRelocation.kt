@@ -34,11 +34,13 @@ class BrandRelocation(
             moves += PathMove(sameBase.path, target.path)
             if (!target.exists() && sameBase.isDirectory && sameBase.renameTo(target)) movedSomething = true
             if (sandboxed) {
-                val oldFlatpak = home.resolve(".var/app/$PREVIOUS_APP_ID/$kind/$PREVIOUS_APP_FOLDER")
-                moves += PathMove(oldFlatpak.path, target.path)
-                if (!target.exists() && runHostScript(MOVE_FOLDER, listOf(oldFlatpak.path, target.path)).orEmpty().contains("moved")) {
-                    Logger.info(TAG, "moved the previous Flatpak's $kind folder")
-                    movedSomething = true
+                for (previous in PREVIOUS_FLATPAKS) {
+                    val oldFlatpak = home.resolve(".var/app/${previous.appId}/$kind/${previous.folder}")
+                    moves += PathMove(oldFlatpak.path, target.path)
+                    if (!target.exists() && runHostScript(MOVE_FOLDER, listOf(oldFlatpak.path, target.path)).orEmpty().contains("moved")) {
+                        Logger.info(TAG, "moved the $kind folder of ${previous.appId}")
+                        movedSomething = true
+                    }
                 }
             }
         }
@@ -55,9 +57,13 @@ class BrandRelocation(
             Logger.warn(TAG, "previous library folder is on another device; left in place")
         }
         val marker = data.resolve(MARKER)
-        if (!movedSomething && marker.isFile) return
+        val markerVersion = runCatching { marker.readText().trim() }.getOrNull()
+        if (!movedSomething && markerVersion == MARKER_VERSION) return
         if (!data.isDirectory) return
         rewriteStoredPaths(data, moves)
+        if (markerVersion != null && markerVersion != MARKER_VERSION) {
+            runCatching { data.resolve(STEAM_SHORTCUT_STALE).writeText("") }
+        }
         runCatching { marker.writeText(MARKER_VERSION) }
     }
 
@@ -79,11 +85,15 @@ class BrandRelocation(
         private const val TAG = "BrandRelocation"
         const val APP_FOLDER = "icebreaker"
         const val PREVIOUS_APP_FOLDER = "argosy-desktop"
-        const val PREVIOUS_APP_ID = "io.github.stealthx3.ArgosyDesktop"
+        val PREVIOUS_FLATPAKS = listOf(
+            PreviousFlatpak("io.github.stealthx3.IceBreaker", APP_FOLDER),
+            PreviousFlatpak("io.github.stealthx3.ArgosyDesktop", PREVIOUS_APP_FOLDER),
+        )
         const val LIBRARY = "Games/IceBreaker"
         const val PREVIOUS_LIBRARY = "Games/Argosy"
         private const val MARKER = ".brand-relocation"
-        private const val MARKER_VERSION = "1"
+        private const val MARKER_VERSION = "2"
+        const val STEAM_SHORTCUT_STALE = ".steam-shortcut-stale"
 
         private val MOVE_FOLDER = """
             [ -d "$1" ] && [ ! -L "$1" ] && [ ! -e "$2" ] || exit 0
@@ -115,10 +125,15 @@ class BrandRelocation(
             echo merged
         """.trimIndent()
 
+        private fun xdg(variable: String, fallback: String): File {
+            val home = System.getProperty("user.home")
+            return File(System.getenv(variable)?.takeIf { it.isNotBlank() } ?: (home + fallback))
+        }
+
+        fun steamShortcutStaleFlag(): File = xdg("XDG_DATA_HOME", "/.local/share").resolve(APP_FOLDER).resolve(STEAM_SHORTCUT_STALE)
+
         fun forThisMachine(): BrandRelocation {
             val home = File(System.getProperty("user.home"))
-            fun xdg(variable: String, fallback: String) =
-                File(System.getenv(variable)?.takeIf { it.isNotBlank() } ?: (home.path + fallback))
             return BrandRelocation(
                 home = home,
                 dataHome = xdg("XDG_DATA_HOME", "/.local/share"),
@@ -131,6 +146,8 @@ class BrandRelocation(
 }
 
 data class PathMove(val from: String, val to: String)
+
+data class PreviousFlatpak(val appId: String, val folder: String)
 
 class PathRewriter(moves: List<PathMove>) {
     private val rules = moves.filter { it.from != it.to }.distinct().map { move ->

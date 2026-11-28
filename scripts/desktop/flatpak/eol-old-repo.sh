@@ -8,7 +8,7 @@ root="$(cd "$(dirname "$0")/../../.." && pwd)"
 cd "$root"
 src=build/flatpak/repo
 old_id=io.github.stealthx3.ArgosyDesktop
-new_id=io.github.stealthx3.IceBreaker
+new_id=io.github.stealthx3.icebreaker-client
 url=https://stealthx3.github.io/argosy-desktop/repo/
 reason="Argosy Desktop is now IceBreaker ($new_id). Accept the replacement to keep your settings and downloads. New home: https://stealthx3.github.io/icesuite-test/"
 bridge_reason="This copy of IceBreaker comes from the closed Argosy Desktop repository and gets no more updates. Switch to the IceSuite test repository (your data stays): flatpak remote-add --user --if-not-exists icesuite-test https://stealthx3.github.io/icesuite-test/flatpak/icesuite-test.flatpakrepo && flatpak install --user --reinstall icesuite-test $new_id"
@@ -38,8 +38,8 @@ flatpak build-update-repo "${sign[@]}" --generate-static-deltas --prune --title=
 
 gpg_line=""
 [ -n "$key" ] && gpg_line="GPGKey=$(gpg ${GNUPGHOME:+--homedir "$GNUPGHOME"} --export "$key" | base64 -w0)"
-homepage=https://github.com/Stealthx3/IceBreaker
-icon=https://raw.githubusercontent.com/Stealthx3/IceBreaker/main/desktopApp/flatpak/icons/hicolor/scalable/apps/io.github.stealthx3.IceBreaker.svg
+homepage=https://github.com/Stealthx3/icebreaker-client
+icon=https://raw.githubusercontent.com/Stealthx3/icebreaker-client/main/desktopApp/flatpak/icons/hicolor/scalable/apps/io.github.stealthx3.icebreaker-client.svg
 {
   echo "[Flatpak Repo]"
   echo "Title=Argosy Desktop"

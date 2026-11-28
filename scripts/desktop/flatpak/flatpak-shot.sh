@@ -5,7 +5,7 @@ set -u
 out=$1
 settle=${2:-20}
 size=${3:-1920x1080}
-app_id=io.github.stealthx3.IceBreaker
+app_id=io.github.stealthx3.icebreaker-client
 root="$(cd "$(dirname "$0")/../../.." && pwd)"
 cd "$root"
 mkdir -p build/desktop-logs "$(dirname "$out")"

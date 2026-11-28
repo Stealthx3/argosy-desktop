@@ -1,14 +1,16 @@
 # IceBreaker
 
 > [!IMPORTANT]
-> **Argosy Desktop is now IceBreaker.** The app id changed to `io.github.stealthx3.IceBreaker`, and releases now come from [IceBreaker's own Flatpak repository](https://stealthx3.github.io/IceBreaker/) (test builds from the [IceSuite test repository](https://stealthx3.github.io/icesuite-test/)). The old `io.github.stealthx3.ArgosyDesktop` gets no more updates.
+> **IceBreaker has a new app ID: `io.github.stealthx3.icebreaker-client`** (from 1.0.1). It was `io.github.stealthx3.icebreaker-client`, and before that Argosy Desktop's `io.github.stealthx3.ArgosyDesktop`. The name stays IceBreaker. Releases come from [IceBreaker's own Flatpak repository](https://stealthx3.github.io/icebreaker-client/) (test builds from the [IceSuite test repository](https://stealthx3.github.io/icesuite-test/)). The old IDs get no more updates.
 >
-> **Already have Argosy Desktop?** Pick one:
+> **Already have IceBreaker or Argosy Desktop?** Pick one:
 >
-> - **Update in place:** run `flatpak update --user` and answer **yes** when it offers to replace Argosy Desktop with `io.github.stealthx3.IceBreaker`. Settings, sign-in and downloads move with it.
-> - **Install fresh:** remove the old app with `flatpak uninstall --user io.github.stealthx3.ArgosyDesktop` (without `--delete-data`), then install IceBreaker as shown under [Install](#install). On its first start, IceBreaker moves the old app's settings and downloads over.
+> - **Update in place:** run `flatpak update --user` and answer **yes** when it offers to replace the old app with `io.github.stealthx3.icebreaker-client`. Settings, sign-in and downloads move with it.
+> - **Install fresh:** remove the old app with `flatpak uninstall --user <old ID>` (without `--delete-data`), then install IceBreaker as shown under [Install](#install). On its first start, IceBreaker moves the old app's settings and downloads over.
 >
-> Either way, your games folder `~/Games/Argosy` becomes `~/Games/IceBreaker` on the first start, and the saved paths follow it. Emulator saves are not touched.
+> **Added IceBreaker to Steam?** After the switch, open **Settings → Add to Steam** and add it again with Steam closed; the existing shortcut is updated in place and keeps its play time.
+>
+> Coming from Argosy Desktop, your games folder `~/Games/Argosy` becomes `~/Games/IceBreaker` on the first start, and the saved paths follow it. Emulator saves are not touched.
 
 IceBreaker is a Linux port of the [Argosy launcher](https://github.com/rommapp/argosy-launcher), shipped as a Flatpak. Based on Argosy by the RomM team; an independent port, not affiliated with or endorsed by rommapp. It runs Argosy's own interface on the Linux desktop and connects to a [RomM](https://github.com/rommapp/romm) server for your library, downloads and save sync. Play from a PC handheld, a mouse and keyboard, or from the couch.
 
@@ -63,17 +65,17 @@ You need Flatpak (preinstalled on Fedora, SteamOS, Bazzite and Linux Mint; on Ub
 Install the stable release from IceBreaker's own Flatpak repository (signed; `flatpak update` keeps it current):
 
 ```bash
-flatpak install --user --from https://stealthx3.github.io/IceBreaker/io.github.stealthx3.IceBreaker.flatpakref
+flatpak install --user --from https://stealthx3.github.io/icebreaker-client/io.github.stealthx3.icebreaker-client.flatpakref
 ```
 
 Or add the repository once and install from it:
 
 ```bash
-flatpak remote-add --user --if-not-exists icebreaker https://stealthx3.github.io/IceBreaker/icebreaker.flatpakrepo
+flatpak remote-add --user --if-not-exists icebreaker https://stealthx3.github.io/icebreaker-client/icebreaker.flatpakrepo
 ```
 
 ```bash
-flatpak install --user icebreaker io.github.stealthx3.IceBreaker
+flatpak install --user icebreaker io.github.stealthx3.icebreaker-client
 ```
 
 Test builds come from the IceSuite test repository ([Stealthx3/icesuite-test](https://github.com/Stealthx3/icesuite-test)), which serves every IceSuite app.
@@ -88,15 +90,15 @@ flatpak install --user flathub org.libretro.RetroArch
 
 - **Steam and Steam Deck:** **Settings → Add to Steam** (also offered once at the end of setup) adds IceBreaker to Steam with its capsule, banner, logo and icon, in the `IceSuite` collection. Quit Steam completely first, including its tray icon. On a Deck, do this in Desktop Mode, then start IceBreaker from Game Mode. Steam from Flathub also needs, once: `flatpak override --user --talk-name=org.freedesktop.Flatpak com.valvesoftware.Steam`.
 - **Updates:** `flatpak update` (the repository is signed; your data stays).
-- **Uninstall:** first use **Settings → Add to Steam → Remove from Steam** if you added it (Flatpak cannot remove the Steam shortcut on uninstall), then `flatpak uninstall --user io.github.stealthx3.IceBreaker` (add `--delete-data` to remove settings; games in `~/Games/IceBreaker` stay).
+- **Uninstall:** first use **Settings → Add to Steam → Remove from Steam** if you added it (Flatpak cannot remove the Steam shortcut on uninstall), then `flatpak uninstall --user io.github.stealthx3.icebreaker-client` (add `--delete-data` to remove settings; games in `~/Games/IceBreaker` stay).
 
-Back up emulator saves before turning on Save Sync. Report bugs in [Issues](https://github.com/Stealthx3/IceBreaker/issues) with a log of a run that shows the problem:
+Back up emulator saves before turning on Save Sync. Report bugs in [Issues](https://github.com/Stealthx3/icebreaker-client/issues) with a log of a run that shows the problem:
 
 ```bash
-flatpak run io.github.stealthx3.IceBreaker > ~/icebreaker-run.log 2>&1
+flatpak run io.github.stealthx3.icebreaker-client > ~/icebreaker-run.log 2>&1
 ```
 
-Releases, including single-file `.flatpak` bundles for x86_64 and aarch64, are on the [Releases page](https://github.com/Stealthx3/IceBreaker/releases).
+Releases, including single-file `.flatpak` bundles for x86_64 and aarch64, are on the [Releases page](https://github.com/Stealthx3/icebreaker-client/releases).
 
 ## How it works
 
@@ -117,7 +119,7 @@ The restructure is scripted (`scripts/desktop/restructure/`) so it re-applies to
 JDK 21 is required; the Android SDK only for the Android app.
 
 ```bash
-git clone https://github.com/Stealthx3/IceBreaker.git
+git clone https://github.com/Stealthx3/icebreaker-client.git
 cd IceBreaker
 git submodule update --init --recursive
 ./gradlew :desktopApp:run

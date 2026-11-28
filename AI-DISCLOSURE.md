@@ -147,4 +147,4 @@ Recording what a real build downloads, as these scripts do, covers all of these 
 
 ## Questions
 
-Open an issue at https://github.com/Stealthx3/IceBreaker/issues.
+Open an issue at https://github.com/Stealthx3/icebreaker-client/issues.

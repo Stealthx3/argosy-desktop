@@ -20,7 +20,12 @@ actual class SteamShortcuts @Inject constructor() {
     actual val isSupported: Boolean get() = helper.canExecute() && config.isFile
 
     actual suspend fun status(): SteamShortcutStatus = withContext(Dispatchers.IO) {
-        if (!isSupported) SteamShortcutStatus() else SteamHelperOutput.status(runHelper("status"))
+        if (!isSupported) {
+            SteamShortcutStatus()
+        } else {
+            val status = SteamHelperOutput.status(runHelper("status"))
+            if (status.present && BrandRelocation.steamShortcutStaleFlag().exists()) status.copy(present = false) else status
+        }
     }
 
     actual suspend fun run(operation: SteamShortcutOperation): SteamShortcutOutcome = withContext(Dispatchers.IO) {
@@ -30,7 +35,9 @@ actual class SteamShortcuts @Inject constructor() {
             SteamShortcutOperation.UPDATE_ART -> runHelper("refresh")
             SteamShortcutOperation.REMOVE -> runHelper("remove", "--yes")
         }
-        SteamHelperOutput.outcome(operation, result)
+        SteamHelperOutput.outcome(operation, result).also { outcome ->
+            if (operation == SteamShortcutOperation.ADD && outcome.success) BrandRelocation.steamShortcutStaleFlag().delete()
+        }
     }
 
     fun refreshArtInBackground() {

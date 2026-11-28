@@ -19,7 +19,7 @@ export JAVA_HOME=${JAVA_HOME:-$HOME/.jdks/jdk-21.0.12.1+1}
 export JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS:-} -Dskiko.vsync.enabled=false"
 mkdir -p build/desktop-logs "$outdir"
 log="build/desktop-logs/$(date +%Y%m%d-%H%M%S)-desktop-run.log"
-app_id=io.github.stealthx3.IceBreaker
+app_id=io.github.stealthx3.icebreaker-client
 if [ "${DRIVE_TARGET:-}" = flatpak ]; then
   # The installed Flatpak sees only its own ~/.var/app tree, so the pipe lives there.
   fifo="$HOME/.var/app/$app_id/cache/key-pipe"

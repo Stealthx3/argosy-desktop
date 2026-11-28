@@ -20,7 +20,7 @@ concurrency:
 
 jobs:
   sync:
-    if: github.repository == 'Stealthx3/IceBreaker'
+    if: github.repository == 'Stealthx3/icebreaker-client'
     runs-on: ubuntu-latest
     steps:
       - name: Check out the upstream branch

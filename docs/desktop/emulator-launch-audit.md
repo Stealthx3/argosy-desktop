@@ -1,6 +1,6 @@
 # Emulator launch audit (2026-11-12)
 
-Follow-up to [issue #1](https://github.com/Stealthx3/IceBreaker/issues/1). Eden was fixed in catalog version 3, commit d21dd4641.
+Follow-up to [issue #1](https://github.com/Stealthx3/icebreaker-client/issues/1). Eden was fixed in catalog version 3, commit d21dd4641.
 
 The catalog is `shared/src/desktopMain/resources/emulators/linux-emulators.json`. An entry can only launch games if it has a `launch` object. Without one, `LinuxLaunch.standalone()` returns null and the user sees "Failed to launch <name>". Nothing in the UI hides or marks these emulators, so they are detected and can be chosen, but they never start a game.
 

@@ -13,7 +13,7 @@ class FlatpakInfoTest {
 
     private fun info(filesystems: String, extraContext: String = "", bus: String = "org.freedesktop.Flatpak=talk") = """
         [Application]
-        name=io.github.stealthx3.IceBreaker
+        name=io.github.stealthx3.icebreaker-client
 
         [Context]
         shared=network;ipc;
@@ -72,14 +72,14 @@ class FlatpakInfoTest {
     @Test
     fun theFixCommandNamesTheApp() {
         assertEquals(
-            "flatpak override --user --talk-name=org.freedesktop.Flatpak io.github.stealthx3.IceBreaker",
+            "flatpak override --user --talk-name=org.freedesktop.Flatpak io.github.stealthx3.icebreaker-client",
             FlatpakOverrideCommand.of(listOf(SandboxPermission.HOST_ACCESS.flag))
         )
     }
 
     @Test
     fun theEmulatorFolderListMatchesTheManifest() {
-        val manifest = File("../desktopApp/flatpak/io.github.stealthx3.IceBreaker.yml").readLines()
+        val manifest = File("../desktopApp/flatpak/io.github.stealthx3.icebreaker-client.yml").readLines()
             .map { it.trim() }
             .filter { it.startsWith("- --filesystem=") }
             .map { it.removePrefix("- --filesystem=") }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-  <id>io.github.stealthx3.IceBreaker</id>
+  <id>io.github.stealthx3.icebreaker-client</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0-only</project_license>
   <name>IceBreaker</name>
@@ -25,31 +25,32 @@
       IceBreaker is an independent port and is not affiliated with or endorsed by rommapp.
     </p>
   </description>
-  <launchable type="desktop-id">io.github.stealthx3.IceBreaker.desktop</launchable>
+  <launchable type="desktop-id">io.github.stealthx3.icebreaker-client.desktop</launchable>
   <provides>
+    <id>io.github.stealthx3.IceBreaker</id>
     <id>io.github.stealthx3.ArgosyDesktop</id>
   </provides>
   <screenshots>
     <screenshot type="default">
-      <image>https://raw.githubusercontent.com/Stealthx3/IceBreaker/icebreaker-v1.0.0/docs/desktop/screenshots/icebreaker-home.png</image>
+      <image>https://raw.githubusercontent.com/Stealthx3/icebreaker-client/icebreaker-v1.0.1/docs/desktop/screenshots/icebreaker-home.png</image>
       <caption>Your RomM library on the home screen, driven by a controller</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Stealthx3/IceBreaker/icebreaker-v1.0.0/docs/desktop/screenshots/icebreaker-game-details.png</image>
+      <image>https://raw.githubusercontent.com/Stealthx3/icebreaker-client/icebreaker-v1.0.1/docs/desktop/screenshots/icebreaker-game-details.png</image>
       <caption>Game details with Play, favorites and per-game settings</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Stealthx3/IceBreaker/icebreaker-v1.0.0/docs/desktop/screenshots/icebreaker-left-menu.png</image>
+      <image>https://raw.githubusercontent.com/Stealthx3/icebreaker-client/icebreaker-v1.0.1/docs/desktop/screenshots/icebreaker-left-menu.png</image>
       <caption>The left menu: collections, library, downloads, sync and settings</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Stealthx3/IceBreaker/icebreaker-v1.0.0/docs/desktop/screenshots/icebreaker-add-to-steam.png</image>
+      <image>https://raw.githubusercontent.com/Stealthx3/icebreaker-client/icebreaker-v1.0.1/docs/desktop/screenshots/icebreaker-add-to-steam.png</image>
       <caption>Add IceBreaker to Steam with its artwork, for Game Mode</caption>
     </screenshot>
   </screenshots>
-  <url type="homepage">https://github.com/Stealthx3/IceBreaker</url>
-  <url type="bugtracker">https://github.com/Stealthx3/IceBreaker/issues</url>
-  <url type="vcs-browser">https://github.com/Stealthx3/IceBreaker</url>
+  <url type="homepage">https://github.com/Stealthx3/icebreaker-client</url>
+  <url type="bugtracker">https://github.com/Stealthx3/icebreaker-client/issues</url>
+  <url type="vcs-browser">https://github.com/Stealthx3/icebreaker-client</url>
   <branding>
     <color type="primary" scheme_preference="light">#80e5ff</color>
     <color type="primary" scheme_preference="dark">#06445e</color>
@@ -71,6 +72,11 @@
   </supports>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="1.0.1" date="2026-11-28">
+      <description>
+        <p>New app ID, io.github.stealthx3.icebreaker-client; the name stays IceBreaker. Installs of io.github.stealthx3.IceBreaker switch over with flatpak update, and settings, sign-in and downloads come along. If you added IceBreaker to Steam, open Settings, then Add to Steam, and add it again with Steam closed: the existing shortcut is updated in place.</p>
+      </description>
+    </release>
     <release version="1.0.0" date="2026-11-27">
       <description>
         <p>The first stable release of IceBreaker, after beta testing as Argosy Desktop 0.3 to 0.5.</p>

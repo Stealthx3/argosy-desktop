@@ -7,7 +7,7 @@ key=${2:-}
 case "$url" in */) ;; *) url="$url/" ;; esac
 root="$(cd "$(dirname "$0")/../../.." && pwd)"
 cd "$root"
-app_id=io.github.stealthx3.IceBreaker
+app_id=io.github.stealthx3.icebreaker-client
 out=build/flatpak
 repo=$out/repo
 [ -f "$repo/config" ] || { echo "no repo at $repo: run build-alpha.sh first" >&2; exit 1; }
@@ -21,8 +21,8 @@ if [ -n "$key" ]; then
 fi
 flatpak build-update-repo "${sign[@]}" --generate-static-deltas --prune \
   --title="IceBreaker" "$repo"
-homepage=https://github.com/Stealthx3/IceBreaker
-icon=https://raw.githubusercontent.com/Stealthx3/IceBreaker/main/desktopApp/flatpak/icons/hicolor/scalable/apps/$app_id.svg
+homepage=https://github.com/Stealthx3/icebreaker-client
+icon=https://raw.githubusercontent.com/Stealthx3/icebreaker-client/main/desktopApp/flatpak/icons/hicolor/scalable/apps/$app_id.svg
 {
   echo "[Flatpak Repo]"
   echo "Title=IceBreaker"
